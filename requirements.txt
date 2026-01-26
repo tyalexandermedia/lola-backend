@@ -1,0 +1,10 @@
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+pydantic==2.6.1
+pydantic-settings==2.1.0
+sqlmodel==0.0.14
+requests==2.31.0
+beautifulsoup4==4.12.3
+sendgrid==6.11.0
+python-multipart==0.0.9
+email-validator==2.1.0
