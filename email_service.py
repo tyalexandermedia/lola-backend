@@ -70,7 +70,7 @@ def send_audit_email(to_email: str, name: str, audit_results: Dict):
     """
     
     message = Mail(
-        from_email='audits@tyalexandermedia.com',
+        from_email='ty@tyalexandermedia.com',
         to_emails=to_email,
         subject='Your Free SEO Audit Results - Lola',
         html_content=html_content
@@ -108,7 +108,7 @@ def send_owner_notification(owner_email: str, lead_data: Dict):
     """
     
     message = Mail(
-        from_email='audits@tyalexandermedia.com',
+        from_email='ty@tyalexandermedia.com',
         to_emails=owner_email,
         subject=f'New Lead: {lead_data["name"]} - {lead_data["business_type"]}',
         html_content=html_content
