@@ -14,7 +14,6 @@ from config import settings
 
 app = FastAPI(title="Lola SEO Audit API", version="1.0.0")
 
-# CORS Configuration
 origins = settings.ALLOWED_ORIGINS.split(",") if settings.ALLOWED_ORIGINS else ["*"]
 
 app.add_middleware(
@@ -25,15 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Startup: Create database
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
     print("✅ Database initialized")
     print(f"✅ CORS enabled for: {origins}")
 
-
-# Request/Response Models
 class AuditRequest(BaseModel):
     name: str
     email: EmailStr
@@ -48,7 +44,6 @@ class AuditRequest(BaseModel):
             raise ValueError('Field cannot be empty')
         return v.strip()
 
-
 class AuditResponse(BaseModel):
     lead_id: str
     summary: str
@@ -58,8 +53,6 @@ class AuditResponse(BaseModel):
     thirty_day_plan: List[str]
     disclaimer: str
 
-
-# Admin authentication
 def verify_admin_key(x_admin_key: str = Header(None)):
     if not settings.ADMIN_KEY:
         raise HTTPException(status_code=500, detail="Admin key not configured")
@@ -67,23 +60,13 @@ def verify_admin_key(x_admin_key: str = Header(None)):
         raise HTTPException(status_code=403, detail="Invalid admin key")
     return True
 
-
-# Routes
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
     return {"ok": True, "service": "Lola SEO Audit API", "timestamp": datetime.utcnow().isoformat()}
-
 
 @app.post("/audit", response_model=AuditResponse)
 async def create_audit(request: AuditRequest, session: Session = Depends(get_session)):
-    """
-    Main audit endpoint - analyzes website and returns SEO findings
-    """
-        print(f"⚠️ EMAIL ERROR: {email_error}")
-    import traceback
-    traceback.print_exc()
-        # Run SEO audit
+    try:
         print(f"🔍 Starting audit for {request.website}")
         audit_results = run_seo_audit(
             website=str(request.website),
@@ -91,7 +74,6 @@ async def create_audit(request: AuditRequest, session: Session = Depends(get_ses
             location=request.location
         )
         
-        # Create lead record
         lead = Lead(
             name=request.name,
             email=request.email,
@@ -108,17 +90,18 @@ async def create_audit(request: AuditRequest, session: Session = Depends(get_ses
         
         print(f"✅ Lead saved with ID: {lead.id}")
         
-        # Send emails (non-blocking, failures won't crash the API)
         try:
             if settings.SENDGRID_API_KEY:
+                print(f"📧 Attempting to send email to {request.email}")
                 send_audit_email(
                     to_email=request.email,
                     name=request.name,
                     audit_results=audit_results
                 )
-                print(f"📧 Audit email sent to {request.email}")
+                print(f"✅ Audit email sent to {request.email}")
                 
                 if settings.OWNER_EMAIL:
+                    print(f"📧 Sending owner notification to {settings.OWNER_EMAIL}")
                     send_owner_notification(
                         owner_email=settings.OWNER_EMAIL,
                         lead_data={
@@ -129,11 +112,14 @@ async def create_audit(request: AuditRequest, session: Session = Depends(get_ses
                             "location": request.location
                         }
                     )
-                    print(f"📧 Owner notification sent to {settings.OWNER_EMAIL}")
+                    print(f"✅ Owner notification sent to {settings.OWNER_EMAIL}")
+            else:
+                print("⚠️ SENDGRID_API_KEY not set, skipping email")
         except Exception as email_error:
-            print(f"⚠️ Email sending failed (non-critical): {email_error}")
+            print(f"❌ EMAIL ERROR: {email_error}")
+            import traceback
+            traceback.print_exc()
         
-        # Return structured response
         return AuditResponse(
             lead_id=str(lead.id),
             summary=audit_results["summary"],
@@ -148,19 +134,14 @@ async def create_audit(request: AuditRequest, session: Session = Depends(get_ses
         print(f"❌ Audit failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Audit failed: {str(e)}")
 
-
 @app.get("/leads")
 async def get_leads(
     session: Session = Depends(get_session),
     admin_verified: bool = Depends(verify_admin_key)
 ):
-    """
-    Admin endpoint - returns last 50 leads with masked emails
-    """
     statement = select(Lead).order_by(Lead.created_at.desc()).limit(50)
     leads = session.exec(statement).all()
     
-    # Mask emails for privacy
     def mask_email(email: str) -> str:
         parts = email.split("@")
         if len(parts) != 2:
@@ -189,10 +170,8 @@ async def get_leads(
         ]
     }
 
-
 @app.get("/")
 async def root():
-    """API information"""
     return {
         "service": "Lola SEO Audit API",
         "version": "1.0.0",
@@ -203,7 +182,9 @@ async def root():
         }
     }
 
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
