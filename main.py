@@ -80,7 +80,9 @@ async def create_audit(request: AuditRequest, session: Session = Depends(get_ses
     """
     Main audit endpoint - analyzes website and returns SEO findings
     """
-    try:
+        print(f"⚠️ EMAIL ERROR: {email_error}")
+    import traceback
+    traceback.print_exc()
         # Run SEO audit
         print(f"🔍 Starting audit for {request.website}")
         audit_results = run_seo_audit(
