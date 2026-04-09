@@ -40,11 +40,13 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ── CORS ─────────────────────────────────────────────────────────
-origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",")]
+_raw_origins = settings.ALLOWED_ORIGINS or "*"
+origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+# Always allow all origins in Railway — tighten once live domain confirmed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

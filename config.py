@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     LOLA_SECRET_ADMIN_KEY: str = "lola-admin-change-me"
 
     # CORS
-    ALLOWED_ORIGINS: str = "*"
+    ALLOWED_ORIGINS: str = "https://lola-seo.vercel.app,https://links.tyalexandermedia.com,http://localhost:3000"
 
     # Notifications
     RESEND_API_KEY: Optional[str] = None
