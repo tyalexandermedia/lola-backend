@@ -31,7 +31,7 @@ async def _noop(): return {'ok': False, 'error': 'instagram_removed'}
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("lola")
 
-app = FastAPI(title="LOLA SEO API", version="3.0.0")
+app = FastAPI(title="LOLA SEO API", version="3.0.0", debug=True)
 
 app.add_middleware(
     CORSMiddleware,
