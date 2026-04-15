@@ -11,8 +11,11 @@ from .revenue import calculate_revenue_leak, revenue_context, INDUSTRY_BASELINES
 
 # ── Category Scorers ────────────────────────────────────────────
 
-def score_site_health(scrape: dict, ssl: dict) -> tuple[int, list]:
+def score_site_health(scrape: dict, ssl: dict, url: str = "", city: str = "") -> tuple[int, list]:
     """Score based on EXACT site data. Returns (score, findings list)."""
+    city_short = city.split(',')[0].strip() if city else ""
+    domain = url.replace('https://','').replace('http://','').rstrip('/') if url else "your site"
+
     s = 0
     findings = []
 
@@ -229,7 +232,7 @@ def compile_issues(all_findings: list, revenue_leak: int) -> list:
 
 # ── Quick wins ──────────────────────────────────────────────────
 
-def build_quick_wins(issues: list, scrape: dict, city: str, business_type: str) -> list:
+def build_quick_wins(issues: list, scrape: dict, city: str, business_type: str, business_name: str = "") -> list:
     wins = []
     city_short = city.split(",")[0].strip()
     btype = business_type.replace("_", " ").title()
@@ -242,7 +245,7 @@ def build_quick_wins(issues: list, scrape: dict, city: str, business_type: str) 
             "effort": "15 minutes",
             "impact": "Critical",
             "steps": [
-                f"Write this: '{btype} in {city_short} | [Your Business Name]'",
+                f"Write this: '{btype} in {city_short} | {business_name}' (swap in your actual name)",
                 "Go to your CMS (Wix, WordPress, etc.) → Pages → SEO Settings",
                 "Paste it in the Title field and save",
                 f"Keep it under 65 characters — your template is {len(btype) + len(city_short) + 20} characters"
@@ -340,7 +343,7 @@ def build_roadmap(issues: list) -> dict:
 
 # ── Main scoring function ────────────────────────────────────────
 
-async def calculate_full_score(check_data: dict, business_type: str, city: str, percentile_fn=None) -> dict:
+async def calculate_full_score(check_data: dict, business_type: str, city: str, percentile_fn=None, business_name: str = "", url: str = "") -> dict:
     ssl     = check_data.get("ssl", {})
     scrape  = check_data.get("scrape", {})
     ps      = check_data.get("pagespeed", {})
@@ -403,7 +406,7 @@ async def calculate_full_score(check_data: dict, business_type: str, city: str, 
     issues = compile_issues(all_findings, revenue_leak)
 
     # Quick wins based on ACTUAL data
-    quick_wins = build_quick_wins(issues, scrape, city, business_type)
+    quick_wins = build_quick_wins(issues, scrape, city, business_type, business_name=business_name)
 
     # Roadmap
     roadmap = build_roadmap(issues)

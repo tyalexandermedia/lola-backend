@@ -72,15 +72,19 @@ def _section_label(icon: str, text: str, color: str = GOLD) -> str:
         f'{icon}&nbsp; {text}</div>'
     )
 
-def _issue_row(issue: dict, biz: str, city: str, btype: str) -> str:
+def _issue_row(issue: dict, biz: str, city: str, btype: str, audit_url: str = "") -> str:
     sev   = issue.get("severity", "Medium")
     color = SEV_COLOR.get(sev, MEDIUM)
     title = issue.get("issue", "")
     desc  = issue.get("description", "")
     rev   = issue.get("revenue_impact", "")
-    # Inject business context into description if it isn't already there
-    if biz.lower() not in desc.lower() and city.lower() not in desc.lower():
-        desc = f"{biz}: {desc}"
+    # Ensure every description mentions this specific business
+    # If neither biz name nor domain appears, prefix with business context
+    url_domain = audit_url.replace("https://","").replace("http://","").rstrip("/") if audit_url else ""
+    biz_mentioned = biz.lower() in desc.lower() or (url_domain and url_domain.lower() in desc.lower())
+    city_mentioned = city.lower() in desc.lower()
+    if not biz_mentioned:
+        desc = f"<strong>{biz}:</strong> {desc}"
     return f"""
 <div style="margin-bottom:12px;border-left:3px solid {color};border-radius:0 8px 8px 0;
   background:{DARK};padding:14px 16px;border-top:1px solid {DARK_BDR};
@@ -218,7 +222,7 @@ def generate_html_report(audit: dict) -> str:
       + cat_row("Content",        "✍️", "content")
     )
 
-    issues_html  = "".join(_issue_row(i, biz, city, btype) for i in issues)
+    issues_html  = "".join(_issue_row(i, biz, city, btype, url) for i in issues)
     wins_html    = "".join(_win_row(w, i+1, biz, city) for i, w in enumerate(wins))
     roadmap_html = (
         _roadmap_row("Days 1–30",  roadmap.get("day_30", []), GREEN)

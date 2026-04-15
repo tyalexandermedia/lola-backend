@@ -176,7 +176,7 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
     }
 
     # Score (returns unique scores based on actual site data)
-    scored = await calculate_full_score(check_data, body.business_type, body.city, get_percentile)
+    scored = await calculate_full_score(check_data, body.business_type, body.city, get_percentile, business_name=body.business_name, url=url)
 
     # Build full result
     result = {
