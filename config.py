@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # Notifications
     RESEND_API_KEY: Optional[str] = None
     OWNER_EMAIL: str = "ty@tyalexandermedia.com"
+    WIX_API_KEY: str = ""  # Wix API key for CRM contact sync
 
     class Config:
         env_file = ".env"

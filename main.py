@@ -25,6 +25,8 @@ from checks.social_check import check_instagram  # kept for import compatibility
 from scoring.engine import calculate_full_score
 from automation.make_webhook import trigger_make_webhook
 from automation.report_generator import generate_html_report
+from automation.wix_crm import upsert_wix_contact
+from automation.sequence_sender import run_nurture_sequence
 
 async def _noop(): return {'ok': False, 'error': 'instagram_removed'}
 
@@ -203,6 +205,15 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
     if settings.MAKE_WEBHOOK_URL:
         background_tasks.add_task(trigger_make_webhook, settings.MAKE_WEBHOOK_URL, result, body.email)
     background_tasks.add_task(send_report_email, body.email, body.business_name, html_report, audit_id)
+    # Wix CRM: create/update contact with audit data for lead segmentation
+    if settings.WIX_API_KEY:
+        background_tasks.add_task(upsert_wix_contact, {**result, "email": body.email}, settings.WIX_API_KEY)
+    # 3-email nurture sequence: D+0 (2hr), D+2, D+5
+    if body.email and settings.RESEND_API_KEY:
+        background_tasks.add_task(
+            asyncio.ensure_future,
+            run_nurture_sequence(body.email, {**result, "email": body.email}, settings.RESEND_API_KEY)
+        )
 
     # Strip internal fields before response
     result.pop("email", None)
