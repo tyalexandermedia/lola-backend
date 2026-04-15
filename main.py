@@ -26,6 +26,8 @@ from scoring.engine import calculate_full_score
 from automation.make_webhook import trigger_make_webhook
 from automation.report_generator import generate_html_report
 
+async def _noop(): return {'ok': False, 'error': 'instagram_removed'}
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("lola")
 

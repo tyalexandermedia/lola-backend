@@ -23,6 +23,10 @@ async def check_competitors(
                 CUSTOM_SEARCH_URL,
                 params={"q": query, "key": api_key, "cx": cx, "num": 5},
             )
+        if r.status_code == 403:
+            return {**fallback, "ok": True, "error": "Custom Search API: billing not enabled or daily quota exceeded. Go to console.cloud.google.com/billing to activate free $300 credit."}
+        if r.status_code == 400:
+            return {**fallback, "ok": True, "error": "Custom Search API: invalid CX ID or API key"}
         if not r.is_success:
             return {**fallback, "ok": True, "error": f"HTTP {r.status_code}"}
 
