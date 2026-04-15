@@ -269,6 +269,16 @@ async def health():
 async def root():
     return {"service": "LOLA SEO API v3", "health": "/health", "audit": "POST /audit"}
 
+
+@app.post("/admin/cache/clear")
+async def clear_cache(x_admin_key: Optional[str] = Header(None)):
+    if x_admin_key != settings.LOLA_SECRET_ADMIN_KEY:
+        raise HTTPException(403, "Forbidden")
+    count = len(_AUDIT_CACHE)
+    _AUDIT_CACHE.clear()
+    logger.info(f"Cache cleared — {count} entries removed")
+    return {"cleared": count, "message": f"Cleared {count} cached audits"}
+
 if __name__ == "__main__":
     import uvicorn, os
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
