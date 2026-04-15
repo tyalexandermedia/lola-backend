@@ -85,20 +85,56 @@ def _issue_row(issue: dict, biz: str, city: str, btype: str, audit_url: str = ""
     city_mentioned = city.lower() in desc.lower()
     if not biz_mentioned:
         desc = f"<strong>{biz}:</strong> {desc}"
+    # Upsell pill for GBP/local issues → $400 retainer
+    cta_type = issue.get("cta_type", "")
+    upsell_html = ""
+    if cta_type == "retainer" or "Business Profile" in title or "address" in title.lower():
+        upsell_html = f'''
+<div style="padding:10px 16px;border-top:1px solid {DARK_BDR};
+  background:rgba(201,168,76,0.03);display:flex;align-items:center;
+  flex-wrap:wrap;gap:8px;font-size:12px;color:{MUTED};
+  font-family:-apple-system,sans-serif">
+  <span>Ty's team fixes this for you →</span>
+  <a href="https://www.tyalexandermedia.com/contact?offer=retainer&issue=gbp"
+    style="display:inline-block;padding:5px 12px;background:{GOLD};
+    color:{DARK};font-size:11px;font-weight:700;border-radius:4px;
+    text-decoration:none;font-family:-apple-system,sans-serif">
+    See the $400/mo Plan
+  </a>
+</div>'''
+    elif cta_type == "quick-fix":
+        upsell_html = f'''
+<div style="padding:10px 16px;border-top:1px solid {DARK_BDR};
+  background:rgba(201,168,76,0.03);display:flex;align-items:center;
+  flex-wrap:wrap;gap:8px">
+  <span style="font-size:12px;color:{MUTED};font-family:-apple-system,sans-serif">
+    Get the exact fix template →
+  </span>
+  <a href="https://www.tyalexandermedia.com/contact?offer=quick-fix"
+    style="display:inline-block;padding:5px 12px;background:{GOLD};
+    color:{DARK};font-size:11px;font-weight:700;border-radius:4px;
+    text-decoration:none;font-family:-apple-system,sans-serif">
+    $97 Playbook
+  </a>
+</div>'''
+
     return f"""
 <div style="margin-bottom:12px;border-left:3px solid {color};border-radius:0 8px 8px 0;
-  background:{DARK};padding:14px 16px;border-top:1px solid {DARK_BDR};
-  border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR}">
-  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-    <div style="flex:1;min-width:0">
-      <div style="font-size:13px;font-weight:700;color:{TEXT};line-height:1.4;
-        font-family:-apple-system,sans-serif;margin-bottom:4px">{title}</div>
-      <p style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin:0 0 6px;
-        font-family:-apple-system,sans-serif">{desc}</p>
-      {f'<div style="font-size:11px;font-weight:700;color:{color};font-family:DM Mono,monospace,sans-serif">💸 {rev}</div>' if rev else ''}
+  background:{DARK};border-top:1px solid {DARK_BDR};
+  border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR};overflow:hidden">
+  <div style="padding:14px 16px">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:{TEXT};line-height:1.4;
+          font-family:-apple-system,sans-serif;margin-bottom:4px">{title}</div>
+        <p style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin:0 0 6px;
+          font-family:-apple-system,sans-serif">{desc}</p>
+        {f'<div style="font-size:11px;font-weight:700;color:{color};font-family:DM Mono,monospace,sans-serif">>> {rev}</div>' if rev else ''}
+      </div>
+      <div style="flex-shrink:0;padding-top:2px">{_badge(sev, color, color + "15")}</div>
     </div>
-    <div style="flex-shrink:0;padding-top:2px">{_badge(sev, color, color + "15")}</div>
   </div>
+  {upsell_html}
 </div>"""
 
 def _win_row(win: dict, idx: int, biz: str, city: str) -> str:

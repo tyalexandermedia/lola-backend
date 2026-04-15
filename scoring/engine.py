@@ -81,7 +81,7 @@ def score_local_presence(scrape: dict, gbp: dict, city: str) -> tuple[int, list]
         else:
             findings.append(("critical", "Zero Google reviews", "93% of local buyers read reviews before choosing. You have none to show them."))
     else:
-        findings.append(("critical", "Google Business Profile not found", f"When someone searches 'soft wash near me' in {city_short}, you're invisible. This is the #1 local ranking factor."))
+        findings.append(("critical", "Google Business Profile not found", f"When someone in {city_short} searches for your service on Google right now, {business_name} doesn't appear — not in the Local Pack, not on Maps. Google's business listings show competitors who claimed their profile. This single fix can put you on the first page within days."))
 
     if scrape.get("has_phone"):
         s += 10
@@ -223,7 +223,7 @@ def compile_issues(all_findings: list, revenue_leak: int) -> list:
             "issue": title,
             "revenue_impact": f"~${rev_impact:,}/month in missed leads" if rev_impact > 0 else "Reduces trust and rankings",
             "description": description,
-            "cta_type": "consult" if sev == "critical" else "quickfix",
+            "cta_type": "retainer" if sev == "critical" else "quickfix",
         })
 
     issues.sort(key=lambda x: SEVERITY_ORDER.get(x["severity"].lower(), 3))
@@ -260,7 +260,7 @@ def build_quick_wins(issues: list, scrape: dict, city: str, business_type: str, 
             "impact": "Critical",
             "steps": [
                 f"Your current title: '{existing_title}'",
-                f"Change it to include {city_short}: '{btype} in {city_short} | [Business Name]'",
+                f"Change it to: '{btype} in {city_short} | {business_name}'",
                 "Go to your CMS → Pages → SEO Settings → Title field"
             ]
         })
