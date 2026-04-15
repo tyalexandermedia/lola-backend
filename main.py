@@ -158,7 +158,7 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
         "competitors": comp_r.get("competitors", []),
         "gbp": {k: gbp_r.get(k) for k in ["claimed","rating","review_count","photos_count","hours_set","address"]},
         "pagespeed": {k: ps_r.get(k,"N/A") for k in ["performance","lcp","fcp","cls","opportunities"]},
-        "instagram": None,  from checks.social_check import check_instagram  # kept for import compatibility
+        "instagram": None,  # Instagram removed
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
