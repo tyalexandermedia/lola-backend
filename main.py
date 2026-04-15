@@ -21,7 +21,7 @@ from checks.safe_browsing_check import check_safe_browsing
 from checks.sitemap_check import check_crawlability
 from checks.backlink_check import check_backlinks
 from checks.competitor_check import check_competitors
-# Instagram removed
+from checks.social_check import check_instagram  # kept for import compatibility
 from scoring.engine import calculate_full_score
 from automation.make_webhook import trigger_make_webhook
 from automation.report_generator import generate_html_report
@@ -31,7 +31,7 @@ async def _noop(): return {'ok': False, 'error': 'instagram_removed'}
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("lola")
 
-app = FastAPI(title="LOLA SEO API", version="3.0.0", debug=True)
+app = FastAPI(title="LOLA SEO API", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -158,7 +158,7 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
         "competitors": comp_r.get("competitors", []),
         "gbp": {k: gbp_r.get(k) for k in ["claimed","rating","review_count","photos_count","hours_set","address"]},
         "pagespeed": {k: ps_r.get(k,"N/A") for k in ["performance","lcp","fcp","cls","opportunities"]},
-        "instagram": None,  # Instagram removed
+        "instagram": None,  from checks.social_check import check_instagram  # kept for import compatibility
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
