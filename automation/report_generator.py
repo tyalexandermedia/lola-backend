@@ -22,6 +22,7 @@ def generate_html_report(audit: dict) -> str:
     grade = audit.get("grade", "F")
     grade_label = audit.get("grade_label", "Off the Leash")
     revenue_leak = audit.get("revenue_leak_monthly", 0)
+    leads_lost = audit.get("leads_lost_monthly", "20–35")
     issues = audit.get("issues", [])
     quick_wins = audit.get("quick_wins", [])
     cats = audit.get("categories", {})
@@ -139,6 +140,9 @@ def generate_html_report(audit: dict) -> str:
       {grade_emoji} {grade_label}
     </div>
     <p style="font-size:14px;color:#94a8cc;line-height:1.7;margin:0">{summary}</p>
+    <div style="margin-top:14px;padding:12px 20px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:8px;display:inline-block">
+      <span style="font-size:14px;font-weight:700;color:#f87171">📞 At your current score, you&rsquo;re missing an estimated {leads_lost} inbound calls per month.</span>
+    </div>
   </div>
 
   <!-- Revenue leak -->
@@ -174,6 +178,21 @@ def generate_html_report(audit: dict) -> str:
     {wins_html}
   </div>
 
+  <!-- Sandbar case study -->
+  <div style="margin:0 24px 20px;padding:20px;background:#0d1224;border:1px solid #111e40;border-radius:10px;border-left:4px solid #6366f1">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6366f1;margin-bottom:8px">🐾 Real Results — Tampa, FL</div>
+    <p style="font-size:13px;color:#94a8cc;line-height:1.7;margin:0">
+      We fixed these exact issues for a soft wash contractor in Tampa. Missing title tags. No GBP optimization. Zero schema markup.
+      <strong style="color:#fff">They ranked for their top 5 keywords in 3 weeks.</strong>
+      {biz} has the same issues they had.
+    </p>
+  </div>
+
+  <!-- Price anchor -->
+  <div style="padding:0 24px 8px;text-align:center">
+    <p style="font-size:12px;color:#4d637a;margin:0">Agencies charge $500–$1,500 for this audit alone. Ty&rsquo;s team fixes your title tags, meta descriptions, schema, and Open Graph tags in 24 hours.</p>
+  </div>
+
   <!-- $97 CTA -->
   <div style="margin:0 24px 20px;padding:24px;background:linear-gradient(135deg,#0f1d3a,#091020);border:1px solid rgba(228,177,24,0.3);border-radius:12px;text-align:center">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#e4b118;margin-bottom:10px">⚡ Done-For-You Fix — $97</div>
@@ -205,6 +224,12 @@ def generate_html_report(audit: dict) -> str:
     <a href="{CALENDLY_LINK}?ref=retainer-report" style="display:inline-block;padding:14px 28px;border:1.5px solid rgba(228,177,24,0.4);color:#e4b118;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none">
       Book a Free Strategy Call →
     </a>
+  </div>
+
+  <!-- Referral -->
+  <div style="padding:12px 24px;background:#0a1020;text-align:center;border-top:1px solid #0c1530">
+    <p style="font-size:12px;color:#4d637a;margin:0">Know another contractor who&rsquo;s invisible on Google? Send them this link. Lola works for free. 🐾<br>
+    <a href="https://lola-seo.vercel.app" style="color:#e4b118;text-decoration:none">lola-seo.vercel.app</a></p>
   </div>
 
   <!-- Footer -->

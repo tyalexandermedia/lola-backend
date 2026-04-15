@@ -413,10 +413,18 @@ async def calculate_full_score(check_data: dict, business_type: str, city: str, 
 
     label = get_industry_label(business_type)
 
+    # Leads lost estimate based on score
+    if total < 25:   leads_lost = "50–70"
+    elif total < 40: leads_lost = "35–50"
+    elif total < 60: leads_lost = "20–35"
+    elif total < 75: leads_lost = "10–20"
+    else:            leads_lost = "3–10"
+
     return {
         "total_score": total,
         "grade": grade,
         "grade_label": grade_label,
+        "leads_lost_monthly": leads_lost,
         "confidence_score": confidence,
         "percentile_rank": percentile,
         "percentile_string": f"Better than {percentile}% of {label} in {city.split(',')[0]}",

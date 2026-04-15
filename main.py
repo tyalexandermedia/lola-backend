@@ -21,7 +21,7 @@ from checks.safe_browsing_check import check_safe_browsing
 from checks.sitemap_check import check_crawlability
 from checks.backlink_check import check_backlinks
 from checks.competitor_check import check_competitors
-from checks.social_check import check_instagram
+# Instagram removed
 from scoring.engine import calculate_full_score
 from automation.make_webhook import trigger_make_webhook
 from automation.report_generator import generate_html_report
@@ -156,7 +156,7 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
         "competitors": comp_r.get("competitors", []),
         "gbp": {k: gbp_r.get(k) for k in ["claimed","rating","review_count","photos_count","hours_set","address"]},
         "pagespeed": {k: ps_r.get(k,"N/A") for k in ["performance","lcp","fcp","cls","opportunities"]},
-        "instagram": ig_r if ig_r.get("ok") else None,
+        "instagram": None,  # Instagram removed
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
