@@ -26,7 +26,18 @@ async def check_gbp(business_name: str, city: str, website: str = "", api_key: O
         if not r.is_success or not r.json().get("results"):
             return {**fallback, "ok": True, "claimed": False, "error": "Not found in Places API"}
 
-        place = r.json()["results"][0]
+        results = r.json()["results"]
+        # Find the best-matching result by name similarity (not just first result)
+        biz_lower = business_name.lower().replace("-", " ").replace("_", " ")
+        biz_words = set(biz_lower.split())
+        def _match_score(r):
+            rname = r.get("name", "").lower()
+            rwords = set(rname.split())
+            # Count overlapping words
+            overlap = len(biz_words & rwords)
+            return overlap
+        results_sorted = sorted(results, key=_match_score, reverse=True)
+        place = results_sorted[0]
         place_id = place.get("place_id")
 
         async with httpx.AsyncClient(timeout=10.0) as client:
