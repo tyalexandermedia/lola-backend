@@ -3,7 +3,7 @@ LOLA SEO Backend v3.0
 4-Agent local business revenue diagnostic
 Ty Alexander Media — Tampa Bay, FL
 """
-import asyncio, uuid, logging
+import asyncio, uuid, logging, time
 from datetime import datetime
 from typing import Optional
 import httpx
@@ -40,6 +40,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── In-memory audit cache (10 min TTL, keyed by website+biz_name) ────────────
+_AUDIT_CACHE: dict = {}  # key -> {"result": dict, "html": str, "ts": float}
+_CACHE_TTL = 600  # 10 minutes
+
+def _cache_key(website: str, biz_name: str) -> str:
+    return f"{website.lower().strip('/')}|{biz_name.lower().strip()}"
+
+def _cache_get(key: str):
+    entry = _AUDIT_CACHE.get(key)
+    if entry and (time.time() - entry["ts"]) < _CACHE_TTL:
+        return entry
+    if key in _AUDIT_CACHE:
+        del _AUDIT_CACHE[key]
+    return None
+
+def _cache_set(key: str, result: dict, html: str):
+    _AUDIT_CACHE[key] = {"result": result, "html": html, "ts": time.time()}
+
 
 @app.on_event("startup")
 async def startup():
@@ -122,6 +141,17 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
     url = body.website
     logger.info(f"[{audit_id}] Audit: {body.business_name} | {url} | {body.city} | {body.business_type}")
 
+    # ── Cache hit: re-use existing result, just fire email ────────────────────
+    ck = _cache_key(url, body.business_name)
+    cached = _cache_get(ck)
+    if cached and body.email:
+        logger.info(f"[{audit_id}] Cache HIT for {url} — skipping re-audit, sending email")
+        background_tasks.add_task(
+            send_report_email, body.email, body.business_name, cached["html"], audit_id
+        )
+        stripped = {k: v for k, v in cached["result"].items() if k not in ("email", "_scrape", "_gbp")}
+        return stripped
+
     # Run all checks concurrently — each with individual timeouts
     (ssl_r, scrape_r, ps_r, gbp_r, safe_r, sitemap_r, backlink_r, comp_r, ig_r) = \
     await asyncio.gather(
@@ -164,6 +194,9 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
 
     # Generate personalized HTML report
     html_report = generate_html_report(result)
+
+    # Cache this result so email re-submits don't re-run all checks
+    _cache_set(ck, result, html_report)
 
     # Background: save to DB + fire Make webhook + send email
     background_tasks.add_task(save_audit, audit_id, result)

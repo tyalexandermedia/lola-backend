@@ -1,333 +1,572 @@
 """
-LOLA SEO — Agent 2: Personalized HTML Email Report
-Matches the frontend conversion flow exactly:
-  Score → Issues → $97 Playbook → $400 Retainer
-Every sentence references THIS business. No generic copy.
+LOLA SEO — Email Report Generator v4
+Mobile-first HTML email. Every sentence references THIS business.
+Offer ladder: $97 DIY Playbook → $400/mo Ty's Team.
 """
 
-GRADE_EMOJI  = {"A": "🏆", "B": "✅", "C": "🐾", "D": "⚠️", "F": "🚨"}
-SEV_COLOR    = {"Critical": "#E05252", "High": "#E08840", "Medium": "#D4B84A"}
-
-QUICK_FIX_LINK = "https://www.tyalexandermedia.com/contact?offer=quick-fix"
-RETAINER_LINK  = "https://www.tyalexandermedia.com/contact?offer=retainer"
-REVIEW_LINK    = "https://share.google/IPROAQnD4PhW8zXxi"
-LOLA_LOGO      = "https://lola-seo.vercel.app/lola-logo.png"
-
-# ── Design tokens (matches frontend exactly) ─────────────────
+# ── Design tokens (matches frontend exactly) ─────────────────────
 DARK      = "#0A0A0A"
 DARK_CARD = "#111111"
-DARK_BDR  = "#1E1E1E"
+DARK_BDR  = "#222222"
 GOLD      = "#C9A84C"
 GOLD_DIM  = "#8B6E2E"
+GOLD_BG   = "rgba(201,168,76,0.08)"
 TEXT      = "#F0EAD6"
-MUTED     = "#8A8278"
-FAINT     = "#5A554E"
+TEXT_BR   = "#C8C0B0"   # brightened for desktop readability
+MUTED     = "#A89F94"   # up from #8A8278
+FAINT     = "#6E6860"   # up from #5A554E
 CRITICAL  = "#E05252"
 HIGH      = "#E08840"
+MEDIUM    = "#D4B84A"
 GREEN     = "#4CAF80"
+GREEN_BG  = "rgba(76,175,128,0.08)"
 
+LOLA_LOGO     = "https://lola-seo.vercel.app/lola-logo.png"
+QF_LINK       = "https://www.tyalexandermedia.com/contact?offer=quick-fix"
+RETAINER_LINK = "https://www.tyalexandermedia.com/contact?offer=retainer"
+REVIEW_LINK   = "https://share.google/IPROAQnD4PhW8zXxi"
+
+GRADE_EMOJI = {"A": "🏆", "B": "✅", "C": "🐾", "D": "⚠️", "F": "🚨"}
+SEV_COLOR   = {"Critical": CRITICAL, "High": HIGH, "Medium": MEDIUM}
+
+GRADE_SUMMARY = {
+    "A": "{biz} is dialed in. A few more moves and you own {city}.",
+    "B": "{biz} is showing up — but the gap to #1 in {city} is specific and very closable.",
+    "C": "{biz} is visible but leaving real money on the table in {city} every week.",
+    "D": "{biz} has serious gaps. People in {city} are searching right now — and calling someone else.",
+    "F": "{biz} is effectively invisible on Google. Every day costs you real customers in {city}.",
+}
+
+
+# ─────────────────────────────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────────────────────────────
+
+def _color_for_score(s: int) -> str:
+    if s >= 75: return GREEN
+    if s >= 50: return MEDIUM
+    return CRITICAL
+
+def _bar(score: int, color: str) -> str:
+    w = max(2, min(score, 100))
+    return (
+        f'<div style="background:{DARK};border-radius:3px;height:6px;'
+        f'width:100%;max-width:120px;display:inline-block;vertical-align:middle">'
+        f'<div style="background:{color};height:6px;border-radius:3px;width:{w}%"></div>'
+        f'</div>'
+    )
+
+def _badge(text: str, color: str, bg: str) -> str:
+    return (
+        f'<span style="display:inline-block;padding:3px 9px;border-radius:99px;'
+        f'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;'
+        f'color:{color};background:{bg};border:1px solid {color}40;'
+        f'font-family:\'DM Mono\',monospace,sans-serif">{text}</span>'
+    )
+
+def _section_label(icon: str, text: str, color: str = GOLD) -> str:
+    return (
+        f'<div style="font-size:10px;font-weight:700;text-transform:uppercase;'
+        f'letter-spacing:0.18em;color:{color};margin:0 0 14px;padding-bottom:8px;'
+        f'border-bottom:1px solid {DARK_BDR};font-family:\'DM Mono\',monospace,sans-serif">'
+        f'{icon}&nbsp; {text}</div>'
+    )
+
+def _issue_row(issue: dict, biz: str, city: str, btype: str) -> str:
+    sev   = issue.get("severity", "Medium")
+    color = SEV_COLOR.get(sev, MEDIUM)
+    title = issue.get("issue", "")
+    desc  = issue.get("description", "")
+    rev   = issue.get("revenue_impact", "")
+    # Inject business context into description if it isn't already there
+    if biz.lower() not in desc.lower() and city.lower() not in desc.lower():
+        desc = f"{biz}: {desc}"
+    return f"""
+<div style="margin-bottom:12px;border-left:3px solid {color};border-radius:0 8px 8px 0;
+  background:{DARK};padding:14px 16px;border-top:1px solid {DARK_BDR};
+  border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR}">
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;color:{TEXT};line-height:1.4;
+        font-family:-apple-system,sans-serif;margin-bottom:4px">{title}</div>
+      <p style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin:0 0 6px;
+        font-family:-apple-system,sans-serif">{desc}</p>
+      {f'<div style="font-size:11px;font-weight:700;color:{color};font-family:DM Mono,monospace,sans-serif">💸 {rev}</div>' if rev else ''}
+    </div>
+    <div style="flex-shrink:0;padding-top:2px">{_badge(sev, color, color + "15")}</div>
+  </div>
+</div>"""
+
+def _win_row(win: dict, idx: int, biz: str, city: str) -> str:
+    steps = win.get("steps") or []
+    steps_html = "".join(
+        f'<li style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin-bottom:5px;'
+        f'font-family:-apple-system,sans-serif">{s}</li>'
+        for s in steps[:5]
+    )
+    effort = win.get("effort", "")
+    return f"""
+<div style="margin-bottom:12px;background:{DARK};border:1px solid {DARK_BDR};
+  border-radius:8px;overflow:hidden">
+  <div style="padding:12px 16px;border-bottom:1px solid {DARK_BDR};
+    display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:24px;height:24px;border-radius:50%;background:{GREEN};
+        color:#061410;font-size:11px;font-weight:700;display:flex;align-items:center;
+        justify-content:center;flex-shrink:0;font-family:DM Mono,monospace,sans-serif">
+        {idx}
+      </div>
+      <span style="font-size:14px;font-weight:700;color:{TEXT};
+        font-family:-apple-system,sans-serif">{win.get('win','')}</span>
+    </div>
+    {f'<span style="font-size:10px;color:{GREEN};font-weight:700;font-family:DM Mono,monospace,sans-serif;background:{GREEN_BG};padding:3px 8px;border-radius:99px;border:1px solid {GREEN}40">{effort}</span>' if effort else ''}
+  </div>
+  {f'<div style="padding:12px 16px"><ol style="margin:0;padding-left:18px">{steps_html}</ol></div>' if steps_html else ''}
+</div>"""
+
+def _roadmap_row(label: str, items: list, color: str) -> str:
+    if not items: return ""
+    rows = "".join(
+        f'<li style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin-bottom:4px;'
+        f'font-family:-apple-system,sans-serif">{i}</li>'
+        for i in items
+    )
+    return f"""
+<div style="margin-bottom:10px;border-left:3px solid {color};padding:12px 16px;
+  background:{DARK};border-radius:0 8px 8px 0;border-top:1px solid {DARK_BDR};
+  border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR}">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+    color:{color};margin-bottom:8px;font-family:DM Mono,monospace,sans-serif">{label}</div>
+  <ul style="margin:0;padding-left:16px">{rows}</ul>
+</div>"""
+
+
+# ─────────────────────────────────────────────────────────────────
+# MAIN GENERATOR
+# ─────────────────────────────────────────────────────────────────
 
 def generate_html_report(audit: dict) -> str:
     biz         = audit.get("business_name", "Your Business")
-    city        = audit.get("city", "your city").split(",")[0].strip()
+    city_full   = audit.get("city", "your city")
+    city        = city_full.split(",")[0].strip()
     url         = audit.get("website", "")
+    url_display = url.replace("https://", "").replace("http://", "").rstrip("/")
     btype       = audit.get("business_type", "contractor").replace("_", " ").title()
-    total       = audit.get("total_score", 0)
+    total       = int(audit.get("total_score", 0))
     grade       = audit.get("grade", "F")
     grade_label = audit.get("grade_label", "Off the Leash")
-    revenue_leak= audit.get("revenue_leak_monthly", 0)
-    leads_lost  = audit.get("leads_lost_monthly", "20–35")
-    issues      = audit.get("issues", [])
-    quick_wins  = audit.get("quick_wins", [])
+    revenue     = int(audit.get("revenue_leak_monthly", 0))
+    leads       = audit.get("leads_lost_monthly", "20–35")
+    issues      = audit.get("issues", [])[:7]
+    wins        = audit.get("quick_wins", [])[:4]
     cats        = audit.get("categories", {})
     roadmap     = audit.get("roadmap", {})
 
     competitors = audit.get("competitors") or []
     comp        = competitors[0] if competitors else {}
-    comp_name   = comp.get("title") or comp.get("name") or comp.get("business_name") or ""
+    comp_name   = (comp.get("title") or comp.get("name") or comp.get("business_name") or "").strip()
     comp_url    = comp.get("url", "")
-    has_comp    = bool(comp_name and comp_name.strip())
+    has_comp    = bool(comp_name)
 
-    # Score color
-    if total >= 75:
-        score_color = GREEN
-    elif total >= 50:
-        score_color = HIGH
-    else:
-        score_color = CRITICAL
+    score_color  = _color_for_score(total)
+    grade_emoji  = GRADE_EMOJI.get(grade, "🚨")
+    summary      = GRADE_SUMMARY.get(grade, GRADE_SUMMARY["F"]).format(biz=biz, city=city)
 
-    grade_emoji = GRADE_EMOJI.get(grade, "🚨")
-
-    # Grade-aware one-liner summary
-    summaries = {
-        "A": f"{biz} is dialed in. A few more moves and you own {city}.",
-        "B": f"{biz} has a solid base — but the gap to #1 in {city} is specific and closable.",
-        "C": f"{biz} is showing up but leaving real money on the table in {city} every week.",
-        "D": f"{biz} has serious gaps. Customers in {city} are searching — and finding someone else.",
-        "F": f"{biz} is effectively invisible on Google right now. Every day costs you customers.",
-    }
-    summary = summaries.get(grade, summaries["F"])
-
-    # Urgency line for $97 CTA
-    if has_comp:
-        urgency = f"Every day you wait is another day {comp_name} gets that call instead of you."
-    else:
-        urgency = f"Every day you wait, a competitor in {city} is picking up the phone you should be answering."
-
-    # ── Helper: category bar row ────────────────────────────
-    def cat_row(label: str, key: str) -> str:
-        cat   = cats.get(key, {})
-        score = cat.get("score", 0)
-        status= cat.get("status", "critical")
-        color = GREEN if status == "good" else GOLD if status == "warning" else CRITICAL
-        return f"""
-        <tr>
-          <td style="padding:10px 16px;font-size:13px;color:{MUTED};border-bottom:1px solid {DARK_BDR};font-family:-apple-system,sans-serif">{label}</td>
-          <td style="padding:10px 16px;border-bottom:1px solid {DARK_BDR}">
-            <div style="background:{DARK};border-radius:2px;height:6px;width:100%;max-width:140px">
-              <div style="background:{color};height:6px;border-radius:2px;width:{score}%"></div>
-            </div>
-          </td>
-          <td style="padding:10px 16px;font-size:16px;font-weight:700;color:{color};border-bottom:1px solid {DARK_BDR};text-align:right;font-family:'DM Mono',monospace,sans-serif">{score}<span style="font-size:11px;color:{FAINT}">/100</span></td>
-        </tr>"""
-
-    # ── Helper: issue block ──────────────────────────────────
-    def issue_block(issue: dict) -> str:
-        sev   = issue.get("severity", "Medium")
-        color = SEV_COLOR.get(sev, GOLD)
-        rev   = issue.get("revenue_impact", "")
-        return f"""
-        <div style="border-left:3px solid {color};padding:14px 18px;background:{DARK};border-radius:0 6px 6px 0;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:600;color:{color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">{sev} Impact</div>
-          <div style="font-size:14px;font-weight:600;color:{TEXT};margin-bottom:5px;font-family:-apple-system,sans-serif">{issue.get('issue','')}</div>
-          <div style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:6px;font-family:-apple-system,sans-serif">{issue.get('description','')}</div>
-          {f'<div style="font-size:12px;color:{color};font-weight:600">💸 {rev}</div>' if rev else ''}
-        </div>"""
-
-    # ── Helper: quick win block ──────────────────────────────
-    def win_block(win: dict) -> str:
-        steps_html = "".join(
-            f'<li style="font-size:12px;color:{MUTED};line-height:1.65;margin-bottom:4px;font-family:-apple-system,sans-serif">{s}</li>'
-            for s in (win.get("steps") or [])
-        )
-        return f"""
-        <div style="background:{DARK};border-radius:6px;padding:14px 16px;margin-bottom:10px;border:1px solid {DARK_BDR}">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-            <div style="font-size:13px;font-weight:600;color:{TEXT};font-family:-apple-system,sans-serif">#{win.get('rank','')} {win.get('win','')}</div>
-            <div style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(76,175,128,0.1);color:{GREEN};border-radius:99px;border:1px solid rgba(76,175,128,0.2);white-space:nowrap">{win.get('effort','')}</div>
-          </div>
-          <ol style="margin:0;padding-left:18px">{steps_html}</ol>
-        </div>"""
-
-    # ── Helper: roadmap block ────────────────────────────────
-    def roadmap_block(label: str, key: str, color: str) -> str:
-        items = roadmap.get(key, [])
-        if not items:
-            return ""
-        items_html = "".join(
-            f'<li style="font-size:12px;color:{MUTED};line-height:1.65;margin-bottom:3px;font-family:-apple-system,sans-serif">{i}</li>'
-            for i in items
-        )
-        return f"""
-        <div style="border-left:3px solid {color};padding:12px 16px;margin-bottom:8px;background:{DARK};border-radius:0 6px 6px 0">
-          <div style="font-size:10px;font-weight:600;color:{color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">{label}</div>
-          <ul style="margin:0;padding-left:16px">{items_html}</ul>
-        </div>"""
-
-    # ── Build sections ───────────────────────────────────────
-    issues_html  = "".join(issue_block(i) for i in issues[:6])
-    wins_html    = "".join(win_block(w) for w in quick_wins[:4])
-    roadmap_html = (
-        roadmap_block("Days 1–30",  "day_30", GREEN)
-      + roadmap_block("Days 31–60", "day_60", GOLD)
-      + roadmap_block("Days 61–90", "day_90", "#6366f1")
+    urgency_line = (
+        f"Every day you wait is another day {comp_name} gets the call instead of {biz}."
+        if has_comp else
+        f"Every day {biz} isn't on page 1, a competitor in {city} gets that customer instead."
     )
 
-    comp_section = ""
+    # ── Score ring (SVG, works in most email clients) ─────────────
+    pct         = total / 100
+    circ        = 282  # 2π×45
+    dash_offset = circ - (circ * pct)
+    score_ring  = f"""
+<svg width="110" height="110" viewBox="0 0 110 110" style="display:block;margin:0 auto 8px">
+  <circle cx="55" cy="55" r="45" fill="none" stroke="{DARK_BDR}" stroke-width="8"/>
+  <circle cx="55" cy="55" r="45" fill="none" stroke="{score_color}" stroke-width="8"
+    stroke-dasharray="{circ}" stroke-dashoffset="{dash_offset:.1f}"
+    stroke-linecap="round" transform="rotate(-90 55 55)"/>
+  <text x="55" y="52" text-anchor="middle" font-size="26" font-weight="800"
+    fill="{score_color}" font-family="DM Mono,monospace,sans-serif">{total}</text>
+  <text x="55" y="66" text-anchor="middle" font-size="11" fill="{FAINT}"
+    font-family="DM Mono,monospace,sans-serif">/100</text>
+</svg>"""
+
+    # ── Category rows ─────────────────────────────────────────────
+    def cat_row(label: str, icon: str, key: str) -> str:
+        s = int(cats.get(key, {}).get("score", 0))
+        c = _color_for_score(s)
+        return f"""
+<tr>
+  <td style="padding:10px 14px;font-size:13px;color:{MUTED};border-bottom:1px solid {DARK_BDR};
+    font-family:-apple-system,sans-serif;white-space:nowrap">{icon} {label}</td>
+  <td style="padding:10px 14px;border-bottom:1px solid {DARK_BDR};width:50%">
+    {_bar(s, c)}
+  </td>
+  <td style="padding:10px 14px;font-size:18px;font-weight:800;color:{c};
+    border-bottom:1px solid {DARK_BDR};text-align:right;font-family:DM Mono,monospace,sans-serif;
+    white-space:nowrap">{s}<span style="font-size:10px;color:{FAINT}">/100</span></td>
+</tr>"""
+
+    cats_html = (
+        cat_row("Site Health",    "🌐", "site_health")
+      + cat_row("Local Presence", "📍", "local_presence")
+      + cat_row("Mobile",         "📱", "mobile")
+      + cat_row("Page Speed",     "⚡", "page_speed")
+      + cat_row("Content",        "✍️", "content")
+    )
+
+    issues_html  = "".join(_issue_row(i, biz, city, btype) for i in issues)
+    wins_html    = "".join(_win_row(w, i+1, biz, city) for i, w in enumerate(wins))
+    roadmap_html = (
+        _roadmap_row("Days 1–30",  roadmap.get("day_30", []), GREEN)
+      + _roadmap_row("Days 31–60", roadmap.get("day_60", []), GOLD)
+      + _roadmap_row("Days 61–90", roadmap.get("day_90", []), "#7C6FCD")
+    )
+
+    # ── Competitor block ──────────────────────────────────────────
+    comp_block = ""
     if has_comp:
-        comp_section = f"""
-        <!-- Competitor -->
-        <div style="padding:0 24px 20px">
-          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:{CRITICAL};margin-bottom:10px">🏁 Who's Beating You in {city}</div>
-          <div style="background:{DARK};border-radius:6px;padding:18px;border:1px solid {DARK_BDR};border-left:3px solid {CRITICAL}">
-            <div style="font-size:15px;font-weight:700;color:{TEXT};margin-bottom:2px;font-family:-apple-system,sans-serif">{comp_name}</div>
-            {f'<div style="font-size:11px;color:{FAINT};margin-bottom:10px">{comp_url}</div>' if comp_url else ''}
-            <p style="font-size:13px;color:{MUTED};line-height:1.65;margin:0;font-family:-apple-system,sans-serif">
-              Lola searched <em>&ldquo;{btype.lower()} in {city}&rdquo;</em> on Google.
-              {comp_name} is ranking above {biz} right now.
-              Every day that holds, they&rsquo;re getting calls that should be yours.
-            </p>
-          </div>
-        </div>"""
+        comp_block = f"""
+<div style="padding:0 20px 20px">
+  {_section_label("🏁", f"Who's Beating {biz} in {city}", CRITICAL)}
+  <div style="background:{DARK};border:1px solid {DARK_BDR};border-left:3px solid {CRITICAL};
+    border-radius:0 8px 8px 0;padding:16px">
+    <div style="font-size:15px;font-weight:700;color:{TEXT};margin-bottom:3px;
+      font-family:-apple-system,sans-serif">{comp_name}</div>
+    {f'<div style="font-size:11px;color:{FAINT};margin-bottom:10px;font-family:DM Mono,monospace,sans-serif">{comp_url}</div>' if comp_url else ''}
+    <p style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin:0;
+      font-family:-apple-system,sans-serif">
+      Lola searched <em>"{btype.lower()} in {city}"</em> on Google.
+      {comp_name} is ranking above {biz} right now.
+      Every call they get from {city} is a call {biz} should have answered.
+    </p>
+  </div>
+</div>"""
 
-    # ── Sandbar proof point (only for non-A grades) ──────────
-    proof_section = ""
+    # ── Proof point ───────────────────────────────────────────────
+    proof_block = ""
     if grade not in ("A", "B"):
-        proof_section = f"""
-        <div style="margin:0 24px 20px;padding:18px;background:{DARK};border:1px solid {DARK_BDR};border-radius:6px;border-left:3px solid {GOLD}">
-          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:{GOLD};margin-bottom:8px">🐾 Real Results — Tampa Bay</div>
-          <p style="font-size:13px;color:{MUTED};line-height:1.65;margin:0;font-family:-apple-system,sans-serif">
-            A soft wash contractor in Tampa had the same gaps as {biz} — missing title tags, no GBP, zero schema.
-            <strong style="color:{TEXT}">They ranked for their top 5 keywords in 3 weeks.</strong>
-            The fix list below is the same playbook.
-          </p>
-        </div>"""
+        proof_block = f"""
+<div style="margin:0 20px 20px;padding:16px;background:{DARK};border:1px solid {DARK_BDR};
+  border-left:3px solid {GOLD};border-radius:0 8px 8px 0">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;
+    color:{GOLD};margin-bottom:8px;font-family:DM Mono,monospace,sans-serif">🐾 Real Results — Tampa Bay</div>
+  <p style="font-size:13px;color:{TEXT_BR};line-height:1.7;margin:0;
+    font-family:-apple-system,sans-serif">
+    A {btype.lower()} in Tampa had the exact same gaps as {biz} — no title tag,
+    no GBP, zero schema markup.
+    <strong style="color:{TEXT}">Ranked for their top 5 keywords in 3 weeks.</strong>
+    The fix list below is the same playbook.
+  </p>
+</div>"""
 
-    # ── Google review link ───────────────────────────────────
-    google_review = f"""
-        <div style="margin:0 24px 20px;padding:18px;background:{DARK};border:1px solid {DARK_BDR};border-radius:6px;text-align:center">
-          <div style="font-size:13px;color:{MUTED};margin-bottom:10px;font-family:-apple-system,sans-serif">Did this report help {biz}? Lola runs on referrals. 🐾</div>
-          <a href="{REVIEW_LINK}" style="display:inline-block;padding:10px 20px;border:1px solid {GOLD_DIM};color:{GOLD};font-size:13px;font-weight:600;border-radius:4px;text-decoration:none;font-family:-apple-system,sans-serif">
-            Leave Lola a Google Review →
-          </a>
-        </div>"""
+    # ── $97 DIY Playbook CTA ──────────────────────────────────────
+    offer_97 = f"""
+<div style="margin:0 20px 16px;border-radius:8px;overflow:hidden;
+  border-left:3px solid {GOLD};border-top:1px solid {DARK_BDR};
+  border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR};
+  background:{DARK}">
+  <div style="padding:20px">
+    <!-- Score badge -->
+    <div style="display:flex;align-items:center;gap:14px;background:{DARK_CARD};
+      border:1px solid {DARK_BDR};border-radius:6px;padding:14px;margin-bottom:18px">
+      <div style="font-size:44px;font-weight:800;color:{score_color};line-height:1;
+        font-family:DM Mono,monospace,sans-serif;flex-shrink:0">
+        {total}<span style="font-size:14px;color:{FAINT}">/100</span>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:{TEXT};
+          font-family:-apple-system,sans-serif">{grade_emoji} {grade_label}</div>
+        <div style="font-size:12px;color:{CRITICAL};font-weight:600;
+          font-family:-apple-system,sans-serif">
+          Estimated ${revenue:,}/mo in missed leads
+        </div>
+      </div>
+    </div>
 
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;
+      color:{GOLD};margin-bottom:8px;font-family:DM Mono,monospace,sans-serif">Do It Yourself</div>
+    <div style="font-size:22px;font-weight:700;color:{TEXT};margin-bottom:10px;
+      font-family:-apple-system,sans-serif;line-height:1.2">
+      Get Lola's Full Playbook — $97
+    </div>
+    <p style="font-size:13px;color:{MUTED};line-height:1.7;margin:0 0 14px;
+      font-family:-apple-system,sans-serif">
+      Lola gives you the exact fix list for {biz} — written for your business,
+      your city, your gaps. You implement it yourself. No call needed.
+      Agencies charge $500–1,500 for an audit like this. $97. One time. Yours forever.
+    </p>
+
+    <!-- Deliverables -->
+    <div style="margin-bottom:18px">
+      {"".join(f'<div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid {DARK_BDR};font-size:13px;color:{TEXT_BR};font-family:-apple-system,sans-serif"><span style="color:{GOLD};font-weight:700;flex-shrink:0">✓</span>{item}</div>' for item in [
+        f"Exact title tag formula for {biz} in {city}",
+        "Meta description template — ready to copy and paste",
+        "Schema markup code to paste directly into your site",
+        "GBP optimization checklist (step-by-step)",
+        "Local citation submission guide",
+        "Priority fix order — know exactly what to do first",
+      ])}
+    </div>
+
+    <a href="{QF_LINK}&biz={biz.replace(' ','%20')}&score={total}"
+      style="display:block;padding:16px;background:{GOLD};color:{DARK};font-weight:700;
+      font-size:18px;border-radius:6px;text-decoration:none;text-align:center;
+      font-family:-apple-system,sans-serif;letter-spacing:0.03em">
+      Get the $97 Playbook →
+    </a>
+    <p style="font-size:12px;color:{CRITICAL};font-weight:600;text-align:center;
+      margin:10px 0 0;font-family:-apple-system,sans-serif">{urgency_line}</p>
+  </div>
+</div>"""
+
+    # ── $400/mo Retainer CTA ──────────────────────────────────────
+    stack_rows = "".join(
+        f'<tr>'
+        f'<td style="padding:7px 14px;font-size:13px;color:{TEXT_BR};'
+        f'border-bottom:1px solid {DARK_BDR};font-family:-apple-system,sans-serif">✓ {item}</td>'
+        f'<td style="padding:7px 14px;font-size:11px;color:{FAINT};'
+        f'border-bottom:1px solid {DARK_BDR};text-align:right;text-decoration:line-through;'
+        f'font-family:DM Mono,monospace,sans-serif;white-space:nowrap">{val}</td>'
+        f'</tr>'
+        for item, val in [
+            ("Full Lola Audit + Findings Report", "$500"),
+            ("Title Tag + Meta Description — Implemented", "$300"),
+            ("Schema Markup — Installed", "$200"),
+            ("Google Business Profile — Fully Optimized", "$300"),
+            ("Local Citation Cleanup", "$200"),
+            ("Monthly Content (1 page or blog post)", "$300"),
+            ("Monthly Ranking Report", "$150"),
+        ]
+    )
+
+    offer_400 = f"""
+<div style="margin:0 20px 20px;border-radius:8px;overflow:hidden;
+  border:1px solid {GOLD};background:{DARK}">
+  <div style="padding:20px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;
+      color:{GOLD};margin-bottom:8px;font-family:DM Mono,monospace,sans-serif">
+      Most Popular · Best Value
+    </div>
+    <div style="font-size:22px;font-weight:700;color:{TEXT};margin-bottom:10px;
+      font-family:-apple-system,sans-serif;line-height:1.2">
+      Let Ty's Team Fix {biz} for You
+    </div>
+    <p style="font-size:13px;color:{MUTED};line-height:1.7;margin:0 0 16px;
+      font-family:-apple-system,sans-serif">
+      Skip the DIY. Ty's team takes every finding in this report and executes it
+      for {biz} — GBP setup, on-page fixes, monthly content, citations, and a
+      ranking report every month. You run your business. We get it found, called, and chosen.
+    </p>
+
+    <!-- Value stack -->
+    <table style="width:100%;border-collapse:collapse;background:{DARK_CARD};
+      border-radius:6px;overflow:hidden;border:1px solid {DARK_BDR};margin-bottom:14px">
+      {stack_rows}
+      <tr>
+        <td style="padding:10px 14px;font-size:13px;color:{MUTED};
+          font-family:-apple-system,sans-serif;font-weight:600">Total Value:</td>
+        <td style="padding:10px 14px;font-size:14px;color:{FAINT};text-decoration:line-through;
+          text-align:right;font-family:DM Mono,monospace,sans-serif">$1,950</td>
+      </tr>
+    </table>
+
+    <!-- Price perception -->
+    <div style="font-size:24px;font-weight:700;color:{GOLD};margin-bottom:8px;
+      font-family:-apple-system,sans-serif">
+      You get all of it for $397 total
+    </div>
+    <p style="font-size:13px;color:{MUTED};line-height:1.7;margin:0 0 16px;
+      font-family:-apple-system,sans-serif">
+      That's the $97 playbook + Ty's full implementation team for $300 more.
+      First month is $397 — then just $400/month after that.
+      Month to month. Cancel anytime. No contracts.
+    </p>
+
+    <div style="display:inline-block;padding:5px 14px;background:{GOLD};color:{DARK};
+      font-size:11px;font-weight:700;border-radius:3px;margin-bottom:16px;
+      font-family:DM Mono,monospace,sans-serif">
+      YOU SAVE OVER $1,500
+    </div>
+    <br>
+    <a href="{RETAINER_LINK}&biz={biz.replace(' ','%20')}&score={total}"
+      style="display:block;padding:14px;background:transparent;color:{GOLD};font-weight:700;
+      font-size:18px;border-radius:6px;text-decoration:none;text-align:center;
+      border:1.5px solid {GOLD};font-family:-apple-system,sans-serif;letter-spacing:0.03em">
+      Add Ty's Team for $300 More →
+    </a>
+    <p style="font-size:11px;color:{FAINT};text-align:center;margin:8px 0 0;
+      font-family:-apple-system,sans-serif">
+      First month = full implementation of everything Lola found for {biz} today.
+    </p>
+  </div>
+</div>"""
+
+    # ── Google review link ────────────────────────────────────────
+    review_block = f"""
+<div style="margin:0 20px 20px;padding:16px;background:{DARK};border:1px solid {DARK_BDR};
+  border-radius:8px;text-align:center">
+  <p style="font-size:13px;color:{MUTED};margin:0 0 12px;
+    font-family:-apple-system,sans-serif">
+    Did Lola help {biz}? Leave a Google review — it helps other local businesses find us. 🐾
+  </p>
+  <a href="{REVIEW_LINK}"
+    style="display:inline-block;padding:10px 22px;border:1px solid {GOLD_DIM};color:{GOLD};
+    font-size:13px;font-weight:600;border-radius:6px;text-decoration:none;
+    font-family:-apple-system,sans-serif">
+    Leave Lola a Google Review →
+  </a>
+</div>"""
+
+    # ─────────────────────────────────────────────────────────────
+    # FINAL HTML (mobile-first, 600px max, inline styles only)
+    # ─────────────────────────────────────────────────────────────
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOLA SEO — {biz} Audit Report</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<title>LOLA SEO — {biz} Audit</title>
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+<style>
+  @media only screen and (max-width:600px) {{
+    .email-outer {{ padding:8px !important; }}
+    .email-card  {{ border-radius:12px !important; }}
+    .hero-score  {{ font-size:80px !important; }}
+    .section-pad {{ padding:0 14px 18px !important; }}
+    .offer-pad   {{ margin:0 14px 14px !important; }}
+    table        {{ width:100% !important; }}
+  }}
+</style>
 </head>
-<body style="margin:0;padding:0;background:{DARK};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-<div style="max-width:600px;margin:0 auto;background:{DARK_CARD};border-radius:8px;overflow:hidden;border:1px solid {DARK_BDR}">
+<body style="margin:0;padding:0;background:#050505;-webkit-text-size-adjust:100%">
+<div class="email-outer" style="max-width:600px;margin:0 auto;padding:16px">
+<div class="email-card" style="background:{DARK_CARD};border-radius:8px;
+  overflow:hidden;border:1px solid {DARK_BDR}">
 
-  <!-- Header -->
-  <div style="background:linear-gradient(135deg,{DARK_CARD},{DARK});padding:24px;text-align:center;border-bottom:1px solid {DARK_BDR}">
-    <img src="{LOLA_LOGO}" alt="Lola" style="width:56px;height:56px;border-radius:50%;border:2px solid {GOLD_DIM};margin-bottom:12px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2em;color:{GOLD};margin-bottom:4px;font-family:'DM Mono',monospace,sans-serif">LOLA SEO · TY ALEXANDER MEDIA</div>
-    <div style="font-size:18px;font-weight:700;color:{TEXT};font-family:-apple-system,sans-serif">{biz} — Free SEO Audit</div>
-    <div style="font-size:11px;color:{FAINT};margin-top:4px;font-family:'DM Mono',monospace,sans-serif">{url} · {city}</div>
+  <!-- ── HEADER ── -->
+  <div style="background:linear-gradient(160deg,#161616,{DARK});padding:24px 20px;
+    text-align:center;border-bottom:1px solid {DARK_BDR}">
+    <img src="{LOLA_LOGO}" alt="Lola" width="56" height="56"
+      style="border-radius:50%;border:2px solid {GOLD_DIM};margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.22em;
+      color:{GOLD};margin-bottom:5px;font-family:DM Mono,monospace,sans-serif">
+      LOLA SEO · BY TY ALEXANDER MEDIA
+    </div>
+    <div style="font-size:19px;font-weight:700;color:{TEXT};margin-bottom:4px;
+      font-family:-apple-system,sans-serif">{biz} — Free SEO Audit</div>
+    <div style="font-size:11px;color:{FAINT};font-family:DM Mono,monospace,sans-serif">
+      {url_display} · {city}
+    </div>
   </div>
 
-  <!-- Score hero -->
-  <div style="padding:28px 24px;text-align:center;border-bottom:1px solid {DARK_BDR}">
-    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{FAINT};margin-bottom:10px;font-family:'DM Mono',monospace,sans-serif">Lola&rsquo;s Verdict</div>
-    <div style="font-size:80px;font-weight:800;color:{score_color};line-height:1;font-family:'DM Mono',monospace,sans-serif">{total}</div>
-    <div style="font-size:12px;color:{FAINT};margin-bottom:10px;font-family:'DM Mono',monospace,sans-serif">/100 · Grade {grade}</div>
-    <div style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:99px;font-size:12px;font-weight:600;color:{GOLD};margin-bottom:16px;font-family:'DM Mono',monospace,sans-serif">
+  <!-- ── SCORE HERO ── -->
+  <div style="padding:28px 20px 20px;text-align:center;
+    border-bottom:1px solid {DARK_BDR};
+    background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.06) 0%,transparent 60%)">
+
+    {score_ring}
+
+    <div style="font-size:12px;color:{FAINT};margin-bottom:10px;
+      font-family:DM Mono,monospace,sans-serif">Grade {grade}</div>
+
+    <div style="display:inline-block;padding:7px 18px;
+      background:{score_color}18;border:1px solid {score_color}40;
+      border-radius:99px;font-size:13px;font-weight:700;color:{score_color};
+      margin-bottom:16px;font-family:DM Mono,monospace,sans-serif">
       {grade_emoji} {grade_label}
     </div>
-    <p style="font-size:14px;color:{MUTED};line-height:1.7;margin:0 0 14px;font-family:-apple-system,sans-serif">{summary}</p>
-    <div style="padding:12px 20px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.25);border-radius:6px;display:inline-block">
-      <span style="font-size:14px;font-weight:600;color:{CRITICAL};font-family:-apple-system,sans-serif">You&rsquo;re missing an estimated {leads_lost} inbound calls per month.</span>
+
+    <p style="font-size:14px;color:{MUTED};line-height:1.75;
+      margin:0 0 16px;max-width:400px;margin-left:auto;margin-right:auto;
+      font-family:-apple-system,sans-serif">{summary}</p>
+
+    <!-- Leads lost callout -->
+    <div style="display:inline-block;padding:12px 20px;
+      background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);
+      border-radius:8px;max-width:100%;box-sizing:border-box">
+      <div style="font-size:15px;font-weight:700;color:{CRITICAL};
+        font-family:-apple-system,sans-serif;line-height:1.5">
+        You're missing an estimated {leads} inbound calls per month.
+      </div>
     </div>
   </div>
 
-  <!-- Revenue leak -->
-  <div style="margin:20px 24px;padding:18px 20px;background:{DARK};border:1px solid rgba(224,82,82,0.3);border-radius:6px;text-align:center">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:{CRITICAL};margin-bottom:8px;font-family:'DM Mono',monospace,sans-serif">Estimated Monthly Revenue Leak</div>
-    <div style="font-size:52px;font-weight:800;color:{TEXT};line-height:1;font-family:'DM Mono',monospace,sans-serif">${revenue_leak:,}</div>
-    <div style="font-size:11px;color:{FAINT};margin-top:4px;font-family:-apple-system,sans-serif">in missed leads per month based on your market and score</div>
+  <!-- ── REVENUE LEAK ── -->
+  <div style="margin:18px 20px;padding:18px;background:{DARK};
+    border:1px solid rgba(224,82,82,0.25);border-radius:8px;text-align:center">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;
+      color:{CRITICAL};margin-bottom:8px;font-family:DM Mono,monospace,sans-serif">
+      Estimated Monthly Revenue Leak
+    </div>
+    <div style="font-size:56px;font-weight:800;color:{TEXT};line-height:1;
+      font-family:DM Mono,monospace,sans-serif">${revenue:,}</div>
+    <div style="font-size:12px;color:{FAINT};margin-top:5px;
+      font-family:-apple-system,sans-serif">
+      in missed leads per month based on {city} market + your score
+    </div>
   </div>
 
-  <!-- Score breakdown -->
-  <div style="padding:0 24px 20px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{GOLD};margin-bottom:12px;font-family:'DM Mono',monospace,sans-serif">🐾 Score Breakdown</div>
-    <table style="width:100%;border-collapse:collapse;background:{DARK};border-radius:6px;overflow:hidden;border:1px solid {DARK_BDR}">
-      {cat_row("Site Health",     "site_health")}
-      {cat_row("Local Presence",  "local_presence")}
-      {cat_row("Mobile",          "mobile")}
-      {cat_row("Page Speed",      "page_speed")}
-      {cat_row("Content",         "content")}
+  <!-- ── SCORE BREAKDOWN ── -->
+  <div class="section-pad" style="padding:0 20px 18px">
+    {_section_label("🐾", "Score Breakdown")}
+    <table style="width:100%;border-collapse:collapse;background:{DARK};
+      border-radius:8px;overflow:hidden;border:1px solid {DARK_BDR}">
+      {cats_html}
     </table>
   </div>
 
-  <!-- Issues -->
-  <div style="padding:0 24px 20px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{CRITICAL};margin-bottom:12px;font-family:'DM Mono',monospace,sans-serif">🚨 What Lola Found</div>
+  <!-- ── ISSUES ── -->
+  <div class="section-pad" style="padding:0 20px 18px">
+    {_section_label("🚨", "What Lola Found", CRITICAL)}
     {issues_html}
   </div>
 
-  {comp_section}
+  {comp_block}
 
-  <!-- Quick wins -->
-  <div style="padding:0 24px 20px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{GREEN};margin-bottom:12px;font-family:'DM Mono',monospace,sans-serif">🎾 Quick Wins — Do These First</div>
+  <!-- ── QUICK WINS ── -->
+  <div class="section-pad" style="padding:0 20px 18px">
+    {_section_label("🎾", "Quick Wins — Do These First", GREEN)}
     {wins_html}
   </div>
 
-  {proof_section}
+  {proof_block}
 
-  <!-- $97 PLAYBOOK CTA (matches frontend exactly) -->
-  <div style="margin:0 24px 16px;padding:24px;background:{DARK};border-radius:6px;border-left:3px solid {GOLD};border-top:1px solid {DARK_BDR};border-right:1px solid {DARK_BDR};border-bottom:1px solid {DARK_BDR}">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{GOLD};margin-bottom:8px;font-family:'DM Mono',monospace,sans-serif">Do It Yourself</div>
-    <div style="font-size:22px;font-weight:700;color:{TEXT};margin-bottom:8px;font-family:-apple-system,sans-serif">Get Lola&rsquo;s Full Playbook — $97</div>
-    <p style="font-size:13px;color:{MUTED};line-height:1.65;margin:0 0 14px;font-family:-apple-system,sans-serif">
-      Your score is a <strong style="color:{score_color}">{total}/100</strong>. Agencies charge $500–1,500 for an audit like this.
-      Lola&rsquo;s playbook is $97. One time. Yours forever.
-    </p>
-    <ul style="margin:0 0 16px;padding-left:18px">
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">Exact title tag formulas for {biz} and {city}</li>
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">Meta description templates — ready to copy and paste</li>
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">Schema markup code to paste directly into your site</li>
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">GBP optimization checklist</li>
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">Local citation submission guide</li>
-      <li style="font-size:13px;color:{MUTED};line-height:1.65;margin-bottom:5px;font-family:-apple-system,sans-serif">Priority fix order — know exactly what to do first</li>
-    </ul>
-    <a href="{QUICK_FIX_LINK}&biz={biz}&score={total}" style="display:block;padding:16px;background:{GOLD};color:{DARK};font-weight:700;font-size:17px;border-radius:4px;text-decoration:none;text-align:center;font-family:-apple-system,sans-serif">
-      Get the $97 Playbook →
-    </a>
-    <p style="font-size:12px;color:{CRITICAL};text-align:center;margin:10px 0 0;font-family:-apple-system,sans-serif">{urgency}</p>
-  </div>
+  <!-- ── $97 DIY PLAYBOOK ── -->
+  {offer_97}
 
-  <!-- $400 RETAINER UPSELL (immediately after $97) -->
-  <div style="margin:0 24px 20px;padding:24px;background:{DARK};border-radius:6px;border:1px solid {GOLD}">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{GOLD};margin-bottom:8px;font-family:'DM Mono',monospace,sans-serif">Most Popular · Best Value</div>
-    <div style="font-size:22px;font-weight:700;color:{TEXT};margin-bottom:8px;font-family:-apple-system,sans-serif">Let Ty&rsquo;s Team Handle All of It</div>
+  <!-- ── $400 RETAINER UPSELL ── -->
+  {offer_400}
 
-    <!-- Value stack -->
-    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
-      {''.join(f"""<tr><td style="font-size:12px;color:{MUTED};padding:5px 0;border-bottom:1px solid {DARK_BDR};font-family:-apple-system,sans-serif">✓ {item}</td><td style="font-size:11px;color:{FAINT};padding:5px 0;border-bottom:1px solid {DARK_BDR};text-align:right;text-decoration:line-through;font-family:'DM Mono',monospace,sans-serif">{val}</td></tr>""" for item, val in [
-        ("Full Lola Audit Report", "$500"),
-        ("Title Tag + Meta Implementation", "$300"),
-        ("Schema Markup Setup", "$200"),
-        ("GBP Optimization", "$300"),
-        ("Local Citation Cleanup", "$200"),
-        ("Monthly Content (1 page/blog)", "$300"),
-        ("Monthly Ranking Report", "$150"),
-      ])}
-    </table>
-    <div style="border-top:1px solid {DARK_BDR};padding-top:10px;margin-bottom:14px;display:flex;justify-content:space-between">
-      <span style="font-size:12px;color:{MUTED};font-family:-apple-system,sans-serif">Total Value:</span>
-      <span style="font-size:13px;color:{FAINT};text-decoration:line-through;font-family:'DM Mono',monospace,sans-serif">$1,950</span>
-    </div>
-
-    <div style="font-size:22px;font-weight:700;color:{GOLD};margin-bottom:8px;font-family:-apple-system,sans-serif">You get all of it for $397 total</div>
-    <p style="font-size:13px;color:{MUTED};line-height:1.65;margin:0 0 14px;font-family:-apple-system,sans-serif">
-      Add the $97 playbook + Ty&rsquo;s full implementation team for $300 more.
-      That&rsquo;s $397 for your first month. Then just $400/month after that.
-      Cancel anytime. No contracts. You run {biz} — we get it found, called, and chosen.
-    </p>
-    <div style="display:inline-block;padding:5px 12px;background:{GOLD};color:{DARK};font-size:11px;font-weight:700;border-radius:3px;margin-bottom:14px;font-family:'DM Mono',monospace,sans-serif">YOU SAVE OVER $1,500</div>
-    <br>
-    <a href="{RETAINER_LINK}&score={total}&biz={biz}" style="display:block;padding:14px;background:transparent;color:{GOLD};font-weight:700;font-size:16px;border-radius:4px;text-decoration:none;text-align:center;border:1.5px solid {GOLD};font-family:-apple-system,sans-serif">
-      Add Ty&rsquo;s Team for $300 More →
-    </a>
-    <p style="font-size:11px;color:{FAINT};text-align:center;margin:8px 0 0;font-family:-apple-system,sans-serif">Month to month. Cancel anytime. First month = full implementation of everything Lola found today.</p>
-  </div>
-
-  <!-- Roadmap -->
-  <div style="padding:0 24px 20px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:{MUTED};margin-bottom:12px;font-family:'DM Mono',monospace,sans-serif">📅 Your 90-Day Fix Roadmap</div>
+  <!-- ── 90-DAY ROADMAP ── -->
+  <div class="section-pad" style="padding:0 20px 18px">
+    {_section_label("📅", "Your 90-Day Fix Roadmap", MUTED)}
     {roadmap_html}
   </div>
 
-  <!-- Google Review -->
-  {google_review}
+  <!-- ── GOOGLE REVIEW ── -->
+  {review_block}
 
-  <!-- Footer -->
-  <div style="padding:16px 24px;background:{DARK};text-align:center;border-top:1px solid {DARK_BDR}">
-    <div style="font-size:10px;color:{FAINT};font-family:'DM Mono',monospace,sans-serif">
-      Ty Alexander Media · Tampa Bay, FL ·
-      <a href="tel:+17273006573" style="color:{GOLD};text-decoration:none">727-300-6573</a> ·
-      <a href="https://tyalexandermedia.com" style="color:{FAINT};text-decoration:none">tyalexandermedia.com</a>
-    </div>
-    <div style="font-size:10px;color:{FAINT};margin-top:6px;font-family:'DM Mono',monospace,sans-serif">
-      © 2026 Ty Alexander Media · Tampa Bay FL
+  <!-- ── FOOTER ── -->
+  <div style="padding:16px 20px;background:{DARK};border-top:1px solid {DARK_BDR};
+    text-align:center">
+    <div style="font-size:11px;color:{FAINT};line-height:1.8;
+      font-family:DM Mono,monospace,sans-serif">
+      Ty Alexander Media · Tampa Bay, FL<br>
+      <a href="tel:+17273006573" style="color:{GOLD};text-decoration:none">727-300-6573</a>
+      &nbsp;·&nbsp;
+      <a href="https://tyalexandermedia.com" style="color:{FAINT};text-decoration:none">
+        tyalexandermedia.com
+      </a><br>
+      <span style="color:{FAINT}">© 2026 Ty Alexander Media</span>
     </div>
   </div>
 
+</div>
 </div>
 </body>
 </html>"""
