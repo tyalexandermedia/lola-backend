@@ -66,7 +66,7 @@ def score_site_health(scrape: dict, ssl: dict, url: str = "", city: str = "") ->
     return min(s, 100), findings
 
 
-def score_local_presence(scrape: dict, gbp: dict, city: str) -> tuple[int, list]:
+def score_local_presence(scrape: dict, gbp: dict, city: str, business_name: str = 'your business') -> tuple[int, list]:
     s = 0
     findings = []
     city_short = city.split(",")[0].strip() if city else ""
@@ -355,7 +355,7 @@ async def calculate_full_score(check_data: dict, business_type: str, city: str, 
 
     # Score each category and collect findings
     health_s,  health_f  = score_site_health(scrape, ssl)
-    local_s,   local_f   = score_local_presence(scrape, gbp, city)
+    local_s,   local_f   = score_local_presence(scrape, gbp, city, business_name=business_name)
     mobile_s,  mobile_f  = score_mobile(scrape, ps)
     speed_s,   speed_f   = score_page_speed(ps)
     content_s, content_f = score_content(scrape, city, business_type)
