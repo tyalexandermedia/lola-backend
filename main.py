@@ -164,8 +164,10 @@ async def create_audit(body: AuditRequest, background_tasks: BackgroundTasks):
         _safe(check_safe_browsing(url, settings.GOOGLE_SAFE_BROWSING_API_KEY), 8, {"ok":True,"is_safe":True}),
         _safe(check_crawlability(url), 10, {"ok":False,"robots_ok":True,"sitemap_found":False}),
         _safe(check_backlinks(url), 12, {"ok":False,"has_backlinks":False}),
-        _safe(check_competitors(body.business_name, body.city, body.business_type, url,
-              settings.GOOGLE_CUSTOM_SEARCH_API_KEY, settings.GOOGLE_CUSTOM_SEARCH_CX), 12, {"ok":False,"competitors":[]}),
+        _safe(check_competitors(body.business_name, body.city, body.business_type,
+              serp_api_key=settings.SERP_API_KEY,
+              custom_search_key=settings.GOOGLE_CUSTOM_SEARCH_API_KEY,
+              custom_search_cx=settings.GOOGLE_CUSTOM_SEARCH_CX), 12, {"ok":False,"competitors":[]}),
         _safe(check_instagram(body.instagram_handle), 10, {"ok":False}),
     )
 

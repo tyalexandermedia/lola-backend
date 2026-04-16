@@ -1,58 +1,144 @@
-import httpx
-from typing import Optional, List
-from urllib.parse import urlparse
+"""
+LOLA SEO — Competitor Check (SerpApi)
+Pulls real Google local pack + organic results for the business's city + service type.
+Returns top competitors by name with ratings, review counts, and URLs.
+Falls back to Custom Search if SerpApi unavailable.
+"""
+import httpx, logging, os
 
-CUSTOM_SEARCH_URL = "https://www.googleapis.com/customsearch/v1"
+logger = logging.getLogger("lola.competitors")
+
+SERP_URL   = "https://serpapi.com/search.json"
+CUSTOM_URL = "https://www.googleapis.com/customsearch/v1"
 
 
 async def check_competitors(
     business_name: str,
     city: str,
     business_type: str,
-    website: str = "",
-    api_key: Optional[str] = None,
-    cx: Optional[str] = None,
+    serp_api_key: str = "",
+    custom_search_key: str = "",
+    custom_search_cx:  str = "",
 ) -> dict:
-    fallback = {"ok": False, "competitors": [], "business_in_results": False, "error": None}
-    if not api_key or not cx:
-        return {**fallback, "ok": True, "error": "No Custom Search API key/CX"}
-    try:
-        query = f"{business_type.replace('_', ' ')} in {city}"
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            r = await client.get(
-                CUSTOM_SEARCH_URL,
-                params={"q": query, "key": api_key, "cx": cx, "num": 5},
-            )
-        if r.status_code == 403:
-            return {**fallback, "ok": True, "error": "Custom Search API: billing not enabled or daily quota exceeded. Go to console.cloud.google.com/billing to activate free $300 credit."}
-        if r.status_code == 400:
-            return {**fallback, "ok": True, "error": "Custom Search API: invalid CX ID or API key"}
-        if not r.is_success:
-            return {**fallback, "ok": True, "error": f"HTTP {r.status_code}"}
+    fallback = {"ok": True, "competitors": [], "local_pack": [], "score": 50}
+    city_short = city.split(",")[0].strip()
+    btype = business_type.replace("_", " ")
+    query = f"{btype} {city_short}"
 
-        items = r.json().get("items", [])
-        domain = urlparse(website).netloc.replace("www.", "") if website else ""
+    # ── Strategy 1: SerpApi (best — real Google results) ─────────────────────
+    if serp_api_key:
+        try:
+            params = {
+                "q":          query,
+                "location":   city,
+                "api_key":    serp_api_key,
+                "engine":     "google",
+                "num":        10,
+                "gl":         "us",
+                "hl":         "en",
+            }
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.get(SERP_URL, params=params)
 
-        competitors = []
-        business_in_results = False
-        for item in items[:3]:
-            item_domain = urlparse(item.get("link", "")).netloc.replace("www.", "")
-            if domain and domain == item_domain:
-                business_in_results = True
-                continue
-            competitors.append({
-                "title": item.get("title", ""),
-                "url": item.get("link", ""),
-                "snippet": item.get("snippet", ""),
-                "domain": item_domain,
-            })
+            if r.is_success:
+                data = r.json()
 
-        return {
-            "ok": True,
-            "competitors": competitors[:3],
-            "business_in_results": business_in_results,
-            "query": query,
-            "error": None,
-        }
-    except Exception as e:
-        return {**fallback, "ok": True, "error": str(e)}
+                # Local pack (3-pack at top of Google) — highest value
+                local_places = (
+                    data.get("local_results", {}).get("places", [])
+                    or data.get("local_pack", [])
+                    or []
+                )
+                competitors = []
+                for place in local_places[:5]:
+                    name = place.get("title", "")
+                    if business_name.lower() in name.lower():
+                        continue  # skip self
+                    competitors.append({
+                        "name":         name,
+                        "title":        name,
+                        "url":          place.get("website", "") or place.get("link", ""),
+                        "rating":       place.get("rating"),
+                        "review_count": place.get("reviews"),
+                        "position":     place.get("position", 0),
+                        "source":       "local_pack",
+                    })
+
+                # Organic results as supplement
+                organic = data.get("organic_results", [])
+                for result in organic[:6]:
+                    name  = result.get("title", "")
+                    url   = result.get("link", "")
+                    # Skip directories and aggregators
+                    skip_domains = ["yelp.com","angi.com","homeadvisor.com",
+                                    "thumbtack.com","bbb.org","yellowpages.com",
+                                    "google.com","facebook.com","nextdoor.com"]
+                    if any(d in url for d in skip_domains):
+                        continue
+                    if business_name.lower() in name.lower():
+                        continue
+                    # Avoid duplicates
+                    if any(c["url"] == url for c in competitors):
+                        continue
+                    competitors.append({
+                        "name":         name,
+                        "title":        name,
+                        "url":          url,
+                        "link":         url,
+                        "rating":       None,
+                        "review_count": None,
+                        "position":     result.get("position", 0),
+                        "source":       "organic",
+                    })
+
+                # Also find self in local pack for GBP context
+                self_in_pack = next(
+                    (p for p in local_places if business_name.lower() in p.get("title","").lower()),
+                    None
+                )
+
+                score = 50
+                if competitors:
+                    score = 30  # being outranked is bad
+                if self_in_pack:
+                    score = 70  # at least we're in the pack
+
+                logger.info(f"SerpApi: {len(competitors)} competitors, self_in_pack={bool(self_in_pack)}")
+                return {
+                    **fallback,
+                    "competitors":   competitors[:5],
+                    "local_pack":    [c for c in competitors if c.get("source") == "local_pack"],
+                    "self_in_pack":  self_in_pack,
+                    "score":         score,
+                    "query":         query,
+                }
+        except Exception as e:
+            logger.warning(f"SerpApi failed: {e}")
+
+    # ── Strategy 2: Google Custom Search (fallback) ────────────────────────────
+    if custom_search_key and custom_search_cx:
+        try:
+            params = {
+                "key": custom_search_key,
+                "cx":  custom_search_cx,
+                "q":   query,
+                "num": 5,
+            }
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.get(CUSTOM_URL, params=params)
+            if r.is_success:
+                items = r.json().get("items", [])
+                competitors = [
+                    {"name": i.get("title",""), "title": i.get("title",""),
+                     "url": i.get("link",""), "link": i.get("link",""),
+                     "source": "custom_search"}
+                    for i in items
+                    if business_name.lower() not in i.get("title","").lower()
+                ]
+                logger.info(f"Custom Search fallback: {len(competitors)} results")
+                return {**fallback, "competitors": competitors[:5], "score": 40}
+        except Exception as e:
+            logger.warning(f"Custom Search failed: {e}")
+
+    logger.info("No competitor data available — both APIs unavailable")
+    return fallback

@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     RESEND_API_KEY: Optional[str] = None
     OWNER_EMAIL: str = "ty@tyalexandermedia.com"
     WIX_API_KEY: str = ""  # Wix API key for CRM contact sync
+    SERP_API_KEY: str = ""  # SerpApi key for real Google competitor data
 
     class Config:
         env_file = ".env"
