@@ -126,8 +126,7 @@ def _issue_row(issue, biz, city, btype, url=""):
   <div style="padding:14px 16px">
     <div style="font-size:14px;font-weight:700;color:{TEXT};margin-bottom:5px;
       font-family:-apple-system,sans-serif">{title}</div>
-    <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0
-      {f';margin-bottom:6px' if rev else ''};font-family:-apple-system,sans-serif">{desc}</p>
+    <p style="font-size:14px;color:{TEXT_MUTED};line-height:1.8;margin:0 0 8px;font-family:-apple-system,sans-serif">{desc}</p>
     {f'<div style="font-size:12px;font-weight:600;color:{color};margin-top:6px;font-family:-apple-system,sans-serif">Estimated impact: {rev}</div>' if rev else ''}
   </div>
   {upsell}
@@ -136,8 +135,7 @@ def _issue_row(issue, biz, city, btype, url=""):
 def _win_row(win, idx, biz, city):
     steps = win.get("steps") or []
     steps_html = "".join(
-        f'<li style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;'
-        f'margin-bottom:4px;font-family:-apple-system,sans-serif">{s}</li>'
+        f'<li style="font-size:14px;color:{TEXT_MUTED};line-height:1.8;margin-bottom:6px;font-family:-apple-system,sans-serif">{s}</li>'
         for s in steps[:5]
     )
     effort = win.get("effort", "")
@@ -151,8 +149,7 @@ def _win_row(win, idx, biz, city):
       <div style="width:26px;height:26px;border-radius:50%;background:{NAVY};
         color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;
         justify-content:center;flex-shrink:0;font-family:-apple-system,sans-serif">{idx}</div>
-      <span style="font-size:13px;font-weight:700;color:{TEXT};
-        font-family:-apple-system,sans-serif">{win.get('win','')}</span>
+      <span style="font-size:14px;font-weight:700;color:{TEXT};font-family:-apple-system,sans-serif">{win.get('win','')}</span>
     </div>
     {f'<span style="font-size:11px;color:{NAVY};font-weight:600;background:{BLUE_BG};padding:3px 10px;border-radius:99px;font-family:-apple-system,sans-serif">{effort}</span>' if effort else ''}
   </div>
@@ -217,8 +214,7 @@ def generate_html_report(audit: dict) -> str:
         c  = _score_color(s)
         return f'''
 <tr>
-  <td style="padding:12px 16px;font-size:13px;color:{TEXT};border-bottom:1px solid {BORDER};
-    font-family:-apple-system,sans-serif;font-weight:500">{label}</td>
+  <td style="padding:10px 14px;font-size:13px;color:{TEXT};border-bottom:1px solid {BORDER};font-family:-apple-system,sans-serif;font-weight:500;white-space:nowrap">{label}</td>
   <td style="padding:12px 16px;border-bottom:1px solid {BORDER}">{_bar(s, c)}</td>
   <td style="padding:12px 16px;font-size:18px;font-weight:800;color:{c};
     border-bottom:1px solid {BORDER};text-align:right;
@@ -280,8 +276,7 @@ def generate_html_report(audit: dict) -> str:
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;
       letter-spacing:0.15em;color:rgba(255,255,255,0.7);margin-bottom:4px;
       font-family:-apple-system,sans-serif">Do It Yourself</div>
-    <div style="font-size:24px;font-weight:800;color:#fff;
-      font-family:-apple-system,sans-serif">Get Lola's Full Playbook — $97</div>
+    <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;font-family:-apple-system,sans-serif">Fix {biz}'s SEO — $97</div>
   </div>
   <div style="padding:20px">
     <!-- Score badge -->
@@ -294,13 +289,10 @@ def generate_html_report(audit: dict) -> str:
       <div>
         <div style="font-size:14px;font-weight:700;color:{TEXT};
           font-family:-apple-system,sans-serif">{g_emoji} {grade_label}</div>
-        <div style="font-size:12px;color:{CRITICAL};font-weight:600;
-          font-family:-apple-system,sans-serif">
-          Estimated ${revenue:,}/mo in missed leads
-        </div>
+        <div style="font-size:12px;color:{CRITICAL};font-weight:600;font-family:-apple-system,sans-serif">Est. ${revenue:,}/mo in missed leads</div>
       </div>
     </div>
-    <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0 0 14px;
+    <p style="font-size:15px;color:{TEXT_MUTED};line-height:1.8;margin:0 0 14px;
       font-family:-apple-system,sans-serif">
       Your score is <strong style="color:{sc}">{total}/100</strong>.
       Agencies charge $500–1,500 for an audit like this.
@@ -349,8 +341,7 @@ def generate_html_report(audit: dict) -> str:
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;
       letter-spacing:0.15em;color:rgba(255,255,255,0.7);margin-bottom:4px;
       font-family:-apple-system,sans-serif">Most Popular · Best Value</div>
-    <div style="font-size:24px;font-weight:800;color:#fff;
-      font-family:-apple-system,sans-serif">Let Ty's Team Handle It</div>
+    <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;font-family:-apple-system,sans-serif">Let Ty's Team Fix {biz}</div>
   </div>
   <div style="padding:20px">
     <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0 0 16px;
@@ -426,7 +417,7 @@ def generate_html_report(audit: dict) -> str:
 </style>
 </head>
 <body style="margin:0;padding:0;background:{LIGHT_GRAY};-webkit-text-size-adjust:100%">
-<div class="email-outer" style="max-width:600px;margin:0 auto;padding:20px 16px">
+<div class="email-outer" style="max-width:600px;margin:0 auto;padding:12px 0">
 <div class="email-card" style="background:{WHITE};border-radius:10px;
   overflow:hidden;border:1px solid {BORDER};box-shadow:0 2px 12px rgba(0,0,0,0.06)">
 
