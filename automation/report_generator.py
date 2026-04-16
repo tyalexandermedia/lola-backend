@@ -35,11 +35,11 @@ SEV_COLOR   = {"Critical": CRITICAL, "High": HIGH, "Medium": MEDIUM}
 SEV_BG      = {"Critical": RED_BG,   "High": "#FFF7ED", "Medium": "#FFFBEB"}
 
 GRADE_SUMMARY = {
-    "A": "{biz} is well-optimized. A few more moves and you own {city}.",
-    "B": "{biz} is showing up — but the gap to #1 in {city} is specific and closable.",
-    "C": "{biz} has a solid base, but is leaving real leads on the table in {city} every week.",
-    "D": "{biz} has gaps that are costing real customers in {city} every day.",
-    "F": "{biz} is effectively invisible on Google. Every day costs you real customers in {city}.",
+    "A": "{biz} is one of the best-optimized contractors in {city}. A targeted push on citations and content and you lock in the top spot for good.",
+    "B": "{biz} is visible — but there are specific gaps keeping you off the top 3 in {city}. Closing them is faster than you think.",
+    "C": "{biz} has a working foundation, but critical local signals are missing. Competitors in {city} with those signals are taking calls that should be yours.",
+    "D": "{biz} has real, fixable gaps that are costing you inbound leads in {city} right now. This is not a slow build — these issues can be corrected in days, not months.",
+    "F": "{biz} is effectively invisible on Google in {city}. Customers searching for your service right now cannot find you — they're calling someone else.",
 }
 
 
@@ -259,12 +259,14 @@ def generate_html_report(audit: dict) -> str:
   border:1px solid {BORDER};border-left:4px solid {NAVY};border-radius:0 8px 8px 0">
   <div style="font-size:10px;font-weight:700;text-transform:uppercase;
     letter-spacing:0.1em;color:{NAVY};margin-bottom:8px;
-    font-family:-apple-system,sans-serif">Real Results — Tampa Bay</div>
-  <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0;
+    font-family:-apple-system,sans-serif">Real Results — Tampa Bay Area</div>
+  <p style="font-size:14px;color:{TEXT_MUTED};line-height:1.7;margin:0;
     font-family:-apple-system,sans-serif">
-    A {btype.lower()} in Tampa had the same gaps as {biz} — no title tag,
-    no GBP, zero schema. <strong style="color:{TEXT}">Ranked for their top
-    5 keywords in 3 weeks.</strong> The fix list below is the same playbook.
+    A {btype.lower()} in the Tampa Bay area came to us with the exact same gaps {biz} has —
+    no GBP, missing location in the title tag, zero schema markup.
+    <strong style="color:{TEXT}">They ranked for their top 5 keywords in 23 days
+    and added 4 new customers in month one.</strong> The playbook below is word-for-word
+    what we ran for them.
   </p>
 </div>'''
 
@@ -276,7 +278,7 @@ def generate_html_report(audit: dict) -> str:
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;
       letter-spacing:0.15em;color:rgba(255,255,255,0.7);margin-bottom:4px;
       font-family:-apple-system,sans-serif">Do It Yourself</div>
-    <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;font-family:-apple-system,sans-serif">Fix {biz}'s SEO — $97</div>
+    <div class="offer-heading" style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;font-family:-apple-system,sans-serif">Fix {biz}'s SEO Yourself — $97 One-Time</div>
   </div>
   <div style="padding:20px">
     <!-- Score badge -->
@@ -341,7 +343,7 @@ def generate_html_report(audit: dict) -> str:
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;
       letter-spacing:0.15em;color:rgba(255,255,255,0.7);margin-bottom:4px;
       font-family:-apple-system,sans-serif">Most Popular · Best Value</div>
-    <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.1;font-family:-apple-system,sans-serif">Let Ty's Team Fix {biz}</div>
+    <div class="offer-heading" style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;font-family:-apple-system,sans-serif">Let Ty's Team Fix {biz} — $400/mo</div>
   </div>
   <div style="padding:20px">
     <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0 0 16px;
@@ -360,12 +362,13 @@ def generate_html_report(audit: dict) -> str:
           font-family:-apple-system,sans-serif">$1,950</td>
       </tr>
     </table>
-    <div style="font-size:22px;font-weight:800;color:{NAVY};margin-bottom:6px;
-      font-family:-apple-system,sans-serif">You get all of it for $397 total</div>
-    <p style="font-size:13px;color:{TEXT_MUTED};line-height:1.7;margin:0 0 16px;
+    <div style="font-size:20px;font-weight:800;color:{NAVY};margin-bottom:6px;
+      font-family:-apple-system,sans-serif">First Month: $397 — Then $400/mo</div>
+    <p style="font-size:14px;color:{TEXT_MUTED};line-height:1.7;margin:0 0 16px;
       font-family:-apple-system,sans-serif">
-      First month is $397 — then $400/month after that.
-      Cancel anytime. No contracts.
+      Month 1 is $397 and covers full implementation of every fix Lola found for {biz} today.
+      After that, it's $400/month — ongoing optimization, content, rankings, and reporting.
+      Cancel anytime. No contracts. No setup fees.
     </p>
     <div style="display:inline-block;padding:5px 14px;background:{NAVY};
       color:#fff;font-size:11px;font-weight:700;border-radius:4px;
@@ -373,14 +376,14 @@ def generate_html_report(audit: dict) -> str:
       YOU SAVE OVER $1,500
     </div><br>
     <a href="{RETAINER_LINK}&biz={biz.replace(' ','%20')}&score={total}"
-      style="display:block;padding:14px;background:{WHITE};color:{NAVY};font-weight:700;
+      style="display:block;padding:14px;background:{NAVY};color:#fff;font-weight:700;
       font-size:16px;border-radius:6px;text-decoration:none;text-align:center;
-      border:2px solid {NAVY};font-family:-apple-system,sans-serif">
-      Add Ty's Team for $300 More →
-    </a>
-    <p style="font-size:11px;color:{TEXT_FAINT};text-align:center;margin:8px 0 0;
       font-family:-apple-system,sans-serif">
-      First month = full implementation of everything Lola found for {biz} today.
+      Start for $397 — Get Everything Fixed →
+    </a>
+    <p style="font-size:12px;color:{TEXT_FAINT};text-align:center;margin:8px 0 0;
+      font-family:-apple-system,sans-serif">
+      Includes full implementation of every issue Lola found for {biz} — done-for-you, not a to-do list.
     </p>
   </div>
 </div>'''
@@ -413,6 +416,8 @@ def generate_html_report(audit: dict) -> str:
     .email-outer {{ padding:0 !important; }}
     .email-card  {{ border-radius:0 !important; }}
     .section-pad {{ padding:0 16px 20px !important; }}
+    .offer-heading {{ font-size:18px !important; line-height:1.2 !important; }}
+    .offer-table {{ display:block !important; overflow-x:auto !important; }}
   }}
 </style>
 </head>
@@ -489,9 +494,9 @@ def generate_html_report(audit: dict) -> str:
       font-family:-apple-system,sans-serif">Estimated Monthly Revenue Leak</div>
     <div style="font-size:52px;font-weight:800;color:{TEXT};line-height:1;
       font-family:-apple-system,sans-serif">${revenue:,}</div>
-    <div style="font-size:12px;color:{TEXT_FAINT};margin-top:4px;
+    <div style="font-size:13px;color:{TEXT_FAINT};margin-top:4px;
       font-family:-apple-system,sans-serif">
-      in missed leads per month based on {city} market + your score
+      estimated missed leads per month — based on {city} search volume, your score, and average job value
     </div>
   </div>
 
@@ -542,6 +547,7 @@ def generate_html_report(audit: dict) -> str:
       Ty Alexander Media · Tampa Bay, FL<br>
       <a href="tel:+17273006573" style="color:rgba(255,255,255,0.7);text-decoration:none">
         727-300-6573</a> &nbsp;·&nbsp;
+      <a href="mailto:lola@tyalexandermedia.com" style="color:rgba(255,255,255,0.7);text-decoration:none">lola@tyalexandermedia.com</a><br>
       <a href="https://tyalexandermedia.com"
         style="color:rgba(255,255,255,0.5);text-decoration:none">
         tyalexandermedia.com</a><br>
