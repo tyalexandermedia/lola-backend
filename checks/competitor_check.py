@@ -28,14 +28,15 @@ async def check_competitors(
     # ── Strategy 1: SerpApi (best — real Google results) ─────────────────────
     if serp_api_key:
         try:
+            # SerpApi: use gl+hl for US locale, no location param (causes errors with short city formats)
             params = {
-                "q":          query,
-                "location":   city,
-                "api_key":    serp_api_key,
-                "engine":     "google",
-                "num":        10,
-                "gl":         "us",
-                "hl":         "en",
+                "q":       query,
+                "api_key": serp_api_key,
+                "engine":  "google",
+                "num":     10,
+                "gl":      "us",
+                "hl":      "en",
+                "google_domain": "google.com",
             }
             async with httpx.AsyncClient(timeout=15.0) as client:
                 r = await client.get(SERP_URL, params=params)
