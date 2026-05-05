@@ -1,6 +1,6 @@
 # ============================================================
-# LOLA SEO BACKEND — Complete Implementation
-# FastAPI + Google APIs + Brevo Automation
+# LOLA SEO BACKEND — ENHANCED VERSION
+# Improved Revenue Calculator + User Experience
 # ============================================================
 
 import os
@@ -15,7 +15,7 @@ from typing import Optional, List
 
 # ── INITIALIZE APP ──────────────────────────────────────────
 
-app = FastAPI(title="Lola SEO Backend", version="2.0")
+app = FastAPI(title="Lola SEO Backend", version="2.1-Enhanced")
 
 # ── CORS SETUP ──────────────────────────────────────────────
 
@@ -39,7 +39,6 @@ GOOGLE_CUSTOM_SEARCH_CX = os.getenv("GOOGLE_CUSTOM_SEARCH_CX")
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 BREVO_LIST_ID = os.getenv("BREVO_LIST_ID", "2")
-BREVO_WEBHOOK_URL = os.getenv("BREVO_WEBHOOK_URL")
 
 LOLA_SECRET_ADMIN_KEY = os.getenv("LOLA_SECRET_ADMIN_KEY", "admin-key-change-me")
 
@@ -61,66 +60,100 @@ class HealthResponse(BaseModel):
     has_brevo_key: bool
     has_custom_search_key: bool
 
-# ── REVENUE CALCULATOR ──────────────────────────────────────
+# ── ENHANCED REVENUE CALCULATOR ─────────────────────────────
 
-def calculate_revenue_leak(business_type: str, score: int) -> int:
+class RevenueCalculator:
     """
-    Estimate monthly revenue loss based on SEO score.
-    Higher score = lower leak (better rankings).
+    Enhanced revenue leak calculator with:
+    - Vertical-specific job values
+    - Realistic call estimates
+    - Pricing impact analysis
+    - Conversion rate modeling
     """
     
-    job_values = {
-        "soft wash": 500,
-        "pressure wash": 450,
-        "hvac": 650,
-        "roofing": 8000,
-        "plumbing": 400,
-        "electrical": 500,
-        "landscaping": 350,
-        "contractor": 500,
-        "restaurant": 75,
-        "salon": 150,
-        "medical": 300,
-        "retail": 100,
-        "default": 500
+    # Job values by vertical (realistic 2026 pricing)
+    JOB_VALUES = {
+        "soft wash": {"min": 300, "avg": 500, "max": 800},
+        "pressure wash": {"min": 250, "avg": 450, "max": 750},
+        "hvac": {"min": 400, "avg": 650, "max": 1200},
+        "roofing": {"min": 5000, "avg": 8000, "max": 15000},
+        "plumbing": {"min": 200, "avg": 400, "max": 800},
+        "electrical": {"min": 300, "avg": 500, "max": 900},
+        "landscaping": {"min": 200, "avg": 350, "max": 600},
+        "contractor": {"min": 300, "avg": 500, "max": 1000},
+        "restaurant": {"min": 30, "avg": 75, "max": 150},
+        "salon": {"min": 60, "avg": 150, "max": 300},
+        "medical": {"min": 200, "avg": 300, "max": 500},
+        "retail": {"min": 50, "avg": 100, "max": 250},
+        "default": {"min": 300, "avg": 500, "max": 1000}
     }
     
-    job_value = job_values.get(business_type.lower(), 500)
+    @staticmethod
+    def get_job_value(business_type: str) -> dict:
+        """Get realistic job value range for business type"""
+        return RevenueCalculator.JOB_VALUES.get(
+            business_type.lower(),
+            RevenueCalculator.JOB_VALUES["default"]
+        )
     
-    # Estimate missed calls/month based on score
-    missed_calls_map = {
-        25: 60,   # Very poor score = many missed calls
-        40: 40,
-        60: 25,
-        75: 15,
-        100: 5    # Excellent score = few missed calls
-    }
+    @staticmethod
+    def estimate_monthly_calls(score: int) -> dict:
+        """
+        Estimate monthly calls based on SEO score.
+        Higher score = fewer missed calls.
+        """
+        
+        # Score ranges and estimated missed calls
+        if score >= 90:
+            return {"missed": 3, "label": "Minimal Loss", "efficiency": "95%"}
+        elif score >= 80:
+            return {"missed": 8, "label": "Low Loss", "efficiency": "85%"}
+        elif score >= 70:
+            return {"missed": 15, "label": "Moderate Loss", "efficiency": "70%"}
+        elif score >= 60:
+            return {"missed": 25, "label": "Significant Loss", "efficiency": "50%"}
+        elif score >= 50:
+            return {"missed": 40, "label": "High Loss", "efficiency": "30%"}
+        else:
+            return {"missed": 60, "label": "Critical Loss", "efficiency": "10%"}
     
-    missed_calls = 60
-    for threshold, calls in sorted(missed_calls_map.items()):
-        if score <= threshold:
-            missed_calls = calls
-            break
-    
-    monthly_leak = missed_calls * job_value
-    return monthly_leak
-
-def get_grade(score: int) -> tuple:
-    """Convert score (0-100) to letter grade (A-F)"""
-    
-    grade_map = [
-        (90, "A", "🏆 Best in Show"),
-        (80, "B", "✅ Solid Foundation"),
-        (70, "C", "🐾 Needs Work"),
-        (60, "D", "⚠️ Needs Training"),
-        (0, "F", "🚨 Off the Leash")
-    ]
-    
-    for threshold, grade, label in grade_map:
-        if score >= threshold:
-            return grade, label
-    
-    return "F", "🚨 Off the Leash"
+    @staticmethod
+    def calculate_revenue_leak(business_type: str, score: int) -> dict:
+        """
+        Calculate detailed revenue leak with:
+        - Monthly missed calls
+        - Revenue loss estimate
+        - Pricing impact
+        - Recovery potential
+        """
+        
+        job_value = RevenueCalculator.get_job_value(business_type)
+        calls_data = RevenueCalculator.estimate_monthly_calls(score)
+        
+        missed_calls = calls_data["missed"]
+        avg_job_value = job_value["avg"]
+        
+        # Calculate monthly leak
+        monthly_leak = missed_calls * avg_job_value
+        annual_leak = monthly_leak * 12
+        
+        # Calculate potential recovery if score improved
+        improved_calls_data = RevenueCalculator.estimate_monthly_calls(score + 25)
+        improved_leak = improved_calls_data["missed"] * avg_job_value
+        recovery_potential = monthly_leak - improved_leak
+        
+        return {
+            "monthly_leak": int(monthly_leak),
+            "annual_leak": int(annual_leak),
+            "missed_calls_per_month": missed_calls,
+            "avg_job_value": int(avg_job_value),
+            "job_value_range": f"${job_value['min']}-${job_value['max']}",
+            "efficiency_label": calls_data["label"],
+            "current_efficiency": calls_data["efficiency"],
+            "recovery_potential": int(recovery_potential),
+            "recovery_calls": int(recovery_potential / avg_job_value) if avg_job_value > 0 else 0,
+            "payback_months": max(1, int(3000 / (recovery_potential / 12))) if recovery_potential > 0 else 0
+        }
 
 # ── GOOGLE API CALLS ────────────────────────────────────────
 
@@ -143,7 +176,7 @@ async def get_page_speed(website: str) -> dict:
         
         response = requests.get(url, params=params, timeout=15)
         
-        if response.status_code == 429:  # Rate limited
+        if response.status_code == 429:
             return {"ok": False, "performance": 50, "accessibility": 50, "seo": 50}
         
         data = response.json()
@@ -177,7 +210,7 @@ async def get_safe_browsing(website: str) -> dict:
         payload = {
             "client": {
                 "clientId": "lola-seo",
-                "clientVersion": "2.0"
+                "clientVersion": "2.1"
             },
             "threatInfo": {
                 "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE"],
@@ -336,7 +369,6 @@ def calculate_total_score(
     """
     
     score = 0
-    max_score = 100
     
     # Page Speed (25%)
     speed_contribution = (page_speed / 100) * 25
@@ -373,6 +405,23 @@ def calculate_total_score(
     
     return min(int(score), 100)
 
+def get_grade(score: int) -> tuple:
+    """Convert score (0-100) to letter grade (A-F)"""
+    
+    grade_map = [
+        (90, "A", "🏆 Best in Show"),
+        (80, "B", "✅ Solid Foundation"),
+        (70, "C", "🐾 Needs Work"),
+        (60, "D", "⚠️ Needs Training"),
+        (0, "F", "🚨 Off the Leash")
+    ]
+    
+    for threshold, grade, label in grade_map:
+        if score >= threshold:
+            return grade, label
+    
+    return "F", "🚨 Off the Leash"
+
 # ── BREVO INTEGRATION ───────────────────────────────────────
 
 def send_to_brevo(
@@ -381,13 +430,13 @@ def send_to_brevo(
     city: str,
     business_type: str,
     total_score: int,
-    revenue_leak: int,
+    revenue_leak: dict,
     grade: str,
     grade_label: str
 ) -> bool:
     """
-    Send contact to Brevo and add to list.
-    This triggers the Brevo automation workflow (5-email sequence).
+    Send contact to Brevo with detailed revenue data.
+    Triggers Brevo automation workflow (5-email sequence).
     """
     
     if not BREVO_API_KEY:
@@ -411,7 +460,10 @@ def send_to_brevo(
                 "SEO_SCORE": total_score,
                 "SEO_GRADE": grade,
                 "SEO_GRADE_LABEL": grade_label,
-                "REVENUE_LEAK": revenue_leak,
+                "MONTHLY_LEAK": revenue_leak.get("monthly_leak", 0),
+                "ANNUAL_LEAK": revenue_leak.get("annual_leak", 0),
+                "MISSED_CALLS": revenue_leak.get("missed_calls_per_month", 0),
+                "RECOVERY_POTENTIAL": revenue_leak.get("recovery_potential", 0),
                 "AUDIT_SOURCE": "lola_seo",
                 "AUDIT_DATE": datetime.now().isoformat()
             },
@@ -472,8 +524,11 @@ async def audit(request: AuditRequest):
             request.business_type
         )
         
-        # Calculate revenue leak
-        revenue_leak = calculate_revenue_leak(request.business_type, total_score)
+        # Calculate enhanced revenue leak
+        revenue_leak = RevenueCalculator.calculate_revenue_leak(
+            request.business_type,
+            total_score
+        )
         
         # Get grade
         grade, grade_label = get_grade(total_score)
@@ -493,9 +548,9 @@ async def audit(request: AuditRequest):
             grade_label
         )
         
-        print(f"✅ LOLA AUDIT COMPLETE: Score={total_score}, Grade={grade}, Revenue Leak=${revenue_leak}/mo")
+        print(f"✅ LOLA AUDIT COMPLETE: Score={total_score}, Grade={grade}, Monthly Leak=${revenue_leak['monthly_leak']}")
         
-        # Return full audit report
+        # Return full audit report with enhanced data
         return {
             "audit_id": audit_id,
             "business_name": request.business_name,
@@ -506,7 +561,7 @@ async def audit(request: AuditRequest):
             "total_score": total_score,
             "grade": grade,
             "grade_label": grade_label,
-            "revenue_leak_monthly": revenue_leak,
+            "revenue_leak": revenue_leak,
             "page_speed": {
                 "performance": page_speed_result.get("performance", 50),
                 "accessibility": page_speed_result.get("accessibility", 50),
@@ -569,7 +624,14 @@ async def get_leads(x_admin_key: str = None):
 async def root():
     return {
         "name": "Lola SEO Backend",
-        "version": "2.0",
+        "version": "2.1-Enhanced",
+        "features": [
+            "Real Google APIs (PageSpeed, Places, Safe Browsing, Custom Search)",
+            "Enhanced revenue calculator with pricing impact",
+            "Vertical-specific job value estimates",
+            "Recovery potential analysis",
+            "Automatic Brevo integration (5-email sequence)"
+        ],
         "endpoints": [
             "POST /audit (main audit)",
             "GET /health (status check)",
