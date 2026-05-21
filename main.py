@@ -6,12 +6,16 @@
 import os
 import uuid
 import asyncio
+import traceback
 import requests
+from dotenv import load_dotenv
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
+
+load_dotenv()
 
 app = FastAPI(title="Lola SEO", version="3.0")
 
@@ -25,6 +29,8 @@ GOOGLE_CUSTOM_SEARCH_KEY = os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY")
 GOOGLE_CUSTOM_SEARCH_CX = os.getenv("GOOGLE_CUSTOM_SEARCH_CX")
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 BREVO_LIST_ID = os.getenv("BREVO_LIST_ID", "2")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+AUDIT_FROM_EMAIL = os.getenv("AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>")
 
 class AuditRequest(BaseModel):
     business_name: str
@@ -167,36 +173,146 @@ async def get_safe_browsing(website: str) -> dict:
 
 async def get_business_info(business_name: str, city: str) -> dict:
     if not GOOGLE_PLACES_KEY:
-        return {"ok": False, "name": business_name, "address": "", "phone": "", "rating": 0, "verified": False}
-    
+        return {
+            "ok": False,
+            "name": business_name,
+            "address": "",
+            "phone": "",
+            "website": "",
+            "rating": 0,
+            "review_count": 0,
+            "business_status": None,
+            "place_id": None,
+            "place_url": None,
+            "verified": None,
+            "verification_confidence": "low",
+        }
+
     try:
-        url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
-        params = {
+        find_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+        find_params = {
             "input": f"{business_name} {city}",
             "inputtype": "textquery",
             "key": GOOGLE_PLACES_KEY,
-            "fields": "formatted_address,formatted_phone_number,rating,user_ratings_total,business_status"
+            "fields": "place_id,formatted_address,formatted_phone_number,name,rating,user_ratings_total,business_status",
         }
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(find_url, params=find_params, timeout=10)
         data = response.json()
-        
+
         candidates = data.get("candidates", [])
         if not candidates:
-            return {"ok": False, "name": business_name, "address": "", "phone": "", "rating": 0, "verified": False}
-        
+            return {
+                "ok": False,
+                "name": business_name,
+                "address": "",
+                "phone": "",
+                "website": "",
+                "rating": 0,
+                "review_count": 0,
+                "business_status": None,
+                "place_id": None,
+                "place_url": None,
+                "verified": None,
+                "verification_confidence": "low",
+            }
+
         place = candidates[0]
+        place_id = place.get("place_id")
+
+        details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+        details_params = {
+            "place_id": place_id,
+            "key": GOOGLE_PLACES_KEY,
+            "fields": ",".join([
+                "name",
+                "formatted_address",
+                "formatted_phone_number",
+                "website",
+                "rating",
+                "user_ratings_total",
+                "business_status",
+                "opening_hours",
+                "photos",
+                "reviews",
+                "url",
+                "permanently_closed",
+                "types",
+            ]),
+        }
+        details_response = requests.get(details_url, params=details_params, timeout=10)
+        details = details_response.json().get("result", {})
+
+        if not details:
+            return {
+                "ok": False,
+                "name": business_name,
+                "address": "",
+                "phone": "",
+                "website": "",
+                "rating": 0,
+                "review_count": 0,
+                "business_status": None,
+                "place_id": place_id,
+                "place_url": None,
+                "verified": None,
+                "verification_confidence": "low",
+            }
+
+        has_website = bool(details.get("website"))
+        has_hours = bool(details.get("opening_hours"))
+        photo_count = len(details.get("photos", []))
+        has_photos = photo_count > 0
+        review_count = details.get("user_ratings_total", 0)
+        has_reviews = review_count > 0
+        has_address = bool(details.get("formatted_address"))
+        has_phone = bool(details.get("formatted_phone_number"))
+
+        completeness_signals = sum([
+            has_website,
+            has_hours,
+            has_photos,
+            has_reviews,
+            has_address,
+            has_phone,
+        ])
+
+        if completeness_signals >= 5:
+            verification_confidence = "high"
+        elif completeness_signals >= 3:
+            verification_confidence = "medium"
+        else:
+            verification_confidence = "low"
+
         return {
             "ok": True,
-            "name": business_name,
-            "address": place.get("formatted_address", ""),
-            "phone": place.get("formatted_phone_number", ""),
-            "rating": place.get("rating", 0),
-            "review_count": place.get("user_ratings_total", 0),
-            "verified": place.get("business_status") == "OPERATIONAL"
+            "name": details.get("name", business_name),
+            "address": details.get("formatted_address", ""),
+            "phone": details.get("formatted_phone_number", ""),
+            "website": details.get("website", ""),
+            "rating": details.get("rating", 0),
+            "review_count": review_count,
+            "business_status": details.get("business_status"),
+            "place_id": place_id,
+            "place_url": details.get("url"),
+            "verified": None,
+            "verification_confidence": verification_confidence,
         }
     except Exception as e:
         print(f"Places error: {e}")
-        return {"ok": False, "name": business_name, "address": "", "phone": "", "rating": 0, "verified": False}
+        return {
+            "ok": False,
+            "name": business_name,
+            "address": "",
+            "phone": "",
+            "website": "",
+            "rating": 0,
+            "review_count": 0,
+            "business_status": None,
+            "place_id": None,
+            "place_url": None,
+            "verified": None,
+            "verification_confidence": "low",
+        }
 
 async def get_competitors(business_type: str, city: str) -> List[dict]:
     if not GOOGLE_CUSTOM_SEARCH_KEY or not GOOGLE_CUSTOM_SEARCH_CX:
@@ -242,8 +358,15 @@ def calculate_total_score(page_speed: int, accessibility: int, seo_score: int, i
         local_score += 10
     if business_info.get("phone"):
         local_score += 10
-    if business_info.get("verified"):
+
+    verification_confidence = business_info.get("verification_confidence")
+    if verification_confidence == "high":
         local_score += 5
+    elif verification_confidence == "medium":
+        local_score += 3
+    elif verification_confidence == "low":
+        local_score += 1
+
     if business_info.get("rating", 0) > 0:
         local_score += 5
     score += local_score
@@ -285,6 +408,48 @@ def send_to_brevo(email: str, business_name: str, city: str, business_type: str,
         print(f"Brevo error: {e}")
         return False
 
+
+def send_audit_email(to_email: str, total_score: int, grade: str, monthly_leak: int) -> bool:
+    if not RESEND_API_KEY:
+        print("Resend skipped: RESEND_API_KEY is not configured.")
+        return False
+
+    subject = "Your Lola SEO Audit Results"
+    body = (
+        f"Hello,\n\n"
+        f"Your Lola SEO audit is complete.\n"
+        f"Score: {total_score}\n"
+        f"Grade: {grade}\n"
+        f"Estimated monthly revenue leak: ${monthly_leak}\n\n"
+        f"Thank you,\n"
+        f"LOLA SEO"
+    )
+
+    try:
+        response = requests.post(
+            "https://api.resend.com/emails",
+            json={
+                "from":    AUDIT_FROM_EMAIL,
+                "to":      [to_email],
+                "subject": subject,
+                "text":    body,
+            },
+            headers={
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type":  "application/json",
+            },
+            timeout=10,
+        )
+        print(f"Resend send status: {response.status_code} → {to_email}")
+        if 200 <= response.status_code < 300:
+            return True
+        print(f"Resend error body: {response.text}")
+        return False
+    except Exception:
+        print("Resend exception:")
+        traceback.print_exc()
+        return False
+
 # ── MAIN ENDPOINT ────────────────────────────────────────────
 
 @app.post("/audit")
@@ -317,11 +482,16 @@ async def audit(request: AuditRequest):
         grade, grade_label = get_grade(total_score)
         audit_id = str(uuid.uuid4())
         
+        business_info_result["verification_confidence_description"] = (
+            "This score reflects how complete the Google listing profile appears "
+            "based on visible signals like website, hours, photos, reviews, "
+            "address, and phone. It is a profile completeness signal, not direct "
+            "confirmation of owner verification by Google."
+        )
+        
         send_to_brevo(request.email, request.business_name, request.city, request.business_type, total_score, revenue_leak, grade, grade_label)
-        
-        print(f"✅ COMPLETE: {total_score}/100")
-        
-        return {
+
+        audit_response = {
             "audit_id": audit_id,
             "business_name": request.business_name,
             "website": website,
@@ -348,6 +518,19 @@ async def audit(request: AuditRequest):
                 "content": {"score": 60}
             }
         }
+
+        email_sent = send_audit_email(
+            request.email,
+            total_score,
+            grade,
+            revenue_leak.get("monthly_leak", 0),
+        )
+        if email_sent:
+            print(f"Resend audit email sent to {request.email}")
+        else:
+            print(f"Resend audit email not sent for {request.email}")
+
+        return audit_response
     except Exception as e:
         print(f"❌ ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
