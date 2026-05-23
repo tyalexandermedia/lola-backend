@@ -192,7 +192,7 @@ async def run_batch(leads: List[Lead], dry_run: bool = False) -> dict:
 
     async with httpx.AsyncClient() as client:
         for i, lead in enumerate(eligible):
-            variant: VariantKey = ["A", "B", "C"][i % 3]  # type: ignore[assignment]
+            variant: VariantKey = ["A", "B", "C", "D", "E"][i % 5]  # type: ignore[assignment]
             ok, msg_id, subject, _body, reply_alias = await send_one(
                 client, lead, variant, dry_run=dry_run
             )

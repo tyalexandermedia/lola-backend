@@ -89,4 +89,20 @@ export interface AuditResult {
   categories: Record<string, { score: number }>;
   signals: Record<string, SignalStatus>;
   recommendations: Recommendation[];
+  agent_readiness?: AgentReadiness;
+}
+
+export interface AgentReadinessCategory {
+  name: string;
+  score: number;
+  weight: number;
+  value: number;
+  available: boolean;
+}
+
+export interface AgentReadiness {
+  score: number;
+  grade: string;
+  grade_label: string;
+  categories: AgentReadinessCategory[];
 }

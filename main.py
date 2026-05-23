@@ -289,6 +289,94 @@ def get_grade(score: int) -> tuple:
 CONFIDENCE_TO_SCORE = {"high": 90, "medium": 65, "low": 35}
 
 
+def compute_agent_readiness_score(
+    page_speed: dict, business_info: dict, safe_browsing: dict
+) -> dict:
+    """
+    Phase 1 Agent Readiness Score — how prepared is this business to be
+    SURFACED by AI search agents (ChatGPT, Perplexity, Google AI Overviews,
+    Gemini) when they answer "best <service> in <city>" queries.
+
+    Computed from existing audit signals — no extra API calls. Returns:
+        { "score": int 0-100, "grade": "A".."F", "categories": [...] }
+
+    Per the spec, the five categories sum to 100:
+        Entity Clarity        (25 pts)  GMB completeness + verification
+        Multi-Source Presence (25 pts)  Citations + NAP consistency
+        Review Velocity       (20 pts)  Rating + count
+        Content Depth         (15 pts)  Lighthouse SEO + accessibility
+        Technical Foundation  (15 pts)  Lighthouse performance + safety
+    """
+    bi_ok = bool(business_info.get("ok", False))
+    confidence = business_info.get("verification_confidence", "low")
+    rating = float(business_info.get("rating") or 0)
+    review_count = int(business_info.get("review_count") or 0)
+    ps_ok = bool(page_speed.get("ok", False))
+    sb_ok = bool(safe_browsing.get("ok", False))
+    is_safe = bool(safe_browsing.get("is_safe", True))
+
+    # 1. Entity Clarity (25) — GMB completeness signal
+    confidence_pts = {"high": 100, "medium": 65, "low": 35}.get(confidence, 35)
+    entity_pts = int(25 * (confidence_pts / 100)) if bi_ok else 0
+
+    # 2. Multi-Source Presence (25) — proxied by GBP presence + has-website
+    has_website = bool(business_info.get("website"))
+    has_phone = bool(business_info.get("phone"))
+    has_address = bool(business_info.get("address"))
+    nap_score = sum([has_website, has_phone, has_address]) / 3
+    multi_pts = int(25 * nap_score) if bi_ok else 0
+
+    # 3. Review Velocity & Recency (20)
+    if bi_ok and review_count > 0:
+        rating_pts = (rating / 5.0) if rating else 0
+        # 50 reviews → full credit
+        count_pts = min(1.0, review_count / 50.0)
+        review_pts = int(20 * (0.6 * rating_pts + 0.4 * count_pts))
+    else:
+        review_pts = 0
+
+    # 4. Content Depth (15) — Lighthouse SEO + a11y
+    if ps_ok:
+        content_pts = int(15 * ((page_speed.get("seo", 50) + page_speed.get("accessibility", 50)) / 200))
+    else:
+        content_pts = 0
+
+    # 5. Technical Foundation (15) — Lighthouse perf + Safe Browsing clean
+    if ps_ok:
+        perf_component = page_speed.get("performance", 50) / 100
+        safety_component = 1.0 if (not sb_ok or is_safe) else 0.0
+        tech_pts = int(15 * (0.7 * perf_component + 0.3 * safety_component))
+    else:
+        tech_pts = 0
+
+    raw_total = entity_pts + multi_pts + review_pts + content_pts + tech_pts
+    score = max(0, min(100, raw_total))
+
+    if score >= 85:
+        grade = ("A", "Agent-Ready")
+    elif score >= 70:
+        grade = ("B", "Mostly Ready")
+    elif score >= 55:
+        grade = ("C", "Needs Work")
+    elif score >= 40:
+        grade = ("D", "Largely Invisible")
+    else:
+        grade = ("F", "Invisible to AI")
+
+    return {
+        "score": score,
+        "grade": grade[0],
+        "grade_label": grade[1],
+        "categories": [
+            {"name": "Entity Clarity", "score": int(entity_pts / 25 * 100), "weight": 25, "value": entity_pts, "available": bi_ok},
+            {"name": "Multi-Source Presence", "score": int(multi_pts / 25 * 100), "weight": 25, "value": multi_pts, "available": bi_ok},
+            {"name": "Review Velocity", "score": int(review_pts / 20 * 100) if review_pts else 0, "weight": 20, "value": review_pts, "available": bi_ok and review_count > 0},
+            {"name": "Content Depth", "score": int(content_pts / 15 * 100), "weight": 15, "value": content_pts, "available": ps_ok},
+            {"name": "Technical Foundation", "score": int(tech_pts / 15 * 100), "weight": 15, "value": tech_pts, "available": ps_ok},
+        ],
+    }
+
+
 def compute_home_services_score(
     page_speed: dict, business_info: dict, safe_browsing: dict
 ) -> tuple:
@@ -698,6 +786,9 @@ async def audit(request: AuditRequest) -> AuditResponse:
             total_score, category_scores, signal_status = compute_home_services_score(
                 page_speed_result, business_info_result, safe_browsing_result,
             )
+            agent_readiness = compute_agent_readiness_score(
+                page_speed_result, business_info_result, safe_browsing_result,
+            )
             incomplete = total_score < 0
 
             # For percentile + revenue-leak math we need a numeric score even
@@ -766,6 +857,7 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 "categories": category_scores,
                 "signals": signal_status,
                 "recommendations": recommendations,
+                "agent_readiness": agent_readiness,
             }
 
             await save_audit(

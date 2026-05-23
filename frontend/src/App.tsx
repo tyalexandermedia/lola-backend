@@ -3,16 +3,22 @@ import { useEffect, useMemo, useState } from 'react';
 import AuditFlow, { API_URL } from './AuditFlow';
 import SharedReport from './SharedReport';
 import AdminLeads from './AdminLeads';
+import Homepage from './Homepage';
+import PricingPage from './PricingPage';
 import type { HealthResponse } from './types';
 
 type Route =
+  | { name: 'home' }
   | { name: 'audit' }
+  | { name: 'pricing' }
   | { name: 'report'; auditId: string }
   | { name: 'admin' }
   | { name: 'unknown' };
 
 function parseRoute(pathname: string): Route {
-  if (pathname === '/' || pathname === '') return { name: 'audit' };
+  if (pathname === '/' || pathname === '') return { name: 'home' };
+  if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
+  if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/admin/leads') return { name: 'admin' };
   const reportMatch = pathname.match(/^\/r\/([^/]+)\/?$/);
   if (reportMatch) return { name: 'report', auditId: decodeURIComponent(reportMatch[1]) };
@@ -49,18 +55,26 @@ function App() {
   const degraded = useMemo(() => detectDegradedApis(health), [health]);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white">
+    <div className="min-h-screen scroll-smooth bg-[#0A0A0B] text-white">
       <Header />
       <div
-        className={`mx-auto flex flex-col px-5 pt-10 pb-20 sm:px-6 ${
+        className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${
           route.name === 'report' || route.name === 'admin'
-            ? 'max-w-[1280px]'
-            : 'max-w-[640px]'
+            ? 'max-w-[1280px] pt-8 sm:pt-12'
+            : route.name === 'home' || route.name === 'pricing'
+            ? 'max-w-[1120px] pt-8 sm:pt-12'
+            : 'max-w-[640px] pt-8 sm:pt-10'
         }`}
       >
-        {degraded.length > 0 && <ApiDegradedBanner />}
+        {/* Banner moved OUT of the top of the page — now rendered as a
+            collapsible accordion at the bottom of the results page. Keeps the
+            hero clean and trustworthy. Only audit/admin/notfound routes still
+            show it inline if degraded; home/pricing/report handle it locally. */}
+        {degraded.length > 0 && route.name === 'audit' && <ApiDegradedBanner />}
 
+        {route.name === 'home' && <Homepage />}
         {route.name === 'audit' && <AuditFlow />}
+        {route.name === 'pricing' && <PricingPage />}
         {route.name === 'report' && <SharedReport auditId={route.auditId} />}
         {route.name === 'admin' && <AdminLeads />}
         {route.name === 'unknown' && <NotFound />}
@@ -96,17 +110,28 @@ function ApiDegradedBanner() {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.04] bg-[#0A0A0B]/80 backdrop-blur-[12px]">
-      <div className="mx-auto flex max-w-[640px] items-center justify-between px-5 py-6 sm:px-6">
-        <a
-          href="/"
-          className="text-[14px] font-bold uppercase tracking-[0.15em] text-[#D4AF37]"
-        >
-          LOLA SEO
+    <header className="sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
+      <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
+        {/* Logo — gold gradient wordmark + paw */}
+        <a href="/" className="group flex items-center gap-2" aria-label="Lola SEO — home">
+          <span aria-hidden className="text-[16px] leading-none">🐾</span>
+          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[15px]">
+            LOLA SEO
+          </span>
         </a>
-        <span className="hidden text-[12px] font-medium uppercase tracking-[0.18em] text-[#8A8F98] sm:inline">
-          Home services audit
-        </span>
+
+        {/* Right nav */}
+        <nav className="flex items-center gap-5 text-[13px] font-medium uppercase tracking-[0.12em] sm:gap-7 sm:text-[13px]">
+          <a href="/" className="text-[#C5C5C8] transition hover:text-[#D4AF37]">
+            Home
+          </a>
+          <a href="/audit" className="text-[#C5C5C8] transition hover:text-[#D4AF37]">
+            Audit
+          </a>
+          <a href="/pricing" className="text-[#C5C5C8] transition hover:text-[#D4AF37]">
+            Pricing
+          </a>
+        </nav>
       </div>
     </header>
   );
