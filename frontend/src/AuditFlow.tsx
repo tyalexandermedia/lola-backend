@@ -1090,19 +1090,19 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
 // new Stripe Payment Link URLs in Vercel env vars before launch.
 const STRIPE_DIY_PDF_URL =
   (import.meta.env.VITE_STRIPE_DIY_PDF_URL as string | undefined) ||
-  'https://buy.stripe.com/diy-pdf-placeholder';
+  'https://buy.stripe.com/14A7sK65YaJ127fg5P3oA09';
 
 const STRIPE_SPRINT_URL =
   (import.meta.env.VITE_STRIPE_SPRINT_URL as string | undefined) ||
-  'https://buy.stripe.com/sprint-placeholder';
+  'https://buy.stripe.com/aFabJ00LEdVd3bj3j33oA07';
 
 const STRIPE_RETAINER_MONTHLY_URL =
   (import.meta.env.VITE_STRIPE_RETAINER_MONTHLY_URL as string | undefined) ||
-  'https://buy.stripe.com/retainer-monthly-placeholder';
+  'https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08';
 
 const STRIPE_PRO_URL =
   (import.meta.env.VITE_STRIPE_PRO_URL as string | undefined) ||
-  'https://buy.stripe.com/pro-placeholder';
+  'https://buy.stripe.com/eVq14mfGydVd9zH2eZ3oA06';
 
 if (typeof window !== 'undefined') {
   for (const [name, val] of [

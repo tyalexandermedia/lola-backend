@@ -408,15 +408,16 @@ cd frontend && npm run dev
 
 ## Pricing matrix v2 — locked 2026-05-23
 
-| Tier | Price | Type | Env var | Stripe Payment Link |
+| Tier | Price | Type | Env var | Live Stripe Payment Link |
 |---|---|---|---|---|
-| DIY Playbook | **$47** | one-time | `VITE_STRIPE_DIY_PDF_URL` | ⏳ create |
-| Local SEO Sprint | **$397** | one-time | `VITE_STRIPE_SPRINT_URL` | ⏳ create |
-| Local SEO Retainer | **$697/mo** | monthly | `VITE_STRIPE_RETAINER_MONTHLY_URL` | ⏳ create |
-| Local SEO Pro | **$6,970/yr** | annual (Best Value) | `VITE_STRIPE_PRO_URL` | ⏳ create |
+| DIY Playbook | **$47** | one-time | `VITE_STRIPE_DIY_PDF_URL` | ✅ `…3oA09` |
+| Local SEO Sprint | **$397** | one-time | `VITE_STRIPE_SPRINT_URL` | ✅ `…3oA07` |
+| Local SEO Retainer | **$697/mo** | monthly | `VITE_STRIPE_RETAINER_MONTHLY_URL` | ✅ `…3oA08` |
+| Local SEO Pro | **$6,970/yr** | annual (Best Value) | `VITE_STRIPE_PRO_URL` | ✅ `…3oA06` |
 
-Old Stripe URLs ($499 / $1,497 / $4,990) are dead — pricing changed,
-re-create all 4 from scratch in Stripe Dashboard.
+All 4 live URLs baked into the source as fallbacks (and `.env.example`).
+Set the same 4 env vars in Vercel for clean separation per environment;
+without them, the source defaults take over.
 
 ### Paste-ready Stripe Payment Link descriptions
 
