@@ -1,10 +1,28 @@
 import aiosqlite
 import json
 import os
+import pathlib
 from datetime import datetime
 from typing import Optional, List
 
 DB_PATH = os.getenv("DB_PATH", "lola.db")
+
+# Defensive: if DB_PATH points to a nested directory (e.g. Railway volume at
+# /data/lola.db), ensure the parent exists. Falls back to working-dir SQLite
+# if the configured path can't be created — prevents startup crash from
+# missing volume mounts.
+def _ensure_db_parent():
+    global DB_PATH
+    parent = pathlib.Path(DB_PATH).parent
+    if str(parent) in (".", ""):
+        return
+    try:
+        parent.mkdir(parents=True, exist_ok=True)
+    except (OSError, PermissionError) as e:
+        print(f"⚠️  Could not create DB parent dir {parent}: {e}. Falling back to ./lola.db")
+        DB_PATH = "lola.db"
+
+_ensure_db_parent()
 
 CREATE_AUDITS = """
 CREATE TABLE IF NOT EXISTS audits (
