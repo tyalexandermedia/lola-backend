@@ -141,6 +141,22 @@ async def get_percentile(business_type: str, city: str, score: int) -> int:
     return max(1, min(99, percentile))
 
 
+async def get_audit_by_id(audit_id: str) -> Optional[dict]:
+    """Return the stored `raw_result` payload for a given audit_id, or None."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT raw_result FROM audits WHERE id = ?",
+            (audit_id,),
+        ) as cur:
+            row = await cur.fetchone()
+    if not row or not row[0]:
+        return None
+    try:
+        return json.loads(row[0])
+    except (TypeError, ValueError):
+        return None
+
+
 async def get_recent_leads(limit: int = 50) -> List[dict]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
