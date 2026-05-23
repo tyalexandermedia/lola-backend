@@ -160,7 +160,15 @@ async def get_percentile(business_type: str, city: str, score: int) -> int:
 
 
 async def get_audit_by_id(audit_id: str) -> Optional[dict]:
-    """Return the stored `raw_result` payload for a given audit_id, or None."""
+    """
+    Return the full audit_response shape (top-level fields like signals,
+    categories, recommendations, agent_readiness, etc.) for a given audit_id.
+
+    save_audit stores a wrapper dict like {email, business_name, ..., raw_result: {full audit}}.
+    The React /r/:id viewer expects the *full audit* at the top level, so we
+    unwrap raw_result here. Falls back to the wrapper itself for older rows
+    written before this format was settled.
+    """
     async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute(
             "SELECT raw_result FROM audits WHERE id = ?",
@@ -170,9 +178,13 @@ async def get_audit_by_id(audit_id: str) -> Optional[dict]:
     if not row or not row[0]:
         return None
     try:
-        return json.loads(row[0])
+        wrapper = json.loads(row[0])
     except (TypeError, ValueError):
         return None
+    # Unwrap if the saved payload nested the full audit under raw_result.
+    if isinstance(wrapper, dict) and isinstance(wrapper.get("raw_result"), dict):
+        return wrapper["raw_result"]
+    return wrapper
 
 
 async def get_recent_leads(limit: int = 50) -> List[dict]:
