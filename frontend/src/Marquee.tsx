@@ -11,7 +11,7 @@ const STATS = [
   'First Win Promise guarantee',
   '20-second audit, no signup',
   'Auto-Fix snippet technology',
-  'Transparent pricing $499–$1,497/mo',
+  'Transparent pricing — $47 DIY to $697/mo full-service',
   'Faith-driven, legacy-focused',
 ];
 

@@ -6,6 +6,7 @@ import type {
   PricingResponse,
   Recommendation,
 } from './types';
+import { track } from './analytics';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -268,24 +269,24 @@ function QuestionStage({
   }, [error]);
 
   return (
-    <main className="flex flex-1 flex-col pt-12 sm:pt-16">
+    <main className="flex flex-1 flex-col pt-2 sm:pt-6">
       <ProgressBar total={totalSteps} current={stepIndex} />
 
-      <div key={question.key} className="animate-slide-up mt-8">
+      <div key={question.key} className="animate-slide-up mt-4 sm:mt-6">
         <p
-          className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#FFD166]"
+          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#FFD166] sm:text-[12px]"
           aria-live="polite"
         >
           Step {stepIndex + 1} of {totalSteps}
         </p>
 
-        <h1 className="mt-4 text-[32px] font-bold leading-[1.15] text-white lg:text-[44px]">
+        <h1 className="mt-2 text-[26px] font-bold leading-[1.15] text-white sm:mt-3 sm:text-[32px] lg:text-[40px]">
           {question.prompt}
         </h1>
 
-        <p className="mt-4 text-[17px] leading-[1.6] text-[#9AA0A6]">{question.lola}</p>
+        <p className="mt-2 text-[15px] leading-[1.55] text-[#9AA0A6] sm:mt-3 sm:text-[17px] sm:leading-[1.6]">{question.lola}</p>
 
-        <div className="mt-10">
+        <div className="mt-5 sm:mt-8">
           {question.options ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {question.options.map((opt) => {
@@ -342,11 +343,20 @@ function QuestionStage({
             {error}
           </p>
         )}
+
+        {/* Heads-up note: only on the last step, below the email input.
+            Informational, not action-blocking — keeps CTA above the fold. */}
+        {isLastStep && (
+          <p className="mt-4 text-[12px] leading-[1.5] text-[#7A7F8A]">
+            Heads up: if any external data source is syncing, your audit still runs —
+            partial data shows as "pending" and populates within 24 hours.
+          </p>
+        )}
       </div>
 
       {/* Mobile: Next first (top), Back below — via flex-col-reverse.
           Desktop: Back left, Next right via sm:flex-row + justify-between. */}
-      <div className="mt-16 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <button
           type="button"
           onClick={onBack}
@@ -610,7 +620,7 @@ export function ResultsStage({
           <button
             type="button"
             onClick={copyShareLink}
-            className="rounded-xl bg-white/[0.05] px-3 py-1.5 text-[11px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+            className="flex h-11 min-w-[140px] items-center justify-center rounded-xl bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
           >
             {copied ? 'Copied ✓' : 'Copy share link'}
           </button>
@@ -707,6 +717,68 @@ export function ResultsStage({
         </section>
       )}
 
+      {/* AI Search Visibility — v1 placeholder section. Frames the upcoming
+          metric (where you actually show up across ChatGPT/Perplexity/Gemini)
+          and tells the reader honestly that live tracking is a Pro feature. */}
+      <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
+        <div className="flex items-center gap-2">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+            AI Search Visibility
+          </p>
+          <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+            Beta
+          </span>
+        </div>
+        <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
+          Where you show up when buyers ask AI
+        </h3>
+        <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+          Your Agent Readiness Score above predicts <em>how well</em> AI agents can
+          understand your business. The next layer — live tracking of <strong className="text-white">where you actually appear</strong> in
+          ChatGPT, Perplexity, Gemini, and Google AI Overviews for the queries
+          buyers run in {audit.city} — is rolling out to Pro retainers next month.
+        </p>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            { label: 'ChatGPT', status: 'Tracking — ships Q3' },
+            { label: 'Perplexity', status: 'Tracking — ships Q3' },
+            { label: 'Google AI Overviews', status: 'Tracking — ships Q3' },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="rounded-[12px] border border-white/[0.06] bg-[#0A0A0B]/40 p-4"
+            >
+              <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-white">
+                {row.label}
+              </p>
+              <p className="mt-1.5 text-[11px] text-[#8A8F98]">{row.status}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-5 text-[12px] leading-[1.5] text-[#7A7F8A]">
+          Honest note: this section is a roadmap placeholder. Today's score reflects
+          AI-readability signals (entities, reviews, schema, site speed). Live citation
+          tracking goes live with the{' '}
+          <a
+            href="/pricing#pro"
+            onClick={() => trackClick('pro_cta_clicked', { from: 'ai_search_visibility_note' })}
+            className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
+          >
+            Pro tier
+          </a>.
+        </p>
+
+        <a
+          href={withUtm(STRIPE_PRO_URL, 'ai_search_visibility', { campaign: 'pro_upgrade' })}
+          onClick={() => trackClick('pro_cta_clicked', { from: 'ai_search_visibility_button' })}
+          className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
+        >
+          Skip the wait — Go Pro ($6,970/yr, save $1,394) →
+        </a>
+      </section>
+
       <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category signals</p>
@@ -773,7 +845,7 @@ const PRICING_URL =
 
 const STRATEGY_CALL_URL =
   (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
-  'https://tyalexandermedia.com/book';
+  'https://cal.com/ty-alexander-media/15min';
 
 const GUIDE_URL =
   (import.meta.env.VITE_GUIDE_URL as string | undefined) ||
@@ -799,23 +871,23 @@ function withUtm(
   return `${url}${sep}${params.toString()}`;
 }
 
-// Minimal analytics shim — fires to Plausible / GA if either is loaded,
-// otherwise console.log. Caller passes a stable label (book_call,
-// guide_download, case_study_view, rerun_audit).
+// Analytics shim — routes through PostHog (analytics.ts) which falls back to
+// console.log when VITE_POSTHOG_KEY isn't set. Plausible/GA kept as fan-out
+// so historical dashboards keep filling.
 function trackClick(label: string, props?: Record<string, string | number>) {
   if (typeof window === 'undefined') return;
+  try {
+    track(label, props);
+  } catch {
+    /* analytics must never break the click */
+  }
   const w = window as unknown as {
     plausible?: (event: string, opts?: { props?: object }) => void;
     gtag?: (cmd: string, event: string, opts?: object) => void;
   };
   try {
-    if (w.plausible) {
-      w.plausible(label, props ? { props } : undefined);
-    } else if (w.gtag) {
-      w.gtag('event', label, { event_category: 'cta', ...(props || {}) });
-    } else if (typeof console !== 'undefined') {
-      console.log(`[track] ${label}`, props || {});
-    }
+    if (w.plausible) w.plausible(label, props ? { props } : undefined);
+    else if (w.gtag) w.gtag('event', label, { event_category: 'cta', ...(props || {}) });
   } catch {
     /* analytics must never break the click */
   }
@@ -1012,19 +1084,14 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
   );
 }
 
-// CTA destinations. All three are placeholders — wire each to the real Stripe
-// checkout (or Calendly intent URL) when those exist. The current backend
-// doesn't run any Stripe code; these are just where the buttons point.
-const PLAYBOOK_URL = 'https://tyalexandermedia.com/playbook';
-const BOOK_LOLA_URL = 'https://tyalexandermedia.com/book';
-const PRO_URL = 'https://tyalexandermedia.com/pro';
+// ── Stripe payment URLs (env-overridable) ─────────────────────
+// All 4 reset to placeholders 2026-05-23 because pricing changed (Sprint
+// $397, Retainer $697/mo, Pro $6,970/yr, DIY Playbook $47). User sets the
+// new Stripe Payment Link URLs in Vercel env vars before launch.
+const STRIPE_DIY_PDF_URL =
+  (import.meta.env.VITE_STRIPE_DIY_PDF_URL as string | undefined) ||
+  'https://buy.stripe.com/diy-pdf-placeholder';
 
-// ── Stripe payment URLs (env-overridable) ─────────────────────
-// Set these in Vercel → Environment Variables when you create the Stripe
-// Payment Links. They render with a placeholder + console.warn until set.
-// ── Stripe payment URLs (env-overridable) ─────────────────────
-// Set these in Vercel → Environment Variables when you create the Stripe
-// Payment Links. They render with placeholders + console.warn until set.
 const STRIPE_SPRINT_URL =
   (import.meta.env.VITE_STRIPE_SPRINT_URL as string | undefined) ||
   'https://buy.stripe.com/sprint-placeholder';
@@ -1033,28 +1100,20 @@ const STRIPE_RETAINER_MONTHLY_URL =
   (import.meta.env.VITE_STRIPE_RETAINER_MONTHLY_URL as string | undefined) ||
   'https://buy.stripe.com/retainer-monthly-placeholder';
 
-const STRIPE_RETAINER_ANNUAL_URL =
-  (import.meta.env.VITE_STRIPE_RETAINER_ANNUAL_URL as string | undefined) ||
-  'https://buy.stripe.com/retainer-annual-placeholder';
+const STRIPE_PRO_URL =
+  (import.meta.env.VITE_STRIPE_PRO_URL as string | undefined) ||
+  'https://buy.stripe.com/pro-placeholder';
 
 if (typeof window !== 'undefined') {
-  if (!import.meta.env.VITE_STRIPE_SPRINT_URL) {
-    console.warn(
-      '[lola pricing] VITE_STRIPE_SPRINT_URL not set — using placeholder.\n' +
-        '             Set in Vercel/Railway → Variables → VITE_STRIPE_SPRINT_URL.',
-    );
-  }
-  if (!import.meta.env.VITE_STRIPE_RETAINER_MONTHLY_URL) {
-    console.warn(
-      '[lola pricing] VITE_STRIPE_RETAINER_MONTHLY_URL not set — using placeholder.\n' +
-        '             Set in Vercel/Railway → Variables → VITE_STRIPE_RETAINER_MONTHLY_URL.',
-    );
-  }
-  if (!import.meta.env.VITE_STRIPE_RETAINER_ANNUAL_URL) {
-    console.warn(
-      '[lola pricing] VITE_STRIPE_RETAINER_ANNUAL_URL not set — using placeholder.\n' +
-        '             Set in Vercel/Railway → Variables → VITE_STRIPE_RETAINER_ANNUAL_URL.',
-    );
+  for (const [name, val] of [
+    ['VITE_STRIPE_DIY_PDF_URL', STRIPE_DIY_PDF_URL],
+    ['VITE_STRIPE_SPRINT_URL', STRIPE_SPRINT_URL],
+    ['VITE_STRIPE_RETAINER_MONTHLY_URL', STRIPE_RETAINER_MONTHLY_URL],
+    ['VITE_STRIPE_PRO_URL', STRIPE_PRO_URL],
+  ] as const) {
+    if (val.includes('placeholder')) {
+      console.warn(`[lola pricing] ${name} not set — using placeholder.`);
+    }
   }
 }
 
@@ -1177,48 +1236,6 @@ function PricingTier({
   );
 }
 
-// ── Billing-frequency toggle (Retainer card only) ────────────────────
-type RetainerBilling = 'monthly' | 'annual';
-
-function RetainerBillingToggle({
-  value,
-  onChange,
-}: {
-  value: RetainerBilling;
-  onChange: (v: RetainerBilling) => void;
-}) {
-  return (
-    <div className="inline-flex w-full max-w-[280px] items-center rounded-full border border-white/[0.10] bg-[#0A0A0B] p-1 text-[11px] font-bold uppercase tracking-[0.14em]">
-      <button
-        type="button"
-        onClick={() => onChange('monthly')}
-        aria-pressed={value === 'monthly'}
-        className={`flex-1 rounded-full px-3 py-1.5 transition-all duration-200 ${
-          value === 'monthly'
-            ? 'bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]'
-            : 'text-[#8A8F98] hover:text-white'
-        }`}
-      >
-        Monthly
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange('annual')}
-        aria-pressed={value === 'annual'}
-        className={`flex-1 rounded-full px-3 py-1.5 transition-all duration-200 ${
-          value === 'annual'
-            ? 'bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]'
-            : 'text-[#8A8F98] hover:text-white'
-        }`}
-      >
-        Annual <span className="ml-1 text-[10px] text-[#D4AF37]" style={{
-          color: value === 'annual' ? '#0A0A0B' : '#D4AF37'
-        }}>-17%</span>
-      </button>
-    </div>
-  );
-}
-
 function UpsellCta({
   businessName: _bn,
   incomplete: _inc,
@@ -1228,7 +1245,6 @@ function UpsellCta({
   incomplete: boolean;
   monthlyLeak?: number;
 }) {
-  const [billing, setBilling] = useState<RetainerBilling>('monthly');
   const promiseRef = useRef<HTMLDivElement>(null);
   const promiseSeen = useRef(false);
 
@@ -1258,44 +1274,10 @@ function UpsellCta({
     campaign: 'sprint',
     medium: 'pricing',
   });
-  const retainerMonthlyHref = withUtm(STRIPE_RETAINER_MONTHLY_URL, 'retainer_monthly', {
+  const retainerHref = withUtm(STRIPE_RETAINER_MONTHLY_URL, 'retainer_monthly', {
     campaign: 'retainer',
     medium: 'pricing',
   });
-  const retainerAnnualHref = withUtm(STRIPE_RETAINER_ANNUAL_URL, 'retainer_annual', {
-    campaign: 'retainer',
-    medium: 'pricing',
-  });
-
-  const handleToggle = (v: RetainerBilling) => {
-    if (v === billing) return;
-    setBilling(v);
-    trackClick(v === 'monthly' ? 'pricing_billing_toggled_monthly' : 'pricing_billing_toggled_annual');
-  };
-
-  const retainerProps = billing === 'monthly'
-    ? {
-        price: '$499',
-        pricePeriod: '/month · cancel anytime',
-        priceMeta: null,
-        ctaLabel: 'Start the Retainer →',
-        ctaHref: retainerMonthlyHref,
-        ctaSubtext: 'No refund first month · Cancel anytime after',
-        onCtaClick: () => trackClick('retainer_monthly_cta_clicked', { tier: 'retainer', billing: 'monthly' }),
-      }
-    : {
-        price: '$4,990',
-        pricePeriod: '/year · save $998',
-        priceMeta: (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#D4AF37]/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-            Best value · 2 months free
-          </span>
-        ),
-        ctaLabel: 'Get the Annual Deal →',
-        ctaHref: retainerAnnualHref,
-        ctaSubtext: 'Locks in your rate for 12 months · No refund first 30 days',
-        onCtaClick: () => trackClick('retainer_annual_cta_clicked', { tier: 'retainer', billing: 'annual' }),
-      };
 
   return (
     <section className="mt-12">
@@ -1333,9 +1315,9 @@ function UpsellCta({
         <div className="order-3 lg:order-1">
           <PricingTier
             variant="sprint"
-            eyebrow="One-time project"
+            eyebrow="Done-with-you · One-time"
             name="Local SEO Sprint"
-            price="$499"
+            price="$397"
             pricePeriod="one-time payment"
             positioning="For contractors who want one focused fix — fast."
             features={[
@@ -1348,7 +1330,7 @@ function UpsellCta({
             ]}
             ctaLabel="Start the Sprint →"
             ctaHref={sprintHref}
-            ctaSubtext="No subscription · Delivery in 7 days"
+            ctaSubtext="No subscription · 48hr onboarding"
             onCtaClick={() => trackClick('sprint_cta_clicked', { tier: 'sprint' })}
           />
         </div>
@@ -1356,23 +1338,33 @@ function UpsellCta({
         <div className="order-1 lg:order-2">
           <PricingTier
             variant="retainer"
-            eyebrow="Done-for-you monthly"
+            eyebrow="Done-for-you · Monthly"
             name="Local SEO Retainer"
-            billingToggle={
-              <RetainerBillingToggle value={billing} onChange={handleToggle} />
-            }
+            price="$697"
+            pricePeriod="/month · cancel anytime"
             positioning="For contractors ready to dominate their market — month after month."
             features={[
               'Everything in the Sprint, ongoing',
+              'AI Search Visibility tracking (20 prompts/mo)',
               'Monthly content + link building',
               'GMB management + weekly posts',
               'Citation cleanup + new directory submissions',
               'Bi-weekly performance reports',
               'Priority Slack + text support',
-              'Quarterly strategy calls',
             ]}
-            {...retainerProps}
+            ctaLabel="Start the Retainer →"
+            ctaHref={retainerHref}
+            ctaSubtext="Cancel anytime · 48hr onboarding"
+            onCtaClick={() => trackClick('retainer_monthly_cta_clicked', { tier: 'retainer' })}
           />
+          {/* Inline upgrade nudge — single line, links to /pricing#pro */}
+          <a
+            href="/pricing#pro"
+            onClick={() => trackClick('pro_cta_clicked', { from: 'retainer_card_nudge' })}
+            className="mt-3 block text-center text-[12px] font-semibold text-[#D4AF37]/85 underline-offset-2 hover:underline"
+          >
+            Or commit annually as Pro — save $1,394 →
+          </a>
         </div>
 
         {/* Testimonial as 3rd column, narrower than tier cards */}

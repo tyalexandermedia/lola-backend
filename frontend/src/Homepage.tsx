@@ -49,6 +49,14 @@ export default function Homepage() {
           Transparent pricing. No long-term contracts.
         </p>
 
+        {/* AI search positioning — the single line that frames why "AI visibility"
+            is different from "SEO." Sits between subhead and CTA so it's the last
+            thing read before clicking. */}
+        <p className="mt-5 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-white sm:text-[15px]">
+          Lola checks where your business shows up in <span className="font-semibold text-[#D4AF37]">Google</span> AND in{' '}
+          <span className="font-semibold text-[#D4AF37]">ChatGPT/AI search</span> — because that's where your next customer is searching.
+        </p>
+
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
             href="/audit"
@@ -74,7 +82,7 @@ export default function Homepage() {
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>
         {' '}Premium agencies charge $2,500/mo to fix it.
         {' '}
-        <span className="font-bold text-[#D4AF37]">Lola does the work for $499/mo</span>
+        <span className="font-bold text-[#D4AF37]">Lola does the work for $697/mo</span>
         {' '}— with a guarantee.
         {' '}<span className="font-bold text-white">Real work or you walk.</span>
       </p>
@@ -90,7 +98,7 @@ export default function Homepage() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
             { num: '20 sec', label: 'Audit completion time' },
-            { num: '$2,500/mo', label: 'Saved vs premium agencies' },
+            { num: '$1,800/mo', label: 'Saved vs premium agencies' },
             { num: '5 keywords', label: 'Ranked in 3 weeks (Sandbar)' },
             { num: '60 days', label: 'To first guaranteed win' },
           ].map((s, i) => (

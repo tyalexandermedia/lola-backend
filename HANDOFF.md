@@ -358,3 +358,97 @@ cd frontend && npm run dev
 - ✅ Per-audit API budget + per-day audit cap
 - ✅ ~2,300 lines of orphaned code deleted (scoring/, checks/, api/,
   config.py, wix_crm.py, make_webhook.py, report_generator.py)
+
+---
+
+## December Ship List v2 — what was just shipped (2026-05-23)
+
+- ✅ **Step 5 layout** — banner moved out of top, paddings tightened. Step 5
+  CTA verified above the fold at 375×667 (input top 232, "Run the audit"
+  bottom 446 of 667).
+- ✅ **Mobile/iPad touch targets** — Header nav links now `min-h-[44px]` with
+  `py-3`. Pricing Monthly/Annual toggle now `h-11`. "Copy share link" button
+  now `h-11`. All meet WCAG 2.5.5.
+- ✅ **AI search positioning** — line added to Homepage hero (between subhead
+  and CTA) and to Email 2 (gold left-bar callout above competitor line). New
+  "AI Search Visibility" section in the audit report below Agent Readiness
+  with three placeholder rows (ChatGPT / Perplexity / Google AI Overviews,
+  "Tracking — ships Q3").
+- ✅ **Email 3 reframe** — "$400/mo SEO retainer" → "$499/month SEO automation
+  — we don't just tell you what's broken, we fix it weekly." Subject updated
+  from "SEO" to "AI visibility."
+- ✅ **PostHog wired** — `posthog-js` installed, `src/analytics.ts` wrapper,
+  `initAnalytics()` called from `main.tsx`. `trackClick` fans out to PostHog +
+  Plausible + GA. Falls back to `console.log` when `VITE_POSTHOG_KEY` is
+  unset. Session recording + heatmaps + autocapture enabled by default.
+- ✅ **lola-auditor agent** — committed at `.claude/agents/lola-auditor.md`.
+  Auto-discovered by Claude Code's Agent picker. Use it pre-merge with
+  `subagent_type=lola-auditor` (or pick it from `+ Manage Agents`).
+
+### Still external (you must do)
+
+- **`git push -u origin marquee-preview`** — sandbox has no GitHub auth.
+  Run from your terminal: `gh auth login` if needed, then push. The branch
+  is at commit `d70528f`, +`<this turn's commits>`.
+- **Set `VITE_POSTHOG_KEY` + `VITE_POSTHOG_HOST` in Vercel** — Project →
+  Settings → Environment Variables. Grab Project API key from
+  PostHog → Project Settings.
+- **Set 4 Stripe Payment Link env vars in Vercel** — `VITE_STRIPE_SPRINT_URL`,
+  `VITE_STRIPE_RETAINER_MONTHLY_URL`, `VITE_STRIPE_RETAINER_ANNUAL_URL`,
+  `VITE_STRIPE_PRO_URL`.
+- **Set `VITE_CAL_COM_URL` in Vercel** to your real Cal.com strategy link.
+
+### Awaiting decision (flagged, not built)
+
+- **PDF white-label report (v2-P8)** — 2-3 hrs backend work. Needs ReportLab
+  or weasyprint, branded template, SendGrid pipeline (or Resend attachment).
+  Say "build the PDF report" when you want it.
+
+---
+
+## Pricing matrix v2 — locked 2026-05-23
+
+| Tier | Price | Type | Env var | Stripe Payment Link |
+|---|---|---|---|---|
+| DIY Playbook | **$47** | one-time | `VITE_STRIPE_DIY_PDF_URL` | ⏳ create |
+| Local SEO Sprint | **$397** | one-time | `VITE_STRIPE_SPRINT_URL` | ⏳ create |
+| Local SEO Retainer | **$697/mo** | monthly | `VITE_STRIPE_RETAINER_MONTHLY_URL` | ⏳ create |
+| Local SEO Pro | **$6,970/yr** | annual (Best Value) | `VITE_STRIPE_PRO_URL` | ⏳ create |
+
+Old Stripe URLs ($499 / $1,497 / $4,990) are dead — pricing changed,
+re-create all 4 from scratch in Stripe Dashboard.
+
+### Paste-ready Stripe Payment Link descriptions
+
+**DIY Playbook — $47, one-time**
+> Step-by-step local SEO playbook for contractors who want to DIY. The exact system we use for paying clients — broken into plain-English checklists. Covers GMB optimization, citation building, on-page fixes, review strategy, and AI search visibility basics. No fluff, no jargon. Built for contractors, not marketers. Instant PDF download.
+
+**Local SEO Sprint — $397, one-time**
+> One focused fix — fast. For contractors who need clarity and a real plan. Includes a full Lola audit with priority fix list, Agent Readiness Score, AI search visibility baseline (5 prompts), custom 90-day SEO action plan, 60-minute strategy call with Coach Ty, GMB optimization checklist, citation + directory audit, and 30 days of email + Slack support. 48-hour onboarding. First Win Promise backed.
+
+**Local SEO Retainer — $697/mo, recurring monthly**
+> For contractors ready to dominate their local market month after month. Includes everything in the Sprint, ongoing — plus AI search visibility tracking (20 prompts/mo), prompt tracking dashboard, monthly content + link building, GMB management with weekly posts, citation cleanup, new directory submissions, bi-weekly performance reports, and priority Slack + text support. 48-hour onboarding. First Win Promise backed. Cancel anytime.
+
+**Local SEO Pro — $6,970/yr, recurring annual**
+> The premium tier for contractors serious about dominating their market. Everything in the Retainer PLUS quarterly strategy calls with Coach Ty, priority fix queue, locked-in pricing (no rate increases ever), and Lola Pro badge for your site. Save $1,394 vs monthly. Built for Florida contractors ready to commit — and win — long-term. First Win Promise backed.
+
+### Vercel env vars to set (one paste session)
+
+```
+VITE_STRIPE_DIY_PDF_URL=https://buy.stripe.com/<new-diy-link>
+VITE_STRIPE_SPRINT_URL=https://buy.stripe.com/<new-sprint-link>
+VITE_STRIPE_RETAINER_MONTHLY_URL=https://buy.stripe.com/<new-retainer-link>
+VITE_STRIPE_PRO_URL=https://buy.stripe.com/<new-pro-link>
+```
+
+Apply to **Production + Preview + Development**. Redeploy after.
+
+### Files touched in this rewrite
+
+- `frontend/src/PricingPage.tsx` — 3-tier → 4-tier, dropped billing toggle, added DIY card, repositioned Pro as annual with strikethrough + "Save $1,394" + "Best Value" badge, expanded comparison table with Pro-tier perks (price lock, quarterly calls).
+- `frontend/src/AuditFlow.tsx` — Sprint $397, Retainer $697, dropped in-page billing toggle, added inline "Or commit annually as Pro — save $1,394" nudge under the Retainer card, updated AI Search Visibility CTA to "Go Pro ($6,970/yr, save $1,394)".
+- `frontend/src/Homepage.tsx` — execution-framing line `$499/mo` → `$697/mo`; "Saved vs premium agencies" stat `$2,500` → `$1,800`.
+- `frontend/src/Marquee.tsx` — pricing-range string updated to `$47 DIY to $697/mo full-service`.
+- `automation/emails/email3_day5.html` — `$499/month` → `$697/month`, added Pro/annual nudge.
+- `outreach/templates.py` — variants D + E `$499/mo` → `$697/mo`; variant E mentions $47 DIY playbook.
+- `.env.example` — added `VITE_STRIPE_DIY_PDF_URL`, dropped `VITE_STRIPE_RETAINER_ANNUAL_URL`, reset all 4 URLs to placeholders.
