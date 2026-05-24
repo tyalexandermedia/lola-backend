@@ -1,19 +1,25 @@
 """
 Review-capture API.
 
-Mounted under /reviews. Two surfaces:
+Mounted under /reviews. Three surfaces:
 
   Admin (X-Admin-Key required, matches LOLA_SECRET_ADMIN_KEY):
     POST   /reviews/businesses          create or upsert a managed business
-    GET    /reviews/businesses          list all businesses
-    GET    /reviews/businesses/{id}     single business
+    GET    /reviews/businesses          list all businesses (with share payload)
+    GET    /reviews/businesses/{id}     single business (with share payload)
     POST   /reviews/request             send a review-request email NOW
     GET    /reviews/requests            recent review requests (admin view)
 
-  Public (no auth):
+  Per-customer public (no auth — tied to a specific outbound request):
     GET    /reviews/r/{request_id}/config     used by the feedback page on load
     POST   /reviews/r/{request_id}/rating     customer taps 1-5 stars
     POST   /reviews/r/{request_id}/feedback   customer submits private text
+
+  Per-business public (no auth — for QR / in-store / shareable links):
+    GET    /reviews/businesses/{id}/qr.svg    QR pointing at the public review URL
+    GET    /reviews/b/{business_id}/config    feedback page boot (no tracking)
+    POST   /reviews/b/{business_id}/rating    creates the request row on engagement,
+                                              returns request_id for follow-up feedback
 
 Routing rule: rating >= 4 → google. rating <= 3 → private. We always include
 the Google URL in the rating response so the negative-feedback page can still
@@ -44,6 +50,7 @@ from reviews.emails import (
     send_customer_request_email,
     send_owner_feedback_email,
 )
+from reviews.qr import make_qr_svg
 from reviews.sms import send_sms_review_request, twilio_enabled
 
 
@@ -72,6 +79,36 @@ def _public_base_url() -> str:
 
 def _feedback_url(request_id: str) -> str:
     return f"{_public_base_url()}/lp/feedback?id={request_id}"
+
+
+def _public_review_url(business_id: str) -> str:
+    """Untracked per-business URL — what the QR code encodes."""
+    return f"{_public_base_url()}/lp/feedback?b={business_id}"
+
+
+def _qr_url(business_id: str) -> str:
+    return f"{_public_base_url()}/reviews/businesses/{business_id}/qr.svg"
+
+
+def _sms_template(business_name: str, link: str) -> str:
+    """Short, copy-pasteable SMS body for owners to text from their own phone
+    (Google Voice, iMessage, WhatsApp). Coach Ty plain voice."""
+    return (
+        f"Hey it's {business_name} — would you take 30 seconds to share how "
+        f"we did? {link}"
+    )
+
+
+def _share_payload(business: dict) -> dict:
+    """The 'give-it-away' surface: everything an owner needs to start
+    collecting reviews without any platform integration."""
+    bid = business["id"]
+    link = _public_review_url(bid)
+    return {
+        "public_review_url": link,
+        "qr_svg_url": _qr_url(bid),
+        "sms_template": _sms_template(business["name"], link),
+    }
 
 
 def _google_review_url(business: dict) -> str:
@@ -147,6 +184,10 @@ class FeedbackIn(BaseModel):
 # ── Admin: businesses ──────────────────────────────────────
 
 
+def _with_share(business: dict) -> dict:
+    return {**business, "share": _share_payload(business)}
+
+
 @router.post(
     "/businesses",
     status_code=201,
@@ -164,12 +205,13 @@ async def admin_create_business(body: BusinessIn):
         brand_primary_color=body.brand_primary_color,
         logo_url=body.logo_url,
     )
-    return row
+    return _with_share(row)
 
 
 @router.get("/businesses", dependencies=[Depends(require_admin_key)])
 async def admin_list_businesses():
-    return {"businesses": await list_businesses()}
+    rows = await list_businesses()
+    return {"businesses": [_with_share(b) for b in rows]}
 
 
 @router.get(
@@ -179,7 +221,75 @@ async def admin_get_business(business_id: str):
     biz = await get_business(business_id)
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
-    return biz
+    return _with_share(biz)
+
+
+# ── Public: per-business QR (no auth — QR encodes a public URL) ────
+
+
+@router.get("/businesses/{business_id}/qr.svg")
+async def public_business_qr(business_id: str):
+    biz = await get_business(business_id)
+    if not biz:
+        raise HTTPException(status_code=404, detail="Business not found")
+    svg = make_qr_svg(_public_review_url(business_id))
+    return Response(
+        content=svg,
+        media_type="image/svg+xml",
+        # Cache an hour — business name/branding doesn't change often, and
+        # the encoded URL is stable per business_id.
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
+# ── Public: per-business feedback flow (QR / shareable link) ───────
+
+
+@router.get("/b/{business_id}/config")
+async def public_business_config(business_id: str):
+    """Boots the feedback page in untracked mode. No DB write — we only create
+    a review_requests row when the user actually engages (taps a star)."""
+    biz = await get_business(business_id)
+    if not biz:
+        raise HTTPException(status_code=404, detail="Business not found")
+    return {
+        "business": {
+            "name": biz["name"],
+            "brand_primary_color": biz.get("brand_primary_color") or "#0a66c2",
+            "logo_url": biz.get("logo_url"),
+            "industry": biz.get("industry"),
+        },
+        "google_review_url": _google_review_url(biz),
+        "already_responded": False,
+    }
+
+
+@router.post("/b/{business_id}/rating")
+async def public_business_rating(business_id: str, body: RatingIn):
+    """Creates the review_requests row at engagement time and records the
+    rating. Returns the new request_id so the frontend can POST private
+    feedback to the existing /reviews/r/{id}/feedback endpoint."""
+    biz = await get_business(business_id)
+    if not biz:
+        raise HTTPException(status_code=404, detail="Business not found")
+
+    request_id = uuid.uuid4().hex
+    await create_review_request(
+        request_id=request_id,
+        business_id=business_id,
+        customer_name=None,
+        customer_email=None,
+        customer_phone=None,
+        channel="qr",
+    )
+    routed = "google" if body.rating >= 4 else "private"
+    await record_rating(request_id, body.rating, routed)
+
+    return {
+        "request_id": request_id,
+        "routed": routed,
+        "google_review_url": _google_review_url(biz),
+    }
 
 
 # ── Admin: send a review request ───────────────────────────
