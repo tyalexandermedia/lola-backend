@@ -80,6 +80,8 @@ from db.outreach import (
     recent_sends as outreach_recent_sends,
 )
 from outreach.sender import make_unsub_token
+from db.reviews import init_reviews_tables
+from reviews.routes import router as reviews_router
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
@@ -104,7 +106,11 @@ async def startup_event():
     await init_cache_table()
     await init_outreach_tables()
     await init_applications_table()
+    await init_reviews_tables()
     await cache_purge_expired()
+
+
+app.include_router(reviews_router)
 
 
 GOOGLE_PAGESPEED_KEY = os.getenv("GOOGLE_PAGESPEED_API_KEY", "").strip() or None
@@ -749,7 +755,20 @@ async def send_audit_email(
     monthly_fmt = f"${monthly_leak:,}"
     yearly_fmt = f"${monthly_leak * 12:,}"
     report_url = f"{PUBLIC_APP_URL}/r/{audit_id}"
+    retainer_url = f"{PUBLIC_APP_URL}/retainer"
+    apply_url = f"{PUBLIC_APP_URL}/apply"
     subject = _pick_subject(business_name, monthly_leak, audit_id)
+
+    # Live founding-counter for the P.S. — falls back gracefully if DB hiccups.
+    try:
+        founding_used = await get_founding_count("standard")
+        founding_remaining = max(0, FOUNDING_CAP - founding_used)
+    except Exception:
+        founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
+    founding_line = (
+        f"P.P.S. — First {FOUNDING_CAP} retainer clients lock $697/mo for life. "
+        f"We're at {FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP} right now."
+    )
 
     # Plain-text fallback (Gmail uses this for the preview pane + accessibility)
     text = f"""Hey {first_name},
@@ -794,11 +813,22 @@ The Lola Retainer. Six specialist AI agents + Coach Ty working your account week
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
 
-Talk soon,
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🦴 Want Lola's 6 AI agents working YOUR account weekly?
+
+→ See the Retainer: {retainer_url}
+→ Apply (Coach Ty reviews every application): {apply_url}
+
 Coach Ty
-Founder, Lola | Ty Alexander Media | Tampa
+Founder, Ty Alexander Media
+Tampa Bay, FL
++1-727-300-6573 · ty@tyalexandermedia.com
+@tyalexandermedia on IG
 
 P.S. — That {total_score} score means you're already doing the hard part. The next gap is where the {monthly_fmt}/mo lives. Don't leave it on the table.
+
+{founding_line}
 """
 
     # Mobile-responsive HTML — single column, 600px max, inline styles (email-safe).
@@ -896,14 +926,27 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 
 <tr><td style="padding:24px 28px;">
 <p style="margin:0 0 12px;font-size:14px;line-height:1.65;color:#F0EAD6;font-weight:600;">OR JUST HIT REPLY.</p>
-<p style="margin:0 0 18px;font-size:14px;line-height:1.65;color:#C8C0B0;">Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure — just a real conversation about what's costing you the most.</p>
-<p style="margin:0 0 4px;font-size:14px;color:#C8C0B0;">Talk soon,</p>
+<p style="margin:0 0 14px;font-size:14px;line-height:1.65;color:#C8C0B0;">Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.</p>
+</td></tr>
+
+<tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
+
+<tr><td style="padding:24px 28px;">
+<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's 6 AI agents working YOUR account weekly?</p>
+<table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
+<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Retainer →</a>
+</td></tr></table>
+<p style="margin:0 0 18px;font-size:13px;line-height:1.55;color:#A89F94;"><a href="{apply_url}" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none;font-weight:600;">Or apply first — Coach Ty reviews every application →</a></p>
 <p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
-<p style="margin:4px 0 0;font-size:12px;color:#A89F94;">Founder, Lola | Ty Alexander Media | Tampa<br>📱 Reply or text anytime</p>
+<p style="margin:4px 0 0;font-size:12px;line-height:1.6;color:#A89F94;">Founder, Ty Alexander Media<br>Tampa Bay, FL<br><a href="tel:+17273006573" style="color:#C9A84C;text-decoration:none">+1-727-300-6573</a> · <a href="mailto:ty@tyalexandermedia.com" style="color:#C9A84C;text-decoration:none">ty@tyalexandermedia.com</a><br><a href="https://www.instagram.com/tyalexandermedia" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none">@tyalexandermedia on IG</a></p>
+</td></tr>
+
+<tr><td style="padding:0 28px 14px;">
+<p style="margin:0;padding:14px 18px;background:#0A0A0A;border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6;color:#C8C0B0;font-style:italic;">P.S. — That <strong style="color:#F0EAD6;">{total_score}</strong> score means you're already doing the hard part. The next gap is where the <strong style="color:#F0EAD6;">{monthly_fmt}/mo</strong> lives. Don't leave it on the table.</p>
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:14px 18px;background:#0A0A0A;border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6;color:#C8C0B0;font-style:italic;">P.S. — That <strong style="color:#F0EAD6;">{total_score}</strong> score means you're already doing the hard part. The next gap is where the <strong style="color:#F0EAD6;">{monthly_fmt}/mo</strong> lives. Don't leave it on the table.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} retainer clients lock $697/mo for life. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
 </td></tr>
 
 </table>
