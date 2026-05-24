@@ -53,15 +53,27 @@ export default function ApplyPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
+  // Match a host with at least one dot + a real TLD (>=2 alpha). Accepts
+  // "mybiz.com", "mybiz.com/path", "https://mybiz.com". Rejects "mybiz" alone.
+  const websiteLooksReal = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(website.trim());
+
   const valid =
     first_name.trim() &&
     last_name.trim() &&
     /\S+@\S+\.\S+/.test(email) &&
     business_name.trim() &&
-    website.trim() &&
+    websiteLooksReal &&
     monthly_revenue &&
     trade &&
     tier;
+
+  // Auto-prepend https:// on blur so the backend receives a parseable URL.
+  const normalizeWebsite = () => {
+    const v = website.trim();
+    if (v && !/^https?:\/\//i.test(v)) {
+      setWebsite(`https://${v}`);
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +186,7 @@ export default function ApplyPage() {
           placeholder="https://"
           value={website}
           onChange={setWebsite}
+          onBlur={normalizeWebsite}
           autoComplete="url"
           required
         />
@@ -252,6 +265,7 @@ export default function ApplyPage() {
             value={frustration}
             onChange={(e) => setFrustration(e.target.value)}
             rows={4}
+            maxLength={2000}
             placeholder="e.g. We rank #3 for our main keyword but the top 2 are taking all the calls…"
             className="mt-3 block w-full resize-y rounded-[12px] border border-white/[0.10] bg-[#0F0F12] px-4 py-3 text-[14px] text-white outline-none transition placeholder:text-[#5A5F68] focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
           />
@@ -320,6 +334,7 @@ function FieldText({
   label,
   value,
   onChange,
+  onBlur,
   type = 'text',
   required,
   placeholder,
@@ -328,6 +343,7 @@ function FieldText({
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   type?: string;
   required?: boolean;
   placeholder?: string;
@@ -344,6 +360,7 @@ function FieldText({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}

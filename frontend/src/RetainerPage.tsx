@@ -105,12 +105,21 @@ export default function RetainerPage() {
             >
               🦴 Activate the Retainer — $697/mo →
             </a>
+            {/* Desktop: full button. Mobile: small text link (sticky bar
+                already provides primary CTA; this avoids occlusion). */}
             <a
               href="/apply"
               onClick={() => track('retainer_apply_clicked', { from: 'hero' })}
-              className="inline-flex h-14 items-center justify-center rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+              className="hidden sm:inline-flex h-16 items-center justify-center rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[15px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06]"
             >
               Apply first (we'll review fit)
+            </a>
+            <a
+              href="/apply"
+              onClick={() => track('retainer_apply_clicked', { from: 'hero_mobile' })}
+              className="text-[13px] font-semibold text-[#D4AF37] underline-offset-2 hover:underline sm:hidden"
+            >
+              Or apply first — Coach Ty reviews fit →
             </a>
           </div>
         </section>
@@ -236,10 +245,14 @@ export default function RetainerPage() {
               <span className="font-semibold text-white">$897/mo</span>. Founders keep $697/mo
               forever, even when public pricing goes up.
             </p>
-            <p className="relative mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-2 text-[13px] font-bold text-[#D4AF37]">
-              Spots remaining:{' '}
-              {slotsRemaining !== null ? `${slotsRemaining} of ${foundingCap}` : `${foundingCap} of ${foundingCap}`}
-            </p>
+            {/* Only show numeric counter when we have a real reading. Hiding
+                the chip on fetch-fail beats showing "10 of 10" which reads as
+                no urgency (or worse: as already sold out). */}
+            {slotsRemaining !== null && slotsRemaining > 0 && (
+              <p className="relative mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-2 text-[13px] font-bold text-[#D4AF37]">
+                Spots remaining: {slotsRemaining} of {foundingCap}
+              </p>
+            )}
           </div>
         </section>
 
@@ -493,7 +506,7 @@ export default function RetainerPage() {
       </main>
 
       {/* Sticky bottom CTA bar — mobile only */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-4 py-3 backdrop-blur-[12px] sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.5)] backdrop-blur-[12px] sm:hidden">
         <a
           href={retainerHref}
           target="_blank"
