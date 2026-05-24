@@ -1,5 +1,10 @@
 {
   "rewrites": [
+    { "source": "/lp/industries", "destination": "/lp/industries.html" },
+    { "source": "/lp/local-seo-pressure-washing-florida", "destination": "/lp/local-seo-pressure-washing-florida.html" },
+    { "source": "/lp/local-seo-hvac-contractors-tampa", "destination": "/lp/local-seo-hvac-contractors-tampa.html" },
+    { "source": "/lp/local-seo-roofers-florida", "destination": "/lp/local-seo-roofers-florida.html" },
+    { "source": "/lp/local-seo-plumbers-tampa", "destination": "/lp/local-seo-plumbers-tampa.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

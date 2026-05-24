@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lola.tyalexandermedia.com/sitemap.xml

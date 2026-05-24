@@ -116,9 +116,25 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip() or None
 BREVO_LIST_ID = os.getenv("BREVO_LIST_ID", "2").strip()
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip() or None
 AUDIT_FROM_EMAIL = os.getenv(
-    "AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>"
+    "AUDIT_FROM_EMAIL", "Coach Ty (Lola) <ty@tyalexandermedia.com>"
+).strip()
+AUDIT_REPLY_TO_EMAIL = os.getenv(
+    "AUDIT_REPLY_TO_EMAIL", "ty@tyalexandermedia.com"
 ).strip()
 PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
+
+# Stripe Payment Link URLs used in the audit-confirmation email upsell.
+# Same as VITE_STRIPE_*_URL on the frontend — env-overridable so they can be
+# swapped per environment without code changes. Defaults are the live prod links.
+STRIPE_DIY_URL = os.getenv(
+    "STRIPE_DIY_URL", "https://buy.stripe.com/14A7sK65YaJ127fg5P3oA09"
+).strip()
+STRIPE_SPRINT_URL = os.getenv(
+    "STRIPE_SPRINT_URL", "https://buy.stripe.com/aFabJ00LEdVd3bj3j33oA07"
+).strip()
+STRIPE_RETAINER_URL = os.getenv(
+    "STRIPE_RETAINER_URL", "https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08"
+).strip()
 
 HOME_SERVICES_TYPES = {
     "soft wash",
@@ -684,6 +700,35 @@ async def send_to_brevo(
         return False
 
 
+def _derive_first_name(business_name: str, email: str) -> str:
+    """
+    Best-effort first name for greeting. Falls back gracefully:
+      1) email local-part if it looks like a first name (single word ≤16 chars, alpha)
+      2) first word of business_name if non-generic
+      3) "there"
+    """
+    if email and "@" in email:
+        local = email.split("@", 1)[0].split("+", 1)[0]
+        # Strip common separators, take first chunk
+        first_chunk = local.replace(".", " ").replace("_", " ").replace("-", " ").split()[0] if local else ""
+        if first_chunk and first_chunk.isalpha() and len(first_chunk) <= 16:
+            return first_chunk.capitalize()
+    if business_name:
+        return business_name.split()[0]
+    return "there"
+
+
+# A/B test subject — round-robined by audit_id hash so users hitting the same
+# audit twice see the same subject (no inconsistency on resend).
+def _pick_subject(business_name: str, monthly_leak: int, audit_id: str) -> str:
+    leak_fmt = f"${monthly_leak:,}"
+    variants = [
+        f"{business_name} — your audit's in (and there's {leak_fmt}/mo on the table)",
+        f"[{business_name}] Lola sniffed out {leak_fmt}/mo leaking from your site",
+    ]
+    return variants[hash(audit_id) % 2]
+
+
 async def send_audit_email(
     client: httpx.AsyncClient,
     to_email: str,
@@ -698,23 +743,173 @@ async def send_audit_email(
     if not RESEND_API_KEY:
         print("Resend skipped: RESEND_API_KEY not configured.")
         return False
-    subject = f"{business_name} scored {total_score}/100 — Lola's notes"
+
+    first_name = _derive_first_name(business_name, to_email)
+    tier_label = f"{grade_label} ({grade} tier)"
+    monthly_fmt = f"${monthly_leak:,}"
+    yearly_fmt = f"${monthly_leak * 12:,}"
     report_url = f"{PUBLIC_APP_URL}/r/{audit_id}"
-    html = f"""
-    <div style="font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;color:#0f172a;max-width:560px;margin:0 auto;">
-      <h2 style="margin:0 0 12px;">Your Lola SEO audit is ready.</h2>
-      <p style="font-size:16px;line-height:1.6;">{lola_message}</p>
-      <table style="margin:16px 0;width:100%;border-collapse:collapse;">
-        <tr><td style="padding:8px 0;"><strong>Score</strong></td><td>{total_score}/100 ({grade} — {grade_label})</td></tr>
-        <tr><td style="padding:8px 0;"><strong>Estimated monthly leak</strong></td><td>${monthly_leak:,}</td></tr>
-      </table>
-      <p style="margin:24px 0;">
-        <a href="{report_url}" style="display:inline-block;background:#facc15;color:#0f172a;padding:12px 22px;border-radius:14px;font-weight:600;text-decoration:none;">View the full report →</a>
-      </p>
-      <p style="font-size:13px;color:#64748b;word-break:break-all;">Or paste this into your browser: {report_url}</p>
-      <p style="font-size:14px;color:#475569;">Reply to this email if you'd like Lola to walk through the fix order with you. — LOLA SEO</p>
-    </div>
-    """
+    subject = _pick_subject(business_name, monthly_leak, audit_id)
+
+    # Plain-text fallback (Gmail uses this for the preview pane + accessibility)
+    text = f"""Hey {first_name},
+
+Lola finished sniffing around {business_name}'s local SEO — and she's got news.
+
+THE SCORE
+{total_score}/100 — {tier_label}
+
+You're already ahead of most contractors in Florida. That's the good news.
+
+THE LEAK
+{monthly_fmt}/month walking out the door
+
+That's not theoretical. That's the estimated revenue slipping to competitors every 30 days because of fixable gaps Lola found in your local SEO + AI search visibility.
+
+{yearly_fmt}/year. Every year. Until it's fixed.
+
+VIEW YOUR FULL AUDIT REPORT:
+{report_url}
+
+Inside the report:
+- Your priority fix list (ranked by revenue impact)
+- AI Search Visibility score (ChatGPT + Google AI)
+- GMB optimization gaps
+- Citation cleanup opportunities
+- The exact moves to lock in your lead
+
+WHAT NOW? 3 PATHS, YOUR CHOICE:
+
+OPTION 1 — Do It Yourself ($47)
+The DIY Playbook. Every checklist Lola uses, in plain English.
+{STRIPE_DIY_URL}
+
+OPTION 2 — Get a Real Plan ($397)
+The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
+{STRIPE_SPRINT_URL}
+
+OPTION 3 — Hand It Off ($697/mo)
+The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. Cancel anytime.
+{STRIPE_RETAINER_URL}
+
+Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
+
+Talk soon,
+Coach Ty
+Founder, Lola | Ty Alexander Media | Tampa
+
+P.S. — That {total_score} score means you're already doing the hard part. The next gap is where the {monthly_fmt}/mo lives. Don't leave it on the table.
+"""
+
+    # Mobile-responsive HTML — single column, 600px max, inline styles (email-safe).
+    # Tap targets are 48px tall minimum. Stripe links open in new tab (target=_blank).
+    html = f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{subject}</title></head>
+<body style="margin:0;padding:0;background:#0A0A0A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#E8E4D8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;">
+<tr><td align="center" style="padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#111111;border:1px solid #222222;border-radius:12px;overflow:hidden;">
+
+<tr><td style="padding:32px 28px 8px;">
+<p style="margin:0 0 18px;font-size:17px;line-height:1.55;color:#E8E4D8;">Hey {first_name},</p>
+<p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#C8C0B0;">Lola finished sniffing around <strong style="color:#F0EAD6;">{business_name}</strong>'s local SEO — and she's got news.</p>
+</td></tr>
+
+<tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
+
+<tr><td style="padding:24px 28px;">
+<p style="margin:0 0 6px;font-family:'DM Mono',monospace,Courier;font-size:10px;letter-spacing:0.16em;color:#A89F94;text-transform:uppercase;font-weight:600;">THE SCORE</p>
+<p style="margin:0 0 8px;"><span style="font-size:38px;font-weight:700;color:#C9A84C;">{total_score}</span><span style="font-size:18px;color:#A89F94;">/100</span></p>
+<p style="margin:0 0 18px;font-size:14px;color:#E8E4D8;font-weight:600;">{tier_label}</p>
+<p style="margin:0;font-size:15px;line-height:1.65;color:#C8C0B0;">You're already ahead of most contractors in Florida. That's the good news.</p>
+</td></tr>
+
+<tr><td style="padding:0 28px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #E05252;border-radius:8px;">
+<tr><td style="padding:22px 24px;">
+<p style="margin:0 0 6px;font-family:'DM Mono',monospace,Courier;font-size:10px;letter-spacing:0.16em;color:#E05252;text-transform:uppercase;font-weight:600;">THE LEAK</p>
+<p style="margin:0 0 12px;"><span style="font-size:32px;font-weight:700;color:#F0EAD6;">{monthly_fmt}</span><span style="font-size:14px;color:#A89F94;">/month walking out the door</span></p>
+<p style="margin:0 0 12px;font-size:14px;line-height:1.65;color:#C8C0B0;">That's not theoretical. That's the estimated revenue slipping to competitors every 30 days because of fixable gaps Lola found in your local SEO + AI search visibility.</p>
+<p style="margin:0;font-size:15px;line-height:1.65;color:#F0EAD6;font-weight:600;">{yearly_fmt}/year. Every year. Until it's fixed.</p>
+</td></tr></table>
+</td></tr>
+
+<tr><td style="padding:28px 28px 12px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+<tr><td style="border-radius:8px;background:#C9A84C;">
+<a href="{report_url}" target="_blank" rel="noopener" style="display:inline-block;padding:16px 32px;font-size:16px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.2;">📊 View Your Full Audit Report →</a>
+</td></tr></table>
+<p style="margin:14px 0 0;text-align:center;font-size:12px;color:#7A7268;word-break:break-all;">{report_url}</p>
+</td></tr>
+
+<tr><td style="padding:8px 28px 24px;">
+<p style="margin:0 0 10px;font-size:14px;line-height:1.6;color:#C8C0B0;">Inside the report:</p>
+<ul style="margin:0 0 0 20px;padding:0;font-size:14px;line-height:1.7;color:#C8C0B0;">
+<li>Your priority fix list (ranked by revenue impact)</li>
+<li>AI Search Visibility score (ChatGPT + Google AI)</li>
+<li>GMB optimization gaps</li>
+<li>Citation cleanup opportunities</li>
+<li>The exact moves to lock in your lead</li>
+</ul>
+</td></tr>
+
+<tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
+
+<tr><td style="padding:28px 28px 8px;">
+<p style="margin:0 0 18px;font-family:'DM Mono',monospace,Courier;font-size:11px;letter-spacing:0.16em;color:#A89F94;text-transform:uppercase;font-weight:600;">WHAT NOW? 3 PATHS, YOUR CHOICE:</p>
+</td></tr>
+
+<tr><td style="padding:0 28px 14px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
+<tr><td style="padding:20px 22px;">
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — Do It Yourself</strong> <span style="color:#C9A84C;">($47)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The DIY Playbook. Every checklist Lola uses, in plain English. For contractors with time, not budget.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
+<a href="{STRIPE_DIY_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the Playbook — $47 →</a>
+</td></tr></table>
+</td></tr></table>
+</td></tr>
+
+<tr><td style="padding:0 28px 14px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
+<tr><td style="padding:20px 22px;">
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get a Real Plan</strong> <span style="color:#C9A84C;">($397)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
+<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Start the Sprint — $397 →</a>
+</td></tr></table>
+</td></tr></table>
+</td></tr>
+
+<tr><td style="padding:0 28px 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
+<tr><td style="padding:20px 22px;">
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Hand It Off</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. Cancel anytime.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
+<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start the Retainer — $697/mo →</a>
+</td></tr></table>
+</td></tr></table>
+</td></tr>
+
+<tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
+
+<tr><td style="padding:24px 28px;">
+<p style="margin:0 0 12px;font-size:14px;line-height:1.65;color:#F0EAD6;font-weight:600;">OR JUST HIT REPLY.</p>
+<p style="margin:0 0 18px;font-size:14px;line-height:1.65;color:#C8C0B0;">Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure — just a real conversation about what's costing you the most.</p>
+<p style="margin:0 0 4px;font-size:14px;color:#C8C0B0;">Talk soon,</p>
+<p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
+<p style="margin:4px 0 0;font-size:12px;color:#A89F94;">Founder, Lola | Ty Alexander Media | Tampa<br>📱 Reply or text anytime</p>
+</td></tr>
+
+<tr><td style="padding:0 28px 28px;">
+<p style="margin:0;padding:14px 18px;background:#0A0A0A;border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6;color:#C8C0B0;font-style:italic;">P.S. — That <strong style="color:#F0EAD6;">{total_score}</strong> score means you're already doing the hard part. The next gap is where the <strong style="color:#F0EAD6;">{monthly_fmt}/mo</strong> lives. Don't leave it on the table.</p>
+</td></tr>
+
+</table>
+</td></tr></table>
+</body></html>"""
+
     try:
         resp = await client.post(
             "https://api.resend.com/emails",
@@ -723,11 +918,16 @@ async def send_audit_email(
                 "to": [to_email],
                 "subject": subject,
                 "html": html,
+                "text": text,
+                "reply_to": AUDIT_REPLY_TO_EMAIL,
             },
             headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
             timeout=API_TIMEOUT,
         )
-        return 200 <= resp.status_code < 300
+        if not (200 <= resp.status_code < 300):
+            print(f"Resend error {resp.status_code} for audit {audit_id}: {resp.text[:200]}")
+            return False
+        return True
     except Exception:
         traceback.print_exc()
         return False
