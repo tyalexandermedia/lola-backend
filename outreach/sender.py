@@ -37,7 +37,7 @@ OUTREACH_FROM_EMAIL = os.getenv(
     "OUTREACH_FROM_EMAIL",
     os.getenv("AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>"),
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola-seo.vercel.app").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
 ADMIN_KEY = os.getenv("LOLA_SECRET_ADMIN_KEY", "").encode("utf-8")
 
 JITTER_MIN_SEC = int(os.getenv("OUTREACH_JITTER_MIN_SEC", "30"))
@@ -85,7 +85,7 @@ def audit_link_for(variant: VariantKey, email: str) -> str:
 def unsub_link_for(email: str) -> str:
     token = make_unsub_token(email)
     qs = urllib.parse.urlencode({"email": email, "token": token})
-    return f"{PUBLIC_APP_URL.replace('lola-seo.vercel.app', '')}/unsubscribe?{qs}" if False else f"{PUBLIC_APP_URL}/unsubscribe?{qs}"
+    return f"{PUBLIC_APP_URL.replace('lola.tyalexandermedia.com', '')}/unsubscribe?{qs}" if False else f"{PUBLIC_APP_URL}/unsubscribe?{qs}"
 
 
 def render_unsub_footer(email: str) -> str:
