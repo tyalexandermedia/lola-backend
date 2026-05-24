@@ -1556,7 +1556,7 @@ function LeakCard({
               setMode('dollars');
               trackClick('leak_toggle', { mode: 'dollars' });
             }}
-            className={`flex h-7 items-center rounded-full px-2.5 transition ${
+            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
               mode === 'dollars' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
             }`}
           >
@@ -1570,7 +1570,7 @@ function LeakCard({
               setMode('calls');
               trackClick('leak_toggle', { mode: 'calls' });
             }}
-            className={`flex h-7 items-center rounded-full px-2.5 transition ${
+            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
               mode === 'calls' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
             }`}
           >

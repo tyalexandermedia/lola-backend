@@ -46,6 +46,17 @@ const TRADES = [
   'Other',
 ] as const;
 
+// Trades that AuditFlow's TRADE_TO_SERVICE can pre-fill on Step 2. Keep
+// in sync with TRADE_TO_SERVICE in AuditFlow.tsx.
+const MAPPED_TRADES = new Set<string>([
+  'HVAC',
+  'Plumber',
+  'Roofer',
+  'Soft Wash / Pressure Wash',
+  'Pest Control',
+  'Landscaper',
+]);
+
 const PLURAL: Record<string, string> = {
   HVAC: 'HVAC techs',
   Plumber: 'plumbers',
@@ -139,7 +150,9 @@ export default function Homepage() {
           )}
         </p>
 
-        <p className="mt-5 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-white sm:text-[15px]">
+        {/* AI-line callout — hidden on mobile so trade picker + CTA stay
+            above the fold at 375x667. Re-appears at sm: where there's room. */}
+        <p className="mt-5 hidden max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[15px] leading-[1.55] text-white sm:block">
           Lola checks where your business shows up in{' '}
           <span className="font-semibold text-[#D4AF37]">Google</span> AND in{' '}
           <span className="font-semibold text-[#D4AF37]">ChatGPT/AI search</span> — because
@@ -174,6 +187,14 @@ export default function Homepage() {
               </option>
             ))}
           </select>
+          {/* Microcopy when an unmapped trade is picked — sets expectations
+              honestly (Step 2 of the audit will still ask). */}
+          {trade && !MAPPED_TRADES.has(trade) && (
+            <p className="mt-2 text-[12px] leading-[1.5] text-[#8A8F98]">
+              We've fully tuned audits for {Array.from(MAPPED_TRADES).slice(0, 5).join(', ')} so far. For{' '}
+              <span className="text-[#D4AF37]">{trade}</span>, we'll ask the same questions and run a general home-services audit. Full {trade.toLowerCase()} playbook ships Q1 2026.
+            </p>
+          )}
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
