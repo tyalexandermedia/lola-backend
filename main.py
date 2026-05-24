@@ -57,6 +57,11 @@ from db.api_cache import (
     cache_purge_expired,
     audits_today_count,
 )
+from db.applications import (
+    init_applications_table,
+    save_application,
+    get_recent_applications,
+)
 from api_clients.google_apis import (
     API_STATUS,
     ApiBudget,
@@ -98,6 +103,7 @@ async def startup_event():
     await init_pricing_table()
     await init_cache_table()
     await init_outreach_tables()
+    await init_applications_table()
     await cache_purge_expired()
 
 
@@ -1035,6 +1041,136 @@ async def pricing():
             "pro":      {"monthly": 997, "monthly_original": 1297},
         },
     }
+
+
+class ApplicationRequest(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    business_name: str
+    website: str
+    monthly_revenue: str   # under_20k | 20k_50k | 50k_100k | 100k_plus
+    trade: str
+    frustration: Optional[str] = ""
+    tier: str              # retainer | pro | both
+
+
+REVENUE_LABELS = {
+    "under_20k": "Under $20K",
+    "20k_50k": "$20K-$50K",
+    "50k_100k": "$50K-$100K",
+    "100k_plus": "$100K+",
+}
+
+TIER_LABELS = {
+    "retainer": "Retainer ($697/mo)",
+    "pro": "Pro ($6,970/yr)",
+    "both": "Tell me which fits better",
+}
+
+
+async def _send_application_notification(client: httpx.AsyncClient, app_id: int, body: ApplicationRequest) -> None:
+    """Email the applicant (confirmation) AND ty@ (lead notification)."""
+    if not RESEND_API_KEY:
+        return
+    rev_label = REVENUE_LABELS.get(body.monthly_revenue, body.monthly_revenue)
+    tier_label = TIER_LABELS.get(body.tier, body.tier)
+    # 1) Confirmation to the applicant
+    try:
+        await client.post(
+            "https://api.resend.com/emails",
+            json={
+                "from": AUDIT_FROM_EMAIL,
+                "to": [body.email],
+                "reply_to": AUDIT_REPLY_TO_EMAIL,
+                "subject": f"Got it, {body.first_name} — Coach Ty's reviewing your application",
+                "text": (
+                    f"Hey {body.first_name},\n\n"
+                    f"Your Lola application's in. I review every single one personally and "
+                    f"will reach out within 24 hours.\n\n"
+                    f"What you sent me:\n"
+                    f"  Business: {body.business_name} ({body.website})\n"
+                    f"  Trade: {body.trade}\n"
+                    f"  Monthly revenue: {rev_label}\n"
+                    f"  Interested in: {tier_label}\n\n"
+                    f"Talk soon,\nCoach Ty\nFounder, Lola | Ty Alexander Media | Tampa"
+                ),
+            },
+            headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+            timeout=API_TIMEOUT,
+        )
+    except Exception:
+        traceback.print_exc()
+
+    # 2) Internal notification to ty@
+    try:
+        await client.post(
+            "https://api.resend.com/emails",
+            json={
+                "from": AUDIT_FROM_EMAIL,
+                "to": [AUDIT_REPLY_TO_EMAIL],
+                "reply_to": body.email,
+                "subject": f"[Lola Application #{app_id}] {body.business_name} — {tier_label}",
+                "text": (
+                    f"New application from {body.first_name} {body.last_name}.\n\n"
+                    f"Email: {body.email}\n"
+                    f"Business: {body.business_name}\n"
+                    f"Website: {body.website}\n"
+                    f"Trade: {body.trade}\n"
+                    f"Monthly revenue: {rev_label}\n"
+                    f"Tier: {tier_label}\n\n"
+                    f"Frustration:\n{body.frustration or '(none)'}\n\n"
+                    f"--\nApplication ID: {app_id}\n"
+                    f"Reply directly to this email to respond to the applicant."
+                ),
+            },
+            headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+            timeout=API_TIMEOUT,
+        )
+    except Exception:
+        traceback.print_exc()
+
+
+@app.post("/applications")
+async def submit_application(body: ApplicationRequest):
+    """Public endpoint — no auth. Backed by SQLite + Resend notifications."""
+    # Minimal validation; frontend already validates shape
+    if not body.email or "@" not in body.email:
+        raise HTTPException(status_code=400, detail="Valid email required")
+    if body.monthly_revenue not in REVENUE_LABELS:
+        raise HTTPException(status_code=400, detail="Invalid monthly_revenue")
+    if body.tier not in TIER_LABELS:
+        raise HTTPException(status_code=400, detail="Invalid tier")
+
+    app_id = await save_application(
+        first_name=body.first_name.strip(),
+        last_name=body.last_name.strip(),
+        email=body.email.strip(),
+        business_name=body.business_name.strip(),
+        website=body.website.strip(),
+        monthly_revenue=body.monthly_revenue,
+        trade=body.trade,
+        frustration=(body.frustration or "").strip(),
+        tier=body.tier,
+    )
+
+    async with httpx.AsyncClient() as client:
+        await _send_application_notification(client, app_id, body)
+
+    return {"ok": True, "id": app_id}
+
+
+@app.get("/applications")
+async def list_applications(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    limit: int = 50,
+):
+    """Admin-only — list recent applications. Uses same admin key as /leads."""
+    expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "")
+    if not expected or x_admin_key != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    rows = await get_recent_applications(limit=max(1, min(limit, 200)))
+    return {"applications": rows}
 
 
 class FoundingSignupRequest(BaseModel):
