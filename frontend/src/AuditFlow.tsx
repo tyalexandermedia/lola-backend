@@ -91,6 +91,18 @@ const initialForm: BusinessAuditRequest = {
   email: 'team@sandbarsoftwash.com',
 };
 
+// Map Homepage's trade-picker labels → SERVICE_OPTIONS internal values.
+// Labels that don't match (Electrician, Painter, etc.) leave business_type as-is
+// so the user picks manually on step 2.
+const TRADE_TO_SERVICE: Record<string, string> = {
+  HVAC: 'hvac',
+  Plumber: 'plumbing',
+  Roofer: 'roofing',
+  'Soft Wash / Pressure Wash': 'soft wash',
+  'Pest Control': 'pest',
+  Landscaper: 'landscaping',
+};
+
 export function formatNumber(value: number) {
   return value.toLocaleString('en-US');
 }
@@ -104,6 +116,26 @@ export default function AuditFlow() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [sniffLine, setSniffLine] = useState(SNIFFING_LINES[0]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Hydrate business_type from ?trade=... URL param (Homepage CTAs) or
+  // localStorage.lolaTrade (Homepage dropdown). Mapped via TRADE_TO_SERVICE
+  // so we only pre-fill when the trade matches a valid SERVICE_OPTIONS value.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let trade: string | null = null;
+    try {
+      const p = new URLSearchParams(window.location.search).get('trade');
+      if (p) trade = p;
+      else trade = window.localStorage.getItem('lolaTrade');
+    } catch {
+      /* ignore */
+    }
+    if (!trade) return;
+    const mapped = TRADE_TO_SERVICE[trade];
+    if (mapped) {
+      setForm((prev) => ({ ...prev, business_type: mapped }));
+    }
+  }, []);
 
   const currentQuestion = QUESTIONS[stepIndex];
   const totalSteps = QUESTIONS.length;
@@ -549,18 +581,13 @@ export function ResultsStage({
             </p>
           </div>
 
-          {/* Monthly leak */}
-          <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">
-              Monthly leak
-            </p>
-            <p className="mt-3 bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
-              ${formatNumber(monthlyLeak)}
-            </p>
-            <p className="mt-2 text-[13px] text-[#A0A5AE]">
-              {audit.segment === 'incomplete' ? 'conservative estimate' : '/ month opportunity'}
-            </p>
-          </div>
+          {/* Monthly leak — toggle between $ and missed calls */}
+          <LeakCard
+            monthlyLeak={monthlyLeak}
+            missedCalls={audit.revenue_leak.missed_calls_per_month || 0}
+            avgJobValue={audit.revenue_leak.avg_job_value || 0}
+            isIncomplete={audit.segment === 'incomplete'}
+          />
 
           {/* Annual at stake — DOMINANT */}
           <div
@@ -778,6 +805,83 @@ export function ResultsStage({
           Skip the wait — Go Pro ($6,970/yr, save $1,394) →
         </a>
       </section>
+
+      {/* Who's capturing your customers — top 3 competitors from search results */}
+      {Array.isArray(audit.competitors) && audit.competitors.length > 0 && (
+        <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+            Who's capturing your customers
+          </p>
+          <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
+            Top contractors Google's putting in front of {audit.city} buyers
+          </h3>
+          <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+            Pulled live from Google's top results for "{audit.business_type} {audit.city}".
+            These are the businesses showing up before you on the queries that matter.
+          </p>
+
+          <ol className="mt-5 flex flex-col gap-2">
+            {audit.competitors.slice(0, 3).map((c, i) => {
+              const title = String(c.title || '').replace(/\s*[-|·].*$/, '').trim() || 'Unknown';
+              const url = typeof c.url === 'string' ? c.url : '';
+              const rank = i + 1;
+              return (
+                <li
+                  key={`${title}-${i}`}
+                  className="flex items-center gap-3 rounded-[12px] border border-white/[0.06] bg-[#0A0A0B]/40 p-4"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[14px] font-bold text-[#D4AF37]">
+                    #{rank}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-semibold text-white sm:text-[15px]">
+                      {title}
+                    </p>
+                    {url && (
+                      <p className="mt-0.5 truncate text-[11px] text-[#7A7F8A]">
+                        {url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
+                      </p>
+                    )}
+                  </div>
+                  {url && (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[12px] font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
+                    >
+                      Visit →
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+            <li className="mt-1 flex items-center gap-3 rounded-[12px] border-2 border-[#D4AF37]/45 bg-[#D4AF37]/[0.06] p-4">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[12px] font-bold text-[#0A0A0B]">
+                YOU
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[14px] font-semibold text-white sm:text-[15px]">
+                  {audit.business_name}
+                </p>
+                <p className="mt-0.5 text-[11px] text-[#D4AF37]/85">
+                  Score {audit.total_score}/100 — currently not on page 1 for this query
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <div className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
+            <p className="font-semibold text-white">
+              📊 73% of all local clicks go to businesses ranked #1–3 on Google.
+            </p>
+            <p className="mt-2">
+              68% of customers trust those top-3 businesses by default. The Lola Retainer moves
+              you into that zone — month after month.
+            </p>
+          </div>
+        </section>
+      )}
 
       <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
         <div className="flex items-baseline justify-between gap-3">
@@ -1417,6 +1521,87 @@ function UpsellCta({
 
 // CheckIcon — used by the hero's micro-benefits row. Pricing tier card uses
 // an inline SVG for the same reason but with a slightly thinner stroke.
+// Stat-card with $/missed-calls toggle. Default shows monthly dollars; toggling
+// to "calls" surfaces the visceral count of customers walking past — based on
+// the same revenue_leak math the backend already returned (no recompute on FE).
+function LeakCard({
+  monthlyLeak,
+  missedCalls,
+  avgJobValue,
+  isIncomplete,
+}: {
+  monthlyLeak: number;
+  missedCalls: number;
+  avgJobValue: number;
+  isIncomplete: boolean;
+}) {
+  const [mode, setMode] = useState<'dollars' | 'calls'>('dollars');
+
+  return (
+    <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">
+          Monthly leak
+        </p>
+        <div
+          role="tablist"
+          aria-label="Leak display mode"
+          className="inline-flex rounded-full border border-white/[0.08] bg-[#0A0A0B] p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
+        >
+          <button
+            role="tab"
+            aria-selected={mode === 'dollars'}
+            type="button"
+            onClick={() => {
+              setMode('dollars');
+              trackClick('leak_toggle', { mode: 'dollars' });
+            }}
+            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
+              mode === 'dollars' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
+            }`}
+          >
+            💰 $
+          </button>
+          <button
+            role="tab"
+            aria-selected={mode === 'calls'}
+            type="button"
+            onClick={() => {
+              setMode('calls');
+              trackClick('leak_toggle', { mode: 'calls' });
+            }}
+            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
+              mode === 'calls' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
+            }`}
+          >
+            📞 calls
+          </button>
+        </div>
+      </div>
+
+      {mode === 'dollars' ? (
+        <>
+          <p className="mt-3 bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
+            ${formatNumber(monthlyLeak)}
+          </p>
+          <p className="mt-2 text-[13px] text-[#A0A5AE]">
+            {isIncomplete ? 'conservative estimate' : '/ month walking out the door'}
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
+            ~{formatNumber(missedCalls)}
+          </p>
+          <p className="mt-2 text-[13px] text-[#A0A5AE]">
+            missed calls / month{avgJobValue > 0 ? ` · ~$${formatNumber(avgJobValue)} avg job` : ''}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
 function CheckIcon({ muted = false }: { muted?: boolean }) {
   return (
     <svg
