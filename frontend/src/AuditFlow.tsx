@@ -98,7 +98,7 @@ const TRADE_TO_SERVICE: Record<string, string> = {
   HVAC: 'hvac',
   Plumber: 'plumbing',
   Roofer: 'roofing',
-  'Soft Wash': 'soft wash',
+  'Soft Wash / Pressure Wash': 'soft wash',
   'Pest Control': 'pest',
   Landscaper: 'landscaping',
 };
