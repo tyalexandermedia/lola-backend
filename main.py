@@ -149,6 +149,8 @@ HOME_SERVICES_TYPES = {
     "plumbing",
     "pest",
     "landscaping",
+    "pool service",
+    "other",
 }
 
 # API_STATUS + the four Google helpers now live in api_clients/google_apis.py
@@ -246,6 +248,8 @@ JOB_VALUES = {
     "plumbing": 400,
     "pest": 250,
     "landscaping": 350,
+    "pool service": 200,  # spec: per-service avg; recurring contracts add LTV
+    "other": 400,         # default for "Other Florida home-service trade"
     "default": 500,
 }
 

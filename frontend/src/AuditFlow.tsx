@@ -10,13 +10,14 @@ import { track } from './analytics';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
+// Spec: 6 options + "Other" — soft wash is the default for direct traffic.
 const SERVICE_OPTIONS = [
-  { value: 'soft wash', label: 'Pressure washing / Soft wash' },
-  { value: 'roofing', label: 'Roofing' },
-  { value: 'hvac', label: 'HVAC' },
-  { value: 'plumbing', label: 'Plumbing' },
-  { value: 'pest', label: 'Pest control' },
-  { value: 'landscaping', label: 'Landscaping' },
+  { value: 'soft wash', label: '🌊 Soft Wash / Pressure Wash' },
+  { value: 'hvac', label: '❄️ HVAC' },
+  { value: 'roofing', label: '🏠 Roofing' },
+  { value: 'plumbing', label: '🔧 Plumbing' },
+  { value: 'pool service', label: '🏊 Pool Service' },
+  { value: 'other', label: 'Other Florida home-service trade' },
 ] as const;
 
 type Stage = 'questions' | 'sniffing' | 'results' | 'error';
@@ -92,16 +93,32 @@ const initialForm: BusinessAuditRequest = {
 };
 
 // Map Homepage's trade-picker labels → SERVICE_OPTIONS internal values.
-// Labels that don't match (Electrician, Painter, etc.) leave business_type as-is
-// so the user picks manually on step 2.
+// Spec: 5 supported industries (soft wash, hvac, roofing, plumbing, pool service).
+// Anything else (Electrician, Painter, etc.) maps to "other" so the audit still
+// runs as a general home-services audit rather than failing silently.
 const TRADE_TO_SERVICE: Record<string, string> = {
   HVAC: 'hvac',
   Plumber: 'plumbing',
   Roofer: 'roofing',
   'Soft Wash / Pressure Wash': 'soft wash',
-  'Pest Control': 'pest',
-  Landscaper: 'landscaping',
+  'Soft Wash': 'soft wash', // back-compat with older localStorage values
+  'Pool Services': 'pool service',
+  'Pool Service': 'pool service',
 };
+
+// Spec — Phase B: smart pre-select from referrer URL path. Used when no
+// ?trade= param + no localStorage. Maps each /lp/* slug → business_type.
+const REFERRER_TO_SERVICE: Array<[string, string]> = [
+  ['/lp/local-seo-pressure-washing-florida', 'soft wash'],
+  ['/lp/local-seo-hvac-contractors-tampa', 'hvac'],
+  ['/lp/local-seo-roofers-florida', 'roofing'],
+  ['/lp/local-seo-plumbers-tampa', 'plumbing'],
+  ['/lp/local-seo-pool-service-florida', 'pool service'],
+];
+
+// Spec — Phase B fallback: if no signal at all, default to soft wash
+// (Coach Ty's dad's trade, real case study, most common starting point).
+const DEFAULT_BUSINESS_TYPE = 'soft wash';
 
 export function formatNumber(value: number) {
   return value.toLocaleString('en-US');
@@ -117,24 +134,64 @@ export default function AuditFlow() {
   const [sniffLine, setSniffLine] = useState(SNIFFING_LINES[0]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Hydrate business_type from ?trade=... URL param (Homepage CTAs) or
-  // localStorage.lolaTrade (Homepage dropdown). Mapped via TRADE_TO_SERVICE
-  // so we only pre-fill when the trade matches a valid SERVICE_OPTIONS value.
+  // Smart business_type pre-select. Priority order (per spec P11 Phase B):
+  //   1. ?trade= URL param (highest — explicit from Homepage CTA / cold email)
+  //   2. document.referrer path → REFERRER_TO_SERVICE (LP → audit nav)
+  //   3. localStorage.lolaTrade (Homepage dropdown persisted)
+  //   4. DEFAULT_BUSINESS_TYPE (soft wash) — never leaves the field blank
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    let trade: string | null = null;
+
+    // 1. URL param wins
     try {
       const p = new URLSearchParams(window.location.search).get('trade');
-      if (p) trade = p;
-      else trade = window.localStorage.getItem('lolaTrade');
+      if (p) {
+        const mapped = TRADE_TO_SERVICE[p];
+        if (mapped) {
+          setForm((prev) => ({ ...prev, business_type: mapped }));
+          trackClick('audit_industry_preselected', { trade: mapped, source: 'url_param' });
+          return;
+        }
+      }
     } catch {
       /* ignore */
     }
-    if (!trade) return;
-    const mapped = TRADE_TO_SERVICE[trade];
-    if (mapped) {
-      setForm((prev) => ({ ...prev, business_type: mapped }));
+
+    // 2. Referrer path match (LP → audit navigation)
+    try {
+      const ref = document.referrer || '';
+      if (ref) {
+        const refUrl = new URL(ref);
+        for (const [path, value] of REFERRER_TO_SERVICE) {
+          if (refUrl.pathname.startsWith(path)) {
+            setForm((prev) => ({ ...prev, business_type: value }));
+            trackClick('audit_industry_preselected', { trade: value, source: 'referrer' });
+            return;
+          }
+        }
+      }
+    } catch {
+      /* ignore — cross-origin or malformed referrer */
     }
+
+    // 3. localStorage (Homepage dropdown previously set)
+    try {
+      const ls = window.localStorage.getItem('lolaTrade');
+      if (ls) {
+        const mapped = TRADE_TO_SERVICE[ls];
+        if (mapped) {
+          setForm((prev) => ({ ...prev, business_type: mapped }));
+          trackClick('audit_industry_preselected', { trade: mapped, source: 'localstorage' });
+          return;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
+    // 4. Hard default — never blank
+    setForm((prev) => ({ ...prev, business_type: DEFAULT_BUSINESS_TYPE }));
+    trackClick('audit_industry_preselected', { trade: DEFAULT_BUSINESS_TYPE, source: 'default' });
   }, []);
 
   const currentQuestion = QUESTIONS[stepIndex];
