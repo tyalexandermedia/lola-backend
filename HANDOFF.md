@@ -213,7 +213,7 @@ Used in:
 - Unsubscribe link
 
 ```
-PUBLIC_APP_URL=https://lola-seo.vercel.app
+PUBLIC_APP_URL=https://lola.tyalexandermedia.com
 ```
 
 (Change if you've put it on a custom domain.)

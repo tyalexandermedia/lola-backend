@@ -2,7 +2,7 @@
 
 These are standalone HTML pages that get deployed by Vite to
 `https://lola.tyalexandermedia.com/lp/*.html` (pre-DNS:
-`https://lola-seo.vercel.app/lp/*.html`).
+`https://lola.tyalexandermedia.com/lp/*.html`).
 
 Vite's static asset handling serves anything in `frontend/public/` at the site
 root — these HTML files bypass the React app entirely (no client-side JS to
