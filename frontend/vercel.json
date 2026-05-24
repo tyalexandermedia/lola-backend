@@ -5,6 +5,7 @@
     { "source": "/lp/local-seo-hvac-contractors-tampa", "destination": "/lp/local-seo-hvac-contractors-tampa.html" },
     { "source": "/lp/local-seo-roofers-florida", "destination": "/lp/local-seo-roofers-florida.html" },
     { "source": "/lp/local-seo-plumbers-tampa", "destination": "/lp/local-seo-plumbers-tampa.html" },
+    { "source": "/lp/feedback", "destination": "/lp/feedback.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

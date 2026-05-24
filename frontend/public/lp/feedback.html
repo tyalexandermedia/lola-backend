@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Share your experience</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Inter Tight',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0A0A0B;color:#E8E4D8;line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--brand,#D4AF37);outline-offset:3px;border-radius:8px}
+.wrap{width:100%;max-width:480px;margin:0 auto;padding:32px 20px 48px;flex:1;display:flex;flex-direction:column}
+.logo{max-height:64px;width:auto;margin:0 auto 24px;display:block}
+.logo-fallback{width:64px;height:64px;border-radius:14px;background:var(--brand,#1f2937);color:var(--brand-fg,#fff);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.02em;margin:0 auto 24px}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.9rem,6vw,2.5rem);line-height:1.1;letter-spacing:-0.005em;color:#F0EAD6;text-align:center;margin-bottom:8px}
+.sub{font-size:15px;color:#9CA3AF;text-align:center;margin-bottom:32px}
+.stars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0 20px}
+.star-btn{min-height:56px;min-width:48px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(255,255,255,0.02);transition:transform 0.12s,border-color 0.15s,background 0.15s;padding:0;-webkit-tap-highlight-color:transparent}
+.star-btn:hover,.star-btn:focus-visible{border-color:var(--brand,#D4AF37);background:rgba(255,255,255,0.05)}
+.star-btn:active{transform:scale(0.94)}
+.star-btn svg{width:32px;height:32px;fill:#3A3F48;transition:fill 0.15s}
+.star-btn:hover svg,.star-btn:focus-visible svg{fill:var(--brand,#D4AF37)}
+.star-btn[data-loading="true"] svg{fill:var(--brand,#D4AF37)}
+.microcopy{font-size:13px;color:#6B7280;text-align:center;margin-top:8px}
+.field{margin-top:18px}
+label{display:block;font-size:14px;font-weight:600;color:#E8E4D8;margin-bottom:8px}
+textarea{width:100%;min-height:140px;padding:14px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;color:#F0EAD6;font-family:inherit;font-size:16px;line-height:1.5;resize:vertical;transition:border-color 0.15s}
+textarea:focus{outline:none;border-color:var(--brand,#D4AF37)}
+.checkbox-row{display:flex;align-items:flex-start;gap:12px;margin-top:16px;padding:14px;background:rgba(255,255,255,0.02);border-radius:10px;cursor:pointer}
+.checkbox-row input[type=checkbox]{width:22px;height:22px;margin:0;accent-color:var(--brand,#D4AF37);flex-shrink:0;cursor:pointer}
+.checkbox-row span{font-size:14px;color:#C8C0B0;line-height:1.4}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;padding:0 24px;margin-top:20px;background:var(--brand,#D4AF37);color:var(--brand-fg,#0A0A0B);font-weight:700;font-size:15px;letter-spacing:0.03em;text-transform:uppercase;border-radius:12px;transition:opacity 0.15s,transform 0.1s;text-decoration:none;text-align:center;-webkit-tap-highlight-color:transparent}
+.btn:hover{opacity:0.92}
+.btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-secondary{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:#E8E4D8}
+.btn-secondary:hover{border-color:var(--brand,#D4AF37);opacity:1}
+.public-link{display:block;text-align:center;margin-top:18px;padding:12px;font-size:14px;color:#9CA3AF;border:1px dashed rgba(255,255,255,0.12);border-radius:10px;text-decoration:none;transition:border-color 0.15s,color 0.15s}
+.public-link:hover{border-color:var(--brand,#D4AF37);color:var(--brand,#D4AF37)}
+.center{text-align:center}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand,#D4AF37);border-radius:50%;animation:spin 0.7s linear infinite;margin:48px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{padding:14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;color:#FCA5A5;font-size:14px;margin-top:16px;text-align:center}
+.thanks-icon{width:64px;height:64px;margin:24px auto 16px;border-radius:50%;background:var(--brand,#D4AF37);color:var(--brand-fg,#0A0A0B);display:flex;align-items:center;justify-content:center;font-size:34px}
+.screen{display:none;flex-direction:column;animation:fadeIn 0.2s ease-out}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.footer{margin-top:auto;padding-top:32px;text-align:center;font-size:11px;color:#3A3F48}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app">
+
+<!-- LOADING -->
+<section class="screen active" id="screen-loading" aria-live="polite">
+  <div class="spinner" role="status" aria-label="Loading"></div>
+</section>
+
+<!-- RATING (default question screen) -->
+<section class="screen" id="screen-rating">
+  <div id="logo-slot"></div>
+  <h1 id="rating-title">How'd we do?</h1>
+  <p class="sub" id="rating-sub">Tap a star — takes 10 seconds.</p>
+  <div class="stars" role="group" aria-label="Rate your experience">
+    <button class="star-btn" data-rating="1" aria-label="Rate 1 star"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+    <button class="star-btn" data-rating="2" aria-label="Rate 2 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+    <button class="star-btn" data-rating="3" aria-label="Rate 3 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+    <button class="star-btn" data-rating="4" aria-label="Rate 4 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+    <button class="star-btn" data-rating="5" aria-label="Rate 5 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+  </div>
+  <p class="microcopy">Your feedback helps small businesses like ours.</p>
+  <div id="rating-error" class="error" hidden></div>
+</section>
+
+<!-- POSITIVE: sending to Google -->
+<section class="screen" id="screen-google">
+  <div class="thanks-icon">★</div>
+  <h1>Thanks!</h1>
+  <p class="sub">Opening Google reviews now&hellip;</p>
+  <a class="btn" id="google-link" href="#" target="_blank" rel="noopener">Open Google reviews</a>
+  <p class="microcopy" style="margin-top:18px">If it doesn't open automatically, tap the button above.</p>
+</section>
+
+<!-- PRIVATE FEEDBACK FORM -->
+<section class="screen" id="screen-private">
+  <h1 id="private-title">What could we have done better?</h1>
+  <p class="sub">This goes straight to the owner. Nobody else sees it.</p>
+  <form id="feedback-form" novalidate>
+    <div class="field">
+      <label for="message">Tell us what happened</label>
+      <textarea id="message" name="message" required minlength="5" maxlength="2000" placeholder="Be honest — we'd rather know."></textarea>
+    </div>
+    <label class="checkbox-row">
+      <input type="checkbox" id="contact-back" name="contact_back">
+      <span>It's OK to contact me about this.</span>
+    </label>
+    <button class="btn" type="submit" id="send-btn">Send</button>
+    <div id="private-error" class="error" hidden></div>
+  </form>
+  <a class="public-link" id="public-fallback" href="#" target="_blank" rel="noopener">Or leave a public Google review anyway &rarr;</a>
+</section>
+
+<!-- THANK YOU (private path) -->
+<section class="screen" id="screen-thanks">
+  <div class="thanks-icon">✓</div>
+  <h1>Thanks — we hear you.</h1>
+  <p class="sub" id="thanks-sub">The owner will see this directly.</p>
+</section>
+
+<!-- ALREADY RESPONDED -->
+<section class="screen" id="screen-already">
+  <div class="thanks-icon">✓</div>
+  <h1>Already got it.</h1>
+  <p class="sub">Thanks — you've already shared your feedback.</p>
+</section>
+
+<!-- ERROR (link invalid / expired) -->
+<section class="screen" id="screen-error">
+  <h1>This link isn't valid.</h1>
+  <p class="sub">It may have expired or been used already. If you got this from a business and think it's a mistake, reply to the text or email they sent.</p>
+</section>
+
+<div class="footer">&nbsp;</div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  // ---- API base ----
+  // Existing /lp/*.html pages reference https://lola.tyalexandermedia.com (same origin as deployment).
+  // Allow runtime override via window.LOLA_API_BASE; otherwise use same origin (Vercel routes to backend).
+  var API_BASE = (typeof window !== 'undefined' && window.LOLA_API_BASE) || window.location.origin;
+
+  // ---- Helpers ----
+  var qs = function(s){ return document.querySelector(s); };
+  var qsa = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  function getQueryParam(name){
+    var m = window.location.search.match(new RegExp('[?&]' + name + '=([^&]+)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  function show(id){
+    qsa('.screen').forEach(function(el){ el.classList.remove('active'); });
+    var el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    // scroll to top on screen change for mobile UX
+    window.scrollTo(0, 0);
+  }
+
+  function showError(elId, msg){
+    var el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function hideError(elId){
+    var el = document.getElementById(elId);
+    if (el) el.hidden = true;
+  }
+
+  // Compute readable text color (black or white) for a given hex brand color.
+  function readableTextOn(hex){
+    if (!hex) return '#FFFFFF';
+    var h = hex.replace('#','');
+    if (h.length === 3) h = h.split('').map(function(c){return c+c;}).join('');
+    if (h.length !== 6) return '#FFFFFF';
+    var r = parseInt(h.substr(0,2),16);
+    var g = parseInt(h.substr(2,2),16);
+    var b = parseInt(h.substr(4,2),16);
+    // relative luminance (sRGB)
+    function ch(v){ v = v/255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+    var L = 0.2126*ch(r) + 0.7152*ch(g) + 0.0722*ch(b);
+    return L > 0.5 ? '#0A0A0B' : '#FFFFFF';
+  }
+
+  function applyBrand(color){
+    if (!color) return;
+    var root = document.documentElement;
+    root.style.setProperty('--brand', color);
+    root.style.setProperty('--brand-fg', readableTextOn(color));
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', color);
+  }
+
+  function renderLogo(business){
+    var slot = document.getElementById('logo-slot');
+    if (!slot) return;
+    if (business && business.logo_url){
+      var img = document.createElement('img');
+      img.src = business.logo_url;
+      img.alt = business.name || 'Business logo';
+      img.className = 'logo';
+      img.onerror = function(){ renderInitial(business); };
+      slot.appendChild(img);
+    } else {
+      renderInitial(business);
+    }
+  }
+  function renderInitial(business){
+    var slot = document.getElementById('logo-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    var div = document.createElement('div');
+    div.className = 'logo-fallback';
+    div.textContent = (business && business.name ? business.name.charAt(0) : '★').toUpperCase();
+    slot.appendChild(div);
+  }
+
+  // ---- API ----
+  function apiGet(path){
+    return fetch(API_BASE + path, { method: 'GET', headers: { 'Accept': 'application/json' } });
+  }
+  function apiPost(path, body){
+    return fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  }
+
+  // ---- State ----
+  var REQUEST_ID = getQueryParam('id');
+  var CONFIG = null;
+  var GOOGLE_URL = null;
+
+  function init(){
+    if (!REQUEST_ID){
+      show('screen-error');
+      return;
+    }
+    loadConfig();
+  }
+
+  function loadConfig(){
+    apiGet('/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/config')
+      .then(function(res){
+        if (res.status === 404) { show('screen-error'); return null; }
+        if (!res.ok) throw new Error('config_failed');
+        return res.json();
+      })
+      .then(function(data){
+        if (!data) return;
+        CONFIG = data;
+        var biz = data.business || {};
+        applyBrand(biz.brand_primary_color);
+        GOOGLE_URL = data.google_review_url || null;
+
+        if (biz.name){
+          document.title = 'Share your experience — ' + biz.name;
+          var t = document.getElementById('rating-title');
+          if (t) t.textContent = 'How was ' + biz.name + '?';
+        }
+
+        if (data.already_responded){
+          show('screen-already');
+          return;
+        }
+
+        renderLogo(biz);
+        wireStars();
+        wirePrivateForm();
+        show('screen-rating');
+      })
+      .catch(function(){
+        show('screen-error');
+      });
+  }
+
+  function wireStars(){
+    var buttons = qsa('.star-btn');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var rating = parseInt(btn.getAttribute('data-rating'), 10);
+        if (!rating) return;
+        submitRating(rating, btn, buttons);
+      });
+    });
+  }
+
+  function submitRating(rating, btn, allButtons){
+    hideError('rating-error');
+    allButtons.forEach(function(b){ b.disabled = true; });
+    // Light up everything up to and including the selected star.
+    allButtons.forEach(function(b){
+      var r = parseInt(b.getAttribute('data-rating'), 10);
+      if (r <= rating) b.setAttribute('data-loading', 'true');
+    });
+
+    apiPost('/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/rating', { rating: rating })
+      .then(function(res){
+        if (!res.ok) throw new Error('rating_failed');
+        return res.json();
+      })
+      .then(function(data){
+        var routed = data && data.routed;
+        var url = (data && data.google_review_url) || GOOGLE_URL;
+        if (routed === 'google'){
+          handleGoogleRoute(url);
+        } else {
+          handlePrivateRoute(url);
+        }
+      })
+      .catch(function(){
+        allButtons.forEach(function(b){ b.disabled = false; b.removeAttribute('data-loading'); });
+        showError('rating-error', "Couldn't send that. Tap a star to try again.");
+      });
+  }
+
+  function handleGoogleRoute(url){
+    if (!url){
+      // Backend said "google" but gave no URL — fall through gracefully.
+      show('screen-thanks');
+      return;
+    }
+    var link = document.getElementById('google-link');
+    if (link) link.setAttribute('href', url);
+    show('screen-google');
+    setTimeout(function(){
+      try { window.location.href = url; } catch(e) {}
+    }, 800);
+  }
+
+  function handlePrivateRoute(url){
+    var fallback = document.getElementById('public-fallback');
+    if (fallback){
+      if (url){
+        fallback.setAttribute('href', url);
+        fallback.style.display = '';
+      } else {
+        fallback.style.display = 'none';
+      }
+    }
+    show('screen-private');
+    var ta = document.getElementById('message');
+    if (ta){ setTimeout(function(){ ta.focus(); }, 100); }
+  }
+
+  function wirePrivateForm(){
+    var form = document.getElementById('feedback-form');
+    if (!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      hideError('private-error');
+      var msg = (document.getElementById('message').value || '').trim();
+      var contact = !!document.getElementById('contact-back').checked;
+      if (msg.length < 5){
+        showError('private-error', 'A few more words would help.');
+        return;
+      }
+      var btn = document.getElementById('send-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      apiPost('/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/feedback', {
+        message: msg,
+        contact_back: contact
+      }).then(function(res){
+        if (res.status === 204 || res.ok){
+          show('screen-thanks');
+        } else {
+          throw new Error('feedback_failed');
+        }
+      }).catch(function(){
+        btn.disabled = false;
+        btn.textContent = 'Try again';
+        showError('private-error', "Couldn't send. Tap Try again.");
+      });
+    });
+  }
+
+  // Run.
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

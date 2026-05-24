@@ -5,11 +5,15 @@ import SharedReport from './SharedReport';
 import AdminLeads from './AdminLeads';
 import Homepage from './Homepage';
 import PricingPage from './PricingPage';
+import RetainerPage from './RetainerPage';
+import ApplyPage from './ApplyPage';
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'pricing' }
+  | { name: 'retainer' }
+  | { name: 'apply' }
   | { name: 'report'; auditId: string }
   | { name: 'admin' }
   | { name: 'unknown' };
@@ -18,6 +22,8 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
+  if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
+  if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
   if (pathname === '/admin/leads') return { name: 'admin' };
   const reportMatch = pathname.match(/^\/r\/([^/]+)\/?$/);
   if (reportMatch) return { name: 'report', auditId: decodeURIComponent(reportMatch[1]) };
@@ -40,10 +46,12 @@ function App() {
   const containerCls =
     route.name === 'report' || route.name === 'admin'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
-      : route.name === 'home' || route.name === 'pricing'
+      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
+      : route.name === 'apply'
+      ? 'max-w-[720px] pt-8 sm:pt-12'
       : 'max-w-[640px] pt-8 sm:pt-10';
 
   return (
@@ -53,6 +61,8 @@ function App() {
         {route.name === 'home' && <Homepage />}
         {route.name === 'audit' && <AuditFlow />}
         {route.name === 'pricing' && <PricingPage />}
+        {route.name === 'retainer' && <RetainerPage />}
+        {route.name === 'apply' && <ApplyPage />}
         {route.name === 'report' && <SharedReport auditId={route.auditId} />}
         {route.name === 'admin' && <AdminLeads />}
         {route.name === 'unknown' && <NotFound />}
