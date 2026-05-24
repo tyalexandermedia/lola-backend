@@ -224,6 +224,7 @@ export default function PricingPage() {
                 'Priority fix queue (Pro clients first)',
                 'Locked-in pricing — no rate increases ever',
                 'Lola Pro badge for your site footer',
+                'CSV export — competitor analysis + lead lists for your own outreach (Pro-only)',
                 '48-hour onboarding',
                 'First Win Promise backed',
               ]}
