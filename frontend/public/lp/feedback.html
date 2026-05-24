@@ -229,20 +229,39 @@ textarea:focus{outline:none;border-color:var(--brand,#D4AF37)}
   }
 
   // ---- State ----
+  // Two modes:
+  //   ?id={request_id}  → per-customer tracked link (from email/SMS request)
+  //   ?b={business_id}  → per-business untracked link (from QR or shareable URL)
+  // In ?b= mode REQUEST_ID is null until the user taps a star; the rating
+  // endpoint creates the row and returns the new request_id, which we stash
+  // so the negative-path feedback POST uses the existing /reviews/r/{id}/* surface.
   var REQUEST_ID = getQueryParam('id');
+  var BUSINESS_ID = getQueryParam('b');
   var CONFIG = null;
   var GOOGLE_URL = null;
 
   function init(){
-    if (!REQUEST_ID){
+    if (!REQUEST_ID && !BUSINESS_ID){
       show('screen-error');
       return;
     }
     loadConfig();
   }
 
+  function configPath(){
+    return REQUEST_ID
+      ? '/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/config'
+      : '/reviews/b/' + encodeURIComponent(BUSINESS_ID) + '/config';
+  }
+
+  function ratingPath(){
+    return REQUEST_ID
+      ? '/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/rating'
+      : '/reviews/b/' + encodeURIComponent(BUSINESS_ID) + '/rating';
+  }
+
   function loadConfig(){
-    apiGet('/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/config')
+    apiGet(configPath())
       .then(function(res){
         if (res.status === 404) { show('screen-error'); return null; }
         if (!res.ok) throw new Error('config_failed');
@@ -296,12 +315,17 @@ textarea:focus{outline:none;border-color:var(--brand,#D4AF37)}
       if (r <= rating) b.setAttribute('data-loading', 'true');
     });
 
-    apiPost('/reviews/r/' + encodeURIComponent(REQUEST_ID) + '/rating', { rating: rating })
+    apiPost(ratingPath(), { rating: rating })
       .then(function(res){
         if (!res.ok) throw new Error('rating_failed');
         return res.json();
       })
       .then(function(data){
+        // In ?b= mode the server creates the row and returns a request_id;
+        // capture it so the negative-path feedback POST has a row to target.
+        if (data && data.request_id && !REQUEST_ID){
+          REQUEST_ID = data.request_id;
+        }
         var routed = data && data.routed;
         var url = (data && data.google_review_url) || GOOGLE_URL;
         if (routed === 'google'){
