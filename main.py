@@ -80,7 +80,7 @@ app = FastAPI(title="Lola SEO", version="4.0")
 
 origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:3000,https://lola-seo.vercel.app",
+    "http://localhost:3000,https://lola.tyalexandermedia.com",
 ).split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -112,7 +112,7 @@ RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip() or None
 AUDIT_FROM_EMAIL = os.getenv(
     "AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>"
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola-seo.vercel.app").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
 
 HOME_SERVICES_TYPES = {
     "soft wash",
