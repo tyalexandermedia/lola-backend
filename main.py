@@ -80,7 +80,7 @@ app = FastAPI(title="Lola SEO", version="4.0")
 
 origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:3000,https://lola-seo.vercel.app",
+    "http://localhost:3000,https://lola.tyalexandermedia.com",
 ).split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -115,7 +115,7 @@ AUDIT_FROM_EMAIL = os.getenv(
 AUDIT_REPLY_TO_EMAIL = os.getenv(
     "AUDIT_REPLY_TO_EMAIL", "ty@tyalexandermedia.com"
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola-seo.vercel.app").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
 
 # Stripe Payment Link URLs used in the audit-confirmation email upsell.
 # Same as VITE_STRIPE_*_URL on the frontend — env-overridable so they can be
