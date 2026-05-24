@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
+# Explicit AI crawler access — critical for AI Mode citation
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
 Sitemap: https://lola.tyalexandermedia.com/sitemap.xml
