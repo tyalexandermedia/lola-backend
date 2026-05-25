@@ -89,6 +89,13 @@ from db.case_studies import (
 )
 from case_studies.configs import CASE_STUDIES
 from case_studies.tracker import run_case_study_snapshot
+from db.reporting import (
+    init_reporting_tables,
+    get_active_clients,
+    upsert_client as reporting_upsert_client,
+    get_recent_sends as reporting_recent_sends,
+)
+from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
@@ -115,6 +122,7 @@ async def startup_event():
     await init_applications_table()
     await init_reviews_tables()
     await init_case_studies_table()
+    await init_reporting_tables()
     await cache_purge_expired()
 
 
@@ -1492,6 +1500,83 @@ async def admin_case_study_history(
         raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
     rows = await get_run_history(slug, query, source, limit=max(1, min(limit, 100)))
     return {"slug": slug, "query": query, "source": source, "history": rows}
+
+
+# ── AGENT TWO — WEEKLY REPORTING ──────────────────────────────
+
+
+class ReportingClientUpsert(BaseModel):
+    slug: str
+    client_name: str
+    client_email: str
+    site_url: str
+    money_keywords: List[str]
+    conversion_rate: float = 0.03
+    avg_job_value: int = 400
+    brevo_template_id: Optional[int] = None
+    gsc_property: Optional[str] = None
+    ga_property_id: Optional[str] = None
+    active: bool = True
+
+
+@app.post("/admin/reporting/clients")
+async def admin_upsert_reporting_client(
+    body: ReportingClientUpsert,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Create or update a weekly-reporting client. Idempotent by slug."""
+    _check_admin(x_admin_key)
+    cid = await reporting_upsert_client(
+        slug=body.slug,
+        client_name=body.client_name,
+        client_email=body.client_email,
+        site_url=body.site_url,
+        money_keywords=body.money_keywords[:5],
+        conversion_rate=body.conversion_rate,
+        avg_job_value=body.avg_job_value,
+        brevo_template_id=body.brevo_template_id,
+        gsc_property=body.gsc_property,
+        ga_property_id=body.ga_property_id,
+        active=body.active,
+    )
+    return {"ok": True, "id": cid, "slug": body.slug}
+
+
+@app.get("/admin/reporting/clients")
+async def admin_list_reporting_clients(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"clients": await get_active_clients()}
+
+
+@app.post("/admin/reporting/run/{slug}")
+async def admin_run_reporting_one(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Trigger Agent Two for a single client. Use for testing before cron goes live."""
+    _check_admin(x_admin_key)
+    return await run_for_client(slug)
+
+
+@app.post("/admin/reporting/run-weekly")
+async def admin_run_reporting_weekly(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Endpoint cron-job.org hits every Monday 7am ET. Runs ALL active clients."""
+    _check_admin(x_admin_key)
+    return await run_weekly_for_all_active()
+
+
+@app.get("/admin/reporting/sends")
+async def admin_reporting_recent_sends(
+    slug: Optional[str] = None,
+    limit: int = 50,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"sends": await reporting_recent_sends(slug=slug, limit=max(1, min(limit, 200)))}
 
 
 class FoundingSignupRequest(BaseModel):

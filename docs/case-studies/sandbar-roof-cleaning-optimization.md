@@ -43,18 +43,66 @@ Note: full DOM audit was limited because Wix renders client-side and external SE
 4. **No structured before/after gallery** — image search traffic underleveraged.
 5. **No internal cross-link block** to related services (house wash, paver sand & seal, gutter cleaning) — passes no link equity within the site.
 
-### Verified ranking baseline (PLACEHOLDER — fill at day 0)
-> Run Google Search Console + manual incognito search on these queries from a Palm Harbor IP and record current position:
->
-> | Query | Position day 0 | Position day 30 | Δ |
-> |---|---|---|---|
-> | roof cleaning palm harbor fl | ___ | ___ | ___ |
-> | soft wash roof cleaning palm harbor | ___ | ___ | ___ |
-> | shingle roof cleaning pinellas | ___ | ___ | ___ |
-> | tile roof cleaning clearwater | ___ | ___ | ___ |
-> | best roof cleaner near me (from Palm Harbor IP) | ___ | ___ | ___ |
+### Automated ranking baseline (live tracker — `case_studies/` module)
 
-ChatGPT + Perplexity baseline — record verbatim AI response to "Best roof cleaner near Palm Harbor FL?" Save screenshot.
+A reusable ranking tracker now lives in the backend. Each "snapshot" hits Google Custom Search per tracked query + asks Claude as an AI Mode proxy whether the client gets recommended. Results persist to SQLite for time-series δ.
+
+**One-liner to capture a snapshot** (replace `<key>` with your `LOLA_SECRET_ADMIN_KEY`):
+
+```bash
+curl -X POST \
+  -H "X-Admin-Key: <key>" \
+  "https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning/run?notes=day-30"
+```
+
+**View latest snapshot:**
+```bash
+curl -H "X-Admin-Key: <key>" \
+  https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning
+```
+
+**View time-series for a single query:**
+```bash
+curl -H "X-Admin-Key: <key>" \
+  "https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning/history?query=roof+cleaning+palm+harbor+fl&source=google_organic"
+```
+
+### Day-0 baseline (2026-05-25) — actual capture state
+
+⚠️ **Tracker code shipped & deployed, but day-0 capture blocked on two external API issues that are user-side fixes (~5 min each):**
+
+| API | State | Fix |
+|---|---|---|
+| Google Custom Search JSON API | HTTP 403 — `This project does not have the access to Custom Search JSON API` | The `GOOGLE_CUSTOM_SEARCH_API_KEY` env var on Railway is scoped to a different GCP project than the one with the Custom Search JSON API enabled. In GCP console, **enable Custom Search JSON API for the project that owns the current key** (or create a new key in the project that already has it enabled). |
+| Anthropic API (AI Mode proxy) | "Anthropic key not configured" | Set `ANTHROPIC_API_KEY` on Railway → Variables. Get a free key at https://console.anthropic.com/. Sub-cent per snapshot (Haiku 4.5). |
+
+Once both keys land, the same curl above auto-fills day-0 baseline + every subsequent snapshot.
+
+### Manual day-0 baseline (interim — until APIs land)
+
+If you want a baseline TODAY before the API fixes:
+1. From a Palm Harbor IP (or VPN), incognito-search each query in the table below.
+2. Note Sandbar's position (top 10 only; "not in top 10" = NIT10).
+3. Screenshot ChatGPT + Perplexity answers to "Best roof cleaner near Palm Harbor FL?" — save to `/docs/case-studies/screenshots/2026-05-25-day0/`.
+
+| Query | Day 0 (manual) | Day 30 (auto) | Δ |
+|---|---|---|---|
+| roof cleaning palm harbor fl | ___ | ___ | ___ |
+| soft wash roof cleaning palm harbor | ___ | ___ | ___ |
+| shingle roof cleaning pinellas county | ___ | ___ | ___ |
+| tile roof cleaning clearwater fl | ___ | ___ | ___ |
+| best roof cleaner near palm harbor | ___ | ___ | ___ |
+| roof cleaning cost florida | ___ | ___ | ___ |
+
+### Cron-driven day-30 capture (zero-touch)
+
+Once the APIs are live, set up a free cron at https://cron-job.org/:
+- URL: `https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning/run?notes=auto-weekly`
+- Method: POST
+- Header: `X-Admin-Key: <key>`
+- Schedule: every Monday 7am ET
+
+That gives you weekly rankings forever, free, no manual touching.
 
 ---
 
