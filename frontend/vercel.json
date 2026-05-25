@@ -7,6 +7,8 @@
     { "source": "/lp/local-seo-plumbers-tampa", "destination": "/lp/local-seo-plumbers-tampa.html" },
     { "source": "/lp/local-seo-pool-service-florida", "destination": "/lp/local-seo-pool-service-florida.html" },
     { "source": "/lp/feedback", "destination": "/lp/feedback.html" },
+    { "source": "/lp/reviews-admin", "destination": "/lp/reviews-admin.html" },
+    { "source": "/reviews/(.*)", "destination": "https://lola-backend-production.up.railway.app/reviews/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

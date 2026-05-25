@@ -31,7 +31,9 @@ import os
 import uuid
 from datetime import datetime, timezone
 from typing import Literal, Optional
+from urllib.parse import urlparse
 
+import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
 from pydantic import BaseModel, Field, field_validator
 
@@ -52,6 +54,7 @@ from reviews.emails import (
 )
 from reviews.qr import make_qr_svg
 from reviews.sms import send_sms_review_request, twilio_enabled
+from api_clients.google_apis import ApiBudget, get_business_info
 
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
@@ -363,6 +366,62 @@ async def admin_list_review_requests(
 ):
     rows = await list_review_requests(business_id=business_id, limit=limit)
     return {"requests": rows}
+
+
+# ── Admin: lookup business by website (Places autofill) ────
+
+
+def _domain_query(website: str) -> str:
+    """Extract a Places-friendly text query from any URL/domain the user pastes.
+
+    sandbarsoftwash.com           → 'sandbarsoftwash'
+    https://www.sandbarsoftwash.com/services → 'sandbarsoftwash'
+    """
+    if not website or not website.strip():
+        return ""
+    raw = website.strip()
+    if "://" not in raw:
+        raw = "https://" + raw
+    host = (urlparse(raw).hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    parts = host.split(".")
+    if len(parts) >= 2:
+        return parts[-2]
+    return host
+
+
+@router.post("/lookup-business", dependencies=[Depends(require_admin_key)])
+async def admin_lookup_business(website: str = Query(..., min_length=3)):
+    """Resolve a website to a Google Places match so the admin UI can autofill
+    name + place_id + phone + address. One Places API call per lookup."""
+    query = _domain_query(website)
+    if not query:
+        raise HTTPException(status_code=400, detail="Invalid website URL")
+
+    print(f"[reviews.lookup] website={website!r} query={query!r}")
+
+    async with httpx.AsyncClient() as client:
+        budget = ApiBudget(2)
+        info = await get_business_info(client, query, "", budget)
+
+    if not info.get("ok") or not info.get("place_id"):
+        raise HTTPException(
+            status_code=404, detail="No Google Places match for that website"
+        )
+
+    return {
+        "name": info["name"],
+        "place_id": info["place_id"],
+        "phone": info.get("phone", ""),
+        "address": info.get("address", ""),
+        "website": info.get("website", "") or website,
+        "place_url": info.get("place_url"),
+        "primary_category": info.get("primary_category"),
+        "rating": info.get("rating", 0),
+        "review_count": info.get("review_count", 0),
+        "verification_confidence": info.get("verification_confidence", "low"),
+    }
 
 
 # ── Public: feedback page lifecycle ────────────────────────
