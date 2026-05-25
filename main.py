@@ -82,6 +82,13 @@ from db.outreach import (
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
+from db.case_studies import (
+    init_case_studies_table,
+    get_latest_run,
+    get_run_history,
+)
+from case_studies.configs import CASE_STUDIES
+from case_studies.tracker import run_case_study_snapshot
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
@@ -107,6 +114,7 @@ async def startup_event():
     await init_outreach_tables()
     await init_applications_table()
     await init_reviews_tables()
+    await init_case_studies_table()
     await cache_purge_expired()
 
 
@@ -1418,6 +1426,72 @@ async def list_applications(
         raise HTTPException(status_code=403, detail="Forbidden")
     rows = await get_recent_applications(limit=max(1, min(limit, 200)))
     return {"applications": rows}
+
+
+# ── CASE STUDY RANKING TRACKER ────────────────────────────────
+
+
+def _check_admin(key: str) -> None:
+    expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "")
+    if not expected or key != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.post("/admin/case-study/{slug}/run")
+async def admin_case_study_run(
+    slug: str,
+    notes: str = "",
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Captures a fresh ranking snapshot for the named case study. Admin only.
+    Idempotent — each call stores a new row per (query, source) with the
+    current timestamp. Safe to run on a cron schedule (cron-job.org etc).
+
+    Example:
+      curl -X POST -H "X-Admin-Key: $KEY" \
+        https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning/run?notes=day-0
+    """
+    _check_admin(x_admin_key)
+    if slug not in CASE_STUDIES:
+        raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
+    summary = await run_case_study_snapshot(slug, notes=notes)
+    return summary
+
+
+@app.get("/admin/case-study/{slug}")
+async def admin_case_study_latest(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Returns the most recent ranking row per (query, source) for a case study."""
+    _check_admin(x_admin_key)
+    if slug not in CASE_STUDIES:
+        raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
+    rows = await get_latest_run(slug)
+    cs = CASE_STUDIES[slug]
+    return {
+        "slug": slug,
+        "client_name": cs.client_name,
+        "target_url": cs.target_url,
+        "latest": rows,
+    }
+
+
+@app.get("/admin/case-study/{slug}/history")
+async def admin_case_study_history(
+    slug: str,
+    query: str,
+    source: str = "google_organic",
+    limit: int = 20,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Time-series for a single (slug, query, source) — used for δ charts."""
+    _check_admin(x_admin_key)
+    if slug not in CASE_STUDIES:
+        raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
+    rows = await get_run_history(slug, query, source, limit=max(1, min(limit, 100)))
+    return {"slug": slug, "query": query, "source": source, "history": rows}
 
 
 class FoundingSignupRequest(BaseModel):
