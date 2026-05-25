@@ -863,6 +863,9 @@ export function ResultsStage({
         </a>
       </section>
 
+      {/* Copy-paste deliverables + Lola's Take + Share — P11 Phase C */}
+      <DeliverablesBlock audit={audit} />
+
       {/* Who's capturing your customers — top 3 competitors from search results */}
       {Array.isArray(audit.competitors) && audit.competitors.length > 0 && (
         <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
@@ -1656,6 +1659,289 @@ function LeakCard({
         </>
       )}
     </div>
+  );
+}
+
+// ── P11 Phase C — Copy-paste deliverables + Lola's Take + Share ──────
+//
+// Four ready-to-deploy artifacts pre-filled from the audit data:
+//   1. Optimized <title> tag
+//   2. Optimized GBP service description (~150 words)
+//   3. First GBP post draft
+//   4. LocalBusiness JSON-LD schema with their actual business info
+//
+// Plus a signed "Lola's Take" closing block (score-aware messaging) and
+// a Share row (copy link + IG tag CTA). Every copy fires a PostHog event
+// so we can measure which deliverable contractors actually use.
+
+function _titleCase(s: string): string {
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function generateTitleTag(audit: AuditResult): string {
+  const service = _titleCase(audit.business_type || 'Local Service');
+  return `${service} in ${audit.city || 'Florida'} | ${audit.business_name || 'Your Business'}`.slice(0, 60);
+}
+
+function generateGbpDescription(audit: AuditResult): string {
+  const service = audit.business_type || 'local services';
+  const city = (audit.city || 'Florida').split(',')[0] || 'Florida';
+  const name = audit.business_name || 'We';
+  return (
+    `${name} delivers ${service} across ${city} and surrounding Florida service areas. ` +
+    `Family-aware values, transparent pricing, and the same crew you trust every visit — ` +
+    `not a rotating call-center. Free quotes by phone or text. Fully insured. ` +
+    `Most jobs scheduled within the same week. ` +
+    `Why ${city.split(' ')[0]} homeowners choose us: real local presence, honest ` +
+    `recommendations (we'll tell you when you don't need the service), and follow-through ` +
+    `after the job is done. Looking for ${service} near ${city}? Call us — we answer our own phones.`
+  ).slice(0, 750);
+}
+
+function generateGbpPost(audit: AuditResult): string {
+  const service = _titleCase(audit.business_type || 'Service');
+  const city = (audit.city || 'Florida').split(',')[0];
+  return (
+    `Need ${service.toLowerCase()} in ${city}?\n\n` +
+    `We're booking new ${service.toLowerCase()} jobs across ${city} and nearby Florida service areas this month.\n\n` +
+    `What you get:\n` +
+    `• Free quote in under 24 hours\n` +
+    `• Fully insured local crew (no out-of-state subs)\n` +
+    `• Honest assessment — if you don't need the service, we'll tell you\n\n` +
+    `Tap "Call" or message us. We answer our own phones.\n\n` +
+    `#${city.replace(/\s+/g, '')}Florida #${service.replace(/\s+/g, '')} #LocalFlorida`
+  );
+}
+
+function generateSchema(audit: AuditResult): string {
+  const blob = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: audit.business_name || 'Your Business',
+    url: audit.website || '',
+    image: '',
+    telephone: '',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: (audit.city || '').split(',')[0] || 'Florida',
+      addressRegion: 'FL',
+      addressCountry: 'US',
+    },
+    areaServed: { '@type': 'City', name: (audit.city || '').split(',')[0] || 'Florida' },
+    priceRange: '$$',
+    description: `${audit.business_type || 'Local services'} in ${audit.city || 'Florida'}.`,
+  };
+  return `<script type="application/ld+json">\n${JSON.stringify(blob, null, 2)}\n</script>`;
+}
+
+function CopyCard({
+  eyebrow,
+  title,
+  hint,
+  body,
+  trackProp,
+}: {
+  eyebrow: string;
+  title: string;
+  hint: string;
+  body: string;
+  trackProp: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = () => {
+    try {
+      navigator.clipboard.writeText(body);
+      setCopied(true);
+      trackClick('audit_deliverable_copied', { deliverable_type: trackProp });
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* graceful no-op */
+    }
+  };
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{eyebrow}</p>
+      <h4 className="mt-2 text-[16px] font-bold text-white sm:text-[17px]">{title}</h4>
+      <p className="mt-1.5 text-[12px] leading-[1.55] text-[#8A8F98]">{hint}</p>
+      <pre className="mt-4 max-h-[180px] overflow-auto whitespace-pre-wrap rounded-[10px] border border-white/[0.06] bg-[#0A0A0B] p-4 font-mono text-[12px] leading-[1.6] text-[#E8E4D8]">
+        {body}
+      </pre>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="mt-3 flex h-11 min-w-[140px] items-center justify-center rounded-[10px] bg-[#D4AF37]/[0.10] px-4 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.18]"
+      >
+        {copied ? '✓ Copied' : '📋 Copy'}
+      </button>
+    </div>
+  );
+}
+
+function DeliverablesBlock({ audit }: { audit: AuditResult }) {
+  const score = audit.total_score;
+  const monthlyLeak = audit.revenue_leak?.monthly_leak || 0;
+  const businessFirst = (audit.business_name || 'your business').split(' ')[0];
+
+  const titleTag = useMemo(() => generateTitleTag(audit), [audit]);
+  const gbpDescription = useMemo(() => generateGbpDescription(audit), [audit]);
+  const gbpPost = useMemo(() => generateGbpPost(audit), [audit]);
+  const schema = useMemo(() => generateSchema(audit), [audit]);
+
+  // Score-aware messaging for "Lola's Take" closing
+  let assessment: string;
+  let topFix: string;
+  let movementHint: string;
+  if (score >= 80) {
+    assessment = 'solid — top tier among Florida operators';
+    topFix = 'Tighten title tag + add 2 GBP posts this week';
+    movementHint = '2–4 spots';
+  } else if (score >= 65) {
+    assessment = 'decent — but a few high-impact gaps are bleeding revenue';
+    topFix = 'Fix the GBP description + add LocalBusiness schema today';
+    movementHint = '4–6 spots';
+  } else {
+    assessment = 'rough — the foundation needs work, but the gap is your opportunity';
+    topFix = 'Deploy all 4 copy-paste artifacts below this week';
+    movementHint = '6–8 spots';
+  }
+
+  const shareUrl = (typeof window !== 'undefined' && window.location)
+    ? `${window.location.origin}/r/${audit.audit_id}?utm_source=share&utm_campaign=audit-${score}`
+    : '';
+  const [shareCopied, setShareCopied] = useState(false);
+  const onShareCopy = () => {
+    try {
+      navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      trackClick('audit_shared', { channel: 'copy_link' });
+      setTimeout(() => setShareCopied(false), 2200);
+    } catch {
+      /* no-op */
+    }
+  };
+
+  return (
+    <>
+      <section className="mt-5 rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] p-6 sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          4 ready-to-deploy fixes
+        </p>
+        <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
+          Paste these in. Move up the rankings.
+        </h3>
+        <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+          Every line below is generated from {audit.business_name}'s actual audit data. Tap copy,
+          paste it where it belongs (page title, GBP description, GBP post, site &lt;head&gt;).
+          Most contractors can ship all four in under 30 minutes.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CopyCard
+            eyebrow="1 · Title tag"
+            title="Optimized <title> for this page"
+            hint="Paste into Wix → Page Settings → SEO → Title (or your CMS equivalent)."
+            body={titleTag}
+            trackProp="title_tag"
+          />
+          <CopyCard
+            eyebrow="2 · GBP description"
+            title="Optimized Google Business Profile description"
+            hint="Paste into Google Business Profile → Edit profile → Business description."
+            body={gbpDescription}
+            trackProp="gbp_description"
+          />
+          <CopyCard
+            eyebrow="3 · GBP post draft"
+            title="Your first GBP post (publish today)"
+            hint="Paste into GBP → Add update → Post. Repeat weekly with seasonal variations."
+            body={gbpPost}
+            trackProp="gbp_post"
+          />
+          <CopyCard
+            eyebrow="4 · LocalBusiness schema"
+            title="Pre-filled structured data"
+            hint="Paste into the <head> of your site — Wix → Advanced SEO → Structured Data."
+            body={schema}
+            trackProp="schema"
+          />
+        </div>
+      </section>
+
+      {/* Lola's Take — signed closing block */}
+      <section className="mt-5 rounded-3xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.08] via-[#F4B942]/[0.04] to-[#0A0A0B] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          🦴 Lola's quick take on {audit.business_name}
+        </p>
+        <div className="mt-4 space-y-3 text-[15px] leading-[1.65] text-white sm:text-[16px]">
+          <p>
+            Your foundation is <strong className="text-[#D4AF37]">{assessment}</strong>. (Score:{' '}
+            <strong>{score}/100 — {audit.grade}</strong>)
+          </p>
+          <p>
+            <strong className="text-white">Fastest win:</strong> {topFix}. That alone could move
+            you <strong className="text-[#D4AF37]">{movementHint}</strong> in 30 days.
+          </p>
+          {monthlyLeak > 0 && (
+            <p>
+              <strong className="text-white">Biggest leak:</strong> The gap between where{' '}
+              {businessFirst} ranks today and where it could rank. That's about{' '}
+              <strong className="text-[#D4AF37]">${formatNumber(monthlyLeak)}/mo</strong> on the
+              table.
+            </p>
+          )}
+          <p className="pt-1 font-semibold text-white">
+            Want me to do this for you instead?
+          </p>
+        </div>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <a
+            href="/retainer"
+            onClick={() => trackClick('retainer_cta_clicked', { from: 'lolas_take' })}
+            className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+          >
+            See the Retainer →
+          </a>
+          <a
+            href="/apply"
+            onClick={() => trackClick('retainer_apply_clicked', { from: 'lolas_take' })}
+            className="inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37]"
+          >
+            Apply (Coach Ty reviews every one)
+          </a>
+        </div>
+        <p className="mt-5 text-[13px] text-[#D4AF37]">
+          — Coach Ty
+          <span className="ml-2 text-[12px] text-[#8A8F98]">
+            Founder, Ty Alexander Media · Tampa Bay, FL · @tyalexandermedia
+          </span>
+        </p>
+      </section>
+
+      {/* Share row */}
+      <section className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          📸 Share your audit score
+        </p>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={onShareCopy}
+            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+          >
+            {shareCopied ? '✓ Link copied' : 'Copy share link'}
+          </button>
+          <a
+            href="https://www.instagram.com/tyalexandermedia"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackClick('audit_shared', { channel: 'instagram' })}
+            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 text-[12px] font-semibold text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.12]"
+          >
+            Tag @tyalexandermedia on IG
+          </a>
+        </div>
+      </section>
+    </>
   );
 }
 
