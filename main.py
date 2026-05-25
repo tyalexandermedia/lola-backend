@@ -139,6 +139,10 @@ async def startup_event():
 
 app.include_router(reviews_router)
 
+from lead_gen import router as lead_gen_router  # noqa: E402
+
+app.include_router(lead_gen_router)
+
 
 GOOGLE_PAGESPEED_KEY = os.getenv("GOOGLE_PAGESPEED_API_KEY", "").strip() or None
 GOOGLE_PLACES_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "").strip() or None
