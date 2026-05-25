@@ -47,14 +47,15 @@ const TRADES = [
 ] as const;
 
 // Trades that AuditFlow's TRADE_TO_SERVICE can pre-fill on Step 2. Keep
-// in sync with TRADE_TO_SERVICE in AuditFlow.tsx.
+// strictly in sync with TRADE_TO_SERVICE in AuditFlow.tsx — claiming a trade
+// is "mapped" but failing to pre-fill is a broken promise on step 1.
 const MAPPED_TRADES = new Set<string>([
   'HVAC',
   'Plumber',
   'Roofer',
   'Soft Wash / Pressure Wash',
-  'Pest Control',
-  'Landscaper',
+  'Pool Service',
+  'Pool Services',
 ]);
 
 const PLURAL: Record<string, string> = {
@@ -274,7 +275,7 @@ export default function Homepage() {
           {[
             { num: '20 sec', label: 'Audit completion time' },
             { num: '$1,800/mo', label: 'Saved vs premium agencies' },
-            { num: '5 keywords', label: 'Ranked in 3 weeks (Sandbar)' },
+            { num: '20+ cities', label: 'Sandbar Soft Wash service area' },
             { num: '60 days', label: 'To first guaranteed win' },
           ].map((s, i) => (
             <div

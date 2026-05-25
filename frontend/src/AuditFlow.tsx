@@ -933,11 +933,12 @@ export function ResultsStage({
 
           <div className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
             <p className="font-semibold text-white">
-              📊 73% of all local clicks go to businesses ranked #1–3 on Google.
+              From what Lola sees on Florida contractor audits: top-3 takes most of the clicks.
+              The rest fight over the scraps.
             </p>
             <p className="mt-2">
-              68% of customers trust those top-3 businesses by default. The Lola Retainer moves
-              you into that zone — month after month.
+              That's the gap. The Lola Retainer moves you into the top-3 zone — month after month
+              — so the calls land with you instead of the next contractor down the list.
             </p>
           </div>
         </section>
@@ -1714,23 +1715,34 @@ function generateGbpPost(audit: AuditResult): string {
 }
 
 function generateSchema(audit: AuditResult): string {
-  const blob = {
+  // Pull verified business_info fields when available — they're populated by
+  // the backend's Google Places lookup during the audit. Only emit keys with
+  // non-empty values to avoid Rich Results warnings for empty required-ish
+  // fields (image, telephone).
+  const bi: Record<string, unknown> =
+    (audit.business_info as Record<string, unknown>) || {};
+  const phone = typeof bi.phone === 'string' ? bi.phone : '';
+  const image = typeof bi.logo === 'string' ? bi.logo : '';
+  const city = (audit.city || '').split(',')[0] || 'Florida';
+
+  const blob: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: audit.business_name || 'Your Business',
-    url: audit.website || '',
-    image: '',
-    telephone: '',
+    description: `${audit.business_type || 'Local services'} in ${audit.city || 'Florida'}.`,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: (audit.city || '').split(',')[0] || 'Florida',
+      addressLocality: city,
       addressRegion: 'FL',
       addressCountry: 'US',
     },
-    areaServed: { '@type': 'City', name: (audit.city || '').split(',')[0] || 'Florida' },
+    areaServed: { '@type': 'City', name: city },
     priceRange: '$$',
-    description: `${audit.business_type || 'Local services'} in ${audit.city || 'Florida'}.`,
   };
+  if (audit.website) blob.url = audit.website;
+  if (phone) blob.telephone = phone;
+  if (image) blob.image = image;
+
   return `<script type="application/ld+json">\n${JSON.stringify(blob, null, 2)}\n</script>`;
 }
 
@@ -1805,7 +1817,10 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
     movementHint = '6–8 spots';
   }
 
-  const shareUrl = (typeof window !== 'undefined' && window.location)
+  // Build share URL only if we have a valid audit_id — otherwise the link
+  // would resolve to /r/undefined and trigger the SharedReport 404 path.
+  const hasShareableId = !!(audit.audit_id && audit.audit_id.length > 8);
+  const shareUrl = hasShareableId && typeof window !== 'undefined' && window.location
     ? `${window.location.origin}/r/${audit.audit_id}?utm_source=share&utm_campaign=audit-${score}`
     : '';
   const [shareCopied, setShareCopied] = useState(false);
@@ -1917,7 +1932,8 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         </p>
       </section>
 
-      {/* Share row */}
+      {/* Share row — only rendered when we have a real audit_id to link to */}
+      {hasShareableId && (
       <section className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
           📸 Share your audit score
@@ -1941,6 +1957,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           </a>
         </div>
       </section>
+      )}
     </>
   );
 }
