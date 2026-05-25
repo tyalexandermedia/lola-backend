@@ -866,6 +866,9 @@ export function ResultsStage({
       {/* Copy-paste deliverables + Lola's Take + Share — P11 Phase C */}
       <DeliverablesBlock audit={audit} />
 
+      {/* AI Enhancement layer — service-type-matched opportunity report */}
+      <EnhancementBlock audit={audit} />
+
       {/* Who's capturing your customers — top 3 competitors from search results */}
       {Array.isArray(audit.competitors) && audit.competitors.length > 0 && (
         <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
@@ -1959,6 +1962,301 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
       </section>
       )}
     </>
+  );
+}
+
+// ── AI ENHANCEMENT LAYER ─────────────────────────────────────────────
+//
+// Lazily fetches the Claude-generated opportunity report from
+// GET /audits/<id>/enhancement. Backend auto-fires generation when an
+// audit completes, so by the time the user opens this report it's
+// usually cached. POSTs to /audits/<id>/enhance if it's still pending
+// (rare race), gracefully degrades if Anthropic key isn't configured.
+
+type EnhancementFinding = {
+  finding?: string;
+  whats_broken?: string;
+  why_it_matters?: string;
+  how_to_fix?: string[];
+  time_to_implement?: string;
+  expected_result?: string;
+};
+
+type EnhancementQuickWin = {
+  title?: string;
+  action?: string;
+  time?: string;
+};
+
+type EnhancementPayload = {
+  title?: string;
+  executive_summary?: string;
+  revenue_leak?: {
+    monthly_dollars?: number;
+    annual_dollars?: number;
+    missed_calls_per_month?: number;
+    explanation?: string;
+  };
+  service_specific_findings?: EnhancementFinding[];
+  quick_wins?: EnhancementQuickWin[];
+  roadmap?: {
+    weeks_1_4?: string[];
+    weeks_5_8?: string[];
+    weeks_9_12?: string[];
+  };
+  ctas?: {
+    diy_label?: string;
+    diy_url?: string;
+    dfy_label?: string;
+    dfy_url?: string;
+  };
+};
+
+function EnhancementBlock({ audit }: { audit: AuditResult }) {
+  const [status, setStatus] = useState<'loading' | 'ready' | 'pending' | 'error'>('loading');
+  const [payload, setPayload] = useState<EnhancementPayload | null>(null);
+
+  useEffect(() => {
+    if (!audit.audit_id) return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const resp = await fetch(`${API_URL}/audits/${encodeURIComponent(audit.audit_id)}/enhancement`);
+        if (!resp.ok) {
+          if (!cancelled) setStatus('error');
+          return;
+        }
+        const data = await resp.json();
+        if (cancelled) return;
+        if (data.status === 'ready' && data.payload) {
+          setPayload(data.payload as EnhancementPayload);
+          setStatus('ready');
+        } else if (data.status === 'pending') {
+          // Trigger generation, wait for result
+          setStatus('pending');
+          const trig = await fetch(
+            `${API_URL}/audits/${encodeURIComponent(audit.audit_id)}/enhance`,
+            { method: 'POST' },
+          );
+          if (cancelled) return;
+          const tdata = await trig.json();
+          if (tdata.status === 'ready' && tdata.payload) {
+            setPayload(tdata.payload as EnhancementPayload);
+            setStatus('ready');
+          } else {
+            setStatus('error');
+          }
+        } else {
+          setStatus('error');
+        }
+      } catch {
+        if (!cancelled) setStatus('error');
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [audit.audit_id]);
+
+  // If the API key isn't configured (or any error), don't render an
+  // empty section — fail silently so the existing report sections stay clean.
+  if (status === 'error') return null;
+
+  if (status === 'loading' || status === 'pending') {
+    return (
+      <section className="mt-5 rounded-3xl border border-[#D4AF37]/20 bg-white/[0.02] p-6 sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          🦴 Lola's enhanced opportunity report
+        </p>
+        <p className="mt-3 text-[14px] text-[#8A8F98]">
+          {status === 'pending' ? 'Generating your contractor-specific report…' : 'Loading deeper analysis…'}
+        </p>
+      </section>
+    );
+  }
+
+  if (!payload) return null;
+
+  return (
+    <section className="mt-5 rounded-3xl border-2 border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.06] via-[#0F0F12] to-[#0A0A0B] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+      <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+        🦴 Lola's enhanced opportunity report
+      </p>
+      <h2 className="mt-3 text-[24px] font-bold leading-tight text-white sm:text-[30px]">
+        {payload.title || `${audit.business_name} — Local SEO Opportunity Report`}
+      </h2>
+
+      {payload.executive_summary && (
+        <p className="mt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:text-[15px]">
+          {payload.executive_summary}
+        </p>
+      )}
+
+      {/* Revenue leak headline */}
+      {payload.revenue_leak && typeof payload.revenue_leak.monthly_dollars === 'number' && (
+        <div className="mt-6 rounded-2xl border border-[#D4AF37]/30 bg-[#0A0A0B] p-5 sm:p-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+            Revenue leak — Lola's deeper read
+          </p>
+          <p className="mt-3">
+            <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[36px] font-extrabold leading-none text-transparent sm:text-[44px]">
+              ${formatNumber(payload.revenue_leak.monthly_dollars)}
+            </span>
+            <span className="ml-2 text-[14px] text-[#A0A5AE]">/month</span>
+          </p>
+          {payload.revenue_leak.annual_dollars ? (
+            <p className="mt-1 text-[13px] text-[#A0A5AE]">
+              ${formatNumber(payload.revenue_leak.annual_dollars)}/year at stake
+            </p>
+          ) : null}
+          {payload.revenue_leak.explanation && (
+            <p className="mt-3 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
+              {payload.revenue_leak.explanation}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Service-specific findings */}
+      {Array.isArray(payload.service_specific_findings) &&
+        payload.service_specific_findings.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+              Service-specific findings ({audit.business_type})
+            </h3>
+            <div className="mt-3 flex flex-col gap-3">
+              {payload.service_specific_findings.map((f, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5"
+                >
+                  {f.finding && (
+                    <p className="text-[14px] font-bold text-white sm:text-[15px]">{f.finding}</p>
+                  )}
+                  {f.whats_broken && (
+                    <p className="mt-2 text-[13px] leading-[1.55] text-[#C5C5C8]">
+                      <span className="font-semibold text-[#E5A95B]">Broken:</span> {f.whats_broken}
+                    </p>
+                  )}
+                  {f.why_it_matters && (
+                    <p className="mt-1.5 text-[13px] leading-[1.55] text-[#C5C5C8]">
+                      <span className="font-semibold text-[#4CAF80]">Why:</span> {f.why_it_matters}
+                    </p>
+                  )}
+                  {Array.isArray(f.how_to_fix) && f.how_to_fix.length > 0 && (
+                    <ul className="mt-2 ml-4 list-disc text-[13px] leading-[1.55] text-[#C5C5C8]">
+                      {f.how_to_fix.map((step, j) => (
+                        <li key={j}>{step}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[#8A8F98]">
+                    {f.time_to_implement && (
+                      <span className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5">
+                        ⏱ {f.time_to_implement}
+                      </span>
+                    )}
+                    {f.expected_result && (
+                      <span className="rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-2 py-0.5 text-[#D4AF37]">
+                        → {f.expected_result}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      {/* Quick wins */}
+      {Array.isArray(payload.quick_wins) && payload.quick_wins.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+            Quick wins (under 24 hours each)
+          </h3>
+          <ul className="mt-3 flex flex-col gap-2">
+            {payload.quick_wins.map((q, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[11px] font-bold text-[#D4AF37]">
+                  {i + 1}
+                </span>
+                <div className="flex-1">
+                  {q.title && (
+                    <p className="text-[14px] font-semibold text-white sm:text-[15px]">{q.title}</p>
+                  )}
+                  {q.action && (
+                    <p className="mt-1 text-[13px] leading-[1.55] text-[#C5C5C8]">{q.action}</p>
+                  )}
+                  {q.time && (
+                    <p className="mt-1.5 text-[11px] text-[#8A8F98]">⏱ {q.time}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 90-Day roadmap */}
+      {payload.roadmap && (
+        <div className="mt-6">
+          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+            Your 90-day roadmap
+          </h3>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { label: 'Weeks 1–4', items: payload.roadmap.weeks_1_4 || [] },
+              { label: 'Weeks 5–8', items: payload.roadmap.weeks_5_8 || [] },
+              { label: 'Weeks 9–12', items: payload.roadmap.weeks_9_12 || [] },
+            ].map((col) => (
+              <div
+                key={col.label}
+                className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4"
+              >
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                  {col.label}
+                </p>
+                <ul className="mt-2 ml-4 list-disc text-[12px] leading-[1.5] text-[#C5C5C8]">
+                  {col.items.map((it, i) => (
+                    <li key={i}>{it}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Two CTAs */}
+      {payload.ctas && (
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          {payload.ctas.diy_url && (
+            <a
+              href={payload.ctas.diy_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackClick('enhancement_diy_cta', { from: 'enhancement_block' })}
+              className="inline-flex flex-1 items-center justify-center rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.12]"
+            >
+              {payload.ctas.diy_label || 'Book a 15-min strategy call'}
+            </a>
+          )}
+          {payload.ctas.dfy_url && (
+            <a
+              href={payload.ctas.dfy_url}
+              onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
+              className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
+            >
+              {payload.ctas.dfy_label || 'Activate the Retainer — $697/mo'}
+            </a>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 

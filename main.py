@@ -96,6 +96,16 @@ from db.reporting import (
     get_recent_sends as reporting_recent_sends,
 )
 from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
+from db.enhancements import (
+    init_enhancements_table,
+    get_enhancement,
+    save_enhancement,
+)
+from agents.enhancement_agent.enhancer import (
+    generate_enhancement,
+    EnhancementError,
+    ANTHROPIC_MODEL as ENHANCEMENT_MODEL,
+)
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
@@ -123,6 +133,7 @@ async def startup_event():
     await init_reviews_tables()
     await init_case_studies_table()
     await init_reporting_tables()
+    await init_enhancements_table()
     await cache_purge_expired()
 
 
@@ -1147,6 +1158,13 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 },
             )
 
+            # Fire-and-forget AI enhancement generation. Frontend will lazily
+            # fetch it via GET /audits/<id>/enhancement when the report renders.
+            # Falls through gracefully if ANTHROPIC_API_KEY isn't configured.
+            asyncio.create_task(
+                _generate_and_cache_enhancement(audit_id, audit_response)
+            )
+
             await upsert_lead(
                 audit_id=audit_id,
                 email=request.email,
@@ -1242,6 +1260,83 @@ async def get_audit(audit_id: str):
         raise HTTPException(status_code=404, detail="Audit not found")
     # The stored payload is the same shape the original /audit endpoint returned.
     return payload
+
+
+# ── AI ENHANCEMENT LAYER ──────────────────────────────────────
+
+
+async def _generate_and_cache_enhancement(audit_id: str, audit_payload: dict) -> None:
+    """
+    Background task: generate enhancement via Claude + cache to SQLite.
+    Never raises — failures get logged in the cache row with status='error'
+    so the frontend can show a graceful degradation message.
+    """
+    try:
+        payload = await generate_enhancement(audit_payload)
+        await save_enhancement(audit_id, payload, status="ready", model=ENHANCEMENT_MODEL)
+    except EnhancementError as e:
+        await save_enhancement(audit_id, {}, status="error", error=str(e),
+                               model=ENHANCEMENT_MODEL)
+    except Exception as e:
+        # Defensive — any unexpected failure still leaves a queryable row
+        await save_enhancement(audit_id, {}, status="error",
+                               error=f"{type(e).__name__}: {str(e)[:200]}",
+                               model=ENHANCEMENT_MODEL)
+
+
+@app.get("/audits/{audit_id}/enhancement")
+async def get_audit_enhancement(audit_id: str):
+    """
+    Public read of the AI enhancement layer for an audit.
+
+    Returns:
+      - 200 with the cached enhancement payload + status if it exists
+      - 404 if the audit itself doesn't exist
+      - 202 with status='pending' if the audit exists but enhancement hasn't
+        been generated yet (frontend can poll or trigger via POST)
+    """
+    audit = await get_audit_by_id(audit_id)
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    cached = await get_enhancement(audit_id)
+    if not cached:
+        return {
+            "audit_id": audit_id,
+            "status": "pending",
+            "message": "Enhancement not yet generated. POST /audits/<id>/enhance to trigger.",
+        }
+    return cached
+
+
+@app.post("/audits/{audit_id}/enhance")
+async def trigger_audit_enhancement(audit_id: str, force: bool = False):
+    """
+    Public trigger — generates the enhancement on-demand. Idempotent unless
+    `force=true` is passed (in which case re-spends a Claude call and
+    overwrites the cached row).
+
+    Returns the freshly-generated payload (synchronous so the frontend can
+    show the result immediately rather than polling).
+    """
+    audit = await get_audit_by_id(audit_id)
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit not found")
+
+    if not force:
+        cached = await get_enhancement(audit_id)
+        if cached and cached.get("status") == "ready":
+            return cached
+
+    try:
+        payload = await generate_enhancement(audit)
+        await save_enhancement(audit_id, payload, status="ready", model=ENHANCEMENT_MODEL)
+        return {"audit_id": audit_id, "status": "ready", "payload": payload,
+                "model": ENHANCEMENT_MODEL}
+    except EnhancementError as e:
+        await save_enhancement(audit_id, {}, status="error", error=str(e),
+                               model=ENHANCEMENT_MODEL)
+        # Return 200 with error so the frontend can show a graceful degraded message
+        return {"audit_id": audit_id, "status": "error", "error": str(e), "payload": {}}
 
 
 @app.get("/health")
