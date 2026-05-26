@@ -109,10 +109,25 @@ from agents.enhancement_agent.enhancer import (
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
-origins = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:3000,https://lola.tyalexandermedia.com",
-).split(",")
+# CORS origins. Always union the env var with the production domain + localhost
+# so a stale/whitespace-broken ALLOWED_ORIGINS env var can't take the site down.
+# Each entry is .strip()'d because Starlette does exact string match — a single
+# leading space ("  https://...") silently breaks the match.
+_REQUIRED_ORIGINS = {
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "https://lola.tyalexandermedia.com",
+}
+_env_origins = {
+    o.strip()
+    for o in (os.getenv("ALLOWED_ORIGINS") or "").split(",")
+    if o.strip()
+}
+origins = sorted(_REQUIRED_ORIGINS | _env_origins)
+print(f"[cors] allow_origins = {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
