@@ -16,6 +16,7 @@ import httpx
 
 from case_studies.configs import CASE_STUDIES, CaseStudy
 from db.case_studies import save_ranking
+from db.reporting import get_client_by_slug
 
 GOOGLE_CUSTOM_SEARCH_KEY = os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY", "").strip() or None
 GOOGLE_CUSTOM_SEARCH_CX = os.getenv("GOOGLE_CUSTOM_SEARCH_CX", "").strip() or None
@@ -102,12 +103,50 @@ async def _claude_ai_mode(
         return False, f"exception: {e}"
 
 
+def _domain_from_url(url: str) -> str:
+    """Pull `host.tld` out of an http(s) URL; tolerates plain domains."""
+    s = (url or "").strip()
+    if s.startswith(("http://", "https://")):
+        s = s.split("://", 1)[1]
+    s = s.split("/", 1)[0]
+    if s.startswith("www."):
+        s = s[4:]
+    return s.lower()
+
+
+async def _load_case_study(slug: str) -> CaseStudy | None:
+    """
+    Resolve a case-study config by slug. Priority:
+      1. reporting_clients DB row (new retainer clients live here — no redeploy
+         needed to start tracking a new one).
+      2. CASE_STUDIES in-memory dict (legacy Sandbar entry stays as a safety
+         net so the existing tracker keeps working even if nothing is in DB).
+    """
+    row = await get_client_by_slug(slug)
+    if row:
+        target_url = (row.get("target_url") or row.get("site_url") or "").strip()
+        return CaseStudy(
+            slug=row["slug"],
+            client_name=row.get("client_name") or row["slug"],
+            target_url=target_url,
+            target_domain=_domain_from_url(target_url or row.get("site_url", "")),
+            google_queries=list(row.get("money_keywords") or []),
+            ai_mode_prompts=list(row.get("ai_mode_prompts") or []),
+        )
+    return CASE_STUDIES.get(slug)
+
+
+async def case_study_exists(slug: str) -> bool:
+    """Used by admin endpoints to validate slug before hitting the tracker."""
+    return (await _load_case_study(slug)) is not None
+
+
 async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
     """
     Captures a full snapshot for a case study. Persists every row to SQLite.
     Returns a summary dict for the response payload.
     """
-    cs: CaseStudy | None = CASE_STUDIES.get(slug)
+    cs: CaseStudy | None = await _load_case_study(slug)
     if not cs:
         return {"error": f"Unknown case study: {slug}"}
 

@@ -88,7 +88,7 @@ from db.case_studies import (
     get_run_history,
 )
 from case_studies.configs import CASE_STUDIES
-from case_studies.tracker import run_case_study_snapshot
+from case_studies.tracker import run_case_study_snapshot, case_study_exists, _load_case_study
 from db.reporting import (
     init_reporting_tables,
     get_active_clients,
@@ -1594,7 +1594,7 @@ async def admin_case_study_run(
         https://lola-backend-production.up.railway.app/admin/case-study/sandbar-roof-cleaning/run?notes=day-0
     """
     _check_admin(x_admin_key)
-    if slug not in CASE_STUDIES:
+    if not await case_study_exists(slug):
         raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
     summary = await run_case_study_snapshot(slug, notes=notes)
     return summary
@@ -1607,10 +1607,10 @@ async def admin_case_study_latest(
 ):
     """Returns the most recent ranking row per (query, source) for a case study."""
     _check_admin(x_admin_key)
-    if slug not in CASE_STUDIES:
+    cs = await _load_case_study(slug)
+    if not cs:
         raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
     rows = await get_latest_run(slug)
-    cs = CASE_STUDIES[slug]
     return {
         "slug": slug,
         "client_name": cs.client_name,
@@ -1629,7 +1629,7 @@ async def admin_case_study_history(
 ):
     """Time-series for a single (slug, query, source) — used for δ charts."""
     _check_admin(x_admin_key)
-    if slug not in CASE_STUDIES:
+    if not await case_study_exists(slug):
         raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
     rows = await get_run_history(slug, query, source, limit=max(1, min(limit, 100)))
     return {"slug": slug, "query": query, "source": source, "history": rows}
@@ -1650,6 +1650,10 @@ class ReportingClientUpsert(BaseModel):
     gsc_property: Optional[str] = None
     ga_property_id: Optional[str] = None
     active: bool = True
+    # New: lets the same row drive the case-study ranking tracker so adding
+    # a retainer client doesn't need a code change in case_studies/configs.py.
+    target_url: Optional[str] = None
+    ai_mode_prompts: Optional[List[str]] = None
 
 
 @app.post("/admin/reporting/clients")
@@ -1671,6 +1675,8 @@ async def admin_upsert_reporting_client(
         gsc_property=body.gsc_property,
         ga_property_id=body.ga_property_id,
         active=body.active,
+        target_url=body.target_url,
+        ai_mode_prompts=body.ai_mode_prompts,
     )
     return {"ok": True, "id": cid, "slug": body.slug}
 

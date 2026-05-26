@@ -53,6 +53,16 @@ CREATE INDEX IF NOT EXISTS idx_reporting_clients_slug ON reporting_clients(slug)
 CREATE INDEX IF NOT EXISTS idx_reporting_sends_slug_week ON reporting_sends(slug, week_of DESC);
 """
 
+# Additive migrations. SQLite has no IF NOT EXISTS for ADD COLUMN, so we
+# try each and swallow the "duplicate column" OperationalError. These two
+# columns let the case-study ranking tracker pull config from this same
+# table — one source of truth for retainer clients instead of a hardcoded
+# Python dict that needs a redeploy to add a client.
+_ADD_COLUMNS = [
+    "ALTER TABLE reporting_clients ADD COLUMN target_url TEXT",
+    "ALTER TABLE reporting_clients ADD COLUMN ai_mode_prompts_json TEXT NOT NULL DEFAULT '[]'",
+]
+
 
 async def init_reporting_tables() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
@@ -61,8 +71,27 @@ async def init_reporting_tables() -> None:
         for stmt in CREATE_IDX.strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
+        for stmt in _ADD_COLUMNS:
+            try:
+                await db.execute(stmt)
+            except aiosqlite.OperationalError as e:
+                if "duplicate column" not in str(e).lower():
+                    raise
         await db.commit()
     print(f"✅ Reporting agent tables ready at {DB_PATH}")
+
+
+def _hydrate_client_row(row: aiosqlite.Row) -> dict:
+    d = dict(row)
+    try:
+        d["money_keywords"] = json.loads(d.pop("money_keywords_json") or "[]")
+    except Exception:
+        d["money_keywords"] = []
+    try:
+        d["ai_mode_prompts"] = json.loads(d.pop("ai_mode_prompts_json") or "[]")
+    except Exception:
+        d["ai_mode_prompts"] = []
+    return d
 
 
 async def get_active_clients() -> List[dict]:
@@ -72,15 +101,7 @@ async def get_active_clients() -> List[dict]:
             "SELECT * FROM reporting_clients WHERE active = 1 ORDER BY slug"
         ) as cur:
             rows = await cur.fetchall()
-            out = []
-            for r in rows:
-                d = dict(r)
-                try:
-                    d["money_keywords"] = json.loads(d.pop("money_keywords_json") or "[]")
-                except Exception:
-                    d["money_keywords"] = []
-                out.append(d)
-            return out
+            return [_hydrate_client_row(r) for r in rows]
 
 
 async def get_client_by_slug(slug: str) -> Optional[dict]:
@@ -92,12 +113,7 @@ async def get_client_by_slug(slug: str) -> Optional[dict]:
             row = await cur.fetchone()
             if not row:
                 return None
-            d = dict(row)
-            try:
-                d["money_keywords"] = json.loads(d.pop("money_keywords_json") or "[]")
-            except Exception:
-                d["money_keywords"] = []
-            return d
+            return _hydrate_client_row(row)
 
 
 async def upsert_client(
@@ -112,14 +128,22 @@ async def upsert_client(
     gsc_property: Optional[str] = None,
     ga_property_id: Optional[str] = None,
     active: bool = True,
+    target_url: Optional[str] = None,
+    ai_mode_prompts: Optional[List[str]] = None,
 ) -> int:
+    """
+    Upsert by slug. New optional args:
+      target_url           — specific page being ranked (case-study tracker uses
+                             this; defaults to site_url at lookup time if NULL).
+      ai_mode_prompts      — prompts for the Claude AI Mode visibility check.
+    """
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """INSERT INTO reporting_clients
                (slug, client_name, client_email, site_url, money_keywords_json,
                 conversion_rate, avg_job_value, brevo_template_id, gsc_property,
-                ga_property_id, active, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+                ga_property_id, active, target_url, ai_mode_prompts_json, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
                ON CONFLICT(slug) DO UPDATE SET
                  client_name = excluded.client_name,
                  client_email = excluded.client_email,
@@ -131,11 +155,15 @@ async def upsert_client(
                  gsc_property = excluded.gsc_property,
                  ga_property_id = excluded.ga_property_id,
                  active = excluded.active,
+                 target_url = excluded.target_url,
+                 ai_mode_prompts_json = excluded.ai_mode_prompts_json,
                  updated_at = datetime('now')""",
             (slug, client_name, client_email, site_url,
              json.dumps(money_keywords), conversion_rate, avg_job_value,
              brevo_template_id, gsc_property, ga_property_id,
-             1 if active else 0),
+             1 if active else 0,
+             target_url,
+             json.dumps(ai_mode_prompts or [])),
         )
         await db.commit()
         async with db.execute(
