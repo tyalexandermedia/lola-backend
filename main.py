@@ -149,6 +149,7 @@ async def startup_event():
     await init_case_studies_table()
     await init_reporting_tables()
     await init_enhancements_table()
+    await init_swarm_tables()
     await cache_purge_expired()
 
 
@@ -157,6 +158,11 @@ app.include_router(reviews_router)
 from lead_gen import router as lead_gen_router  # noqa: E402
 
 app.include_router(lead_gen_router)
+
+from swarm.routes import router as swarm_router  # noqa: E402
+from swarm.memory import init_swarm_tables  # noqa: E402
+
+app.include_router(swarm_router)
 
 
 GOOGLE_PAGESPEED_KEY = os.getenv("GOOGLE_PAGESPEED_API_KEY", "").strip() or None

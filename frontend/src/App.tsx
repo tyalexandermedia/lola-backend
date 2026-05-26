@@ -8,6 +8,7 @@ import PricingPage from './PricingPage';
 import RetainerPage from './RetainerPage';
 import ApplyPage from './ApplyPage';
 import LeadGenGenerator from './LeadGenGenerator';
+import SwarmWorkflow from './SwarmWorkflow';
 
 type Route =
   | { name: 'home' }
@@ -16,6 +17,7 @@ type Route =
   | { name: 'retainer' }
   | { name: 'apply' }
   | { name: 'lead-gen' }
+  | { name: 'swarm' }
   | { name: 'report'; auditId: string }
   | { name: 'admin' }
   | { name: 'unknown' };
@@ -27,6 +29,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
+  if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
   if (pathname === '/admin/leads') return { name: 'admin' };
   const reportMatch = pathname.match(/^\/r\/([^/]+)\/?$/);
   if (reportMatch) return { name: 'report', auditId: decodeURIComponent(reportMatch[1]) };
@@ -57,6 +60,8 @@ function App() {
       ? 'max-w-[720px] pt-8 sm:pt-12'
       : route.name === 'lead-gen'
       ? 'max-w-[960px] pt-6 sm:pt-10'
+      : route.name === 'swarm'
+      ? 'max-w-[960px] pt-6 sm:pt-10'
       : 'max-w-[640px] pt-8 sm:pt-10';
 
   return (
@@ -69,6 +74,7 @@ function App() {
         {route.name === 'retainer' && <RetainerPage />}
         {route.name === 'apply' && <ApplyPage />}
         {route.name === 'lead-gen' && <LeadGenGenerator />}
+        {route.name === 'swarm' && <SwarmWorkflow />}
         {route.name === 'report' && <SharedReport auditId={route.auditId} />}
         {route.name === 'admin' && <AdminLeads />}
         {route.name === 'unknown' && <NotFound />}
