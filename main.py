@@ -169,6 +169,7 @@ from audits.page_seo_checks import (  # noqa: E402
     run_page_seo_checks,
     to_recommendations as page_seo_to_recommendations,
 )
+from audits.schema_generator import suggested_schemas_for_audit  # noqa: E402
 
 
 GOOGLE_PAGESPEED_KEY = os.getenv("GOOGLE_PAGESPEED_API_KEY", "").strip() or None
@@ -1145,6 +1146,12 @@ async def audit(request: AuditRequest) -> AuditResponse:
             # APIs don't cover. Skipped silently when fetch failed so a
             # transient HTML pull doesn't poison the whole audit.
             recommendations.extend(page_seo_to_recommendations(page_seo_result))
+            # Generate copy-paste JSON-LD schema blocks the contractor can
+            # paste into <head>. Only attaches when Places returned a name —
+            # without that we'd emit empty schema, which is worse than none.
+            page_seo_result["suggested_schemas"] = suggested_schemas_for_audit(
+                business_info_result, website, service_type=business_type,
+            )
 
             audit_response = {
                 "audit_id": audit_id,
