@@ -164,6 +164,11 @@ from swarm.memory import init_swarm_tables  # noqa: E402
 
 app.include_router(swarm_router)
 
+from audits.page_seo_checks import (  # noqa: E402
+    run_page_seo_checks,
+    to_recommendations as page_seo_to_recommendations,
+)
+
 
 GOOGLE_PAGESPEED_KEY = os.getenv("GOOGLE_PAGESPEED_API_KEY", "").strip() or None
 GOOGLE_PLACES_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "").strip() or None
@@ -1081,11 +1086,13 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 safe_browsing_result,
                 business_info_result,
                 competitors,
+                page_seo_result,
             ) = await asyncio.gather(
                 get_page_speed(client, website, budget),
                 get_safe_browsing(client, website, budget),
                 get_business_info(client, request.business_name, request.city, budget),
                 get_competitors(client, business_type, request.city, budget),
+                run_page_seo_checks(website),
             )
 
             total_score, category_scores, signal_status = compute_home_services_score(
@@ -1132,6 +1139,11 @@ async def audit(request: AuditRequest) -> AuditResponse:
             recommendations = generate_recommendations(
                 business_info_result, page_speed_result, safe_browsing_result
             )
+            # On-page SEO recommendations (H1, title, meta, canonical, schema)
+            # adapted from JeffLi1993/seo-audit-skill — fills gaps the Google
+            # APIs don't cover. Skipped silently when fetch failed so a
+            # transient HTML pull doesn't poison the whole audit.
+            recommendations.extend(page_seo_to_recommendations(page_seo_result))
 
             audit_response = {
                 "audit_id": audit_id,
@@ -1162,6 +1174,7 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 "categories": category_scores,
                 "signals": signal_status,
                 "recommendations": recommendations,
+                "page_seo": page_seo_result,
                 "agent_readiness": agent_readiness,
             }
 
