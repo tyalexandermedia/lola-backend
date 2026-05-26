@@ -101,3 +101,51 @@ async def get_run_history(slug: str, query: str, source: str, limit: int = 20) -
         ) as cur:
             rows = await cur.fetchall()
             return [dict(r) for r in rows]
+
+
+async def get_all_history_for_slug(
+    slug: str,
+    max_rows_per_series: int = 30,
+) -> List[dict]:
+    """
+    Full time-series for a slug — every (query, source) tuple's last N
+    snapshots, oldest-first per series. Powers the public client dashboard.
+    Excludes raw_excerpt + found_url from the public read (kept in DB for
+    internal debugging) so we don't accidentally surface competitor copy
+    or odd URLs on the client-facing page.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT query, source, position, mentioned, run_at
+               FROM case_study_rankings
+               WHERE slug = ?
+               ORDER BY query, source, run_at ASC""",
+            (slug,),
+        ) as cur:
+            rows = await cur.fetchall()
+
+    series: dict[tuple[str, str], list[dict]] = {}
+    for r in rows:
+        key = (r["query"], r["source"])
+        series.setdefault(key, []).append(
+            {
+                "position": r["position"],
+                "mentioned": bool(r["mentioned"]),
+                "run_at": r["run_at"],
+            }
+        )
+
+    out: list[dict] = []
+    for (query, source), points in series.items():
+        trimmed = points[-max_rows_per_series:]
+        latest = trimmed[-1] if trimmed else {}
+        out.append({
+            "query": query,
+            "source": source,
+            "current": latest,
+            "history": trimmed,
+            "run_count": len(trimmed),
+        })
+    out.sort(key=lambda s: (s["source"], s["query"]))
+    return out

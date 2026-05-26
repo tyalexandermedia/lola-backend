@@ -86,6 +86,7 @@ from db.case_studies import (
     init_case_studies_table,
     get_latest_run,
     get_run_history,
+    get_all_history_for_slug,
 )
 from case_studies.configs import CASE_STUDIES
 from case_studies.tracker import run_case_study_snapshot, case_study_exists, _load_case_study
@@ -1633,6 +1634,37 @@ async def admin_case_study_history(
         raise HTTPException(status_code=404, detail=f"Unknown case study: {slug}")
     rows = await get_run_history(slug, query, source, limit=max(1, min(limit, 100)))
     return {"slug": slug, "query": query, "source": source, "history": rows}
+
+
+# ── PUBLIC CLIENT DASHBOARD ───────────────────────────────────
+# Read-only, no auth. Slug is the URL identifier. Rankings are public info
+# (anyone can search Google themselves), but raw_excerpt + found_url are
+# stripped server-side in get_all_history_for_slug so we don't accidentally
+# leak competitor copy or weird URLs. If a client wants secrecy later,
+# swap to a random public_token column on reporting_clients.
+
+
+@app.get("/reporting/public/{slug}")
+async def public_client_dashboard(slug: str):
+    """
+    Public retainer dashboard payload. The client shares /r/client/<slug>
+    with their team — they see ranking history per tracked keyword and
+    AI-mode mention rate, no login. Safe fields only.
+    """
+    cs = await _load_case_study(slug)
+    if not cs:
+        raise HTTPException(status_code=404, detail="No such client dashboard")
+    series = await get_all_history_for_slug(slug)
+    google_series = [s for s in series if s["source"] == "google_organic"]
+    ai_series = [s for s in series if s["source"] == "claude_ai_mode"]
+    return {
+        "slug": slug,
+        "client_name": cs.client_name,
+        "target_url": cs.target_url,
+        "google": google_series,
+        "ai_mode": ai_series,
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+    }
 
 
 # ── AGENT TWO — WEEKLY REPORTING ──────────────────────────────

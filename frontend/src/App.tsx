@@ -9,6 +9,7 @@ import RetainerPage from './RetainerPage';
 import ApplyPage from './ApplyPage';
 import LeadGenGenerator from './LeadGenGenerator';
 import SwarmWorkflow from './SwarmWorkflow';
+import ClientReport from './ClientReport';
 
 type Route =
   | { name: 'home' }
@@ -19,6 +20,7 @@ type Route =
   | { name: 'lead-gen' }
   | { name: 'swarm' }
   | { name: 'report'; auditId: string }
+  | { name: 'client-report'; slug: string }
   | { name: 'admin' }
   | { name: 'unknown' };
 
@@ -31,6 +33,8 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
   if (pathname === '/admin/leads') return { name: 'admin' };
+  const clientReportMatch = pathname.match(/^\/r\/client\/([^/]+)\/?$/);
+  if (clientReportMatch) return { name: 'client-report', slug: decodeURIComponent(clientReportMatch[1]) };
   const reportMatch = pathname.match(/^\/r\/([^/]+)\/?$/);
   if (reportMatch) return { name: 'report', auditId: decodeURIComponent(reportMatch[1]) };
   return { name: 'unknown' };
@@ -62,6 +66,8 @@ function App() {
       ? 'max-w-[960px] pt-6 sm:pt-10'
       : route.name === 'swarm'
       ? 'max-w-[960px] pt-6 sm:pt-10'
+      : route.name === 'client-report'
+      ? 'max-w-[960px] pt-6 sm:pt-10'
       : 'max-w-[640px] pt-8 sm:pt-10';
 
   return (
@@ -76,6 +82,7 @@ function App() {
         {route.name === 'lead-gen' && <LeadGenGenerator />}
         {route.name === 'swarm' && <SwarmWorkflow />}
         {route.name === 'report' && <SharedReport auditId={route.auditId} />}
+        {route.name === 'client-report' && <ClientReport slug={route.slug} />}
         {route.name === 'admin' && <AdminLeads />}
         {route.name === 'unknown' && <NotFound />}
       </div>
