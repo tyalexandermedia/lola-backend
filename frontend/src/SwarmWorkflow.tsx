@@ -11,13 +11,36 @@ interface SwarmResult {
   next_recommendations: string[];
 }
 
+// Shared with /admin/leads — set once, works on both pages.
+const ADMIN_KEY_STORAGE = 'lola.adminKey';
+
 export default function SwarmWorkflow() {
+  const [adminKey, setAdminKey] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? '';
+  });
+  const [draftKey, setDraftKey] = useState('');
   const [businessUrl, setBusinessUrl] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [generateLeadSystem, setGenerateLeadSystem] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SwarmResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const saveKey = () => {
+    const trimmed = draftKey.trim();
+    if (!trimmed) return;
+    window.sessionStorage.setItem(ADMIN_KEY_STORAGE, trimmed);
+    setAdminKey(trimmed);
+    setDraftKey('');
+  };
+
+  const clearKey = () => {
+    window.sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+    setAdminKey('');
+    setResult(null);
+    setError(null);
+  };
 
   const handleExecute = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,13 +51,19 @@ export default function SwarmWorkflow() {
     try {
       const response = await fetch(`${API_URL}/swarm/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': adminKey,
+        },
         body: JSON.stringify({
           business_url: businessUrl,
           business_name: businessName,
           generate_lead_system: generateLeadSystem,
         }),
       });
+      if (response.status === 401) {
+        throw new Error('Admin key rejected. Clear it and re-enter.');
+      }
       if (!response.ok) {
         const detail = await response.text();
         throw new Error(`HTTP ${response.status}: ${detail.slice(0, 200)}`);
@@ -54,16 +83,53 @@ export default function SwarmWorkflow() {
   return (
     <main className="mx-auto w-full max-w-3xl py-6 sm:py-10">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">
-          Lola SEO Swarm
-        </h1>
-        <p className="mt-2 text-[15px] text-[#C5C5C8]">
-          Ruflo orchestration: <span className="text-[#F4D47C]">Audit → (Report + Lead Gen) → Outreach → Learning</span>.
-          5 Claude Opus calls per run. <span className="text-amber-300">Costs ~$0.50–$2 per execute</span> — use sparingly.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-bold text-white sm:text-4xl">
+              Lola SEO Swarm
+            </h1>
+            <p className="mt-2 text-[15px] text-[#C5C5C8]">
+              Ruflo orchestration: <span className="text-[#F4D47C]">Audit → (Report + Lead Gen) → Outreach → Learning</span>.
+              5 Claude Opus calls per run. <span className="text-amber-300">Costs ~$0.50–$2 per execute</span> — admin-gated.
+            </p>
+          </div>
+          {adminKey && (
+            <button
+              onClick={clearKey}
+              className="rounded-[8px] border border-white/10 px-3 py-1.5 text-[12px] font-medium text-[#9AA0A6] transition hover:border-white/20 hover:text-white"
+            >
+              Sign out admin
+            </button>
+          )}
+        </div>
       </header>
 
-      {!result ? (
+      {!adminKey ? (
+        <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
+          <h2 className="mb-2 text-xl font-bold text-white">Admin key required</h2>
+          <p className="mb-5 text-[14px] text-[#C5C5C8]">
+            This endpoint costs real money per call. Enter your <span className="font-mono text-[#F4D47C]">LOLA_SECRET_ADMIN_KEY</span> to unlock. Stored in this browser session only.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="password"
+              autoComplete="off"
+              placeholder="Admin key"
+              value={draftKey}
+              onChange={(e) => setDraftKey(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') saveKey(); }}
+              className="flex-1 rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 font-mono text-[14px] text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+            />
+            <button
+              onClick={saveKey}
+              disabled={!draftKey.trim()}
+              className="rounded-[10px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] px-6 py-3 text-[14px] font-bold text-slate-950 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Unlock
+            </button>
+          </div>
+        </div>
+      ) : !result ? (
         <form
           onSubmit={handleExecute}
           className="rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8"

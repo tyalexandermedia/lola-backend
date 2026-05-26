@@ -1,14 +1,28 @@
 """Swarm router. Mount on the app at root prefix /swarm."""
 
+import os
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 
 from swarm import memory
 from swarm.orchestrator import SwarmError, swarm
 
 router = APIRouter(prefix="/swarm", tags=["swarm"])
+
+
+def require_admin_key(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+) -> None:
+    """
+    Cost gate. Each /swarm/execute call is ~$0.50-$2 in Opus tokens (5
+    completions). Matches the X-Admin-Key pattern used by /reviews + main.py
+    admin endpoints. Set LOLA_SECRET_ADMIN_KEY on Railway to enable.
+    """
+    expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "")
+    if not expected or x_admin_key != expected:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 class WorkflowRequest(BaseModel):
@@ -26,7 +40,11 @@ class WorkflowResponse(BaseModel):
     next_recommendations: List[str]
 
 
-@router.post("/execute", response_model=WorkflowResponse)
+@router.post(
+    "/execute",
+    response_model=WorkflowResponse,
+    dependencies=[Depends(require_admin_key)],
+)
 async def execute_swarm_workflow(request: WorkflowRequest):
     """
     Execute the full 5-agent Lola swarm. Costs ~$0.50-$2 per call (5 Opus
@@ -54,11 +72,11 @@ async def execute_swarm_workflow(request: WorkflowRequest):
     )
 
 
-@router.get("/history")
+@router.get("/history", dependencies=[Depends(require_admin_key)])
 async def get_workflow_history(limit: int = 50):
     return {"workflows": await memory.list_workflows(limit=limit)}
 
 
-@router.get("/patterns")
+@router.get("/patterns", dependencies=[Depends(require_admin_key)])
 async def get_learned_patterns(limit: int = 100):
     return {"patterns": await memory.get_patterns(limit=limit)}
