@@ -10,6 +10,7 @@ simple.
 """
 
 import os
+import json
 import aiosqlite
 from datetime import datetime
 from typing import List, Optional
@@ -37,12 +38,26 @@ CREATE INDEX IF NOT EXISTS idx_cs_query ON case_study_rankings(query);
 """
 
 
+# Additive migration: store the businesses an AI assistant recommended for
+# a query (the competitors winning it when the client isn't mentioned).
+# Wrapped in try/except so re-deploys against an upgraded DB don't crash.
+_ADD_COLUMNS = [
+    "ALTER TABLE case_study_rankings ADD COLUMN competitors_json TEXT NOT NULL DEFAULT '[]'",
+]
+
+
 async def init_case_studies_table() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(CREATE_TABLE)
         for stmt in CREATE_IDX.strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
+        for stmt in _ADD_COLUMNS:
+            try:
+                await db.execute(stmt)
+            except aiosqlite.OperationalError as e:
+                if "duplicate column" not in str(e).lower():
+                    raise
         await db.commit()
     print(f"✅ Case studies table ready at {DB_PATH}")
 
@@ -56,14 +71,16 @@ async def save_ranking(
     found_url: str = "",
     raw_excerpt: str = "",
     notes: str = "",
+    competitors: Optional[List[str]] = None,
 ) -> int:
     async with aiosqlite.connect(DB_PATH) as db:
         cur = await db.execute(
             """INSERT INTO case_study_rankings
-               (slug, query, source, position, mentioned, found_url, raw_excerpt, notes)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+               (slug, query, source, position, mentioned, found_url, raw_excerpt, notes, competitors_json)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (slug, query, source, position, 1 if mentioned else 0,
-             found_url, raw_excerpt[:500], notes),
+             found_url, raw_excerpt[:500], notes,
+             json.dumps(competitors or [])),
         )
         await db.commit()
         return cur.lastrowid or 0
@@ -117,7 +134,7 @@ async def get_all_history_for_slug(
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            """SELECT query, source, position, mentioned, run_at
+            """SELECT query, source, position, mentioned, run_at, competitors_json
                FROM case_study_rankings
                WHERE slug = ?
                ORDER BY query, source, run_at ASC""",
@@ -128,10 +145,15 @@ async def get_all_history_for_slug(
     series: dict[tuple[str, str], list[dict]] = {}
     for r in rows:
         key = (r["query"], r["source"])
+        try:
+            comps = json.loads(r["competitors_json"] or "[]")
+        except (json.JSONDecodeError, IndexError, KeyError):
+            comps = []
         series.setdefault(key, []).append(
             {
                 "position": r["position"],
                 "mentioned": bool(r["mentioned"]),
+                "competitors": comps,
                 "run_at": r["run_at"],
             }
         )

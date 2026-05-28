@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { API_URL } from './AuditFlow';
 
-type RankPoint = { position: number | null; mentioned: boolean; run_at: string };
+type RankPoint = { position: number | null; mentioned: boolean; competitors?: string[]; run_at: string };
 
 interface Series {
   query: string;
@@ -269,37 +269,33 @@ function RankSparkline({ history }: { history: RankPoint[] }) {
 
 function AIModeTable({ series }: { series: Series[] }) {
   return (
-    <div className="overflow-hidden rounded-[14px] border border-white/10 bg-[#11121A]">
-      <table className="w-full text-left text-[14px]">
-        <thead>
-          <tr className="border-b border-white/10 text-[11px] uppercase tracking-[0.12em] text-[#9AA0A6]">
-            <th className="px-4 py-3 font-bold">Prompt</th>
-            <th className="px-4 py-3 text-center font-bold">Mentioned latest?</th>
-            <th className="px-4 py-3 text-center font-bold">Hit rate</th>
-            <th className="px-4 py-3 text-right font-bold">Runs</th>
-          </tr>
-        </thead>
-        <tbody>
-          {series.map((s) => {
-            const hits = s.history.filter((h) => h.mentioned).length;
-            const rate = s.history.length === 0 ? 0 : Math.round((hits / s.history.length) * 100);
-            return (
-              <tr key={`ai-${s.query}`} className="border-b border-white/5 last:border-0">
-                <td className="px-4 py-3 text-white">{s.query}</td>
-                <td className="px-4 py-3 text-center">
-                  {s.current?.mentioned ? (
-                    <span className="rounded-[6px] bg-emerald-500/15 px-2 py-1 text-[12px] font-bold text-emerald-300">YES</span>
-                  ) : (
-                    <span className="rounded-[6px] bg-white/5 px-2 py-1 text-[12px] font-bold text-[#9AA0A6]">no</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-center text-[#E5E7EB]">{rate}%</td>
-                <td className="px-4 py-3 text-right text-[#9AA0A6]">{s.history.length}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="space-y-3">
+      {series.map((s) => {
+        const hits = s.history.filter((h) => h.mentioned).length;
+        const rate = s.history.length === 0 ? 0 : Math.round((hits / s.history.length) * 100);
+        const competitors = s.current?.competitors || [];
+        return (
+          <div key={`ai-${s.query}`} className="rounded-[12px] border border-white/10 bg-[#11121A] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[14px] font-medium text-white">{s.query}</p>
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[#9AA0A6]">{rate}% hit · {s.history.length} run{s.history.length === 1 ? '' : 's'}</span>
+                {s.current?.mentioned ? (
+                  <span className="rounded-[6px] bg-emerald-500/15 px-2.5 py-1 text-[12px] font-bold text-emerald-300">RECOMMENDED ✓</span>
+                ) : (
+                  <span className="rounded-[6px] bg-red-500/10 px-2.5 py-1 text-[12px] font-bold text-red-300">NOT MENTIONED</span>
+                )}
+              </div>
+            </div>
+            {!s.current?.mentioned && competitors.length > 0 && (
+              <div className="mt-3 rounded-[8px] border border-amber-500/20 bg-amber-500/5 px-3 py-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-amber-300/90">AI recommended instead:</p>
+                <p className="mt-1 text-[13px] text-[#E5E7EB]">{competitors.join(' · ')}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
