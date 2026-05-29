@@ -310,25 +310,24 @@ export default function Homepage() {
 
           <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
             <p>
-              I'm an SEO strategist running Ty Alexander Media. I've watched too many
-              contractors lose jobs to competitors with worse work but better Google presence.
+              Most SEO guys hand you a wall of client logos. I'll show you one:{' '}
+              <span className="font-semibold text-white">my dad's.</span>
             </p>
             <p>
-              So I built Lola — a 6-agent AI system that diagnoses local SEO problems AND fixes
-              them weekly. At a price contractors can actually afford. No 50-page audits that go
-              nowhere. No $5K/mo agency retainers.{' '}
-              <span className="font-semibold text-white">
-                Just real work, real rankings, real revenue.
-              </span>
+              Sandbar Soft Wash — Palm Harbor, 15+ years, master certified. Does great work,
+              but was nearly invisible on Google for the searches that actually book jobs. So I
+              built Lola to fix it, and I'm doing it in public: real site, live dashboard, no
+              cherry-picking the numbers.
             </p>
             <p>
-              When I'm not building Lola, I'm training for HYROX, walking with my fiancée
-              Valeria, or grinding through the Florida heat.
+              That's the offer. No 50-page audit that dies in your inbox. No $5K/mo agency
+              retainer. I run the same system on your business that I run on my father's —{' '}
+              <span className="font-semibold text-white">and I show you the receipts every week.</span>
             </p>
             <p className="text-white">
-              <span className="font-bold text-[#D4AF37]">
-                You answer your own phones. So do I. Let's work.
-              </span>
+              I'm faith-driven, I answer my own phone, and if Lola doesn't move your ranking in
+              30 days, I refund half.{' '}
+              <span className="font-bold text-[#D4AF37]">Same way I'd want to be treated.</span>
             </p>
             <p className="text-[14px] text-[#D4AF37]">
               — Coach Ty
