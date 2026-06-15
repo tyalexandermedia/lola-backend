@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_URL } from './AuditFlow';
+import { API_URL } from './api';
 import { track } from './analytics';
 
 interface WorkflowData {

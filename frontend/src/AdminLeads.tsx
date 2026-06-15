@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { API_URL, formatNumber } from './AuditFlow';
+import { API_URL } from './api';
+import { formatNumber } from './AuditFlow';
 
 type Filter = 'all' | 'warm' | 'hot';
 

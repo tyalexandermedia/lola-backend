@@ -18,6 +18,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
+import LockChecker from './LockChecker';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
 // every primary CTA points here. Env-overridable so the calendar link can be
@@ -382,6 +383,13 @@ export default function Homepage() {
             See all industries →
           </a>
         </p>
+
+        {/* Live Lock checker — leverages the structural backend (local_locks
+            table) to convert real availability into real urgency. Compact
+            variant for in-flow placement; full variant lives on /pricing. */}
+        <div className="mt-8">
+          <LockChecker variant="compact" />
+        </div>
       </section>
 
       {/* ── 6. COACH TY ABOUT ────────────────────────────────────────── */}

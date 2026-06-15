@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import LockChecker from './LockChecker';
 
 // Page-scoped FAQs — each entry powers the visible accordion AND the
 // FAQPage JSON-LD we inject into <head> at mount (route-specific schema
@@ -398,6 +399,12 @@ export default function PricingPage() {
           — Lola SEO Case Study, Palm Harbor FL
         </figcaption>
       </figure>
+
+      {/* ── 6c. LIVE LOCK AVAILABILITY ────────────────────────────────
+          Turns the structural Lock backend (local_locks table + DB-level
+          uniqueness) into a visible conversion lever. Real data, real
+          urgency, no fabricated scarcity. */}
+      <LockChecker />
 
       {/* ── 6b. FAQ — visible accordion + matching FAQPage JSON-LD ────
           Tier-choice + objection-killer Qs, paired with the route-specific

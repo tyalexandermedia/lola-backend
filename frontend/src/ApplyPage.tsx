@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react';
-import { API_URL } from './AuditFlow';
+import { API_URL } from './api';
 import { track } from './analytics';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';

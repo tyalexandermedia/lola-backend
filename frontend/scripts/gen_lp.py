@@ -939,6 +939,7 @@ def render_sitemap(slugs):
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
         ("/methodology", "monthly", "0.8"),
+        ("/case-studies", "monthly", "0.82"),
         ("/case-studies/sandbar", "monthly", "0.85"),
         # High-intent comparison pages — keep in sync with COMPETITORS
         # in frontend/src/VsPage.tsx.
