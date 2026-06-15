@@ -3,53 +3,28 @@
  *
  * Sections:
  *   1. Transparency block (above tiers)
- *   2. 4-tier grid: DIY Playbook · Sprint · Retainer (featured) · Pro
- *   3. First Win Promise + 90-Day Baseline guarantees
+ *   2. 3-tier grid: Starter · Growth (featured, Most Popular) · Pro
+ *   3. 30-Day Half-Back + First Win guarantees
  *   4. Trust strip
  *   5. 3-column comparison: SEO Tools vs Premium Agencies vs Lola
  *   6. Testimonial card
- *   7. Final CTA
  *
- * Pricing matrix (locked 2026-05-23):
- *   - DIY Playbook        $47          one-time
- *   - Local SEO Sprint    $397         one-time
- *   - Local SEO Retainer  $697/mo      monthly recurring
- *   - Local SEO Pro       $6,970/yr    annual recurring (save $1,394 vs monthly)
+ * Pricing matrix (locked 2026-06-15 — call-first rebuild):
+ *   - Starter   $297/mo   done-for-you, monthly, cancel anytime
+ *   - Growth    $697/mo   Most Popular
+ *   - Pro       $997/mo   premium, founder access
+ *
+ * Every CTA books a free strategy call. No Stripe self-serve checkout — at
+ * these price points a 15-minute call closes far better than a cold cart.
  */
 
 import { useEffect, useRef } from 'react';
 
-// ── Stripe payment URLs (env-overridable) ─────────────────────
-// All 4 reset to placeholders 2026-05-23 because pricing changed. User creates
-// new Stripe products and sets the env vars in Vercel/Railway before launch.
-const STRIPE_DIY_PDF_URL =
-  (import.meta.env.VITE_STRIPE_DIY_PDF_URL as string | undefined) ||
-  'https://buy.stripe.com/14A7sK65YaJ127fg5P3oA09';
-
-const STRIPE_SPRINT_URL =
-  (import.meta.env.VITE_STRIPE_SPRINT_URL as string | undefined) ||
-  'https://buy.stripe.com/aFabJ00LEdVd3bj3j33oA07';
-
-const STRIPE_RETAINER_MONTHLY_URL =
-  (import.meta.env.VITE_STRIPE_RETAINER_MONTHLY_URL as string | undefined) ||
-  'https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08';
-
-const STRIPE_PRO_URL =
-  (import.meta.env.VITE_STRIPE_PRO_URL as string | undefined) ||
-  'https://buy.stripe.com/eVq14mfGydVd9zH2eZ3oA06';
-
-if (typeof window !== 'undefined') {
-  for (const [name, val] of [
-    ['VITE_STRIPE_DIY_PDF_URL', STRIPE_DIY_PDF_URL],
-    ['VITE_STRIPE_SPRINT_URL', STRIPE_SPRINT_URL],
-    ['VITE_STRIPE_RETAINER_MONTHLY_URL', STRIPE_RETAINER_MONTHLY_URL],
-    ['VITE_STRIPE_PRO_URL', STRIPE_PRO_URL],
-  ] as const) {
-    if (val.includes('placeholder')) {
-      console.warn(`[lola pricing] ${name} not set — using placeholder.`);
-    }
-  }
-}
+// ── Strategy-call destination (env-overridable) ───────────────
+// Single source of truth: every tier CTA + the final CTA point here.
+const CALENDAR_URL =
+  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
+  'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
 function withUtm(url: string, content: string, campaign: string): string {
   const p = new URLSearchParams({
@@ -85,7 +60,7 @@ export default function PricingPage() {
       (entries) => {
         if (entries[0]?.isIntersecting && !promiseSeen.current) {
           promiseSeen.current = true;
-          track('first_win_promise_viewed');
+          track('guarantee_viewed');
           obs.disconnect();
         }
       },
@@ -95,10 +70,9 @@ export default function PricingPage() {
     return () => obs.disconnect();
   }, []);
 
-  const diyHref = withUtm(STRIPE_DIY_PDF_URL, 'diy_playbook', 'diy_playbook');
-  const sprintHref = withUtm(STRIPE_SPRINT_URL, 'sprint', 'sprint');
-  const retainerHref = withUtm(STRIPE_RETAINER_MONTHLY_URL, 'retainer_monthly', 'retainer');
-  const proHref = withUtm(STRIPE_PRO_URL, 'pro_annual', 'pro');
+  const starterHref = withUtm(CALENDAR_URL, 'starter', 'starter');
+  const growthHref = withUtm(CALENDAR_URL, 'growth', 'growth');
+  const proHref = withUtm(CALENDAR_URL, 'pro', 'pro');
 
   return (
     <main className="flex flex-1 flex-col">
@@ -111,146 +85,116 @@ export default function PricingPage() {
           className="mx-auto mt-4 max-w-[820px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)' }}
         >
-          No "book a call to find out."<br />
+          Three plans.<br />
           No 12-month contracts.
         </h1>
         <p className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
-          Four clear paths — from a $47 DIY playbook to a full-year Pro lock-in.
-          Real work, a guarantee, no surprises.
+          Every plan is done-for-you and month-to-month. Real work, a guarantee,
+          no surprises. Pick the one that fits — then book a free call and we'll
+          confirm it's the right move for your business.
         </p>
       </section>
 
-      {/* ── 2. 4-TIER GRID ─────────────────────────────────────────── */}
+      {/* ── 2. 3-TIER GRID ─────────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
-        {/* DOM order: DIY, Sprint, Retainer, Pro (desktop left→right value ladder).
-            Mobile order: Pro (1) → Retainer (2) → Sprint (3) → DIY (4) — anchor on premium. */}
-        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-4 lg:items-stretch lg:gap-5">
-          {/* DIY PLAYBOOK */}
-          <div className="order-4 lg:order-1">
+        {/* DOM order: Starter, Growth, Pro (desktop left→right value ladder).
+            Mobile order: Growth (1) → Pro (2) → Starter (3) — anchor on popular. */}
+        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-5">
+          {/* STARTER */}
+          <div className="order-3 lg:order-1">
             <TierCard
-              variant="diy"
-              eyebrow="DIY · One-time"
-              name="DIY Playbook"
-              price="$47"
-              pricePeriod="one-time PDF"
-              positioning="The exact local-SEO system we use on paying clients — broken into plain-English checklists."
-              features={[
-                'GMB optimization checklist',
-                'Citation + directory build playbook',
-                'On-page fix templates',
-                'Review-generation scripts',
-                'AI search visibility basics',
-                'Plain-English, no jargon',
-                'Instant PDF download',
-              ]}
-              ctaLabel="Get the Playbook →"
-              ctaHref={diyHref}
-              ctaSubtext="Stripe secure · Instant download · No subscription"
-              onCtaClick={() => track('diy_cta_clicked')}
-            />
-          </div>
-
-          {/* SPRINT */}
-          <div className="order-3 lg:order-2">
-            <TierCard
-              variant="sprint"
-              eyebrow="Done-with-you · One-time"
-              name="Local SEO Sprint"
-              price="$397"
-              pricePeriod="one-time payment"
-              positioning="For contractors who need clarity and a real 90-day plan — fast."
+              variant="starter"
+              eyebrow="Done-for-you · Monthly"
+              name="Starter"
+              price="$297"
+              pricePeriod="/month · cancel anytime"
+              positioning="For the local business that needs to get found — and wants it handled, not homework."
               features={[
                 'Full Lola audit + priority fix list',
-                'Agent Readiness Score',
-                'AI Search Visibility baseline (5 prompts)',
-                'Custom 90-day SEO action plan',
-                '60-min strategy call with Ty',
-                'GMB optimization checklist',
-                'Citation + directory audit',
-                '30 days email + Slack support',
-                '48-hour onboarding',
+                'Google Business Profile optimization',
+                'Citation + directory cleanup',
+                'On-page SEO fixes (titles, schema, speed)',
+                'Review-generation system set up',
+                'AI search visibility baseline (ChatGPT, Perplexity, Gemini)',
+                'Monthly progress report',
+                'Email support',
               ]}
-              ctaLabel="Start the Sprint →"
-              ctaHref={sprintHref}
-              ctaSubtext="Stripe secure · No subscription · 48hr onboarding"
-              onCtaClick={() => track('sprint_cta_clicked')}
+              ctaLabel="Book a call →"
+              ctaHref={starterHref}
+              ctaSubtext="Free 15-min call · No contract · 48hr onboarding"
+              onCtaClick={() => track('starter_cta_clicked')}
             />
           </div>
 
-          {/* RETAINER (featured) */}
-          <div className="order-2 lg:order-3">
+          {/* GROWTH (featured — Most Popular) */}
+          <div className="order-1 lg:order-2">
             <TierCard
-              variant="retainer"
+              variant="growth"
               eyebrow="Done-for-you · Monthly"
-              name="Local SEO Retainer"
+              name="Growth"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="For contractors ready to dominate their market — month after month."
+              positioning="For the business ready to dominate its market — month after month."
               features={[
-                'Everything in the Sprint, ongoing',
+                'Everything in Starter, ongoing',
                 'AI Search Visibility tracking (20 prompts/mo)',
                 'Prompt tracking dashboard',
                 'Monthly content + link building',
                 'GMB management + weekly posts',
-                'Citation cleanup + new directory submissions',
+                'Ongoing citation building + new directories',
                 'Bi-weekly performance reports',
                 'Priority Slack + text support',
               ]}
-              ctaLabel="Start the Retainer →"
-              ctaHref={retainerHref}
-              ctaSubtext="Stripe secure · Cancel anytime · 48hr onboarding"
-              onCtaClick={() => track('retainer_monthly_cta_clicked')}
+              ctaLabel="Book a call →"
+              ctaHref={growthHref}
+              ctaSubtext="Free 15-min call · Cancel anytime · 48hr onboarding"
+              onCtaClick={() => track('growth_cta_clicked')}
             />
           </div>
 
-          {/* PRO — annual lock-in, `id="pro"` is the deep-link target from /pricing#pro */}
-          <div id="pro" className="order-1 scroll-mt-24 lg:order-4">
+          {/* PRO — `id="pro"` is the deep-link target from /pricing#pro */}
+          <div id="pro" className="order-2 scroll-mt-24 lg:order-3">
             <TierCard
               variant="pro"
-              eyebrow="Premium · Annual lock-in"
-              name="Local SEO Pro"
-              price="$6,970"
-              priceStrikethrough="$8,364"
-              pricePeriod="/year · 2 months free"
-              priceMeta={
-                <span className="inline-flex items-center rounded-full bg-[#D4AF37]/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Save $1,394
-                </span>
-              }
-              positioning="For contractors who are all-in. Annual lock-in, premium perks, and rates frozen for life."
+              eyebrow="Premium · Monthly"
+              name="Pro"
+              price="$997"
+              pricePeriod="/month · cancel anytime"
+              positioning="For the business that wants to win the whole region — with Coach Ty on speed dial."
               features={[
-                'Everything in the Retainer',
-                'Quarterly 1-on-1 strategy calls with Coach Ty',
+                'Everything in Growth',
+                'Live AI search citation tracking (ChatGPT, Perplexity, Gemini, Google AI)',
+                'Multi-location / service-area expansion pages',
+                'Monthly 1-on-1 strategy call with Coach Ty',
                 'Priority fix queue (Pro clients first)',
-                'Locked-in pricing — no rate increases ever',
+                'Competitor + lead-list CSV exports (Pro-only)',
                 'Lola Pro badge for your site footer',
-                'CSV export — competitor analysis + lead lists for your own outreach (Pro-only)',
-                '48-hour onboarding',
-                'First Win Promise backed',
+                'Direct line to Coach Ty — Slack + text',
               ]}
-              ctaLabel="Go Pro →"
+              ctaLabel="Book a call →"
               ctaHref={proHref}
-              ctaSubtext="Stripe secure · Pay once, win all year · Save $1,394"
+              ctaSubtext="Free 15-min call · Cancel anytime · Founder access"
               onCtaClick={() => track('pro_cta_clicked')}
             />
           </div>
         </div>
 
         <p className="mx-auto mt-6 max-w-[640px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
-          Pro tier annual lock keeps your rate frozen — even when public pricing
-          goes up. Upgrade from Retainer to Pro anytime; we credit unused months.
+          Not sure which plan? Book the free call and Coach Ty will tell you
+          straight — even if the honest answer is "start with Starter." Move up
+          or down anytime.
         </p>
       </section>
 
       {/* ── 3. GUARANTEES ─────────────────────────────────────────── */}
       <section ref={promiseRef} className="mt-16 sm:mt-20">
         <p className="mx-auto max-w-[680px] text-center text-[14px] italic leading-[1.6] text-[#C5C5C8]">
-          Other tools don't guarantee anything. Premium agencies say "results
-          not guaranteed." We put it in writing — twice.
+          SEO tools guarantee nothing. Premium agencies say "results not
+          guaranteed." We put it in writing — twice.
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-          {/* First Win Promise */}
+          {/* 30-Day Half-Back Guarantee */}
           <div className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-[#0A0A0B] p-7 shadow-[0_0_44px_rgba(212,175,55,0.12)] sm:p-9">
             <div
               aria-hidden
@@ -258,16 +202,16 @@ export default function PricingPage() {
             />
             <p className="relative flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
               <span aria-hidden className="text-[18px] drop-shadow-[0_2px_8px_rgba(212,175,55,0.5)]">🛡️</span>
-              The First Win Promise
+              30-Day Half-Back Guarantee
             </p>
             <p className="relative mt-4 text-[15px] leading-[1.6] text-white sm:text-[16px]">
-              If you don't see at least one measurable win in your first 60 days —
-              a new ranking, a new lead, or a Google Business improvement — your
-              next month is on us.
+              If Lola doesn't move your ranking in your first 30 days, your next
+              month is half off — Coach Ty refunds 50%. Same way he'd want to be
+              treated.
             </p>
           </div>
 
-          {/* 90-Day Baseline */}
+          {/* First Win Promise */}
           <div className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/40 bg-[#0A0A0B] p-7 shadow-[0_0_44px_rgba(212,175,55,0.12)] sm:p-9">
             <div
               aria-hidden
@@ -275,12 +219,13 @@ export default function PricingPage() {
             />
             <p className="relative flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
               <span aria-hidden className="text-[18px] drop-shadow-[0_2px_8px_rgba(212,175,55,0.5)]">📊</span>
-              The 90-Day Baseline
+              The First Win Promise
             </p>
             <p className="relative mt-4 text-[15px] leading-[1.6] text-white sm:text-[16px]">
-              At day 90, we re-audit your visibility across Google AI Overviews,
-              ChatGPT, Perplexity, and Gemini. You see measurable movement in
-              the Agent Share of Voice metric — or your next month is on us.
+              At least one measurable win in your first 60 days — a new ranking,
+              a new lead, or a Google Business improvement — or your next month
+              is on us. We track it across Google and AI search and show you the
+              receipts.
             </p>
           </div>
         </div>
@@ -288,7 +233,7 @@ export default function PricingPage() {
 
       {/* ── 4. TRUST STRIP ──────────────────────────────────────────── */}
       <div className="mx-auto mt-10 max-w-[680px] text-center text-[12px] leading-[1.7] text-[#8A8F98] sm:text-[13px]">
-        🔒 Stripe secure · ✓ No setup fee · ✓ Cancel anytime · ✓ Real work or you walk
+        ✓ No setup fee · ✓ Cancel anytime · ✓ Month-to-month · ✓ Real work or you walk
       </div>
 
       {/* ── 5. 3-COLUMN COMPARISON TABLE ──────────────────────────── */}
@@ -314,7 +259,7 @@ export default function PricingPage() {
                 </th>
                 <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] px-3 py-4 sm:px-5">
                   Lola
-                  <span className="block text-[10px] font-normal text-[#D4AF37]">$47–$697/mo</span>
+                  <span className="block text-[10px] font-normal text-[#D4AF37]">$297–$997/mo</span>
                 </th>
               </tr>
             </thead>
@@ -322,14 +267,13 @@ export default function PricingPage() {
               {[
                 ['❌ You DIY', '✓ Done for you', '✓ Done for you'],
                 ['❌ Hidden total cost', '❌ Hidden pricing', '✓ Transparent pricing'],
-                ['⚠️ Month-to-month (you handle billing)', '❌ 12-month contracts', '✓ Cancel anytime (or lock the year as Pro)'],
-                ['❌ No guarantee', '❌ "Results not guaranteed"', '✓ First Win + 90-Day Baseline'],
+                ['⚠️ Month-to-month (you handle it)', '❌ 12-month contracts', '✓ Month-to-month, cancel anytime'],
+                ['❌ No guarantee', '❌ "Results not guaranteed"', '✓ 30-Day Half-Back + First Win'],
                 ['⚠️ Track LLMs (enterprise tier only)', '❌ Generic "rank #1" framing', '✓ AI Search Visibility (local)'],
-                ['❌ Generic audience', '❌ "Serve everyone"', '✓ Florida home-services specialist'],
+                ['❌ Generic audience', '❌ "Serve everyone"', '✓ Local service business specialist'],
                 ['❌ No execution', '✓ Full service (manual)', '✓ Done-for-you execution every week'],
-                ['⚠️ Steep learning curve', '⚠️ Long sales call', '✓ Free audit in 20 sec'],
-                ['❌ No price lock', '❌ Annual rate hikes', '✓ Pro tier: locked-in pricing for life'],
-                ['❌ No founder access', '⚠️ Account manager only', '✓ Pro tier: quarterly calls with Coach Ty'],
+                ['⚠️ Steep learning curve', '⚠️ Long sales call', '✓ Free 15-min call, real answers'],
+                ['❌ No founder access', '⚠️ Account manager only', '✓ Pro tier: monthly calls with Coach Ty'],
               ].map((row, i) => (
                 <tr key={i}>
                   {row.map((cell, j) => (
@@ -349,10 +293,10 @@ export default function PricingPage() {
         </div>
 
         <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] italic leading-[1.6] text-[#8A8F98] sm:text-[13px]">
-          We're not against tools or agencies. We just believe contractors
-          deserve done-for-you execution, transparent pricing, and a guarantee
-          — without the learning curve of tools or the price tag of premium
-          agencies.
+          We're not against tools or agencies. We just believe local service
+          businesses deserve done-for-you execution, transparent pricing, and a
+          guarantee — without the learning curve of tools or the price tag of
+          premium agencies.
         </p>
       </section>
 
@@ -364,12 +308,36 @@ export default function PricingPage() {
           ))}
         </div>
         <blockquote className="mt-4 text-[17px] italic leading-[1.5] text-white sm:text-[19px]">
-          “Sandbar Soft Wash: 5 keywords ranked in 3 weeks on the Retainer.”
+          “Sandbar Soft Wash: 5 keywords ranked in 3 weeks.”
         </blockquote>
         <figcaption className="mt-4 text-[13px] font-medium text-[#D4AF37] sm:text-[14px]">
           — Lola SEO Case Study, Palm Harbor FL
         </figcaption>
       </figure>
+
+      {/* ── 7. FINAL CTA ─────────────────────────────────────────────── */}
+      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Start Here</p>
+        <h2
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
+        >
+          Book a free 15-minute call with Coach Ty.
+        </h2>
+        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
+          We'll look at your business live, tell you what's leaking, and pick the
+          right plan together. No pitch deck — Coach Ty answers his own phone.
+        </p>
+        <a
+          href={withUtm(CALENDAR_URL, 'final_cta', 'pricing_final')}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => track('pricing_final_cta_clicked')}
+          className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
+        >
+          Book a free strategy call →
+        </a>
+      </section>
 
       {/* Minimal footer */}
       <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
@@ -383,7 +351,7 @@ export default function PricingPage() {
 // ── Components ──────────────────────────────────────────────────
 
 interface TierCardProps {
-  variant: 'diy' | 'sprint' | 'retainer' | 'pro';
+  variant: 'starter' | 'growth' | 'pro';
   eyebrow: string;
   name: string;
   price: string;
@@ -413,28 +381,26 @@ function TierCard({
   ctaSubtext,
   onCtaClick,
 }: TierCardProps) {
-  const isRetainer = variant === 'retainer';
+  const isGrowth = variant === 'growth';
   const isPro = variant === 'pro';
-  const isDiy = variant === 'diy';
+  const isStarter = variant === 'starter';
 
-  const cardClass = isRetainer
+  const cardClass = isGrowth
     ? 'relative flex h-full flex-col rounded-[14px] border-[1.5px] border-[#D4AF37] bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#1A1408] p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.06),0_0_36px_rgba(212,175,55,0.18)] transition-all duration-300 hover:shadow-[inset_0_0_50px_rgba(212,175,55,0.10),0_0_56px_rgba(212,175,55,0.32)] sm:p-7 lg:scale-[1.03]'
     : isPro
     ? 'relative flex h-full flex-col rounded-[14px] border-[1.5px] border-[#D4AF37]/70 bg-gradient-to-br from-[#0F0F12] via-[#100E0A] to-[#1A1408] p-6 shadow-[0_0_36px_rgba(212,175,55,0.18)] transition-all duration-300 hover:border-[#D4AF37] hover:shadow-[0_0_48px_rgba(212,175,55,0.32)] hover:-translate-y-1 sm:p-7'
-    : isDiy
-    ? 'relative flex h-full flex-col rounded-[14px] border border-white/[0.08] bg-[#0F0F12]/70 p-6 opacity-[0.94] transition-all duration-300 hover:border-white/[0.16] hover:opacity-100 hover:-translate-y-1 sm:p-7'
     : 'relative flex h-full flex-col rounded-[14px] border border-white/[0.10] bg-[#0F0F12]/85 p-6 opacity-[0.97] transition-all duration-300 hover:border-white/[0.18] hover:-translate-y-1 sm:p-7';
 
   return (
     <div className={cardClass}>
-      {isRetainer && (
+      {isGrowth && (
         <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]">
           Most Popular
         </span>
       )}
       {isPro && (
         <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.45)]">
-          Best Value
+          Premium
         </span>
       )}
 
@@ -489,9 +455,9 @@ function TierCard({
 
       {/* In-card trust row */}
       <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t border-white/[0.06] pt-3 text-[10px] text-[#8A8F98]">
-        <span className="whitespace-nowrap">🔒 Stripe</span>
+        <span className="whitespace-nowrap">🛡️ 30-Day Half-Back</span>
         <span aria-hidden className="text-[#3A3F48]">·</span>
-        <span className="whitespace-nowrap">🛡️ First Win Promise</span>
+        <span className="whitespace-nowrap">✓ Cancel anytime</span>
         <span aria-hidden className="text-[#3A3F48]">·</span>
         <span className="whitespace-nowrap">⚡ 48hr onboarding</span>
       </div>
@@ -513,4 +479,3 @@ function TierCard({
     </div>
   );
 }
-

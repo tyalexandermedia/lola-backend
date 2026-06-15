@@ -15,7 +15,7 @@ Edit here, then sync into each HTML file.
   "url": "https://tyalexandermedia.com",
   "telephone": "+1-727-300-6573",
   "email": "ty@tyalexandermedia.com",
-  "priceRange": "$47-$697",
+  "priceRange": "$297-$997",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Tampa Bay",
@@ -63,10 +63,10 @@ Edit here, then sync into each HTML file.
   "knowsAbout": [
     "Local SEO",
     "Google Business Profile optimization",
-    "Florida contractor marketing",
+    "Local service business marketing",
     "AI Search Visibility",
     "Soft wash SEO",
-    "Home service contractor marketing"
+    "Local business marketing"
   ]
 }
 ```
