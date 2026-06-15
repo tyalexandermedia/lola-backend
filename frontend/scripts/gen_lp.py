@@ -940,9 +940,13 @@ def render_sitemap(slugs):
         ("/lp/industries", "monthly", "0.8"),
         # High-intent comparison pages — keep in sync with COMPETITORS
         # in frontend/src/VsPage.tsx.
+        ("/vs", "monthly", "0.88"),
         ("/vs/localiq", "monthly", "0.85"),
         ("/vs/brightlocal", "monthly", "0.85"),
         ("/vs/scorpion", "monthly", "0.85"),
+        ("/vs/podium", "monthly", "0.85"),
+        ("/vs/yext", "monthly", "0.85"),
+        ("/vs/hibu", "monthly", "0.85"),
     ]
     rows = ""
     for path, freq, pri in core:

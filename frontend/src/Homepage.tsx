@@ -145,16 +145,16 @@ export default function Homepage() {
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          AI Visibility for Local Service Businesses
+          AI Leads · Local SEO · Service Businesses
         </p>
 
         <h1
           className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
         >
-          I build AI visibility systems that{' '}
+          I turn Google + AI search into{' '}
           <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
-            recommend your business
+            local leads for your business
           </span>{' '}
           — without you touching a thing.
         </h1>

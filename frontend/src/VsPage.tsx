@@ -262,10 +262,210 @@ const SCORPION: Competitor = {
   ],
 };
 
+const PODIUM: Competitor = {
+  slug: 'podium',
+  name: 'Podium',
+  url: 'https://www.podium.com',
+  category: 'Local lead-capture + AI messaging platform',
+  oneLine: 'A leading messaging + reviews platform used by 100,000+ local businesses to capture leads from website chat, SMS, and Google reviews.',
+  priceRange: '$399 – $799+/mo (software)',
+  metaTitle: 'Lola vs Podium — Lead Capture or Lead Generation? | Lola',
+  metaDescription: 'Podium captures the leads you already get. Lola generates new leads through AI search + local SEO. Honest comparison from Coach Ty. Pricing $297-$997/mo.',
+  tldr: {
+    pickThemIf: [
+      'You already get a lot of inbound web/SMS traffic and need to convert it faster',
+      'You want AI-powered chat + payments + reviews software in one tool',
+      'You have someone who can manage the inbox and respond quickly',
+    ],
+    pickLolaIf: [
+      'You need MORE leads, not better conversion of existing ones',
+      'You want to be found on Google + recommended in ChatGPT/Perplexity/Gemini',
+      'You want done-for-you SEO + AI visibility, not another inbox to manage',
+    ],
+  },
+  whereTheyWin: [
+    'Best-in-class AI chat + SMS messaging that converts site visitors to leads',
+    'Tight integration with Google Reviews + payments — one tool for the full conversion funnel',
+    'Built-in marketing automation for review requests and follow-up',
+  ],
+  whereLolaWins: [
+    "Lola fills the top of the funnel — Podium converts what's already there",
+    'AI search visibility (ChatGPT, Perplexity, Gemini) is the core product, not an add-on',
+    'Done-for-you execution — Lola runs the playbook, not a tool you have to operate',
+    'Transparent pricing starts at $297/mo — Podium starts at $399 software + setup costs',
+  ],
+  table: [
+    { label: 'Pricing',          lola: '$297 / $697 / $997 /mo (public)', them: '$399 – $799+/mo (software)',     lolaWin: true  },
+    { label: 'What it does',     lola: 'Generates leads (SEO + AI search)', them: 'Converts existing traffic',    lolaWin: false },
+    { label: 'Done-for-you?',    lola: 'Yes — full execution',             them: 'No — you operate the platform', lolaWin: true  },
+    { label: 'AI search included?', lola: 'Yes — core product',             them: 'No — focused on messaging',      lolaWin: true  },
+    { label: 'Lead capture chat', lola: 'Not included',                    them: 'Yes — best in class',           lolaWin: false },
+    { label: 'Guarantee',        lola: '30-Day Half-Back + First Win',     them: 'Trial-based',                   lolaWin: true  },
+    { label: 'Founder access',   lola: 'Direct — Coach Ty',                them: 'Customer success team',         lolaWin: true  },
+    { label: 'Best for',         lola: 'Owners who need MORE leads',       them: 'Owners with traffic, need conversion', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is Podium an alternative to Lola SEO?',
+      a: "They solve different problems. Podium is built to convert traffic you already have into leads (chat, SMS, review collection). Lola is built to bring you new traffic from Google and AI search. Many businesses use both — Lola at the top, Podium at the bottom of the funnel.",
+    },
+    {
+      q: 'Can I use Lola and Podium together?',
+      a: "Yes — that's actually the strongest combo. Lola drives the visibility (Google Maps, AI search), Podium captures + converts the inbound. We're happy to coordinate so the data flows clean.",
+    },
+    {
+      q: "I don't have enough website traffic to make Podium worth it — what should I do?",
+      a: "Start with Lola. If you're not getting enough inbound, no chat tool fixes that. Once Lola has you ranking and AI-recommended, layer Podium on for conversion — that's the right order.",
+    },
+    {
+      q: "Does Lola do AI chat like Podium?",
+      a: "No — that's not our focus. We optimize what AI search engines say about you when buyers ask them, not chat on your own site. If you need both, run both.",
+    },
+    {
+      q: "How does Lola's pricing compare to Podium's?",
+      a: "Podium starts around $399/mo for the base tier and goes up with seats/features. Lola starts at $297/mo (Starter) with done-for-you SEO + AI search visibility — different product, different value, transparent pricing on both ends.",
+    },
+  ],
+};
+
+const YEXT: Competitor = {
+  slug: 'yext',
+  name: 'Yext',
+  url: 'https://www.yext.com',
+  category: 'Enterprise listings management + Answers platform',
+  oneLine: 'A publicly-traded enterprise platform managing business listings across 200+ directories and AI Answers — used by Fortune 500 brands and multi-location operators.',
+  priceRange: 'Enterprise — quote-only',
+  metaTitle: 'Lola vs Yext — Local Listings + AI Search Compared | Lola',
+  metaDescription: 'Yext manages listings at enterprise scale. Lola does done-for-you local SEO + AI search visibility for service businesses at $297-$997/mo. Honest comparison.',
+  tldr: {
+    pickThemIf: [
+      'You have 50+ locations and need bulk listings management',
+      'You\'re an enterprise brand with a marketing team and budget for SaaS+services',
+      'You want Yext Answers AI for your own site search',
+    ],
+    pickLolaIf: [
+      'You\'re a single or small-multi local service business',
+      'You want done-for-you execution, not another platform license',
+      'You want $297-$997 transparent pricing, not an enterprise contract',
+    ],
+  },
+  whereTheyWin: [
+    'Industry-leading listings sync across 200+ directories and aggregators',
+    'Yext Answers AI for branded-search on your own site',
+    'Enterprise-grade compliance and multi-location workflows',
+  ],
+  whereLolaWins: [
+    'We do the work. Yext is a platform — Lola is execution.',
+    "Lola's AI search visibility tracks ChatGPT/Perplexity/Gemini/Google AI — Yext focuses on listings + on-site Answers",
+    'Public, transparent pricing — Yext is quote-only enterprise',
+    'Founder-led — text Coach Ty, not file a ticket',
+  ],
+  table: [
+    { label: 'Pricing',            lola: '$297 / $697 / $997 /mo',         them: 'Enterprise quote-only',           lolaWin: true  },
+    { label: 'Done-for-you?',      lola: 'Yes',                             them: 'Platform — you operate it',       lolaWin: true  },
+    { label: 'Listings coverage',  lola: 'Top 10-20 (Lola playbook)',       them: '200+ directories',                lolaWin: false },
+    { label: 'AI search visibility', lola: 'Core product',                  them: 'Yext Answers (different focus)',   lolaWin: true  },
+    { label: 'Contract',           lola: 'Month-to-month',                  them: 'Annual enterprise term',          lolaWin: true  },
+    { label: 'Guarantee',          lola: '30-Day Half-Back + First Win',    them: 'Not published',                   lolaWin: true  },
+    { label: 'Best for',           lola: 'Single + small-multi local biz',  them: 'Enterprise + 50+ location brands', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is Yext overkill for my single-location business?',
+      a: "Honest answer: usually yes. Yext is engineered for 50+ locations with central IT. For a single service business, Lola's done-for-you local SEO + AI visibility at $297-$997/mo gets the same ranking outcome without the platform overhead.",
+    },
+    {
+      q: 'Does Lola sync listings to as many directories as Yext?',
+      a: "No. Yext pushes to 200+ aggregators; Lola focuses on the 10-20 directories that actually move local rankings (the 80/20). That's a real trade-off — but for most small local businesses, the long tail of obscure directories doesn't move the needle.",
+    },
+    {
+      q: 'Can I switch from Yext to Lola?',
+      a: "Yes. Most Yext contracts run annual — we'll help you map the handoff so you don't lose listing coverage. Book a free call.",
+    },
+    {
+      q: 'What about Yext Answers vs Lola AI search visibility?',
+      a: "Different products. Yext Answers powers branded search on your own website. Lola AI search visibility tracks and optimizes how external AI agents (ChatGPT, Perplexity, Gemini, Google AI Overviews) recommend you to buyers searching for your category.",
+    },
+    {
+      q: 'Is Yext expensive?',
+      a: "Yext is quote-only but commonly reported in the $400/mo (base) to $2,000+/mo (enterprise) range per location. Lola is $297-$997/mo flat with no per-location fees for single-location businesses.",
+    },
+  ],
+};
+
+const HIBU: Competitor = {
+  slug: 'hibu',
+  name: 'Hibu',
+  url: 'https://www.hibu.com',
+  category: 'Full-service local digital marketing agency',
+  oneLine: 'A full-service local digital marketing agency offering websites, SEO, paid ads, social, and listings management for small businesses.',
+  priceRange: 'Quote-only (typically $300 – $2,500+/mo)',
+  metaTitle: 'Lola vs Hibu — Local SEO + AI Visibility Compared | Lola',
+  metaDescription: 'Hibu is a full-stack local agency. Lola is focused AI Leads + local SEO at $297-$997/mo. Which fits your business? Honest comparison from Coach Ty.',
+  tldr: {
+    pickThemIf: [
+      'You want one vendor handling website + ads + SEO + social + listings',
+      'You don\'t have time to coordinate multiple specialists',
+      'You\'re comfortable with quote-only pricing and a sales conversation',
+    ],
+    pickLolaIf: [
+      'You want focused local SEO + AI search visibility, not a full media stack',
+      'You want to see your price before a sales call',
+      'You want founder-led execution, not an account manager',
+    ],
+  },
+  whereTheyWin: [
+    'One vendor for everything — websites, paid ads, SEO, social, listings under one roof',
+    'Established sales + service teams across the US',
+    'Mature local-business sales process',
+  ],
+  whereLolaWins: [
+    'Focused — local SEO + AI search visibility, not spread across 6 services',
+    'Public, transparent pricing — Hibu is quote-only',
+    'AI search visibility (ChatGPT, Perplexity, Gemini, Google AI) is the core product',
+    'Month-to-month, cancel anytime — Hibu typically runs annual contracts',
+    'Coach Ty answers his own phone — no account manager layer',
+  ],
+  table: [
+    { label: 'Pricing',                 lola: '$297 / $697 / $997 /mo (public)', them: 'Quote-only',                     lolaWin: true  },
+    { label: 'Contract',                lola: 'Month-to-month',                    them: 'Typically annual',                lolaWin: true  },
+    { label: 'Service scope',           lola: 'Local SEO + AI search (focused)',   them: 'Full stack (sites, ads, SEO, social)', lolaWin: false },
+    { label: 'AI search visibility',    lola: 'Core product',                      them: 'Not a primary offering',          lolaWin: true  },
+    { label: 'Guarantee',               lola: '30-Day Half-Back + First Win',      them: 'Not published',                   lolaWin: true  },
+    { label: 'Founder access',          lola: 'Direct — Coach Ty',                 them: 'Account manager',                 lolaWin: true  },
+    { label: 'Best for',                lola: 'Focused execution, transparent',     them: 'One-vendor full-stack',           lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is Hibu a good fit for a single-location service business?',
+      a: "Depends on what you actually need. If you need a website rebuild, paid ads, SEO, and social all from one shop, Hibu's full-stack model is convenient. If you have a working site and just want local SEO + AI search visibility done right, Lola is the more focused play at transparent pricing.",
+    },
+    {
+      q: 'How does Lola compare to Hibu on price?',
+      a: "Hibu doesn't publish pricing — reported engagements range from ~$300/mo (basic listings) to $2,500+/mo (full stack). Lola publishes $297-$997/mo flat. You see exactly what you'll pay before any call.",
+    },
+    {
+      q: 'Can I move from Hibu to Lola mid-contract?',
+      a: "Most Hibu contracts are annual. We'll help you run Lola in parallel during the remainder so you don't lose data continuity, then transition cleanly. Book a free call to plan the handoff.",
+    },
+    {
+      q: 'Does Lola do paid ads or websites like Hibu?',
+      a: "No. Lola is focused on local SEO + AI search visibility. We don't build websites or manage paid ads. Many Lola clients use a specialist for paid ads and have us own the organic + AI side.",
+    },
+    {
+      q: 'Does Hibu do AI search visibility?',
+      a: "Not as a primary offering. Hibu's SEO is traditional Google-focused. Lola tracks and optimizes how ChatGPT, Perplexity, Gemini, and Google AI Overviews recommend you — the angle Hibu doesn't lead with.",
+    },
+  ],
+};
+
 const COMPETITORS: Record<string, Competitor> = {
   localiq: LOCALIQ,
   brightlocal: BRIGHTLOCAL,
   scorpion: SCORPION,
+  podium: PODIUM,
+  yext: YEXT,
+  hibu: HIBU,
 };
 
 export function getCompetitorSlugs(): string[] {
