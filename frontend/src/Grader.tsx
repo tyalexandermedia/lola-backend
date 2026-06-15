@@ -68,16 +68,22 @@ export default function Grader() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [scoringLine, setScoringLine] = useState(SCORING_LINES[0]);
 
-  // Pre-fill business_type from localStorage trade dropdown or ?trade= param.
+  // Pre-fill from URL params and localStorage. Homepage routes here with
+  // ?biz=<name> so the visitor lands mid-form (perceived progress + lower
+  // drop-off). ?trade=<trade> threads from the legacy dropdown too.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      const urlTrade = new URLSearchParams(window.location.search).get('trade');
+      const params = new URLSearchParams(window.location.search);
+      const biz = params.get('biz');
+      const urlTrade = params.get('trade');
       const ls = window.localStorage.getItem('lolaTrade');
       const t = urlTrade || ls || '';
-      if (t && TRADE_TO_SERVICE[t]) {
-        setForm((p) => ({ ...p, business_type: TRADE_TO_SERVICE[t] }));
-      }
+      setForm((p) => ({
+        ...p,
+        business_name: biz?.trim() || p.business_name,
+        business_type: t && TRADE_TO_SERVICE[t] ? TRADE_TO_SERVICE[t] : p.business_type,
+      }));
     } catch { /* ignore */ }
   }, []);
 

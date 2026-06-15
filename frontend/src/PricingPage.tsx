@@ -25,8 +25,8 @@ import { useEffect, useRef } from 'react';
 // since the static index.html schema only covers the homepage's FAQ set).
 const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   {
-    q: 'What is the Local Lock?',
-    a: "One business per niche per city. When you lock a market with Lola, your direct competitors in that city can't sign up with us — we say no. It's our promise that you and Lola are on the same team, not selling the same playbook to your rival. Starter locks 1 city. Growth locks up to 5 cities (your service area). Pro locks up to 10 cities or a multi-location operation.",
+    q: 'What is the Local Lock — and what does it actually promise?',
+    a: "One business per niche per city. When you lock a market, Lola won't run our playbook for your direct competitor in the same city + niche — we say no, in writing. WHAT WE PROMISE: visibility (Google + AI search), clicks to your site, calls to your phone, form fills in your CRM. WHAT WE DON'T PROMISE: closing the lead. That's your craft — your sales process, your follow-up, your trust-building. We get the customer to your door; you earn the job.",
   },
   {
     q: 'Which plan should I pick?',
@@ -162,11 +162,15 @@ export default function PricingPage() {
           </span>
           .
         </h1>
-        <p className="mx-auto mt-5 max-w-[680px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
-          One business per niche per city. When you lock a market, we don&apos;t take
-          your direct competitor as a client there. Three tiers sized by how much
-          territory you want to own — 1 city, your full service area, or a multi-market
+        <p className="mx-auto mt-5 max-w-[700px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
+          One business per niche per city. When you lock a market, we don&apos;t run
+          the Lola playbook for your direct competitor there. Three tiers sized by
+          your service-area scope — 1 city, your full delivery radius, or a multi-market
           region.
+        </p>
+        <p className="mx-auto mt-3 max-w-[680px] text-[13px] italic leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
+          Plain English: we get you <span className="text-white">found, clicked, called, and form-filled</span>.
+          Closing the lead is on you — that&apos;s your craft, not ours.
         </p>
       </section>
 
@@ -183,7 +187,7 @@ export default function PricingPage() {
               name="Starter"
               price="$297"
               pricePeriod="/month · cancel anytime"
-              positioning="Own 1 city in your niche. Your home market — protected, no competitor of yours lands Lola in this city."
+              positioning="Get found in 1 city. Lock = your direct competitor can't hire Lola for the same city + niche. We deliver visibility, clicks, calls, form fills — you close them."
               features={[
                 '🔒 Local Lock — 1 city, your niche, exclusive',
                 'Full Lola audit + priority fix list',
@@ -210,7 +214,7 @@ export default function PricingPage() {
               name="Growth"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="Own your full service area. Up to 5 cities — your van's whole delivery radius — locked to you in your niche."
+              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Lock = no direct competitor can hire Lola in any of those cities + your niche."
               features={[
                 '🔒 Local Lock — up to 5 cities, your niche, exclusive',
                 'Everything in Starter, ongoing',
@@ -237,7 +241,7 @@ export default function PricingPage() {
               name="Pro"
               price="$997"
               pricePeriod="/month · cancel anytime"
-              positioning="Dominate a region. Up to 10 cities or multi-location operations — your whole state or franchise footprint, locked to you in your niche."
+              positioning="Get found across a region — up to 10 cities OR multi-location operations. Lock = no direct competitor can hire Lola in any of those markets + your niche. Coach Ty on Slack."
               features={[
                 '🔒 Local Lock — up to 10 cities OR multi-location, your niche, exclusive',
                 'Everything in Growth',

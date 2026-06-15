@@ -185,58 +185,58 @@ export default function Homepage() {
           that's where your next customer is searching.
         </p>
 
-        {/* Trade picker — feeds AuditFlow + reshapes subhead copy */}
-        <div className="mt-6 max-w-[420px]">
-          <label
-            htmlFor="trade-picker"
-            className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85"
-          >
-            What kind of business are you?
+        {/* Friction-killer single-input form. Replaced the trade dropdown
+            (one extra decision before the click) with a single business-name
+            input that routes to /grader?biz=<name>. Visitor lands on the
+            Grader already mid-form — perceived progress + lower drop-off.
+            Submit-on-Enter is wired so keyboard users get instant action. */}
+        <form
+          className="mt-7 max-w-[520px]"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            const biz = String(fd.get('biz') || '').trim();
+            const q = new URLSearchParams();
+            if (biz) q.set('biz', biz);
+            if (trade) q.set('trade', trade);
+            window.location.assign(`/grader${q.toString() ? '?' + q.toString() : ''}`);
+          }}
+        >
+          <label htmlFor="biz" className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
+            What&apos;s your business name?
           </label>
-          <select
-            id="trade-picker"
-            value={trade}
-            onChange={(e) => handleTradeChange(e.target.value)}
-            className="mt-2 block w-full appearance-none rounded-[12px] border border-[#D4AF37]/30 bg-[#0F0F12] px-4 py-3 text-[15px] font-medium text-white shadow-inner outline-none transition focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%23D4AF37' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>\")",
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 14px center',
-              paddingRight: '38px',
-            }}
-          >
-            <option value="">Pick your business type…</option>
-            {TRADES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-          {/* Microcopy when an unmapped trade is picked — sets expectations
-              honestly (Step 2 of the audit will still ask). */}
-          {trade && !MAPPED_TRADES.has(trade) && (
-            <p className="mt-2 text-[12px] leading-[1.5] text-[#8A8F98]">
-              We've fully tuned audits for {Array.from(MAPPED_TRADES).slice(0, 5).join(', ')} so far. For{' '}
-              <span className="text-[#D4AF37]">{trade}</span>, we'll ask the same questions and run a general local-business audit. Full {trade.toLowerCase()} playbook ships Q1 2026.
-            </p>
-          )}
-        </div>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+            <input
+              id="biz"
+              name="biz"
+              type="text"
+              required
+              autoComplete="organization"
+              placeholder="e.g. Sandbar Soft Wash"
+              className="h-14 flex-1 rounded-[12px] border border-[#D4AF37]/30 bg-[#0F0F12] px-4 text-[15px] font-medium text-white outline-none transition focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
+            />
+            <button
+              type="submit"
+              className="h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:text-[14px]"
+            >
+              Get my AI Score →
+            </button>
+          </div>
+          <p className="mt-3 text-[12px] text-[#7A7F8A] sm:text-[13px]">
+            60 seconds · no signup · 5-category Visibility Score across Google + AI search
+          </p>
+        </form>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Secondary CTA — the call. Still higher-LTV conversion, but no
+            longer the front door (Grader took that). */}
+        <div className="mt-5">
           <a
             href={CALENDAR_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
+            className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
           >
-            Book a free strategy call →
-          </a>
-          <a
-            href={graderHref}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
-          >
-            Or get your free score
+            Or book a free 15-min strategy call →
           </a>
         </div>
 

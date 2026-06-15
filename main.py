@@ -101,6 +101,12 @@ from db.reporting import (
     get_tasks_grouped as reporting_tasks_grouped,
     TASK_CATEGORIES,
     TASK_STATUSES,
+    check_lock,
+    claim_lock,
+    release_lock,
+    locks_for_slug,
+    list_all_locks,
+    LOCK_TIER_QUOTAS,
 )
 from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
 from agents.reporting_agent.playbooks import (
@@ -1977,6 +1983,32 @@ async def admin_onboard_client(
     if body.tier not in PLAYBOOKS:
         raise HTTPException(status_code=400, detail=f"tier must be one of {list(PLAYBOOKS)}")
 
+    # ── Local Lock guardrail ─────────────────────────────────
+    # If service + city are provided, claim the Lock atomically. If a different
+    # client already holds the (niche, city) lock, refuse — this is the system
+    # constraint that makes the Lock promise true (visibility exclusivity, not
+    # sales exclusivity). Same client re-onboarding the same market is a no-op.
+    lock_id: Optional[int] = None
+    if body.service and body.city:
+        claim = await claim_lock(
+            slug=body.slug,
+            niche=body.service,
+            city=body.city,
+            tier=body.tier,
+            notes=f"onboard via {body.client_name}",
+        )
+        if not claim.get("ok"):
+            holder = claim.get("holder") or {}
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "error": "lock_conflict",
+                    "message": f"The {body.service} Lock for {body.city} is already held by client '{holder.get('slug')}'. Pick a different city, a different niche, or release the existing lock first.",
+                    "holder": holder,
+                },
+            )
+        lock_id = claim.get("lock_id")
+
     keywords = body.money_keywords or suggest_money_keywords(body.service or "", body.city or "")
     prompts = body.ai_mode_prompts or suggest_ai_mode_prompts(body.service or "", body.city or "")
 
@@ -2014,8 +2046,89 @@ async def admin_onboard_client(
         "tasks_seeded": seeded,
         "money_keywords": keywords[:5],
         "ai_mode_prompts": prompts,
+        "lock_id": lock_id,
         "dashboard_url": f"/r/client/{body.slug}",
     }
+
+
+# ── Local Lock — visibility-exclusivity enforcement ─────────
+
+
+@app.get("/locks/check")
+async def public_check_lock(niche: str, city: str):
+    """
+    Public availability check. Used by the front-end to honestly say
+    'Tampa plumber Lock is available' or 'already locked' — without
+    exposing the holder's identity to the public. Operator-side details
+    (slug, claimed_at) only return on the admin endpoint.
+    """
+    held = await check_lock(niche, city)
+    return {
+        "niche": niche,
+        "city": city,
+        "available": held is None,
+        "tier": (held or {}).get("tier") if held else None,
+    }
+
+
+@app.get("/admin/locks")
+async def admin_list_locks(
+    active_only: bool = True,
+    slug: Optional[str] = None,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    if slug:
+        return {"locks": await locks_for_slug(slug, active_only=active_only)}
+    return {"locks": await list_all_locks(active_only=active_only)}
+
+
+class LockClaimRequest(BaseModel):
+    slug: str
+    niche: str
+    city: str
+    tier: str = "starter"
+    notes: Optional[str] = None
+
+
+@app.post("/admin/locks/claim")
+async def admin_claim_lock(
+    body: LockClaimRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Manual lock claim (separate from onboard, in case the operator wants
+    to reserve a (niche, city) before the client has a slug yet)."""
+    _check_admin(x_admin_key)
+    if body.tier not in ("starter", "growth", "pro"):
+        raise HTTPException(status_code=400, detail="tier must be starter | growth | pro")
+    # Soft-warn (don't block) when slug exceeds tier quota.
+    held = await locks_for_slug(body.slug, active_only=True)
+    quota = LOCK_TIER_QUOTAS.get(body.tier, 1)
+    quota_warning = None
+    if len(held) >= quota:
+        quota_warning = f"{body.slug} already holds {len(held)} locks at tier '{body.tier}' (quota {quota}). Allowing, but flag for review."
+    claim = await claim_lock(
+        slug=body.slug,
+        niche=body.niche,
+        city=body.city,
+        tier=body.tier,
+        notes=body.notes,
+    )
+    if not claim.get("ok"):
+        raise HTTPException(status_code=409, detail=claim)
+    return {**claim, "quota_warning": quota_warning}
+
+
+@app.delete("/admin/locks/{lock_id}")
+async def admin_release_lock(
+    lock_id: int,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    ok = await release_lock(lock_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="No active lock with that id")
+    return {"ok": True, "released": lock_id}
 
 
 class FoundingSignupRequest(BaseModel):
