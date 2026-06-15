@@ -6,14 +6,14 @@
 
 const STATS = [
   'Sandbar Soft Wash — 5 keywords ranked in 3 weeks',
-  'Built in Tampa Bay, FL',
-  'No long-term contracts',
-  'First Win Promise guarantee',
-  '20-second audit, no signup',
-  'Auto-Fix snippet technology',
+  '✓ Verified Google Business — Ty Alexander Media',
+  'Tracks ChatGPT · Gemini · Perplexity · Claude',
+  '🔒 One business per niche per city — Local Lock',
+  '30-Day Half-Back Guarantee',
+  '60-second AI Visibility Score, no signup',
   'Transparent pricing — $297 to $997/mo, done-for-you',
   'Built for local service businesses',
-  'Faith-driven, legacy-focused',
+  'Faith-driven, legacy-focused, founder-led',
 ];
 
 export default function Marquee() {

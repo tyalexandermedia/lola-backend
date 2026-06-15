@@ -149,15 +149,33 @@ export default function Homepage() {
           The AI Leads Expert · Local Service Businesses
         </p>
 
+        {/* Verified-GBP + Sandbar proof pill — visible above the hero on
+            every breakpoint. Two trust signals in one row: 'we have a real
+            verified Google Business' (kills agency-skepticism) + 'we have a
+            real client proof story you can read' (kills no-track-record
+            skepticism). Both link out to verifiable destinations. */}
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] sm:text-[12px]">
+          <a
+            href="/case-studies/sandbar"
+            className="group inline-flex items-center gap-1.5 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1 font-semibold uppercase tracking-[0.08em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+          >
+            🛡️ Real proof story: Sandbar Soft Wash
+            <span aria-hidden className="transition group-hover:translate-x-0.5">→</span>
+          </a>
+          <span className="hidden items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1 font-semibold uppercase tracking-[0.08em] text-[#9CA3AF] sm:inline-flex">
+            ✓ Verified Google Business · Ty Alexander Media
+          </span>
+        </div>
+
         <h1
           className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
         >
-          I turn Google + AI search into{' '}
+          Get found on Google AND AI search —{' '}
           <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
-            local leads for your business
+            calls, clicks, form fills
           </span>{' '}
-          — without you touching a thing.
+          land on autopilot.
         </h1>
 
         <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
@@ -250,6 +268,39 @@ export default function Homepage() {
           <span>🛡️ 30-day half-back guarantee</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>Cancel anytime</span>
+        </p>
+      </section>
+
+      {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
+          Tight visual proof of WHICH AI engines Lola tracks. Otterly
+          publishes the data: ChatGPT = 56% of AI search referrals, Gemini
+          = 18%, Perplexity = 8%. Putting the platforms on the page makes
+          the AI-search claim concrete the moment cold visitors hit the site. */}
+      <section className="mt-10 sm:mt-12">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
+          AI engines Lola tracks for you
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+          {[
+            { name: 'ChatGPT', share: '56%', sub: 'of AI traffic' },
+            { name: 'Gemini', share: '18%', sub: 'of AI traffic' },
+            { name: 'Perplexity', share: '8%', sub: 'of AI traffic' },
+            { name: 'Claude', share: 'Rising', sub: 'of AI traffic' },
+          ].map((p) => (
+            <div
+              key={p.name}
+              className="flex flex-col rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-3 transition-colors hover:border-[#D4AF37]/30"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-[13px] font-bold text-white sm:text-[14px]">{p.name}</p>
+                <p className="text-[11px] font-bold tabular-nums text-[#D4AF37]">{p.share}</p>
+              </div>
+              <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">{p.sub}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] leading-[1.5] text-[#7A7F8A] sm:text-[12px]">
+          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four for every Lock client.
         </p>
       </section>
 
@@ -430,6 +481,17 @@ export default function Homepage() {
               <span className="block text-[12px] text-[#8A8F98] sm:inline sm:before:content-['_·_']">
                 Founder, Lola | Ty Alexander Media | Tampa Bay, FL
               </span>
+            </p>
+            <p className="mt-3">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]/85 underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
+              >
+                ✓ Verified Google Business — Ty Alexander Media, Tampa Bay, FL
+                <span aria-hidden>↗</span>
+              </a>
             </p>
           </div>
         </div>
