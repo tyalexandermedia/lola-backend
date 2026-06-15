@@ -12,11 +12,13 @@ import SwarmWorkflow from './SwarmWorkflow';
 import ClientReport from './ClientReport';
 import Grader from './Grader';
 import VsPage from './VsPage';
+import VsHub from './VsHub';
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'vs-hub' }
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
   | { name: 'retainer' }
@@ -38,6 +40,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
   if (pathname === '/admin/leads') return { name: 'admin' };
+  if (pathname === '/vs' || pathname === '/vs/') return { name: 'vs-hub' };
   const vsMatch = pathname.match(/^\/vs\/([^/]+)\/?$/);
   if (vsMatch) return { name: 'vs', slug: decodeURIComponent(vsMatch[1]) };
   const clientReportMatch = pathname.match(/^\/r\/client\/([^/]+)\/?$/);
@@ -69,7 +72,7 @@ function App() {
       ? 'max-w-[640px] pt-3 sm:pt-6'
       : route.name === 'grader'
       ? 'max-w-[820px] pt-6 sm:pt-10'
-      : route.name === 'vs'
+      : route.name === 'vs' || route.name === 'vs-hub'
       ? 'max-w-[960px] pt-6 sm:pt-10'
       : route.name === 'apply'
       ? 'max-w-[720px] pt-8 sm:pt-12'
@@ -89,6 +92,7 @@ function App() {
         {route.name === 'audit' && <AuditFlow />}
         {route.name === 'grader' && <Grader />}
         {route.name === 'vs' && <VsPage slug={route.slug} />}
+        {route.name === 'vs-hub' && <VsHub />}
         {route.name === 'pricing' && <PricingPage />}
         {route.name === 'retainer' && <RetainerPage />}
         {route.name === 'apply' && <ApplyPage />}
@@ -111,11 +115,16 @@ function Header() {
         <a
           href="/"
           className="group -mx-2 flex min-h-[44px] items-center gap-2 px-2"
-          aria-label="Lola SEO — home"
+          aria-label="Lola — AI Leads for local business — home"
         >
           <span aria-hidden className="text-[16px] leading-none">🐾</span>
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[15px]">
-            LOLA SEO
+          <span className="flex flex-col leading-none">
+            <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[15px]">
+              LOLA
+            </span>
+            <span className="mt-0.5 hidden text-[8px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/70 sm:block">
+              AI Leads · Local SEO
+            </span>
           </span>
         </a>
 
