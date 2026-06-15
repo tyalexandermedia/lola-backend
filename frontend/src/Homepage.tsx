@@ -131,6 +131,9 @@ export default function Homepage() {
 
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
+  // Grader is the new lead-magnet (60-second single-page form). The trade
+  // param threads through so the business_type pre-selects on submit.
+  const graderHref = trade ? `/grader?trade=${encodeURIComponent(trade)}` : '/grader';
 
   return (
     <main className="flex flex-1 flex-col">
@@ -230,10 +233,10 @@ export default function Homepage() {
             Book a free strategy call →
           </a>
           <a
-            href={auditHref}
+            href={graderHref}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            Or run the free audit
+            Or get your free score
           </a>
         </div>
 
@@ -623,10 +626,10 @@ export default function Homepage() {
             Book a free strategy call →
           </a>
           <a
-            href={auditHref}
+            href={graderHref}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            Or run the free audit
+            Or get your free score
           </a>
         </div>
       </section>

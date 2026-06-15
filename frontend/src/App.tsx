@@ -10,10 +10,12 @@ import ApplyPage from './ApplyPage';
 import LeadGenGenerator from './LeadGenGenerator';
 import SwarmWorkflow from './SwarmWorkflow';
 import ClientReport from './ClientReport';
+import Grader from './Grader';
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
+  | { name: 'grader' }
   | { name: 'pricing' }
   | { name: 'retainer' }
   | { name: 'apply' }
@@ -27,6 +29,7 @@ type Route =
 function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
+  if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
@@ -60,6 +63,8 @@ function App() {
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
+      : route.name === 'grader'
+      ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'apply'
       ? 'max-w-[720px] pt-8 sm:pt-12'
       : route.name === 'lead-gen'
@@ -76,6 +81,7 @@ function App() {
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         {route.name === 'home' && <Homepage />}
         {route.name === 'audit' && <AuditFlow />}
+        {route.name === 'grader' && <Grader />}
         {route.name === 'pricing' && <PricingPage />}
         {route.name === 'retainer' && <RetainerPage />}
         {route.name === 'apply' && <ApplyPage />}
@@ -115,10 +121,10 @@ function Header() {
             Home
           </a>
           <a
-            href="/audit"
+            href="/grader"
             className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
           >
-            Audit
+            Free Grader
           </a>
           <a
             href="/pricing"
