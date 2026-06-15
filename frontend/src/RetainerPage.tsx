@@ -28,7 +28,7 @@ import { track } from './analytics';
 // Call-first rebuild: every retainer CTA now books a free strategy call
 // instead of Stripe self-serve checkout. Name kept for the env-var contract;
 // VITE_STRATEGY_CALL_URL / VITE_CALENDAR_URL override the default.
-const STRIPE_RETAINER_URL =
+const BOOKING_URL =
   (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
@@ -69,9 +69,9 @@ export default function RetainerPage() {
     track('retainer_page_viewed');
   }, []);
 
-  const retainerHref = withUtm(STRIPE_RETAINER_URL, 'sticky_cta');
-  const heroHref = withUtm(STRIPE_RETAINER_URL, 'hero_cta');
-  const finalHref = withUtm(STRIPE_RETAINER_URL, 'final_cta');
+  const retainerHref = withUtm(BOOKING_URL, 'sticky_cta');
+  const heroHref = withUtm(BOOKING_URL, 'hero_cta');
+  const finalHref = withUtm(BOOKING_URL, 'final_cta');
 
   return (
     <>
@@ -273,13 +273,13 @@ export default function RetainerPage() {
             {[
               {
                 emoji: '🛡️',
-                title: '14-Day No-Questions Guarantee',
-                body: 'Activate the Retainer. If it\'s not the right fit in 14 days, full refund. No questions, no friction.',
+                title: '30-Day Half-Back Guarantee',
+                body: 'If Lola doesn\'t move your ranking in your first 30 days, your next month is half off — Coach Ty refunds 50%. Same way he\'d want to be treated.',
               },
               {
-                emoji: '🛡️',
+                emoji: '📊',
                 title: 'First Win Promise',
-                body: 'At least one measurable keyword ranking improvement OR new GMB visibility gain in your first 30 days. If we don\'t deliver, 50% refund automatically.',
+                body: 'At least one measurable win — a new ranking, a new lead, or a Google Business improvement — in your first 60 days, or your next month is on us.',
               },
             ].map((g) => (
               <div
@@ -341,7 +341,7 @@ export default function RetainerPage() {
 
           <ul className="mt-8 flex flex-col gap-3 text-[15px] leading-[1.55] text-white sm:text-[16px]">
             {[
-              'Florida contractor doing $200K–$2M/year',
+              'Florida local service business doing $200K–$2M/year',
               'Tired of being invisible while competitors rank #1',
               'Want SEO done FOR you — not another tool to manage',
               'Want measurable wins in 30 days, not 12 months',
@@ -383,7 +383,7 @@ export default function RetainerPage() {
               },
               {
                 q: 'How fast will I see results?',
-                a: 'First Win Promise: measurable ranking improvement in 30 days. Full ROI typically hits month 3. By month 6 you\'re in the top 3.',
+                a: '30-Day Half-Back: measurable ranking improvement in 30 days or 50% back. Full ROI typically hits month 3. By month 6 you\'re in the top 3.',
               },
               {
                 q: "What if I'm not a Florida contractor?",
@@ -492,11 +492,11 @@ export default function RetainerPage() {
           </p>
 
           <p className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-[#8A8F98] sm:text-[12px]">
-            <span>🔒 Stripe secure</span>
+            <span>🔒 No payment to book</span>
             <span aria-hidden>·</span>
             <span>Cancel anytime</span>
             <span aria-hidden>·</span>
-            <span>14-day guarantee</span>
+            <span>30-Day Half-Back</span>
             <span aria-hidden>·</span>
             <span>First Win Promise</span>
           </p>
