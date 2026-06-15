@@ -76,6 +76,54 @@ CREATE TABLE IF NOT EXISTS reporting_tasks (
 TASK_CATEGORIES = ("content", "citation", "review", "gbp", "fix", "other")
 TASK_STATUSES = ("done", "in_progress", "next_up")
 
+# ── Local Lock — "one business per niche per city" enforcement table.
+# A Lock is held by a client (slug) for a (niche, city_key) pair. When held,
+# the onboard endpoint refuses to take a different client for the same pair.
+# This is what makes the Lock model structurally true — it's not just a
+# marketing promise, it's a system constraint.
+CREATE_LOCKS = """
+CREATE TABLE IF NOT EXISTS local_locks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,                   -- client slug holding the lock
+    niche TEXT NOT NULL,                  -- normalized niche (lowercase)
+    city_key TEXT NOT NULL,               -- normalized city slug (e.g. 'tampa-fl')
+    city_display TEXT NOT NULL,           -- the human-readable city ('Tampa, FL')
+    tier TEXT NOT NULL DEFAULT 'starter', -- starter | growth | pro
+    claimed_at TEXT DEFAULT (datetime('now')),
+    released_at TEXT,                     -- NULL = active hold
+    notes TEXT
+);
+"""
+
+# Partial unique index — only one ACTIVE lock per (niche, city_key).
+# SQLite supports the WHERE clause on partial unique indexes since 3.8.
+CREATE_LOCKS_IDX = """
+CREATE UNIQUE INDEX IF NOT EXISTS idx_local_locks_active_unique
+    ON local_locks(niche, city_key) WHERE released_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_local_locks_slug ON local_locks(slug, released_at);
+"""
+
+# Per-tier lock quota — used by the admin onboard flow to warn (not block)
+# when a client tries to hold more locks than their tier allows. The hard
+# constraint is the (niche, city) uniqueness above; the quota is a soft
+# enforcement for the operator's own sanity.
+LOCK_TIER_QUOTAS = {"starter": 1, "growth": 5, "pro": 10}
+
+
+def normalize_niche(s: str) -> str:
+    """Lowercase + collapsed whitespace. Matches the BUSINESS_TYPES vocab
+    used elsewhere in the system (e.g. 'soft wash', 'plumbing', 'hvac')."""
+    return " ".join((s or "").lower().split())
+
+
+def normalize_city(s: str) -> str:
+    """Slug-ify the city string. 'Tampa, FL' -> 'tampa-fl'. Match logic
+    must round-trip — same input always produces same key."""
+    import re
+    out = (s or "").lower()
+    out = re.sub(r"[^a-z0-9]+", "-", out).strip("-")
+    return out
+
 # Additive migrations. SQLite has no IF NOT EXISTS for ADD COLUMN, so we
 # try each and swallow the "duplicate column" OperationalError. These two
 # columns let the case-study ranking tracker pull config from this same
@@ -92,6 +140,10 @@ async def init_reporting_tables() -> None:
         await db.execute(CREATE_CLIENTS)
         await db.execute(CREATE_SENDS)
         await db.execute(CREATE_TASKS)
+        await db.execute(CREATE_LOCKS)
+        for stmt in CREATE_LOCKS_IDX.strip().split(";"):
+            if stmt.strip():
+                await db.execute(stmt)
         for stmt in CREATE_IDX.strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
@@ -316,3 +368,90 @@ async def get_tasks_grouped(slug: str) -> dict:
         "counts": counts,
         "total_done": len(done),
     }
+
+
+# ── Local Lock helpers ────────────────────────────────────────────
+
+
+async def check_lock(niche: str, city: str) -> Optional[dict]:
+    """Returns the holder dict if (niche, city) is currently locked, else None."""
+    nk, ck = normalize_niche(niche), normalize_city(city)
+    if not nk or not ck:
+        return None
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT id, slug, tier, claimed_at, city_display
+               FROM local_locks
+               WHERE niche = ? AND city_key = ? AND released_at IS NULL
+               LIMIT 1""",
+            (nk, ck),
+        ) as cur:
+            row = await cur.fetchone()
+            return dict(row) if row else None
+
+
+async def claim_lock(
+    slug: str,
+    niche: str,
+    city: str,
+    tier: str = "starter",
+    notes: Optional[str] = None,
+) -> dict:
+    """Claim a lock atomically. Returns {ok, conflict?, holder?, lock_id?}.
+    Idempotent for the same slug — re-claiming your own lock is a no-op."""
+    nk, ck = normalize_niche(niche), normalize_city(city)
+    if not nk or not ck:
+        return {"ok": False, "error": "niche and city required"}
+    existing = await check_lock(niche, city)
+    if existing:
+        if existing["slug"] == slug:
+            return {"ok": True, "lock_id": existing["id"], "idempotent": True}
+        return {"ok": False, "conflict": True, "holder": existing}
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """INSERT INTO local_locks (slug, niche, city_key, city_display, tier, notes)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (slug, nk, ck, city.strip(), tier, notes),
+        )
+        await db.commit()
+        return {"ok": True, "lock_id": cur.lastrowid}
+
+
+async def release_lock(lock_id: int) -> bool:
+    """Soft-release: sets released_at so the (niche, city) can be reclaimed."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """UPDATE local_locks SET released_at = datetime('now')
+               WHERE id = ? AND released_at IS NULL""",
+            (lock_id,),
+        )
+        await db.commit()
+        return (cur.rowcount or 0) > 0
+
+
+async def locks_for_slug(slug: str, active_only: bool = True) -> List[dict]:
+    """All locks held by a client. Used by onboard to enforce tier quotas."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        q = """SELECT id, slug, niche, city_key, city_display, tier,
+                      claimed_at, released_at
+               FROM local_locks WHERE slug = ?"""
+        if active_only:
+            q += " AND released_at IS NULL"
+        q += " ORDER BY claimed_at DESC"
+        async with db.execute(q, (slug,)) as cur:
+            return [dict(r) for r in await cur.fetchall()]
+
+
+async def list_all_locks(active_only: bool = True) -> List[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        q = """SELECT id, slug, niche, city_key, city_display, tier,
+                      claimed_at, released_at
+               FROM local_locks"""
+        if active_only:
+            q += " WHERE released_at IS NULL"
+        q += " ORDER BY claimed_at DESC"
+        async with db.execute(q) as cur:
+            return [dict(r) for r in await cur.fetchall()]
