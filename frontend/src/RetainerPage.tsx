@@ -386,8 +386,8 @@ export default function RetainerPage() {
                 a: '30-Day Half-Back: measurable ranking improvement in 30 days or 50% back. Full ROI typically hits month 3. By month 6 you\'re in the top 3.',
               },
               {
-                q: "What if I'm not a Florida contractor?",
-                a: 'Lola works for any local service business. We\'re Florida-focused because that\'s our network — but the system works anywhere with Google Maps.',
+                q: "What if I'm not in Florida — or not a contractor?",
+                a: 'Lola works for any local service business — home services, cleaning, salons, med spas, auto detailing, lawn care, the whole map. We\'re Tampa-based because that\'s our home network, but the system works anywhere with Google Maps + AI search.',
               },
               {
                 q: "What's the cancellation policy?",
@@ -437,8 +437,8 @@ export default function RetainerPage() {
 
             <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
               <p>
-                I built Lola because I watched too many Florida contractors lose jobs to
-                competitors with worse work but better Google presence.
+                I built Lola because I watched too many local service businesses lose jobs
+                to competitors with worse work but better Google presence.
               </p>
               <p>
                 I'm Coach Ty. I run Ty Alexander Media in Tampa. I train for HYROX when I'm
@@ -447,8 +447,8 @@ export default function RetainerPage() {
               </p>
               <p>
                 Lola isn't a SaaS tool I'm trying to scale to a $100M exit. She's a real
-                system I built for contractors I actually know.{' '}
-                <span className="font-semibold text-white">Including my dad.</span>
+                system I built for local owners I actually know.{' '}
+                <span className="font-semibold text-white">Starting with my dad.</span>
               </p>
               <p className="text-white">
                 <span className="font-bold text-[#D4AF37]">

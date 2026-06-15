@@ -202,7 +202,7 @@ export default function Homepage() {
               paddingRight: '38px',
             }}
           >
-            <option value="">Pick your trade…</option>
+            <option value="">Pick your business type…</option>
             {TRADES.map((t) => (
               <option key={t} value={t}>
                 {t}
@@ -214,7 +214,7 @@ export default function Homepage() {
           {trade && !MAPPED_TRADES.has(trade) && (
             <p className="mt-2 text-[12px] leading-[1.5] text-[#8A8F98]">
               We've fully tuned audits for {Array.from(MAPPED_TRADES).slice(0, 5).join(', ')} so far. For{' '}
-              <span className="text-[#D4AF37]">{trade}</span>, we'll ask the same questions and run a general home-services audit. Full {trade.toLowerCase()} playbook ships Q1 2026.
+              <span className="text-[#D4AF37]">{trade}</span>, we'll ask the same questions and run a general local-business audit. Full {trade.toLowerCase()} playbook ships Q1 2026.
             </p>
           )}
         </div>
@@ -245,7 +245,7 @@ export default function Homepage() {
       <section className="mt-12 sm:mt-16">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-stretch sm:gap-4">
           {[
-            { n: '1', h: 'Pick your trade', sub: 'Tell Lola what you do' },
+            { n: '1', h: 'Pick your business type', sub: 'Tell Lola what you do' },
             { n: '2', h: 'Lola sniffs your site', sub: '~20 seconds' },
             { n: '3', h: 'Get your fix list', sub: 'Plus revenue math' },
           ].map((step, i) => (

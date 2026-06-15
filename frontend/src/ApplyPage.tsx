@@ -20,9 +20,11 @@ type TierInterest = 'retainer' | 'pro' | 'both';
 const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
   'Painter', 'Pool Services', 'General Contractor', 'Handyman', 'Concrete',
-  'Flooring', 'Pest Control', 'Carpet Cleaning', 'Locksmith', 'Masonry',
-  'Windows', 'Gutters', 'Duct Cleaning', 'Fencing', 'Home Remodeling',
-  'Carpenter', 'Arborist', 'Other',
+  'Flooring', 'Pest Control', 'Carpet Cleaning', 'Cleaning Services',
+  'Lawn Care', 'Auto Detailing', 'Garage Doors', 'Moving', 'Med Spa',
+  'Salon / Barber', 'Locksmith', 'Masonry', 'Windows', 'Gutters',
+  'Duct Cleaning', 'Fencing', 'Home Remodeling', 'Carpenter', 'Arborist',
+  'Other',
 ] as const;
 
 const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
@@ -222,13 +224,13 @@ export default function ApplyPage() {
           </div>
         </fieldset>
 
-        {/* Trade */}
+        {/* Business type (visible label kept friendly; `trade` is the internal key). */}
         <div>
           <label
             htmlFor="apply-trade"
             className="block text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85"
           >
-            Trade
+            Business type
           </label>
           <select
             id="apply-trade"
@@ -244,7 +246,7 @@ export default function ApplyPage() {
             }}
             required
           >
-            <option value="">Pick your trade…</option>
+            <option value="">Pick your business type…</option>
             {TRADES.map((t) => (
               <option key={t} value={t}>
                 {t}
