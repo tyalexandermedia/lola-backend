@@ -1403,6 +1403,38 @@ async def trigger_audit_enhancement(audit_id: str, force: bool = False):
         return {"audit_id": audit_id, "status": "error", "error": str(e), "payload": {}}
 
 
+@app.get("/grader/lookup")
+async def grader_lookup(name: str = "", city: str = ""):
+    """
+    PUBLIC lookup that powers Grader auto-fill. Visitor types their business
+    name on the Homepage → lands at /grader?biz=<name> → this endpoint hits
+    Google Places once and returns website + city + (where available) phone +
+    rating so the Grader form goes from 5 fields to 2.
+
+    Open endpoint (no admin gate) because the Grader is a public lead-magnet.
+    The Places API has its own budget cap (1 call here), which caps abuse.
+    """
+    n = (name or "").strip()
+    if len(n) < 2:
+        return {"ok": False, "error": "name required (min 2 chars)"}
+    async with httpx.AsyncClient() as client:
+        budget = ApiBudget(1)
+        info = await get_business_info(client, n, (city or "").strip(), budget)
+    if not info.get("ok"):
+        return {"ok": False, "matched": False}
+    return {
+        "ok": True,
+        "matched": True,
+        "name": info.get("name") or n,
+        "website": info.get("website") or "",
+        "address": info.get("address") or "",
+        "phone": info.get("phone") or "",
+        "primary_category": info.get("primary_category") or "",
+        "rating": info.get("rating", 0),
+        "review_count": info.get("review_count", 0),
+    }
+
+
 @app.get("/health")
 async def health():
     """

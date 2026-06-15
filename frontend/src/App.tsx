@@ -1,20 +1,24 @@
 /// <reference types="vite/client" />
-import { useEffect, useState } from 'react';
-import AuditFlow from './AuditFlow';
-import SharedReport from './SharedReport';
-import AdminLeads from './AdminLeads';
+import { useEffect, useState, lazy, Suspense } from 'react';
+// Homepage stays eager — primary entry, must paint immediately. Everything
+// else is lazy-loaded so the initial bundle stays lean for first-paint /
+// Core Web Vitals (LCP). Each lazy import becomes its own JS chunk under
+// dist/assets that Vite will only fetch when the route is hit.
 import Homepage from './Homepage';
-import PricingPage from './PricingPage';
-import RetainerPage from './RetainerPage';
-import ApplyPage from './ApplyPage';
-import LeadGenGenerator from './LeadGenGenerator';
-import SwarmWorkflow from './SwarmWorkflow';
-import ClientReport from './ClientReport';
-import Grader from './Grader';
-import VsPage from './VsPage';
-import VsHub from './VsHub';
-import Methodology from './Methodology';
-import SandbarCaseStudy from './SandbarCaseStudy';
+const AuditFlow = lazy(() => import('./AuditFlow'));
+const SharedReport = lazy(() => import('./SharedReport'));
+const AdminLeads = lazy(() => import('./AdminLeads'));
+const PricingPage = lazy(() => import('./PricingPage'));
+const RetainerPage = lazy(() => import('./RetainerPage'));
+const ApplyPage = lazy(() => import('./ApplyPage'));
+const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
+const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
+const ClientReport = lazy(() => import('./ClientReport'));
+const Grader = lazy(() => import('./Grader'));
+const VsPage = lazy(() => import('./VsPage'));
+const VsHub = lazy(() => import('./VsHub'));
+const Methodology = lazy(() => import('./Methodology'));
+const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
 
 type Route =
   | { name: 'home' }
@@ -99,26 +103,134 @@ function App() {
     <div className="min-h-screen scroll-smooth bg-[#0A0A0B] text-white">
       <Header />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
-        {route.name === 'home' && <Homepage />}
-        {route.name === 'audit' && <AuditFlow />}
-        {route.name === 'grader' && <Grader />}
-        {route.name === 'methodology' && <Methodology />}
-        {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
-        {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
-        {route.name === 'vs' && <VsPage slug={route.slug} />}
-        {route.name === 'vs-hub' && <VsHub />}
-        {route.name === 'pricing' && <PricingPage />}
-        {route.name === 'retainer' && <RetainerPage />}
-        {route.name === 'apply' && <ApplyPage />}
-        {route.name === 'lead-gen' && <LeadGenGenerator />}
-        {route.name === 'swarm' && <SwarmWorkflow />}
-        {route.name === 'report' && <SharedReport auditId={route.auditId} />}
-        {route.name === 'client-report' && <ClientReport slug={route.slug} />}
-        {route.name === 'admin' && <AdminLeads />}
-        {route.name === 'unknown' && <NotFound />}
+        <Suspense fallback={<RouteFallback />}>
+          {route.name === 'home' && <Homepage />}
+          {route.name === 'audit' && <AuditFlow />}
+          {route.name === 'grader' && <Grader />}
+          {route.name === 'methodology' && <Methodology />}
+          {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
+          {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
+          {route.name === 'vs' && <VsPage slug={route.slug} />}
+          {route.name === 'vs-hub' && <VsHub />}
+          {route.name === 'pricing' && <PricingPage />}
+          {route.name === 'retainer' && <RetainerPage />}
+          {route.name === 'apply' && <ApplyPage />}
+          {route.name === 'lead-gen' && <LeadGenGenerator />}
+          {route.name === 'swarm' && <SwarmWorkflow />}
+          {route.name === 'report' && <SharedReport auditId={route.auditId} />}
+          {route.name === 'client-report' && <ClientReport slug={route.slug} />}
+          {route.name === 'admin' && <AdminLeads />}
+          {route.name === 'unknown' && <NotFound />}
+        </Suspense>
       </div>
+      <SiteFooter route={route} />
       <MobileStickyCTA route={route} />
     </div>
+  );
+}
+
+/**
+ * Suspense fallback for lazy-loaded routes — kept minimal so it doesn't
+ * compete with the LCP element on first paint. Three gold dots, fades in
+ * after ~120ms so fast loads never flash this (Vite's lazy modules are
+ * usually < 200ms on broadband).
+ */
+function RouteFallback() {
+  return (
+    <main className="flex flex-1 items-center justify-center py-32">
+      <div className="flex items-center gap-2 opacity-0 animate-fade-in" style={{ animationDelay: '120ms', animationFillMode: 'forwards' }}>
+        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" />
+        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '120ms' }} />
+        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '240ms' }} />
+      </div>
+    </main>
+  );
+}
+
+/**
+ * Global site footer — sitemap-grade internal linking across the dark-mode
+ * surface. Renders on every public route. Hidden on dashboards / admin /
+ * audit-results-style pages where the page-local footer is already custom.
+ * Pure SEO + UX win — every page now seeds the site graph for crawlers and
+ * gives lost mobile visitors a clean way home.
+ */
+function SiteFooter({ route }: { route: Route }) {
+  // Routes that own their own bottom-of-page footer or shouldn't have a
+  // global one (admin / report dashboards / interactive tools).
+  const HIDE = new Set(['admin', 'report', 'client-report', 'audit', 'lead-gen', 'swarm']);
+  if (HIDE.has(route.name)) return null;
+
+  return (
+    <footer className="mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
+      <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
+        <div className="col-span-2 sm:col-span-1">
+          <a href="/" className="inline-flex items-center gap-2">
+            <span aria-hidden className="text-[18px]">🐾</span>
+            <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent">
+              LOLA — AI LEADS EXPERT
+            </span>
+          </a>
+          <p className="mt-3 max-w-[260px] text-[12px] leading-[1.55] text-[#9CA3AF]">
+            Done-for-you AI Leads + Local SEO for service businesses. Recommended on
+            Google AND ChatGPT, Perplexity, and Gemini.
+          </p>
+          <p className="mt-3 text-[11px] text-[#5A5F68]">
+            Ty Alexander Media · Tampa Bay, FL
+          </p>
+        </div>
+
+        <FooterCol title="Get found">
+          <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
+          <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
+          <FooterLink href="/case-studies/sandbar">Sandbar case study</FooterLink>
+          <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
+        </FooterCol>
+
+        <FooterCol title="Compare">
+          <FooterLink href="/vs">All comparisons</FooterLink>
+          <FooterLink href="/vs/localiq">Lola vs LocalIQ</FooterLink>
+          <FooterLink href="/vs/brightlocal">Lola vs BrightLocal</FooterLink>
+          <FooterLink href="/vs/scorpion">Lola vs Scorpion</FooterLink>
+          <FooterLink href="/vs/podium">Lola vs Podium</FooterLink>
+        </FooterCol>
+
+        <FooterCol title="Trust">
+          <FooterLink href="/methodology">Scoring methodology</FooterLink>
+          <FooterLink href="/lp/industries">Industries we serve</FooterLink>
+          <FooterLink href="/retainer">The Retainer</FooterLink>
+          <FooterLink href="/apply">Apply for a slot</FooterLink>
+        </FooterCol>
+      </div>
+
+      <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
+        <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
+        <p className="mt-1">
+          We work with one business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Claim your Local Lock</a>.
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{title}</p>
+      <ul className="mt-3 flex flex-col gap-2">{children}</ul>
+    </div>
+  );
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <a
+        href={href}
+        className="text-[13px] text-[#C5C5C8] underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
+      >
+        {children}
+      </a>
+    </li>
   );
 }
 

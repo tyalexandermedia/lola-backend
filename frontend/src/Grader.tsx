@@ -39,6 +39,7 @@ const BUSINESS_TYPES = [
 ] as const;
 
 type Phase = 'idle' | 'scoring' | 'error';
+type LookupState = 'idle' | 'searching' | 'found' | 'no_match';
 
 interface Errors {
   business_name?: string;
@@ -67,6 +68,7 @@ export default function Grader() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [apiError, setApiError] = useState<string | null>(null);
   const [scoringLine, setScoringLine] = useState(SCORING_LINES[0]);
+  const [lookup, setLookup] = useState<LookupState>('idle');
 
   // Pre-fill from URL params and localStorage. Homepage routes here with
   // ?biz=<name> so the visitor lands mid-form (perceived progress + lower
@@ -84,8 +86,39 @@ export default function Grader() {
         business_name: biz?.trim() || p.business_name,
         business_type: t && TRADE_TO_SERVICE[t] ? TRADE_TO_SERVICE[t] : p.business_type,
       }));
+
+      // Auto-lookup ONLY when ?biz= is present (deep-link from Homepage).
+      // Drops Grader friction from 5 fields to 2 when Places returns a match.
+      if (biz && biz.trim().length >= 2) {
+        runLookup(biz.trim());
+      }
     } catch { /* ignore */ }
   }, []);
+
+  // Places lookup helper — public endpoint, no auth. Soft-fills website +
+  // city when matched; never clobbers a value the user has already typed.
+  const runLookup = async (bizName: string) => {
+    if (lookup === 'searching') return;
+    setLookup('searching');
+    try {
+      const r = await fetch(`${API_URL}/grader/lookup?name=${encodeURIComponent(bizName)}`);
+      if (!r.ok) { setLookup('no_match'); return; }
+      const data = await r.json();
+      if (data?.ok && data?.matched) {
+        setForm((p) => ({
+          ...p,
+          website: p.website.trim() ? p.website : (data.website || p.website),
+          city: p.city.trim() ? p.city : extractCity(data.address || ''),
+        }));
+        setLookup('found');
+        track('grader_autofill_hit');
+      } else {
+        setLookup('no_match');
+      }
+    } catch {
+      setLookup('no_match');
+    }
+  };
 
   // Inject SoftwareApplication + HowTo JSON-LD on mount; cleaned on unmount.
   // SoftwareApplication makes the page eligible for the "free tool" rich
@@ -259,6 +292,27 @@ export default function Grader() {
           onSubmit={(e) => { e.preventDefault(); grade(); }}
           className="mt-8 rounded-[16px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-7"
         >
+          {/* Auto-fill status — only renders when the user came in via
+              ?biz= (Homepage deep-link) so they see Lola "doing something"
+              while Places resolves the website + city. Subtle, gold-themed. */}
+          {lookup === 'searching' && (
+            <p className="mb-4 flex items-center gap-2 text-[12px] text-[#D4AF37]">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#D4AF37]" />
+              Looking up your business on Google…
+            </p>
+          )}
+          {lookup === 'found' && (
+            <p className="mb-4 flex items-center gap-2 text-[12px] text-emerald-300">
+              <span aria-hidden>✓</span>
+              Found you on Google — website + city pre-filled below.
+            </p>
+          )}
+          {lookup === 'no_match' && (
+            <p className="mb-4 text-[12px] text-[#7A7F8A]">
+              No Google match — fill the fields manually and we&apos;ll still score you.
+            </p>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Business name" error={errors.business_name}>
               <input
@@ -438,6 +492,25 @@ function Field({
       {error && <p className="mt-1.5 text-[12px] text-[#E5A95B]">{error}</p>}
     </div>
   );
+}
+
+/**
+ * Pull a "{City}, {ST}" pair out of a Google Places formatted_address.
+ * Address shapes vary: "123 Main St, Tampa, FL 33602, USA" → "Tampa, FL"
+ * Returns "" when the shape doesn't parse cleanly — caller falls back.
+ */
+function extractCity(address: string): string {
+  if (!address) return '';
+  // Split on commas, drop trailing "USA" / country if present.
+  const parts = address.split(',').map((s) => s.trim()).filter(Boolean);
+  if (parts.length < 3) return '';
+  // From the end: country, "STATE ZIP", "City"
+  const countryDrop = /usa|united states/i.test(parts[parts.length - 1]) ? 1 : 0;
+  const stateZipPart = parts[parts.length - 1 - countryDrop] || '';
+  const cityPart = parts[parts.length - 2 - countryDrop] || '';
+  const stateMatch = stateZipPart.match(/^([A-Z]{2})\b/i);
+  if (cityPart && stateMatch) return `${cityPart}, ${stateMatch[1].toUpperCase()}`;
+  return cityPart || '';
 }
 
 function inputCls(hasError: boolean): string {
