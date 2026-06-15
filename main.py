@@ -95,6 +95,12 @@ from db.reporting import (
     get_active_clients,
     upsert_client as reporting_upsert_client,
     get_recent_sends as reporting_recent_sends,
+    add_task as reporting_add_task,
+    delete_task as reporting_delete_task,
+    list_tasks_for_slug as reporting_list_tasks,
+    get_tasks_grouped as reporting_tasks_grouped,
+    TASK_CATEGORIES,
+    TASK_STATUSES,
 )
 from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
 from db.enhancements import (
@@ -1664,12 +1670,16 @@ async def public_client_dashboard(slug: str):
     series = await get_all_history_for_slug(slug)
     google_series = [s for s in series if s["source"] == "google_organic"]
     ai_series = [s for s in series if s["source"] == "claude_ai_mode"]
+    # Work-delivered feed — proves the retainer is doing the work between
+    # ranking snapshots. Empty/absent until tasks are logged for this slug.
+    implementation = await reporting_tasks_grouped(slug)
     return {
         "slug": slug,
         "client_name": cs.client_name,
         "target_url": cs.target_url,
         "google": google_series,
         "ai_mode": ai_series,
+        "implementation": implementation,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -1736,6 +1746,65 @@ async def admin_run_reporting_one(
     """Trigger Agent Two for a single client. Use for testing before cron goes live."""
     _check_admin(x_admin_key)
     return await run_for_client(slug)
+
+
+# ── IMPLEMENTATION TRACKER (work-delivered feed) ──────────────
+
+
+class ReportingTaskCreate(BaseModel):
+    slug: str
+    title: str
+    category: str = "other"       # content | citation | review | gbp | fix | other
+    status: str = "done"          # done | in_progress | next_up
+    detail: Optional[str] = None
+    url: Optional[str] = None
+    week_of: Optional[str] = None  # ISO date of the Monday; optional
+
+
+@app.post("/admin/reporting/tasks")
+async def admin_add_reporting_task(
+    body: ReportingTaskCreate,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Log a work item for a client — surfaces on /r/client/<slug> + weekly email."""
+    _check_admin(x_admin_key)
+    if not body.title.strip():
+        raise HTTPException(status_code=400, detail="title is required")
+    if body.category not in TASK_CATEGORIES:
+        raise HTTPException(status_code=400, detail=f"category must be one of {TASK_CATEGORIES}")
+    if body.status not in TASK_STATUSES:
+        raise HTTPException(status_code=400, detail=f"status must be one of {TASK_STATUSES}")
+    tid = await reporting_add_task(
+        slug=body.slug,
+        title=body.title,
+        category=body.category,
+        status=body.status,
+        detail=body.detail,
+        url=body.url,
+        week_of=body.week_of,
+    )
+    return {"ok": True, "id": tid, "slug": body.slug}
+
+
+@app.get("/admin/reporting/tasks/{slug}")
+async def admin_list_reporting_tasks(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"slug": slug, "tasks": await reporting_list_tasks(slug)}
+
+
+@app.delete("/admin/reporting/tasks/{task_id}")
+async def admin_delete_reporting_task(
+    task_id: int,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    ok = await reporting_delete_task(task_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="No such task")
+    return {"ok": True, "deleted": task_id}
 
 
 @app.post("/admin/reporting/run-weekly")
