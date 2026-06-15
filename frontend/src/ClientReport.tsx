@@ -11,12 +11,30 @@ interface Series {
   run_count: number;
 }
 
+type TaskItem = {
+  title: string;
+  category: string;
+  detail: string | null;
+  url: string | null;
+  week_of: string | null;
+  created_at: string;
+};
+
+interface Implementation {
+  done: TaskItem[];
+  in_progress: TaskItem[];
+  next_up: TaskItem[];
+  counts: Record<string, number>;
+  total_done: number;
+}
+
 interface DashboardPayload {
   slug: string;
   client_name: string;
   target_url: string;
   google: Series[];
   ai_mode: Series[];
+  implementation?: Implementation;
   generated_at: string;
 }
 
@@ -61,6 +79,8 @@ export default function ClientReport({ slug }: { slug: string }) {
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
+
+      {data.implementation && <WorkDelivered impl={data.implementation} />}
 
       <section className="mt-8">
         <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
@@ -296,6 +316,87 @@ function AIModeTable({ series }: { series: Series[] }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function WorkDelivered({ impl }: { impl: Implementation }) {
+  const c = impl.counts || {};
+  const stats = [
+    { label: 'Content shipped', value: c.content || 0 },
+    { label: 'Citations built', value: c.citation || 0 },
+    { label: 'Reviews requested', value: c.review || 0 },
+    { label: 'Fixes + GBP', value: (c.fix || 0) + (c.gbp || 0) + (c.other || 0) },
+  ];
+  const nothingYet =
+    impl.done.length === 0 && impl.in_progress.length === 0 && impl.next_up.length === 0;
+
+  return (
+    <section className="mt-8">
+      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Work Delivered
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+          What Lola did between snapshots
+        </span>
+      </h2>
+
+      {nothingYet ? (
+        <EmptyHint label="Your work feed updates as Lola ships fixes, content, citations, and reviews." />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-[12px] border border-white/10 bg-[#11121A] px-4 py-3 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{s.label}</p>
+                <p className="mt-1 text-[28px] font-bold leading-none text-[#F4D47C]">{s.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <TaskColumn title="Done" emoji="✅" accent="#10B981" tasks={impl.done} />
+            <TaskColumn title="In progress" emoji="🔧" accent="#F4D47C" tasks={impl.in_progress} />
+            <TaskColumn title="Next up" emoji="⏭" accent="#9AA0A6" tasks={impl.next_up} />
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function TaskColumn({
+  title, emoji, accent, tasks,
+}: { title: string; emoji: string; accent: string; tasks: TaskItem[] }) {
+  return (
+    <div className="rounded-[14px] border border-white/10 bg-[#11121A] p-4">
+      <p className="mb-3 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: accent }}>
+        <span aria-hidden>{emoji}</span>
+        {title}
+        <span className="text-[#6B7280]">({tasks.length})</span>
+      </p>
+      {tasks.length === 0 ? (
+        <p className="text-[13px] text-[#6B7280]">—</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {tasks.map((t, i) => (
+            <li key={i} className="text-[13px] leading-[1.45] text-[#E5E7EB]">
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
+                <span>
+                  {t.url ? (
+                    <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-[#F4D47C] underline-offset-2 hover:underline">
+                      {t.title}
+                    </a>
+                  ) : (
+                    t.title
+                  )}
+                  {t.detail && <span className="block text-[11px] text-[#9AA0A6]">{t.detail}</span>}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -204,22 +204,42 @@ async def fetch_ga(ga_property_id: Optional[str]) -> dict:
 
 async def fetch_implementation_tracker(client_slug: str) -> dict:
     """
-    Implementation tracker per client. Phase 1: returns a stub with placeholders.
-    Phase 2: wire to a real task-tracking source (Airtable / Notion / SQLite table).
+    Implementation tracker per client — reads the `reporting_tasks` table that
+    backs the public dashboard, so the weekly email and the client's live
+    dashboard tell the same story.
 
     Schema:
-      - done_this_week: list[str]
+      - done_this_week: list[str]   (completed; week_of == this Monday, or
+                                     logged in the last 7 days when week_of is unset)
       - in_progress: list[str]
       - next_up: list[str]
     """
-    # TODO Phase 2: read from `reporting_tasks` table (slug, status, week_of)
-    # For Phase 1 the prompt_builder treats empty lists as "not yet tracked"
+    from db.reporting import get_tasks_grouped  # local import avoids a cycle at module load
+
+    grouped = await get_tasks_grouped(client_slug)
+    monday = _this_monday_iso()
+    cutoff = (date.fromisoformat(monday) - timedelta(days=7)).isoformat()
+
+    def _recent(item: dict) -> bool:
+        wk = item.get("week_of")
+        if wk:
+            return wk >= monday
+        created = (item.get("created_at") or "")[:10]
+        return created >= cutoff
+
+    done_week = [t["title"] for t in grouped["done"] if _recent(t)]
     return {
-        "done_this_week": [],
-        "in_progress": [],
-        "next_up": [],
-        "source": "stub — wire to Airtable/Notion/SQLite tasks table in Phase 2",
+        "done_this_week": done_week,
+        "in_progress": [t["title"] for t in grouped["in_progress"]],
+        "next_up": [t["title"] for t in grouped["next_up"]],
+        "counts": grouped["counts"],
+        "source": "reporting_tasks",
     }
+
+
+def _this_monday_iso(today: Optional[date] = None) -> str:
+    d = today or date.today()
+    return (d - timedelta(days=d.weekday())).isoformat()
 
 
 def estimate_weekly_revenue(

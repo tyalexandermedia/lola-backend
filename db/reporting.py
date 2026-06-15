@@ -51,7 +51,30 @@ CREATE TABLE IF NOT EXISTS reporting_sends (
 CREATE_IDX = """
 CREATE INDEX IF NOT EXISTS idx_reporting_clients_slug ON reporting_clients(slug);
 CREATE INDEX IF NOT EXISTS idx_reporting_sends_slug_week ON reporting_sends(slug, week_of DESC);
+CREATE INDEX IF NOT EXISTS idx_reporting_tasks_slug ON reporting_tasks(slug, status);
 """
+
+# Implementation tracker — the "here's the work we did" feed surfaced on the
+# public client dashboard (and fed to the weekly email). One row per work item.
+#   category: content | citation | review | gbp | fix | other
+#   status:   done | in_progress | next_up
+CREATE_TASKS = """
+CREATE TABLE IF NOT EXISTS reporting_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'other',
+    status TEXT NOT NULL DEFAULT 'done',
+    detail TEXT,
+    url TEXT,
+    week_of TEXT,                         -- ISO date of the Monday this lands in
+    created_at TEXT DEFAULT (datetime('now'))
+);
+"""
+
+# Canonical vocab — kept here so the API layer can validate against one source.
+TASK_CATEGORIES = ("content", "citation", "review", "gbp", "fix", "other")
+TASK_STATUSES = ("done", "in_progress", "next_up")
 
 # Additive migrations. SQLite has no IF NOT EXISTS for ADD COLUMN, so we
 # try each and swallow the "duplicate column" OperationalError. These two
@@ -68,6 +91,7 @@ async def init_reporting_tables() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(CREATE_CLIENTS)
         await db.execute(CREATE_SENDS)
+        await db.execute(CREATE_TASKS)
         for stmt in CREATE_IDX.strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
@@ -209,3 +233,86 @@ async def get_recent_sends(slug: Optional[str] = None, limit: int = 50) -> List[
         params = params + (limit,)
         async with db.execute(q, params) as cur:
             return [dict(r) for r in await cur.fetchall()]
+
+
+# ── Implementation tracker (work-delivered feed) ──────────────────
+
+
+async def add_task(
+    slug: str,
+    title: str,
+    category: str = "other",
+    status: str = "done",
+    detail: Optional[str] = None,
+    url: Optional[str] = None,
+    week_of: Optional[str] = None,
+) -> int:
+    """Log a single work item for a client. Returns the new row id."""
+    if category not in TASK_CATEGORIES:
+        category = "other"
+    if status not in TASK_STATUSES:
+        status = "done"
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """INSERT INTO reporting_tasks (slug, title, category, status, detail, url, week_of)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (slug, title.strip(), category, status, detail, url, week_of),
+        )
+        await db.commit()
+        return cur.lastrowid or 0
+
+
+async def delete_task(task_id: int) -> bool:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute("DELETE FROM reporting_tasks WHERE id = ?", (task_id,))
+        await db.commit()
+        return (cur.rowcount or 0) > 0
+
+
+async def list_tasks_for_slug(slug: str, limit: int = 200) -> List[dict]:
+    """All tasks for a client, newest first. Admin view (includes id)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT id, slug, title, category, status, detail, url, week_of, created_at
+               FROM reporting_tasks WHERE slug = ?
+               ORDER BY created_at DESC LIMIT ?""",
+            (slug, limit),
+        ) as cur:
+            return [dict(r) for r in await cur.fetchall()]
+
+
+async def get_tasks_grouped(slug: str) -> dict:
+    """
+    Tasks bucketed by status for the public dashboard + weekly email.
+    Returns done / in_progress / next_up lists (safe fields only) plus
+    per-category counts of completed work.
+    """
+    rows = await list_tasks_for_slug(slug, limit=500)
+    done: List[dict] = []
+    in_progress: List[dict] = []
+    next_up: List[dict] = []
+    counts = {c: 0 for c in TASK_CATEGORIES}
+    for r in rows:
+        item = {
+            "title": r["title"],
+            "category": r["category"],
+            "detail": r["detail"],
+            "url": r["url"],
+            "week_of": r["week_of"],
+            "created_at": r["created_at"],
+        }
+        if r["status"] == "done":
+            done.append(item)
+            counts[r["category"]] = counts.get(r["category"], 0) + 1
+        elif r["status"] == "in_progress":
+            in_progress.append(item)
+        elif r["status"] == "next_up":
+            next_up.append(item)
+    return {
+        "done": done,
+        "in_progress": in_progress,
+        "next_up": next_up,
+        "counts": counts,
+        "total_done": len(done),
+    }
