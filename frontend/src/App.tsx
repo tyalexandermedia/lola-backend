@@ -13,11 +13,13 @@ import ClientReport from './ClientReport';
 import Grader from './Grader';
 import VsPage from './VsPage';
 import VsHub from './VsHub';
+import Methodology from './Methodology';
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'methodology' }
   | { name: 'vs-hub' }
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
@@ -34,6 +36,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
@@ -72,6 +75,8 @@ function App() {
       ? 'max-w-[640px] pt-3 sm:pt-6'
       : route.name === 'grader'
       ? 'max-w-[820px] pt-6 sm:pt-10'
+      : route.name === 'methodology'
+      ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
       ? 'max-w-[960px] pt-6 sm:pt-10'
       : route.name === 'apply'
@@ -91,6 +96,7 @@ function App() {
         {route.name === 'home' && <Homepage />}
         {route.name === 'audit' && <AuditFlow />}
         {route.name === 'grader' && <Grader />}
+        {route.name === 'methodology' && <Methodology />}
         {route.name === 'vs' && <VsPage slug={route.slug} />}
         {route.name === 'vs-hub' && <VsHub />}
         {route.name === 'pricing' && <PricingPage />}
@@ -115,16 +121,11 @@ function Header() {
         <a
           href="/"
           className="group -mx-2 flex min-h-[44px] items-center gap-2 px-2"
-          aria-label="Lola — AI Leads for local business — home"
+          aria-label="Lola — AI Leads Expert — home"
         >
           <span aria-hidden className="text-[16px] leading-none">🐾</span>
-          <span className="flex flex-col leading-none">
-            <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[15px]">
-              LOLA
-            </span>
-            <span className="mt-0.5 hidden text-[8px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/70 sm:block">
-              AI Leads · Local SEO
-            </span>
+          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[14px]">
+            LOLA <span aria-hidden className="text-[#D4AF37]/55">—</span> AI LEADS EXPERT
           </span>
         </a>
 

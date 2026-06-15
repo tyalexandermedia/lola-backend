@@ -11,7 +11,7 @@ import hmac
 import json
 import traceback
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List
 
 # CRITICAL: load_dotenv MUST run before any project module is imported. Many
@@ -1679,6 +1679,64 @@ async def public_client_dashboard(slug: str):
     # Work-delivered feed — proves the retainer is doing the work between
     # ranking snapshots. Empty/absent until tasks are logged for this slug.
     implementation = await reporting_tasks_grouped(slug)
+
+    # ── Share of Voice (the killer Profound-style metric) ──────
+    # SoV = % of (query, run) pairs in claude_ai_mode where the client
+    # was mentioned by the AI. Computed across two windows:
+    #   - lifetime: every snapshot ever taken
+    #   - 30d: last 30 days only (the deltas that matter to a retainer client)
+    # We also compute the delta vs the prior 30-day window so the dashboard
+    # can show "↑ +12 pts vs last month" without recomputing on the FE.
+    from datetime import timezone
+
+    def _to_dt(iso: str):
+        try:
+            return datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        except (ValueError, AttributeError):
+            return None
+
+    now = datetime.now(timezone.utc)
+    cutoff_30 = now - timedelta(days=30)
+    cutoff_60 = now - timedelta(days=60)
+
+    def _sov(history_points: list, since=None, until=None):
+        """Returns (mentions, total) across all AI series within the window."""
+        mentions = 0
+        total = 0
+        for h in history_points:
+            dt = _to_dt(h.get("run_at") or "")
+            if dt is None:
+                continue
+            if since and dt < since:
+                continue
+            if until and dt >= until:
+                continue
+            total += 1
+            if h.get("mentioned"):
+                mentions += 1
+        return mentions, total
+
+    # Flatten every AI-mode history point so the window math is one pass.
+    flat_ai_history: list = []
+    for s in ai_series:
+        for h in s.get("history") or []:
+            flat_ai_history.append(h)
+
+    life_m, life_t = _sov(flat_ai_history)
+    cur_m, cur_t = _sov(flat_ai_history, since=cutoff_30)
+    prev_m, prev_t = _sov(flat_ai_history, since=cutoff_60, until=cutoff_30)
+
+    def _pct(m: int, t: int) -> float:
+        return round(100 * m / t, 1) if t else 0.0
+
+    share_of_voice = {
+        "lifetime": {"pct": _pct(life_m, life_t), "mentions": life_m, "total": life_t},
+        "last_30d": {"pct": _pct(cur_m, cur_t), "mentions": cur_m, "total": cur_t},
+        "prev_30d": {"pct": _pct(prev_m, prev_t), "mentions": prev_m, "total": prev_t},
+        "delta_pts": round(_pct(cur_m, cur_t) - _pct(prev_m, prev_t), 1),
+        "queries_tracked": len(ai_series),
+    }
+
     return {
         "slug": slug,
         "client_name": cs.client_name,
@@ -1686,6 +1744,7 @@ async def public_client_dashboard(slug: str):
         "google": google_series,
         "ai_mode": ai_series,
         "implementation": implementation,
+        "share_of_voice": share_of_voice,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 

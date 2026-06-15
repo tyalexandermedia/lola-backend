@@ -25,8 +25,16 @@ import { useEffect, useRef } from 'react';
 // since the static index.html schema only covers the homepage's FAQ set).
 const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   {
+    q: 'What is the Local Lock?',
+    a: "One business per niche per city. When you lock a market with Lola, your direct competitors in that city can't sign up with us — we say no. It's our promise that you and Lola are on the same team, not selling the same playbook to your rival. Starter locks 1 city. Growth locks up to 5 cities (your service area). Pro locks up to 10 cities or a multi-location operation.",
+  },
+  {
     q: 'Which plan should I pick?',
-    a: "If you just need to get found, Starter ($297). If you want to dominate your market month after month, Growth ($697) — the most popular. If you want everything plus live AI citation tracking, multi-location pages, and monthly 1:1s with Coach Ty, Pro ($997). Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+    a: "Starter ($297) if you operate in one city. Growth ($697) if your vans cover 3–5 cities — that's most home-service businesses. Pro ($997) if you have multiple locations or you serve a whole region/state. Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+  },
+  {
+    q: 'What if a competitor locks my market before I do?',
+    a: "We tell you straight on the call. If your direct competitor is already locked in your city, we'll either point you to an adjacent market we can serve, or place you on a notice list in case the lock opens. We don't play both sides.",
   },
   {
     q: 'Can I switch tiers later?',
@@ -148,13 +156,17 @@ export default function PricingPage() {
           className="mx-auto mt-4 max-w-[820px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)' }}
         >
-          Three plans.<br />
-          No 12-month contracts.
+          Pick your{' '}
+          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+            Local Lock
+          </span>
+          .
         </h1>
-        <p className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
-          Every plan is done-for-you and month-to-month. Real work, a guarantee,
-          no surprises. Pick the one that fits — then book a free call and we'll
-          confirm it's the right move for your business.
+        <p className="mx-auto mt-5 max-w-[680px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
+          One business per niche per city. When you lock a market, we don&apos;t take
+          your direct competitor as a client there. Three tiers sized by how much
+          territory you want to own — 1 city, your full service area, or a multi-market
+          region.
         </p>
       </section>
 
@@ -163,18 +175,19 @@ export default function PricingPage() {
         {/* DOM order: Starter, Growth, Pro (desktop left→right value ladder).
             Mobile order: Growth (1) → Pro (2) → Starter (3) — anchor on popular. */}
         <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-5">
-          {/* STARTER */}
+          {/* STARTER — 1 city Local Lock */}
           <div className="order-3 lg:order-1">
             <TierCard
               variant="starter"
-              eyebrow="Done-for-you · Monthly"
+              eyebrow="1-City Local Lock · Monthly"
               name="Starter"
               price="$297"
               pricePeriod="/month · cancel anytime"
-              positioning="For the local business that needs to get found — and wants it handled, not homework."
+              positioning="Own 1 city in your niche. Your home market — protected, no competitor of yours lands Lola in this city."
               features={[
+                '🔒 Local Lock — 1 city, your niche, exclusive',
                 'Full Lola audit + priority fix list',
-                'Google Business Profile optimization',
+                'Google Business Profile optimization (1 location)',
                 'Citation + directory cleanup',
                 'On-page SEO fixes (titles, schema, speed)',
                 'Review-generation system set up',
@@ -182,59 +195,62 @@ export default function PricingPage() {
                 'Monthly progress report',
                 'Email support',
               ]}
-              ctaLabel="Book a call →"
+              ctaLabel="Claim your city →"
               ctaHref={starterHref}
               ctaSubtext="Free 15-min call · No contract · 48hr onboarding"
               onCtaClick={() => track('starter_cta_clicked')}
             />
           </div>
 
-          {/* GROWTH (featured — Most Popular) */}
+          {/* GROWTH (featured — Most Popular) — Service area lock */}
           <div className="order-1 lg:order-2">
             <TierCard
               variant="growth"
-              eyebrow="Done-for-you · Monthly"
+              eyebrow="Service-Area Lock · Monthly"
               name="Growth"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="For the business ready to dominate its market — month after month."
+              positioning="Own your full service area. Up to 5 cities — your van's whole delivery radius — locked to you in your niche."
               features={[
+                '🔒 Local Lock — up to 5 cities, your niche, exclusive',
                 'Everything in Starter, ongoing',
                 'AI Search Visibility tracking (20 prompts/mo)',
-                'Prompt tracking dashboard',
+                'Public client dashboard (rankings + AI Share of Voice)',
                 'Monthly content + link building',
                 'GMB management + weekly posts',
                 'Ongoing citation building + new directories',
                 'Bi-weekly performance reports',
                 'Priority Slack + text support',
               ]}
-              ctaLabel="Book a call →"
+              ctaLabel="Claim your service area →"
               ctaHref={growthHref}
               ctaSubtext="Free 15-min call · Cancel anytime · 48hr onboarding"
               onCtaClick={() => track('growth_cta_clicked')}
             />
           </div>
 
-          {/* PRO — `id="pro"` is the deep-link target from /pricing#pro */}
+          {/* PRO — Regional/Multi-Market Lock. `id="pro"` is the deep-link target from /pricing#pro. */}
           <div id="pro" className="order-2 scroll-mt-24 lg:order-3">
             <TierCard
               variant="pro"
-              eyebrow="Premium · Monthly"
+              eyebrow="Multi-Market Lock · Monthly"
               name="Pro"
               price="$997"
               pricePeriod="/month · cancel anytime"
-              positioning="For the business that wants to win the whole region — with Coach Ty on speed dial."
+              positioning="Dominate a region. Up to 10 cities or multi-location operations — your whole state or franchise footprint, locked to you in your niche."
               features={[
+                '🔒 Local Lock — up to 10 cities OR multi-location, your niche, exclusive',
                 'Everything in Growth',
                 'Live AI search citation tracking (ChatGPT, Perplexity, Gemini, Google AI)',
-                'Multi-location / service-area expansion pages',
+                'Multi-location / service-area expansion pages (programmatic)',
+                'Per-location dashboards + roll-up metrics',
                 'Monthly 1-on-1 strategy call with Coach Ty',
                 'Priority fix queue (Pro clients first)',
                 'Competitor + lead-list CSV exports (Pro-only)',
                 'Lola Pro badge for your site footer',
                 'Direct line to Coach Ty — Slack + text',
               ]}
-              ctaLabel="Book a call →"
+              ctaLabel="Claim your region →"
               ctaHref={proHref}
               ctaSubtext="Free 15-min call · Cancel anytime · Founder access"
               onCtaClick={() => track('pro_cta_clicked')}
@@ -242,10 +258,11 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <p className="mx-auto mt-6 max-w-[640px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
+        <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
           Not sure which plan? Book the free call and Coach Ty will tell you
-          straight — even if the honest answer is "start with Starter." Move up
-          or down anytime.
+          straight — even if the honest answer is &quot;start with Starter.&quot; Upgrade to
+          a bigger Lock anytime; if your market gets claimed first, you can grandfather
+          the smaller Lock you already hold.
         </p>
       </section>
 
