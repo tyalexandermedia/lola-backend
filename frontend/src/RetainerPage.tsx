@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { API_URL } from './AuditFlow';
+import { API_URL } from './api';
 import { track } from './analytics';
 
 // Call-first rebuild: every retainer CTA now books a free strategy call

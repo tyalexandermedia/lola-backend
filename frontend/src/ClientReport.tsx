@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { API_URL } from './AuditFlow';
+import { API_URL } from './api';
 
 type RankPoint = { position: number | null; mentioned: boolean; competitors?: string[]; run_at: string };
 

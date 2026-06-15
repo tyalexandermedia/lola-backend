@@ -19,12 +19,14 @@ const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
+const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
   | { name: 'methodology' }
+  | { name: 'case-studies-index' }
   | { name: 'case-study'; slug: string }
   | { name: 'vs-hub' }
   | { name: 'vs'; slug: string }
@@ -43,6 +45,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
+  if (pathname === '/case-studies' || pathname === '/case-studies/') return { name: 'case-studies-index' };
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
@@ -85,7 +88,7 @@ function App() {
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'methodology'
       ? 'max-w-[920px] pt-6 sm:pt-10'
-      : route.name === 'case-study'
+      : route.name === 'case-study' || route.name === 'case-studies-index'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
       ? 'max-w-[960px] pt-6 sm:pt-10'
@@ -108,6 +111,7 @@ function App() {
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
           {route.name === 'methodology' && <Methodology />}
+          {route.name === 'case-studies-index' && <CaseStudiesIndex />}
           {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
           {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
           {route.name === 'vs' && <VsPage slug={route.slug} />}
@@ -182,7 +186,7 @@ function SiteFooter({ route }: { route: Route }) {
         <FooterCol title="Get found">
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
-          <FooterLink href="/case-studies/sandbar">Sandbar case study</FooterLink>
+          <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
         </FooterCol>
 
@@ -244,7 +248,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
  * vs a single hero-only CTA. Pattern from Podium / Birdeye marketing sites.
  */
 function MobileStickyCTA({ route }: { route: Route }) {
-  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'retainer']);
+  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   const calendar =

@@ -8,7 +8,10 @@ import type {
 } from './types';
 import { track } from './analytics';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+import { API_URL } from './api';
+// Re-export retained for any external consumer; new code should import from
+// './api' directly so AuditFlow can stay lazy-loaded.
+export { API_URL };
 
 // Spec: 6 options + "Other" — soft wash is the default for direct traffic.
 const SERVICE_OPTIONS = [

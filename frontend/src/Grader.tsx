@@ -17,7 +17,7 @@
 
 import { useEffect, useState } from 'react';
 import type { BusinessAuditRequest, AuditResult } from './types';
-import { API_URL } from './AuditFlow';
+import { API_URL } from './api';
 import { track } from './analytics';
 
 const TRADE_TO_SERVICE: Record<string, string> = {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AuditResult } from './types';
-import { API_URL, ResultsStage } from './AuditFlow';
+import { API_URL } from './api';
+import { ResultsStage } from './AuditFlow';
 
 export default function SharedReport({ auditId }: { auditId: string }) {
   const [audit, setAudit] = useState<AuditResult | null>(null);
