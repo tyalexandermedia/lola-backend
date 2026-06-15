@@ -145,7 +145,7 @@ export default function Homepage() {
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          AI Leads · Local SEO · Service Businesses
+          The AI Leads Expert · Local Service Businesses
         </p>
 
         <h1

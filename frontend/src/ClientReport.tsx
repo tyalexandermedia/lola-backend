@@ -35,7 +35,22 @@ interface DashboardPayload {
   google: Series[];
   ai_mode: Series[];
   implementation?: Implementation;
+  share_of_voice?: ShareOfVoice;
   generated_at: string;
+}
+
+interface ShareOfVoiceWindow {
+  pct: number;
+  mentions: number;
+  total: number;
+}
+
+interface ShareOfVoice {
+  lifetime: ShareOfVoiceWindow;
+  last_30d: ShareOfVoiceWindow;
+  prev_30d: ShareOfVoiceWindow;
+  delta_pts: number;
+  queries_tracked: number;
 }
 
 export default function ClientReport({ slug }: { slug: string }) {
@@ -97,6 +112,10 @@ export default function ClientReport({ slug }: { slug: string }) {
         )}
       </section>
 
+      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
+        <ShareOfVoiceCard sov={data.share_of_voice} />
+      )}
+
       <section className="mt-10">
         <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
           AI Search Visibility
@@ -136,6 +155,65 @@ function Header({ data }: { data: DashboardPayload }) {
         </a>
       )}
     </header>
+  );
+}
+
+/**
+ * Share-of-Voice card — the killer AI-visibility metric stolen from
+ * Profound's playbook. Shows the % of tracked AI queries where the
+ * client got named, with a 30-day delta vs the prior 30 days so the
+ * client sees movement, not a flat number.
+ */
+function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
+  const live = sov.last_30d;
+  const delta = sov.delta_pts;
+  const deltaColor = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#9AA0A6]';
+  const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
+  // Pick the headline tone by current value, not delta.
+  const headlineColor = live.pct >= 50 ? 'text-emerald-300' : live.pct >= 20 ? '#F4D47C' : '#F59E0B';
+
+  return (
+    <section className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_36px_rgba(212,175,55,0.10)] sm:p-8">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+            AI Share of Voice
+          </p>
+          <p className="mt-2 max-w-[460px] text-[13px] leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
+            Of every AI query we tested across {sov.queries_tracked} tracked prompt{sov.queries_tracked === 1 ? '' : 's'} in the last 30 days,
+            this is the percent where AI agents actually named you.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-end">
+          <span
+            className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]"
+            style={{ color: headlineColor }}
+          >
+            {live.pct}%
+          </span>
+          <span className="text-[12px] text-[#9CA3AF]">
+            {live.mentions}/{live.total} runs · last 30d
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Vs prior 30d</p>
+          <p className={`mt-1 text-[16px] font-bold ${deltaColor}`}>
+            {deltaArrow} {Math.abs(delta)} pts
+          </p>
+        </div>
+        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Prior 30d</p>
+          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.prev_30d.pct}%</p>
+        </div>
+        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Lifetime</p>
+          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.lifetime.pct}%</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
