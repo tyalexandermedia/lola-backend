@@ -232,6 +232,10 @@
       "destination": "/lp/reviews-admin.html"
     },
     {
+      "source": "/lp/clients-admin",
+      "destination": "/lp/clients-admin.html"
+    },
+    {
       "source": "/reviews/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
     },

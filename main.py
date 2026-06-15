@@ -103,6 +103,12 @@ from db.reporting import (
     TASK_STATUSES,
 )
 from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
+from agents.reporting_agent.playbooks import (
+    get_playbook,
+    suggest_money_keywords,
+    suggest_ai_mode_prompts,
+    PLAYBOOKS,
+)
 from db.enhancements import (
     init_enhancements_table,
     get_enhancement,
@@ -1824,6 +1830,133 @@ async def admin_reporting_recent_sends(
 ):
     _check_admin(x_admin_key)
     return {"sends": await reporting_recent_sends(slug=slug, limit=max(1, min(limit, 200)))}
+
+
+# ── PLAYBOOKS — duplicate-a-workflow onboarding ──────────────
+
+
+@app.get("/admin/reporting/playbooks")
+async def admin_list_playbooks(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    service: Optional[str] = None,
+    city: Optional[str] = None,
+):
+    """
+    Preview every tier playbook (task list + suggested keywords/prompts when
+    service+city are given). Used by the admin UI to render a "what will be
+    created" block before the operator clicks Onboard.
+    """
+    _check_admin(x_admin_key)
+    return {
+        "playbooks": {tier: get_playbook(tier) for tier in PLAYBOOKS.keys()},
+        "suggested_money_keywords": suggest_money_keywords(service or "", city or ""),
+        "suggested_ai_mode_prompts": suggest_ai_mode_prompts(service or "", city or ""),
+    }
+
+
+class SeedPlaybookRequest(BaseModel):
+    slug: str
+    tier: str  # starter | growth | pro
+
+
+@app.post("/admin/reporting/seed-playbook")
+async def admin_seed_playbook(
+    body: SeedPlaybookRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Append a tier playbook's task list to an existing client. Idempotent
+    by intent — calling twice will duplicate tasks, so the UI guards this."""
+    _check_admin(x_admin_key)
+    tasks = get_playbook(body.tier)
+    if not tasks:
+        raise HTTPException(status_code=400, detail=f"Unknown tier '{body.tier}'")
+    created: List[int] = []
+    for t in tasks:
+        tid = await reporting_add_task(
+            slug=body.slug,
+            title=t["title"],
+            category=t["category"],
+            status=t["status"],
+        )
+        created.append(tid)
+    return {"ok": True, "slug": body.slug, "tier": body.tier, "count": len(created)}
+
+
+class OnboardClientRequest(BaseModel):
+    slug: str
+    client_name: str
+    client_email: str
+    site_url: str
+    tier: str = "growth"               # starter | growth | pro
+    service: Optional[str] = None      # e.g. "soft wash" — for keyword/prompt seeding
+    city: Optional[str] = None         # e.g. "Palm Harbor, FL"
+    money_keywords: Optional[List[str]] = None     # override the suggestion
+    ai_mode_prompts: Optional[List[str]] = None    # override the suggestion
+    target_url: Optional[str] = None
+    gsc_property: Optional[str] = None
+    ga_property_id: Optional[str] = None
+    conversion_rate: float = 0.03
+    avg_job_value: int = 400
+    seed_tasks: bool = True            # seed the tier playbook into reporting_tasks
+
+
+@app.post("/admin/reporting/onboard")
+async def admin_onboard_client(
+    body: OnboardClientRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    One-shot new-client setup: upserts the reporting_clients row + seeds
+    the tier playbook into reporting_tasks. Returns the dashboard URL the
+    operator can hand the client.
+
+    Keywords + prompts default to (service, city) suggestions when the
+    caller doesn't override — so the operator can onboard with just the
+    business name, email, site, service, and city.
+    """
+    _check_admin(x_admin_key)
+    if body.tier not in PLAYBOOKS:
+        raise HTTPException(status_code=400, detail=f"tier must be one of {list(PLAYBOOKS)}")
+
+    keywords = body.money_keywords or suggest_money_keywords(body.service or "", body.city or "")
+    prompts = body.ai_mode_prompts or suggest_ai_mode_prompts(body.service or "", body.city or "")
+
+    cid = await reporting_upsert_client(
+        slug=body.slug,
+        client_name=body.client_name,
+        client_email=body.client_email,
+        site_url=body.site_url,
+        money_keywords=keywords[:5],
+        conversion_rate=body.conversion_rate,
+        avg_job_value=body.avg_job_value,
+        gsc_property=body.gsc_property,
+        ga_property_id=body.ga_property_id,
+        active=True,
+        target_url=body.target_url or body.site_url,
+        ai_mode_prompts=prompts,
+    )
+
+    seeded = 0
+    if body.seed_tasks:
+        for t in get_playbook(body.tier):
+            await reporting_add_task(
+                slug=body.slug,
+                title=t["title"],
+                category=t["category"],
+                status=t["status"],
+            )
+            seeded += 1
+
+    return {
+        "ok": True,
+        "client_id": cid,
+        "slug": body.slug,
+        "tier": body.tier,
+        "tasks_seeded": seeded,
+        "money_keywords": keywords[:5],
+        "ai_mode_prompts": prompts,
+        "dashboard_url": f"/r/client/{body.slug}",
+    }
 
 
 class FoundingSignupRequest(BaseModel):
