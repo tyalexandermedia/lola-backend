@@ -20,6 +20,44 @@
 
 import { useEffect, useRef } from 'react';
 
+// Page-scoped FAQs — each entry powers the visible accordion AND the
+// FAQPage JSON-LD we inject into <head> at mount (route-specific schema
+// since the static index.html schema only covers the homepage's FAQ set).
+const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
+  {
+    q: 'Which plan should I pick?',
+    a: "If you just need to get found, Starter ($297). If you want to dominate your market month after month, Growth ($697) — the most popular. If you want everything plus live AI citation tracking, multi-location pages, and monthly 1:1s with Coach Ty, Pro ($997). Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+  },
+  {
+    q: 'Can I switch tiers later?',
+    a: 'Anytime. Move up or down between Starter, Growth, and Pro with one Slack message. We pro-rate the difference. No friction, no penalty.',
+  },
+  {
+    q: "What's NOT included?",
+    a: "Paid ads (Google LSA, Meta, paid social) — Lola is organic + AI search. Website rebuilds — we optimize what's there; if you need a new site, we'll refer you. CRM and phone systems — we help you collect more leads, you close them.",
+  },
+  {
+    q: 'How does the 30-Day Half-Back Guarantee actually work?',
+    a: "If Lola doesn't move your rankings in the first 30 days, Coach Ty refunds 50% of that month — automatically, no support ticket required. Same way he'd want to be treated.",
+  },
+  {
+    q: 'Is there a setup fee or contract?',
+    a: 'No setup fee. No contract. Month-to-month. Cancel anytime. The only reason to stay is because Lola is making you money.',
+  },
+  {
+    q: 'How fast is onboarding?',
+    a: '48-hour onboarding from the moment your first month clears. Week 1: audit + GBP optimization. Week 2: citation cleanup + on-page fixes. Week 3-4: content + reviews start ramping. You see the work feed live on your client dashboard.',
+  },
+  {
+    q: 'Do you work outside Florida?',
+    a: "Yes. Tampa Bay is home and our proof story (Sandbar Soft Wash) lives there, but the system works in any market with Google Maps and AI search. Clients are in multiple states.",
+  },
+  {
+    q: 'Why is this so much cheaper than premium agencies?',
+    a: "Premium agencies charge $2,500–$3,500/mo and bury overhead in the price (sales reps, account managers, retainer floors). Lola is six specialist AI agents + Coach Ty running the playbook directly. Same execution, no agency bloat, transparent pricing.",
+  },
+];
+
 // ── Strategy-call destination (env-overridable) ───────────────
 // Single source of truth: every tier CTA + the final CTA point here.
 const CALENDAR_URL =
@@ -68,6 +106,31 @@ export default function PricingPage() {
     );
     obs.observe(el);
     return () => obs.disconnect();
+  }, []);
+
+  // Inject route-specific FAQPage JSON-LD. The static index.html schema only
+  // covers homepage Qs; this layer answers buyer-intent queries like
+  // "lola seo pricing" with tier-specific facts. Cleaned up on unmount so
+  // route changes don't leave stale schema in <head>.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const ld = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: PRICING_FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    };
+    const tag = document.createElement('script');
+    tag.type = 'application/ld+json';
+    tag.dataset.lola = 'pricing-faq';
+    tag.textContent = JSON.stringify(ld);
+    document.head.appendChild(tag);
+    return () => {
+      tag.parentNode?.removeChild(tag);
+    };
   }, []);
 
   const starterHref = withUtm(CALENDAR_URL, 'starter', 'starter');
@@ -314,6 +377,44 @@ export default function PricingPage() {
           — Lola SEO Case Study, Palm Harbor FL
         </figcaption>
       </figure>
+
+      {/* ── 6b. FAQ — visible accordion + matching FAQPage JSON-LD ────
+          Tier-choice + objection-killer Qs, paired with the route-specific
+          JSON-LD injected in the useEffect above. Eligible for AI Overview
+          + featured-snippet surfaces for "lola seo pricing" + variants. */}
+      <section className="mt-16 sm:mt-20">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          Pricing FAQ
+        </p>
+        <h2
+          className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
+        >
+          Straight answers before you book.
+        </h2>
+
+        <div className="mx-auto mt-8 flex max-w-[820px] flex-col gap-3">
+          {PRICING_FAQS.map((item, i) => (
+            <details
+              key={i}
+              className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"
+              onToggle={(e) => {
+                if ((e.currentTarget as HTMLDetailsElement).open) {
+                  track('pricing_faq_opened', { question: item.q.slice(0, 40) });
+                }
+              }}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-white sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
+                <span>{item.q}</span>
+                <span aria-hidden className="shrink-0 text-[18px] text-[#D4AF37] transition group-open:rotate-45">+</span>
+              </summary>
+              <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:px-6 sm:pb-6 sm:text-[15px]">
+                {item.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
 
       {/* ── 7. FINAL CTA ─────────────────────────────────────────────── */}
       <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
