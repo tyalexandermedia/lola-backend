@@ -165,9 +165,10 @@ export default function Homepage() {
             </>
           ) : (
             <>
-              Lola makes sure Google AI, ChatGPT, Perplexity, Gemini, and the next
-              generation of AI search agents recommend your local business. Done for you.
-              Transparent pricing. No long-term contracts.
+              For home services, cleaning, salons, med spas, auto detailing, lawn care —
+              any local business buyers find on Google or ask AI to recommend. Lola gets
+              you recommended on Google AI, ChatGPT, Perplexity, and Gemini. Done for you,
+              transparent pricing, no long-term contracts.
             </>
           )}
         </p>
@@ -236,8 +237,15 @@ export default function Homepage() {
           </a>
         </div>
 
-        <p className="mt-5 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          15-min call · No pressure · Or get the free 20-second audit first
+        {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
+            quote-gate every CTA — Lola's public pricing is the moat, so we
+            surface it the moment the visitor commits to looking. */}
+        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
+          <span><span className="font-semibold text-white">From $297/mo</span> · 3 plans, all done-for-you</span>
+          <span aria-hidden className="text-[#3A3F48]">·</span>
+          <span>🛡️ 30-day half-back guarantee</span>
+          <span aria-hidden className="text-[#3A3F48]">·</span>
+          <span>Cancel anytime</span>
         </p>
       </section>
 
@@ -316,6 +324,60 @@ export default function Homepage() {
         </div>
         <p className="mt-5 text-center text-[13px] italic text-[#8A8F98]">
           Currently working with Sandbar Soft Wash and growing. Your business could be next.
+        </p>
+      </section>
+
+      {/* ── 5b. INDUSTRIES WE SERVE ──────────────────────────────────
+          8 tiles linking to the programmatic [service]-seo-[city] hubs.
+          Two wins: (1) cold visitors self-identify into the right niche,
+          (2) crawlable internal links into the LP tree boost entity SEO
+          for "[service] local SEO" queries. Pattern lifted from Scorpion
+          + LocalIQ, dialed to Lola's dark/gold aesthetic. */}
+      <section className="mt-16 sm:mt-24">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          Industries
+        </p>
+        <h2
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
+        >
+          Built for the businesses your neighborhood searches for.
+        </h2>
+        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+          Tuned playbooks for each industry — keywords, schema, and AI-search
+          prompts that match how buyers actually search for your work.
+        </p>
+
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+          {[
+            { emoji: '🏠', name: 'Home Services', slug: 'pressure-washing-seo-tampa' },
+            { emoji: '🔧', name: 'Plumbing', slug: 'plumber-seo-tampa' },
+            { emoji: '❄️', name: 'HVAC', slug: 'hvac-seo-tampa' },
+            { emoji: '🏠', name: 'Roofing', slug: 'roofing-seo-tampa' },
+            { emoji: '🏊', name: 'Pool Service', slug: 'pool-service-seo-tampa' },
+            { emoji: '🧹', name: 'Cleaning', slug: 'cleaning-seo-tampa' },
+            { emoji: '🌿', name: 'Lawn Care', slug: 'lawn-care-seo-tampa' },
+            { emoji: '⚡', name: 'Electrical', slug: 'electrician-seo-tampa' },
+          ].map((ind) => (
+            <a
+              key={ind.slug}
+              href={`/lp/${ind.slug}`}
+              className="group flex min-h-[88px] flex-col justify-between rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.04] sm:p-5"
+            >
+              <span aria-hidden className="text-[22px] sm:text-[24px]">{ind.emoji}</span>
+              <span className="mt-2 text-[14px] font-semibold text-white group-hover:text-[#D4AF37] sm:text-[15px]">
+                {ind.name}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <p className="mt-5 text-[13px] text-[#8A8F98]">
+          Not on the list? Lola works for any local service business — salons, med spas,
+          auto detailing, moving, fencing, more.{' '}
+          <a href="/lp/industries" className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
+            See all industries →
+          </a>
         </p>
       </section>
 
@@ -470,6 +532,72 @@ export default function Homepage() {
           Other tools tell you what's broken and disappear. Lola finds it AND fixes it weekly.
           That's the difference.
         </p>
+      </section>
+
+      {/* ── 8b. FAQ — visible accordion ─────────────────────────────
+          Matches the FAQPage JSON-LD in index.html (search-engine win)
+          and crushes the last-mile objections before the final CTA
+          (conversion win). Pattern from BrightLocal/Scorpion. */}
+      <section className="mt-16 sm:mt-24">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          Common questions
+        </p>
+        <h2
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
+        >
+          The honest answers.
+        </h2>
+
+        <div className="mt-8 flex flex-col gap-3">
+          {[
+            {
+              q: 'What kinds of businesses does Lola work with?',
+              a: 'Local service businesses of all kinds — home services like pressure washing, plumbing, HVAC, roofing, pool care, plus cleaning, salons, med spas, auto detailing, lawn care, and other local trades. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you.',
+            },
+            {
+              q: 'How much does Lola cost?',
+              a: 'Three simple monthly plans, no long-term contracts: Starter $297/mo, Growth $697/mo (most popular), Pro $997/mo. Every plan is done-for-you. No setup fee.',
+            },
+            {
+              q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
+              a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews) because that's increasingly where buyers ask for a recommendation. We track which AI agents recommend you and which competitor they recommend when they don't.",
+            },
+            {
+              q: 'How fast will I see results?',
+              a: "30-Day Half-Back: measurable ranking improvement in your first 30 days, or Coach Ty refunds 50%. First Win Promise: at least one measurable win (ranking, lead, or Google Business improvement) in the first 60 days, or your next month is on us. Full ROI typically hits month 3.",
+            },
+            {
+              q: "Do you only work with Florida businesses?",
+              a: "Tampa Bay is our home network and where our proof story (Sandbar Soft Wash) lives — but the system works anywhere with Google Maps and AI search. Plenty of clients are outside Florida.",
+            },
+            {
+              q: "What's the cancellation policy?",
+              a: "Cancel anytime. No contracts, no minimum commitment. If we're not earning back your investment, you don't owe another dollar.",
+            },
+            {
+              q: "What's actually included each month?",
+              a: "Google Business Profile management, citation cleanup + new submissions, on-page SEO fixes, schema markup, AI search visibility tracking, review-generation system, monthly content (Growth+), and Coach Ty oversight. The exact playbook depends on tier — see /pricing for the full breakdown.",
+            },
+            {
+              q: 'Who is behind Lola?',
+              a: "Coach Ty in Tampa Bay. He built Lola to fix the local visibility of his father's real business — Sandbar Soft Wash in Palm Harbor — and now runs the same system for other local service businesses. He answers his own phone.",
+            },
+          ].map((item, i) => (
+            <details
+              key={i}
+              className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-white sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
+                <span>{item.q}</span>
+                <span aria-hidden className="shrink-0 text-[18px] text-[#D4AF37] transition group-open:rotate-45">+</span>
+              </summary>
+              <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:px-6 sm:pb-6 sm:text-[15px]">
+                {item.a}
+              </div>
+            </details>
+          ))}
+        </div>
       </section>
 
       {/* ── 9. FINAL CTA ─────────────────────────────────────────────── */}
