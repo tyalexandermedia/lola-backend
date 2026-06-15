@@ -961,6 +961,7 @@ def render_vercel(slugs):
     rewrites.append({"source": "/lp/industries", "destination": "/lp/industries.html"})
     rewrites.append({"source": "/lp/feedback", "destination": "/lp/feedback.html"})
     rewrites.append({"source": "/lp/reviews-admin", "destination": "/lp/reviews-admin.html"})
+    rewrites.append({"source": "/lp/clients-admin", "destination": "/lp/clients-admin.html"})
     # 3. Reviews proxy — exactly as-is.
     rewrites.append({"source": "/reviews/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/reviews/$1"})
