@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lola — AI Local SEO Audit + Done-for-You for Florida Contractors</title>
+    <title>Lola — AI Local SEO + Done-for-You for Local Service Businesses</title>
     <meta
       name="description"
-      content="Free AI local SEO audit for Florida contractors. Lola diagnoses what's broken, prioritizes fixes by revenue impact, and tracks Google + ChatGPT rankings. Done-for-you SEO from $697/mo."
+      content="Done-for-you local SEO for local service businesses. Lola gets you recommended on Google AND ChatGPT/AI search, fixes what's broken, and tracks rankings. Plans from $297/mo. Book a free strategy call."
     />
 
     <!-- Open Graph (Facebook, LinkedIn, iMessage previews) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Lola SEO" />
-    <meta property="og:title" content="Lola — AI Local SEO Audit + Done-for-You for Florida Contractors" />
-    <meta property="og:description" content="Free AI local SEO audit for Florida contractors. Lola diagnoses what's broken, prioritizes fixes by revenue impact, and tracks Google + ChatGPT rankings. Done-for-you SEO from $697/mo." />
+    <meta property="og:title" content="Lola — AI Local SEO + Done-for-You for Local Service Businesses" />
+    <meta property="og:description" content="Done-for-you local SEO for local service businesses. Lola gets you recommended on Google AND ChatGPT/AI search. Plans from $297/mo. Book a free strategy call." />
     <meta property="og:url" content="https://lola.tyalexandermedia.com" />
     <meta property="og:image" content="https://lola.tyalexandermedia.com/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -21,14 +21,113 @@
 
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Lola — AI Local SEO Audit for Florida Contractors" />
-    <meta name="twitter:description" content="Free AI local SEO audit. Done-for-you SEO from $697/mo. Built for Florida contractors who answer their own phones." />
+    <meta name="twitter:title" content="Lola — AI Local SEO for Local Service Businesses" />
+    <meta name="twitter:description" content="Done-for-you local SEO. Recommended on Google + ChatGPT. Plans from $297/mo. Built by Coach Ty in Tampa — book a free strategy call." />
     <meta name="twitter:image" content="https://lola.tyalexandermedia.com/og.png" />
 
     <!-- Theme color (matches dark hero) -->
     <meta name="theme-color" content="#0A0A0B" />
 
     <link rel="icon" href="/favicon.svg" />
+
+    <!-- ───────── JSON-LD: ProfessionalService (provider) ───────── -->
+    <!-- Crawlable in the static shell so Google + AI agents resolve the entity
+         even though the marketing UI is client-rendered React. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "@id": "https://lola.tyalexandermedia.com/#business",
+      "name": "Lola SEO by Ty Alexander Media",
+      "alternateName": "Lola SEO",
+      "image": "https://lola.tyalexandermedia.com/coach-ty.jpg",
+      "url": "https://lola.tyalexandermedia.com",
+      "telephone": "+1-727-300-6573",
+      "email": "ty@tyalexandermedia.com",
+      "priceRange": "$297-$997",
+      "description": "Done-for-you local SEO and AI search visibility for local service businesses. Get recommended on Google and ChatGPT/AI search. Plans from $297/mo.",
+      "founder": { "@type": "Person", "name": "Coach Ty", "url": "https://tyalexandermedia.com" },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Tampa Bay",
+        "addressRegion": "FL",
+        "addressCountry": "US"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": "27.9506", "longitude": "-82.4572" },
+      "areaServed": [
+        { "@type": "State", "name": "Florida" },
+        { "@type": "City", "name": "Tampa" },
+        { "@type": "City", "name": "St. Petersburg" },
+        { "@type": "City", "name": "Clearwater" },
+        { "@type": "City", "name": "Palm Harbor" },
+        { "@type": "City", "name": "Sarasota" }
+      ],
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "297",
+        "highPrice": "997",
+        "priceCurrency": "USD",
+        "offerCount": "3"
+      },
+      "sameAs": ["https://www.instagram.com/tyalexandermedia"]
+    }
+    </script>
+
+    <!-- ───────── JSON-LD: FAQPage ───────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What kinds of businesses does Lola work with?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Local service businesses of all kinds — home services like pressure washing, plumbing, HVAC, roofing, and pool care, plus other local trades and service providers who get most of their customers from their local area. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does Lola cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Three simple monthly plans, no long-term contracts: Starter at $297/mo, Growth at $697/mo (most popular), and Pro at $997/mo. Every plan is done-for-you. Book a free strategy call to find the right fit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Lola help me show up in ChatGPT and AI search, not just Google?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Lola optimizes for both traditional Google local results and AI search — ChatGPT, Perplexity, Gemini, and Google AI Overviews — because that's increasingly where buyers ask for a recommendation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a guarantee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. If Lola doesn't move your ranking in 30 days, Coach Ty refunds half. It's the same way he'd want to be treated."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who is behind Lola?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Coach Ty in Tampa Bay. He built Lola to fix the local visibility of his father's real business — Sandbar Soft Wash in Palm Harbor — and now runs the same system for other local service businesses. He answers his own phone."
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="bg-slate-950 text-slate-100">
     <div id="root"></div>

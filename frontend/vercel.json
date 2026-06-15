@@ -1,14 +1,243 @@
 {
+  "redirects": [
+    {
+      "source": "/lp/local-seo-pressure-washing-florida",
+      "destination": "/lp/pressure-washing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/lp/local-seo-hvac-contractors-tampa",
+      "destination": "/lp/hvac-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/lp/local-seo-roofers-florida",
+      "destination": "/lp/roofing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/lp/local-seo-plumbers-tampa",
+      "destination": "/lp/plumber-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/lp/local-seo-pool-service-florida",
+      "destination": "/lp/pool-service-seo-tampa",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/lp/industries", "destination": "/lp/industries.html" },
-    { "source": "/lp/local-seo-pressure-washing-florida", "destination": "/lp/local-seo-pressure-washing-florida.html" },
-    { "source": "/lp/local-seo-hvac-contractors-tampa", "destination": "/lp/local-seo-hvac-contractors-tampa.html" },
-    { "source": "/lp/local-seo-roofers-florida", "destination": "/lp/local-seo-roofers-florida.html" },
-    { "source": "/lp/local-seo-plumbers-tampa", "destination": "/lp/local-seo-plumbers-tampa.html" },
-    { "source": "/lp/local-seo-pool-service-florida", "destination": "/lp/local-seo-pool-service-florida.html" },
-    { "source": "/lp/feedback", "destination": "/lp/feedback.html" },
-    { "source": "/lp/reviews-admin", "destination": "/lp/reviews-admin.html" },
-    { "source": "/reviews/(.*)", "destination": "https://lola-backend-production.up.railway.app/reviews/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/lp/pressure-washing-seo-tampa",
+      "destination": "/lp/pressure-washing-seo-tampa.html"
+    },
+    {
+      "source": "/lp/pressure-washing-seo-st-petersburg",
+      "destination": "/lp/pressure-washing-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/pressure-washing-seo-clearwater",
+      "destination": "/lp/pressure-washing-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/pressure-washing-seo-palm-harbor",
+      "destination": "/lp/pressure-washing-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/pressure-washing-seo-brandon",
+      "destination": "/lp/pressure-washing-seo-brandon.html"
+    },
+    {
+      "source": "/lp/pressure-washing-seo-sarasota",
+      "destination": "/lp/pressure-washing-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/plumber-seo-tampa",
+      "destination": "/lp/plumber-seo-tampa.html"
+    },
+    {
+      "source": "/lp/plumber-seo-st-petersburg",
+      "destination": "/lp/plumber-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/plumber-seo-clearwater",
+      "destination": "/lp/plumber-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/plumber-seo-palm-harbor",
+      "destination": "/lp/plumber-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/plumber-seo-brandon",
+      "destination": "/lp/plumber-seo-brandon.html"
+    },
+    {
+      "source": "/lp/plumber-seo-sarasota",
+      "destination": "/lp/plumber-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/hvac-seo-tampa",
+      "destination": "/lp/hvac-seo-tampa.html"
+    },
+    {
+      "source": "/lp/hvac-seo-st-petersburg",
+      "destination": "/lp/hvac-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/hvac-seo-clearwater",
+      "destination": "/lp/hvac-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/hvac-seo-palm-harbor",
+      "destination": "/lp/hvac-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/hvac-seo-brandon",
+      "destination": "/lp/hvac-seo-brandon.html"
+    },
+    {
+      "source": "/lp/hvac-seo-sarasota",
+      "destination": "/lp/hvac-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/roofing-seo-tampa",
+      "destination": "/lp/roofing-seo-tampa.html"
+    },
+    {
+      "source": "/lp/roofing-seo-st-petersburg",
+      "destination": "/lp/roofing-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/roofing-seo-clearwater",
+      "destination": "/lp/roofing-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/roofing-seo-palm-harbor",
+      "destination": "/lp/roofing-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/roofing-seo-brandon",
+      "destination": "/lp/roofing-seo-brandon.html"
+    },
+    {
+      "source": "/lp/roofing-seo-sarasota",
+      "destination": "/lp/roofing-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-tampa",
+      "destination": "/lp/pool-service-seo-tampa.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-st-petersburg",
+      "destination": "/lp/pool-service-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-clearwater",
+      "destination": "/lp/pool-service-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-palm-harbor",
+      "destination": "/lp/pool-service-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-brandon",
+      "destination": "/lp/pool-service-seo-brandon.html"
+    },
+    {
+      "source": "/lp/pool-service-seo-sarasota",
+      "destination": "/lp/pool-service-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-tampa",
+      "destination": "/lp/lawn-care-seo-tampa.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-st-petersburg",
+      "destination": "/lp/lawn-care-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-clearwater",
+      "destination": "/lp/lawn-care-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-palm-harbor",
+      "destination": "/lp/lawn-care-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-brandon",
+      "destination": "/lp/lawn-care-seo-brandon.html"
+    },
+    {
+      "source": "/lp/lawn-care-seo-sarasota",
+      "destination": "/lp/lawn-care-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/electrician-seo-tampa",
+      "destination": "/lp/electrician-seo-tampa.html"
+    },
+    {
+      "source": "/lp/electrician-seo-st-petersburg",
+      "destination": "/lp/electrician-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/electrician-seo-clearwater",
+      "destination": "/lp/electrician-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/electrician-seo-palm-harbor",
+      "destination": "/lp/electrician-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/electrician-seo-brandon",
+      "destination": "/lp/electrician-seo-brandon.html"
+    },
+    {
+      "source": "/lp/electrician-seo-sarasota",
+      "destination": "/lp/electrician-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-tampa",
+      "destination": "/lp/cleaning-seo-tampa.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-st-petersburg",
+      "destination": "/lp/cleaning-seo-st-petersburg.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-clearwater",
+      "destination": "/lp/cleaning-seo-clearwater.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-palm-harbor",
+      "destination": "/lp/cleaning-seo-palm-harbor.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-brandon",
+      "destination": "/lp/cleaning-seo-brandon.html"
+    },
+    {
+      "source": "/lp/cleaning-seo-sarasota",
+      "destination": "/lp/cleaning-seo-sarasota.html"
+    },
+    {
+      "source": "/lp/industries",
+      "destination": "/lp/industries.html"
+    },
+    {
+      "source": "/lp/feedback",
+      "destination": "/lp/feedback.html"
+    },
+    {
+      "source": "/lp/reviews-admin",
+      "destination": "/lp/reviews-admin.html"
+    },
+    {
+      "source": "/reviews/(.*)",
+      "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }

@@ -19,6 +19,13 @@
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
 
+// Books a free strategy call. Single source of truth for the whole homepage —
+// every primary CTA points here. Env-overridable so the calendar link can be
+// swapped without a code change.
+const CALENDAR_URL =
+  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
+  'https://calendar.app.google/J7idjUDitd2Hziuc7';
+
 const TRADES = [
   'HVAC',
   'Plumber',
@@ -34,6 +41,13 @@ const TRADES = [
   'Flooring',
   'Pest Control',
   'Carpet Cleaning',
+  'Cleaning Services',
+  'Lawn Care',
+  'Auto Detailing',
+  'Garage Doors',
+  'Moving',
+  'Med Spa',
+  'Salon / Barber',
   'Locksmith',
   'Masonry',
   'Windows',
@@ -78,11 +92,18 @@ const PLURAL: Record<string, string> = {
   Windows: 'window pros',
   Gutters: 'gutter crews',
   'Duct Cleaning': 'duct cleaners',
+  'Cleaning Services': 'cleaning companies',
+  'Lawn Care': 'lawn care crews',
+  'Auto Detailing': 'auto detailers',
+  'Garage Doors': 'garage door pros',
+  Moving: 'moving companies',
+  'Med Spa': 'med spas',
+  'Salon / Barber': 'salons + barbershops',
   Fencing: 'fencing crews',
   'Home Remodeling': 'remodelers',
   Carpenter: 'carpenters',
   Arborist: 'arborists',
-  Other: 'home-service pros',
+  Other: 'local service businesses',
 };
 
 export default function Homepage() {
@@ -108,7 +129,7 @@ export default function Homepage() {
     }
   };
 
-  const tradePlural = trade ? PLURAL[trade] ?? 'contractors' : '';
+  const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
 
   return (
@@ -121,7 +142,7 @@ export default function Homepage() {
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          AI Visibility for Local Contractors
+          AI Visibility for Local Service Businesses
         </p>
 
         <h1
@@ -140,12 +161,12 @@ export default function Homepage() {
             <>
               Lola's built for{' '}
               <span className="font-semibold text-white">{tradePlural} in Florida</span>.
-              Run your free audit below.
+              Book a free call below — or run the audit first.
             </>
           ) : (
             <>
               Lola makes sure Google AI, ChatGPT, Perplexity, Gemini, and the next
-              generation of AI search agents recommend your business. Done for you.
+              generation of AI search agents recommend your local business. Done for you.
               Transparent pricing. No long-term contracts.
             </>
           )}
@@ -166,7 +187,7 @@ export default function Homepage() {
             htmlFor="trade-picker"
             className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85"
           >
-            What trade are you?
+            What kind of business are you?
           </label>
           <select
             id="trade-picker"
@@ -200,21 +221,23 @@ export default function Homepage() {
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
-            href={auditHref}
+            href={CALENDAR_URL}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
           >
-            Start free audit →
+            Book a free strategy call →
           </a>
           <a
-            href="/pricing"
+            href={auditHref}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            See pricing
+            Or run the free audit
           </a>
         </div>
 
         <p className="mt-5 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          20-second audit · No signup · No spam
+          15-min call · No pressure · Or get the free 20-second audit first
         </p>
       </section>
 
@@ -351,8 +374,8 @@ export default function Homepage() {
           We don't just diagnose. We execute.
         </h2>
         <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          I'm not an SEO consultant who learned about contractors. I'm a contractor's
-          strategist who built AI visibility from the trenches.
+          I'm not an SEO consultant who read a book about local business. I built AI
+          visibility from the trenches — on my own father's service business first.
         </p>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -414,7 +437,7 @@ export default function Homepage() {
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
               {[
-                ['Built for contractors',       '✅', '✅', '❌', '❌'],
+                ['Built for local service businesses', '✅', '✅', '❌', '❌'],
                 ['Done-for-you retainer',       '✅', '❌', '❌', '❌'],
                 ['AI Search Visibility',        '✅', '❌', '❌', '❌'],
                 ['Personal brand backed',       '✅', '❌', '❌', '❌'],
@@ -456,17 +479,28 @@ export default function Homepage() {
           className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
-          See exactly how AI agents see your business — in 20 seconds.
+          Let's get your business recommended — by Google and by AI.
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          Free audit. No signup. No spam. Just clarity on what's leaking and what to fix first.
+          Book a free 15-minute strategy call with Coach Ty. No pressure, no pitch deck —
+          just a straight answer on what's leaking and what to fix first.
         </p>
-        <a
-          href={auditHref}
-          className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
-        >
-          Start the audit →
-        </a>
+        <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <a
+            href={CALENDAR_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
+          >
+            Book a free strategy call →
+          </a>
+          <a
+            href={auditHref}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+          >
+            Or run the free audit
+          </a>
+        </div>
       </section>
 
       {/* Minimal footer */}

@@ -17,7 +17,7 @@ const SERVICE_OPTIONS = [
   { value: 'roofing', label: '🏠 Roofing' },
   { value: 'plumbing', label: '🔧 Plumbing' },
   { value: 'pool service', label: '🏊 Pool Service' },
-  { value: 'other', label: 'Other Florida home-service trade' },
+  { value: 'other', label: 'Other local service business' },
 ] as const;
 
 type Stage = 'questions' | 'sniffing' | 'results' | 'error';
@@ -44,12 +44,12 @@ const QUESTIONS: ReadonlyArray<QuestionDef> = [
   {
     key: 'business_type',
     prompt: 'What do you actually do for a living?',
-    lola: 'Pick the closest match. We only audit home services.',
+    lola: 'Pick the closest match. Lola audits all local service businesses.',
     options: SERVICE_OPTIONS,
   },
   {
     key: 'city',
-    prompt: 'Where are the trucks rolling?',
+    prompt: 'Where do you do business?',
     lola: 'One city is enough. Lola only needs your home turf.',
     placeholder: 'Tampa, FL',
     validate: (v) => (v.trim().length < 2 ? 'City + state works best.' : null),
@@ -109,6 +109,13 @@ const TRADE_TO_SERVICE: Record<string, string> = {
 // Spec — Phase B: smart pre-select from referrer URL path. Used when no
 // ?trade= param + no localStorage. Maps each /lp/* slug → business_type.
 const REFERRER_TO_SERVICE: Array<[string, string]> = [
+  // New programmatic [service]-seo-[city] slugs (startsWith matches every city).
+  ['/lp/pressure-washing-seo', 'soft wash'],
+  ['/lp/hvac-seo', 'hvac'],
+  ['/lp/roofing-seo', 'roofing'],
+  ['/lp/plumber-seo', 'plumbing'],
+  ['/lp/pool-service-seo', 'pool service'],
+  // Legacy slugs (kept for any in-flight links / 301 sources).
   ['/lp/local-seo-pressure-washing-florida', 'soft wash'],
   ['/lp/local-seo-hvac-contractors-tampa', 'hvac'],
   ['/lp/local-seo-roofers-florida', 'roofing'],
@@ -586,7 +593,7 @@ export function ResultsStage({
     ? audit.business_type.replace(/\b\w/g, (c) => c.toUpperCase())
     : '';
 
-  const heroCtaHref = withUtm(PRICING_URL, 'hero_cta');
+  const heroCtaHref = withUtm(STRATEGY_CALL_URL, 'hero_cta', { campaign: 'plug_leak' });
 
   return (
     <main className="flex flex-1 flex-col">
@@ -669,12 +676,14 @@ export function ResultsStage({
         {/* Primary CTA — full-bleed, scroll-to-pricing */}
         <a
           href={heroCtaHref}
+          target="_blank"
+          rel="noreferrer"
           onClick={() => {
-            trackClick('pricing_cta_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
+            trackClick('book_call_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
           }}
           className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#D4AF37] sm:mt-10 sm:h-16 sm:text-[16px]"
         >
-          <span>See pricing — plug the leak</span>
+          <span>Book a free call — plug the leak</span>
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
         </a>
 
@@ -793,7 +802,7 @@ export function ResultsStage({
           {audit.agent_readiness.score < 70 && (
             <p className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.55] text-[#C5C5C8] sm:text-[14px]">
               AI agents can't fully understand your business yet. That means when
-              ChatGPT, Perplexity, or Google AI recommends a contractor for
+              ChatGPT, Perplexity, or Google AI recommends a business for
               "{audit.city} {audit.business_type}," you're getting skipped — even
               if you rank in traditional search.
             </p>
@@ -855,11 +864,13 @@ export function ResultsStage({
         </p>
 
         <a
-          href={withUtm(STRIPE_PRO_URL, 'ai_search_visibility', { campaign: 'pro_upgrade' })}
-          onClick={() => trackClick('pro_cta_clicked', { from: 'ai_search_visibility_button' })}
+          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'pro_upgrade' })}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => trackClick('book_call_clicked', { from: 'ai_search_visibility_button' })}
           className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
         >
-          Skip the wait — Go Pro ($6,970/yr, save $1,394) →
+          Skip the wait — book a call for Pro live tracking →
         </a>
       </section>
 
@@ -876,7 +887,7 @@ export function ResultsStage({
             Who's capturing your customers
           </p>
           <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
-            Top contractors Google's putting in front of {audit.city} buyers
+            Top businesses Google's putting in front of {audit.city} buyers
           </h3>
           <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
             Pulled live from Google's top results for "{audit.business_type} {audit.city}".
@@ -936,12 +947,12 @@ export function ResultsStage({
 
           <div className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
             <p className="font-semibold text-white">
-              From what Lola sees on Florida contractor audits: top-3 takes most of the clicks.
+              From what Lola sees on local business audits: top-3 takes most of the clicks.
               The rest fight over the scraps.
             </p>
             <p className="mt-2">
-              That's the gap. The Lola Retainer moves you into the top-3 zone — month after month
-              — so the calls land with you instead of the next contractor down the list.
+              That's the gap. Lola moves you into the top-3 zone — month after month —
+              so the calls land with you instead of the next business down the list.
             </p>
           </div>
         </section>
@@ -1013,7 +1024,8 @@ const PRICING_URL =
 
 const STRATEGY_CALL_URL =
   (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
-  'https://cal.com/ty-alexander-media/15min';
+  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
+  'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
 const GUIDE_URL =
   (import.meta.env.VITE_GUIDE_URL as string | undefined) ||
@@ -1161,7 +1173,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
           {headline}
         </h2>
         <p className="mt-5 max-w-[640px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[17px]">
-          Most contractors don't fix this — they grind harder.
+          Most owners don't fix this — they grind harder.
           <br className="hidden sm:inline" />{' '}
           Smart ones plug the leak.
         </p>
@@ -1850,7 +1862,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
           Every line below is generated from {audit.business_name}'s actual audit data. Tap copy,
           paste it where it belongs (page title, GBP description, GBP post, site &lt;head&gt;).
-          Most contractors can ship all four in under 30 minutes.
+          Most owners can ship all four in under 30 minutes.
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -2070,7 +2082,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
           🦴 Lola's enhanced opportunity report
         </p>
         <p className="mt-3 text-[14px] text-[#8A8F98]">
-          {status === 'pending' ? 'Generating your contractor-specific report…' : 'Loading deeper analysis…'}
+          {status === 'pending' ? 'Generating your business-specific report…' : 'Loading deeper analysis…'}
         </p>
       </section>
     );

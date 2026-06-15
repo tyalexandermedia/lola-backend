@@ -25,9 +25,13 @@ import { useEffect, useState } from 'react';
 import { API_URL } from './AuditFlow';
 import { track } from './analytics';
 
+// Call-first rebuild: every retainer CTA now books a free strategy call
+// instead of Stripe self-serve checkout. Name kept for the env-var contract;
+// VITE_STRATEGY_CALL_URL / VITE_CALENDAR_URL override the default.
 const STRIPE_RETAINER_URL =
-  (import.meta.env.VITE_STRIPE_RETAINER_MONTHLY_URL as string | undefined) ||
-  'https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08';
+  (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
+  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
+  'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
 function withUtm(url: string, content: string) {
   const p = new URLSearchParams({

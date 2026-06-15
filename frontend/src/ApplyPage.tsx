@@ -32,9 +32,11 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
   { value: '100k_plus', label: '$100K+' },
 ];
 
+// Values kept stable for the backend/type contract; labels updated to the
+// call-first 3-tier model (Starter $297 / Growth $697 / Pro $997).
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'retainer', label: 'Retainer — $697/mo' },
-  { value: 'pro', label: 'Pro — $6,970/yr' },
+  { value: 'retainer', label: 'Growth — $697/mo' },
+  { value: 'pro', label: 'Pro — $997/mo' },
   { value: 'both', label: 'Tell me which fits better' },
 ];
 
