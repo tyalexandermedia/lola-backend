@@ -136,7 +136,21 @@ _ADD_COLUMNS = [
     # Twilio tracking number forwards to. NULL = call tracking not set up.
     "ALTER TABLE reporting_clients ADD COLUMN forward_number TEXT",
     "ALTER TABLE reporting_clients ADD COLUMN tracking_number TEXT",
+    # Google Business Profile Performance API — OAuth refresh token + the
+    # numeric location id. NULL = GBP not connected (card hidden).
+    "ALTER TABLE reporting_clients ADD COLUMN gbp_location_id TEXT",
+    "ALTER TABLE reporting_clients ADD COLUMN gbp_refresh_token TEXT",
 ]
+
+
+async def set_gbp_credentials(slug: str, location_id: str, refresh_token: str) -> bool:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "UPDATE reporting_clients SET gbp_location_id = ?, gbp_refresh_token = ?, updated_at = datetime('now') WHERE slug = ?",
+            (location_id, refresh_token, slug.strip().lower()),
+        )
+        await db.commit()
+        return (cur.rowcount or 0) > 0
 
 
 async def init_reporting_tables() -> None:

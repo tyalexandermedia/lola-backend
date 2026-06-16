@@ -105,10 +105,16 @@ from db.tracking import (
     recent_calls_admin,
     save_gsc_snapshot,
     get_gsc_snapshot,
+    save_provider_snapshot,
+    get_provider_snapshot,
+    save_cwv,
+    cwv_history,
     EVENT_TYPES,
 )
 from db.reviews import review_counts_for_slug
+from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
+from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webmaster
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -1832,8 +1838,18 @@ async def public_client_dashboard(slug: str):
     # Tier gating: call tracking + GSC are premium (Growth + Pro). Starter
     # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
     call_tracking_on = tier in ("growth", "pro")
+    premium = tier in ("growth", "pro")
     call_quality = await call_quality_stats(slug) if call_tracking_on else None
-    gsc = await get_gsc_snapshot(slug) if tier in ("growth", "pro") else None
+    gsc = await get_gsc_snapshot(slug) if premium else None
+    gbp = await get_provider_snapshot(slug, "gbp") if premium else None
+    bing = await get_provider_snapshot(slug, "bing") if premium else None
+    cwv = await cwv_history(slug)  # CWV trend is fine for all tiers
+    # Lead-source rollup: collapse this-month source counts across call+lead
+    # into a single 'where contacts came from' map for the pie.
+    lead_sources: dict = {}
+    for et in ("call", "lead"):
+        for src, n in (tracking_sources.get(et) or {}).items():
+            lead_sources[src] = lead_sources.get(src, 0) + n
 
     return {
         "slug": slug,
@@ -1852,6 +1868,10 @@ async def public_client_dashboard(slug: str):
         "reviews": reviews,
         "call_quality": call_quality,
         "search_console": gsc,
+        "gbp_performance": gbp if (gbp and not gbp.get("error")) else None,
+        "bing": bing if (bing and not bing.get("error")) else None,
+        "cwv_trend": cwv,
+        "lead_sources": lead_sources,
         "attributed_value": attributed,
         "annualized": annual,
         "cost_per_lead": cpl,
@@ -2596,6 +2616,83 @@ async def admin_gsc_run(
     )
     await save_gsc_snapshot(slug, data)
     return {"ok": True, "slug": slug, "snapshot": data}
+
+
+class GbpTokenRequest(BaseModel):
+    location_id: str   # 'locations/123…' or the bare numeric id
+    refresh_token: str
+
+
+@app.post("/admin/gbp/{slug}/token")
+async def admin_gbp_token(
+    slug: str,
+    body: GbpTokenRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Store the client's GBP OAuth refresh token + location id (one-time
+    after the owner grants consent). Enables GBP Performance pulls."""
+    _check_admin(x_admin_key)
+    ok = await set_gbp_credentials(slug, body.location_id.strip(), body.refresh_token.strip())
+    if not ok:
+        raise HTTPException(status_code=404, detail="Onboard the client first")
+    return {"ok": True, "slug": slug, "gbp_connected": True}
+
+
+@app.post("/admin/metrics/{slug}/run")
+async def admin_metrics_run(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """One-shot weekly refresh of ALL external metrics for a client:
+    Search Console + Analytics, GBP Performance, Bing Webmaster, and Core
+    Web Vitals. Cron this once a week per client. Each source degrades
+    gracefully (missing creds → that card just hides)."""
+    _check_admin(x_admin_key)
+    rc = await get_reporting_client_by_slug(slug)
+    if not rc:
+        raise HTTPException(status_code=404, detail="Onboard the client first")
+    site = rc.get("site_url") or rc.get("target_url") or ""
+    out: dict = {}
+
+    # GSC + GA
+    try:
+        gsc = await fetch_search_metrics(site_url=site, gsc_property=rc.get("gsc_property"),
+                                         ga_property_id=rc.get("ga_property_id"),
+                                         money_keywords=rc.get("money_keywords") or [])
+        await save_gsc_snapshot(slug, gsc)
+        out["gsc"] = "ok" if (gsc.get("gsc") and not gsc["gsc"].get("error")) else "skipped"
+    except Exception as e:
+        out["gsc"] = f"error: {str(e)[:80]}"
+
+    # GBP Performance
+    try:
+        gbp = await fetch_gbp_performance(rc.get("gbp_location_id") or "", rc.get("gbp_refresh_token") or "")
+        await save_provider_snapshot(slug, "gbp", gbp)
+        out["gbp"] = "ok" if not gbp.get("error") else f"skipped: {gbp.get('error','')[:60]}"
+    except Exception as e:
+        out["gbp"] = f"error: {str(e)[:80]}"
+
+    # Bing Webmaster
+    try:
+        bing = await fetch_bing_webmaster(site)
+        await save_provider_snapshot(slug, "bing", bing)
+        out["bing"] = "ok" if not bing.get("error") else f"skipped: {bing.get('error','')[:60]}"
+    except Exception as e:
+        out["bing"] = f"error: {str(e)[:80]}"
+
+    # Core Web Vitals (reuse the audit's PageSpeed call)
+    try:
+        if site:
+            async with httpx.AsyncClient() as client:
+                ps = await get_page_speed(client, site if site.startswith("http") else f"https://{site}", ApiBudget(1))
+            await save_cwv(slug, int(ps.get("performance", 0)), int(ps.get("accessibility", 0)), int(ps.get("seo", 0)))
+            out["cwv"] = "ok" if ps.get("ok") else "skipped"
+        else:
+            out["cwv"] = "skipped: no site"
+    except Exception as e:
+        out["cwv"] = f"error: {str(e)[:80]}"
+
+    return {"ok": True, "slug": slug, "results": out}
 
 
 @app.get("/admin/calls/{slug}")
