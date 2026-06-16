@@ -455,3 +455,22 @@ async def list_all_locks(active_only: bool = True) -> List[dict]:
         q += " ORDER BY claimed_at DESC"
         async with db.execute(q) as cur:
             return [dict(r) for r in await cur.fetchall()]
+
+
+async def recent_locks_public(limit: int = 8) -> List[dict]:
+    """Anonymized recent active locks for the public social-proof ticker.
+    Returns ONLY niche + city_display + tier — never the client slug —
+    so we can show 'soft wash · Palm Harbor, FL — locked' without exposing
+    which business holds it."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT niche, city_display, tier
+               FROM local_locks WHERE released_at IS NULL
+               ORDER BY claimed_at DESC LIMIT ?""",
+            (max(1, min(limit, 25)),),
+        ) as cur:
+            return [
+                {"niche": r["niche"], "city": r["city_display"], "tier": r["tier"]}
+                for r in await cur.fetchall()
+            ]

@@ -7,6 +7,7 @@ import type {
   Recommendation,
 } from './types';
 import { track } from './analytics';
+import LockChecker from './LockChecker';
 
 import { API_URL } from './api';
 // Re-export retained for any external consumer; new code should import from
@@ -1007,6 +1008,16 @@ export function ResultsStage({
       </section>
 
       <ResultsFooter audit={audit} cta={cta} />
+
+      {/* Close the loop: the visitor just saw their score + fixes — now show
+          whether their exact market is still claimable. Pre-filled from the
+          audit's business_type + city so it's one glance, zero typing. */}
+      <div className="mt-12">
+        <LockChecker
+          defaultNiche={audit.business_type || ''}
+          defaultCity={audit.city || ''}
+        />
+      </div>
 
       {/* Data-freshness notice — moved from top-of-page banner to a quiet
           accordion at the bottom of results. Default collapsed; only shows

@@ -19,6 +19,51 @@
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import LockChecker from './LockChecker';
+import { API_URL } from './api';
+
+/**
+ * Recent-locks social-proof strip. Fetches anonymized active locks from
+ * GET /locks/recent and renders a "claimed markets" row. Self-hides when
+ * there are no locks yet (new business) so it never shows an empty/sad
+ * state. Real data only — no fabricated scarcity.
+ */
+function RecentLocksStrip() {
+  const [locks, setLocks] = useState<Array<{ niche: string; city: string }>>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/locks/recent?limit=6`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && Array.isArray(d?.locks)) setLocks(d.locks); })
+      .catch(() => { /* silent — strip just stays hidden */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (locks.length === 0) return null;
+
+  return (
+    <div className="mt-8 rounded-[12px] border border-[#D4AF37]/15 bg-white/[0.02] px-4 py-3">
+      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">
+        🔒 Recently locked markets
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {locks.map((l, i) => (
+          <span
+            key={`${l.niche}-${l.city}-${i}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-[#0F0F12] px-3 py-1 text-[11px] text-[#C5C5C8]"
+          >
+            <span className="capitalize text-white">{l.niche}</span>
+            <span aria-hidden className="text-[#5A5F68]">·</span>
+            {l.city}
+            <span aria-hidden className="text-[#F59E0B]">🔒</span>
+          </span>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] text-[#7A7F8A]">
+        One business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Check if yours is open →</a>
+      </p>
+    </div>
+  );
+}
 
 // Books a free strategy call. Single source of truth for the whole homepage —
 // every primary CTA points here. Env-overridable so the calendar link can be
@@ -269,6 +314,8 @@ export default function Homepage() {
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>Cancel anytime</span>
         </p>
+
+        <RecentLocksStrip />
       </section>
 
       {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
