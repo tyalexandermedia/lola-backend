@@ -205,6 +205,36 @@ label{display:block;font-size:12px;font-weight:600;color:#C8C0B0;margin-bottom:4
     <h2>Active clients</h2>
     <div id="clients" class="list"></div>
   </section>
+
+  <!-- ── 3. TRACKING-LINK SNIPPET GENERATOR ────────────────── -->
+  <section>
+    <h2>📡 Tracking links generator</h2>
+    <div class="card">
+      <p class="hint" style="margin-bottom:14px">Paste the client's slug + phone + site URL — we'll emit paste-ready links and HTML snippets. Drop these on their Google Business Profile, website, and forms; calls/clicks/leads land on the dashboard automatically.</p>
+      <div class="row">
+        <div>
+          <label>Client slug</label>
+          <input id="t-slug" placeholder="sandbar">
+        </div>
+        <div>
+          <label>Phone (with country code)</label>
+          <input id="t-phone" placeholder="+17273006573">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Their website URL</label>
+          <input id="t-site" placeholder="https://sandbarsoftwash.com">
+        </div>
+        <div>
+          <label>Their form/contact page <span class="muted">(optional)</span></label>
+          <input id="t-form" placeholder="https://sandbarsoftwash.com/contact">
+        </div>
+      </div>
+      <button class="btn" style="margin-top:10px" onclick="genSnippets()">Generate links + snippets →</button>
+      <div id="snippets" style="margin-top:14px;display:none"></div>
+    </div>
+  </section>
 </div>
 
 <div id="toast"></div>
@@ -441,6 +471,74 @@ async function snapshot(slug) {
     await api('/admin/case-study/' + encodeURIComponent(slug) + '/run', {method: 'POST'});
     toast('Snapshot run');
   } catch (e) { toast(e.message, true); }
+}
+
+// ── Tracking-link snippet generator ───────────────────────────────
+// Emits paste-ready URLs + HTML snippets for the client's GBP, website,
+// forms, and a 1x1 view pixel. All routes through /t/* on the brand domain
+// so calls/leads/clicks land on the dashboard with full source attribution.
+function genSnippets() {
+  const slug = (document.getElementById('t-slug').value || '').trim().toLowerCase();
+  const phone = (document.getElementById('t-phone').value || '').trim();
+  const site = (document.getElementById('t-site').value || '').trim();
+  const form = (document.getElementById('t-form').value || '').trim();
+  if (!slug) return toast('Slug is required', true);
+  const base = window.location.origin; // serves /t/* via vercel.json proxy
+
+  const phoneClean = phone.replace(/[^+\d]/g, '');
+  const telUri = phoneClean ? (phoneClean.startsWith('+') ? `tel:${phoneClean}` : `tel:+${phoneClean}`) : '';
+
+  const callUrl = telUri
+    ? `${base}/t/c/${slug}?to=${encodeURIComponent(telUri)}&source=gbp`
+    : '(set phone first)';
+  const siteUrl = site
+    ? `${base}/t/go/${slug}?to=${encodeURIComponent(site)}&source=gbp`
+    : '(set site first)';
+  const formUrl = form
+    ? `${base}/t/go/${slug}?to=${encodeURIComponent(form)}&source=gbp_form`
+    : '(set form URL first)';
+  const pixelUrl = `${base}/t/pixel/${slug}.gif?source=site`;
+  const leadBeacon = `${base}/t/lead/${slug}?source=form`;
+
+  const blocks = [
+    { title: '📞 Google Business Profile — Call button', desc: 'In GBP, edit your business → set the Phone field as a CTA link to this URL. Every click counts as an attributed call.', body: callUrl },
+    { title: '🌐 GBP — Website button', desc: 'In GBP, set the Website field to this URL (it redirects to your real site). Tracks click-throughs from Maps + Search.', body: siteUrl },
+    { title: '📝 GBP — Contact / Form CTA', desc: 'Optional — if your GBP has a "Get a Quote" / form button, use this URL. Pre-tagged source=gbp_form.', body: formUrl },
+    { title: '👁️ Page view pixel — embed in <head> of every client page', desc: 'A 1×1 GIF that logs a view event per page load. Lets the dashboard show traffic alongside calls/leads.',
+      body: `<img src="${pixelUrl}" width="1" height="1" alt="" style="position:absolute;left:-9999px" />` },
+    { title: '✅ Form-submit lead beacon — drop in the form\'s onsubmit', desc: 'Fires a no-CORS GET on the lead beacon on submit. Counts the lead even if the form posts elsewhere. Paste inside the existing onsubmit.',
+      body: `<script>
+document.querySelector('form').addEventListener('submit', function(){
+  new Image().src = ${JSON.stringify(leadBeacon)};
+});
+</` + 'script>' },
+  ];
+
+  const out = blocks.map((b, i) => `
+    <div class="card" style="margin-bottom:10px">
+      <p style="font-weight:700;color:#F0EAD6;font-size:14px">${b.title}</p>
+      <p class="hint" style="margin-top:4px">${b.desc}</p>
+      <textarea id="snip-${i}" readonly rows="${b.body.includes('\\n') || b.body.length > 80 ? 4 : 2}" style="margin-top:8px;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#0F0F12">${escape(b.body)}</textarea>
+      <button class="btn btn-sm" style="margin-top:8px" onclick="copySnip(${i})">Copy</button>
+    </div>`).join('');
+
+  const dashUrl = `${base}/r/client/${slug}`;
+  const wrap = document.getElementById('snippets');
+  wrap.innerHTML = `
+    <div class="card" style="background:rgba(212,175,55,0.05);border-color:rgba(212,175,55,0.4)">
+      <p style="font-weight:700;color:#D4AF37;font-size:13px;text-transform:uppercase;letter-spacing:.05em">Client dashboard URL</p>
+      <p style="margin-top:6px"><a href="${dashUrl}" target="_blank" style="color:#D4AF37">${dashUrl} ↗</a></p>
+      <p class="hint" style="margin-top:6px">Hand this to your client. Public, no login (PII stripped server-side). Drives SEO + social proof.</p>
+    </div>
+    <div style="margin-top:14px">${out}</div>`;
+  wrap.style.display = 'block';
+  toast('Snippets ready');
+}
+
+function copySnip(i) {
+  const el = document.getElementById('snip-' + i);
+  el.select(); el.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(el.value).then(() => toast('Copied'), () => toast('Copy failed', true));
 }
 
 function escape(s) {

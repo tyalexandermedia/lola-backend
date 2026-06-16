@@ -92,6 +92,8 @@ from db.tracking import (
     init_tracking_tables,
     log_event,
     counts_for_slug,
+    counts_by_source,
+    attributed_value,
     recent_events,
     EVENT_TYPES,
 )
@@ -1796,6 +1798,14 @@ async def public_client_dashboard(slug: str):
 
     # Call / lead / click attribution — the billing-proof row.
     tracking = await counts_for_slug(slug)
+    tracking_sources = await counts_by_source(slug)
+    # Pull per-client avg_job_value from reporting_clients (operator-set).
+    # Falls back to 400 (matches the leak-calc default) when the slug isn't
+    # in the reporting table yet.
+    from db.reporting import get_client_by_slug as _get_client
+    rc = await _get_client(slug)
+    avg_job_value = int((rc or {}).get("avg_job_value") or 400)
+    attributed = attributed_value(tracking, avg_job_value=avg_job_value)
 
     return {
         "slug": slug,
@@ -1806,6 +1816,8 @@ async def public_client_dashboard(slug: str):
         "implementation": implementation,
         "share_of_voice": share_of_voice,
         "tracking": tracking,
+        "tracking_sources": tracking_sources,
+        "attributed_value": attributed,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 

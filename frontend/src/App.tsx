@@ -187,6 +187,7 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
+          <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
         </FooterCol>
 
