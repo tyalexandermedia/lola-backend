@@ -210,6 +210,7 @@ async def upsert_client(
     active: bool = True,
     target_url: Optional[str] = None,
     ai_mode_prompts: Optional[List[str]] = None,
+    forward_number: Optional[str] = None,
 ) -> int:
     """
     Upsert by slug. New optional args:
@@ -222,8 +223,9 @@ async def upsert_client(
             """INSERT INTO reporting_clients
                (slug, client_name, client_email, site_url, money_keywords_json,
                 conversion_rate, avg_job_value, brevo_template_id, gsc_property,
-                ga_property_id, active, target_url, ai_mode_prompts_json, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+                ga_property_id, active, target_url, ai_mode_prompts_json,
+                forward_number, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
                ON CONFLICT(slug) DO UPDATE SET
                  client_name = excluded.client_name,
                  client_email = excluded.client_email,
@@ -237,13 +239,15 @@ async def upsert_client(
                  active = excluded.active,
                  target_url = excluded.target_url,
                  ai_mode_prompts_json = excluded.ai_mode_prompts_json,
+                 forward_number = COALESCE(excluded.forward_number, reporting_clients.forward_number),
                  updated_at = datetime('now')""",
             (slug, client_name, client_email, site_url,
              json.dumps(money_keywords), conversion_rate, avg_job_value,
              brevo_template_id, gsc_property, ga_property_id,
              1 if active else 0,
              target_url,
-             json.dumps(ai_mode_prompts or [])),
+             json.dumps(ai_mode_prompts or []),
+             forward_number),
         )
         await db.commit()
         async with db.execute(

@@ -42,6 +42,11 @@ interface DashboardPayload {
   funnel?: { view: number; click: number; call: number; lead: number; click_rate: number; call_rate: number; lead_rate: number; overall: number };
   reviews?: { month: number; lifetime: number; google_routed_month: number };
   call_quality?: { month: number; qualified_month: number; long_month: number; lifetime: number; avg_duration_sec: number };
+  search_console?: {
+    gsc?: { error?: string | null; clicks: number; impressions: number; ctr: number; position: number; clicks_prev: number; impressions_prev: number; top_queries: Array<{ query: string; clicks: number; impressions: number; ctr: number; position: number }>; top_pages: Array<{ page: string; clicks: number; impressions: number }> } | null;
+    ga?: { error?: string | null; organic_sessions: number; organic_sessions_prev: number } | null;
+    fetched_at?: string;
+  } | null;
   attributed_value?: {
     value: number; contacts: number; calls: number; leads: number;
     close_rate: number; avg_job_value: number;
@@ -111,6 +116,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.tracking && (
         <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
       )}
+      {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
       {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
       {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
@@ -296,6 +302,75 @@ function BillingProofRow({
           At this month&apos;s pace × 12 mo · conservative no-growth projection
         </p>
       </div>
+    </section>
+  );
+}
+
+/**
+ * Search Console + Analytics card — the client's REAL Google performance,
+ * free data they rarely see clean. 28-day clicks / impressions / CTR / avg
+ * position with month-over-month deltas, top queries, + GA organic sessions.
+ * This is the 'free metrics to sell' layer — pure value, costs nothing.
+ */
+function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_console']> }) {
+  const g = sc.gsc!;
+  const ga = sc.ga;
+  const delta = (now: number, prev: number) => {
+    if (!prev) return null;
+    const d = Math.round(((now - prev) / prev) * 100);
+    return d;
+  };
+  const cd = delta(g.clicks, g.clicks_prev);
+  const idl = delta(g.impressions, g.impressions_prev);
+  const tiles = [
+    { label: 'Clicks', val: g.clicks.toLocaleString(), d: cd, accent: '#6EE7B7' },
+    { label: 'Impressions', val: g.impressions.toLocaleString(), d: idl, accent: '#93C5FD' },
+    { label: 'CTR', val: `${g.ctr}%`, d: null, accent: '#F4D47C' },
+    { label: 'Avg position', val: g.position ? g.position.toFixed(1) : '—', d: null, accent: '#D4AF37', lowerBetter: true },
+  ];
+  return (
+    <section className="mt-6 rounded-2xl border border-[#93C5FD]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1018] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#93C5FD]">
+        🔎 Google Search Console · last 28 days
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+          your real Google performance
+        </span>
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {tiles.map((t) => (
+          <div key={t.label} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{t.label}</p>
+            <p className="mt-1 text-[26px] font-extrabold leading-none" style={{ color: t.accent }}>{t.val}</p>
+            {t.d !== null && t.d !== undefined && (
+              <p className={`mt-1 text-[11px] font-semibold ${t.d > 0 ? 'text-emerald-300' : t.d < 0 ? 'text-red-300' : 'text-[#6B7280]'}`}>
+                {t.d > 0 ? '↑' : t.d < 0 ? '↓' : '·'} {Math.abs(t.d)}% vs prev 28d
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      {ga && !ga.error && ga.organic_sessions > 0 && (
+        <p className="mt-3 text-[12px] text-[#C8C0B0]">
+          📊 Google Analytics: <span className="font-bold text-white">{ga.organic_sessions.toLocaleString()}</span> organic sessions
+          {ga.organic_sessions_prev ? <span className="text-[#9CA3AF]"> (prev period {ga.organic_sessions_prev.toLocaleString()})</span> : null}
+        </p>
+      )}
+      {g.top_queries && g.top_queries.length > 0 && (
+        <div className="mt-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Top queries bringing you traffic</p>
+          <div className="mt-2 space-y-1.5">
+            {g.top_queries.slice(0, 5).map((q) => (
+              <div key={q.query} className="flex items-center justify-between gap-3 rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
+                <span className="truncate text-[13px] text-white">{q.query}</span>
+                <span className="shrink-0 text-[11px] text-[#9CA3AF]">{q.clicks} clicks · #{q.position}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {sc.fetched_at && (
+        <p className="mt-3 text-[10px] text-[#6B7280]">Updated {fmtDateTime(sc.fetched_at)}</p>
+      )}
     </section>
   );
 }
