@@ -99,6 +99,86 @@ async def counts_for_slug(slug: str) -> dict:
     return out
 
 
+async def funnel_for_slug(slug: str) -> dict:
+    """View → Click → Call → Lead conversion funnel for the current month.
+    Each step's drop-off % proves the system compounds — the client sees
+    Lola's work at every stage, not just the final number."""
+    slug_l = slug.strip().lower()
+    out = {"view": 0, "click": 0, "call": 0, "lead": 0}
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT event_type, COUNT(*) FROM tracked_events
+               WHERE slug = ?
+                 AND strftime('%Y-%m', created_at) = strftime('%Y-%m','now')
+               GROUP BY event_type""",
+            (slug_l,),
+        ) as cur:
+            for et, n in await cur.fetchall():
+                if et in out:
+                    out[et] = int(n)
+    def _pct(num: int, den: int) -> float:
+        return round(100 * num / den, 1) if den else 0.0
+    return {
+        "view": out["view"],
+        "click": out["click"],
+        "call": out["call"],
+        "lead": out["lead"],
+        "click_rate": _pct(out["click"], out["view"]),
+        "call_rate": _pct(out["call"], out["click"]),
+        "lead_rate": _pct(out["lead"], out["click"]),
+        "overall": _pct(out["call"] + out["lead"], out["view"]),
+    }
+
+
+async def trend_deltas(slug: str) -> dict:
+    """Per-event-type 'this month vs last month' counts + delta + arrow.
+    The momentum signal — what makes a client renew (or raise) vs churn."""
+    slug_l = slug.strip().lower()
+    out: dict = {t: {"month": 0, "prev_month": 0, "delta": 0, "arrow": "·"} for t in EVENT_TYPES}
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT event_type,
+                   SUM(CASE WHEN strftime('%Y-%m', created_at) = strftime('%Y-%m','now') THEN 1 ELSE 0 END) AS m,
+                   SUM(CASE WHEN strftime('%Y-%m', created_at) = strftime('%Y-%m','now','start of month','-1 day','start of month') THEN 1 ELSE 0 END) AS pm
+               FROM tracked_events WHERE slug = ?
+               GROUP BY event_type""",
+            (slug_l,),
+        ) as cur:
+            for et, m, pm in await cur.fetchall():
+                if et in out:
+                    m_i, pm_i = int(m or 0), int(pm or 0)
+                    delta = m_i - pm_i
+                    out[et] = {
+                        "month": m_i, "prev_month": pm_i, "delta": delta,
+                        "arrow": "↑" if delta > 0 else "↓" if delta < 0 else "·",
+                    }
+    return out
+
+
+def cost_per_lead(counts: dict, monthly_retainer: int) -> dict:
+    """CPL = retainer / contacts this month. The number that lets you raise
+    the retainer ('our CPL is $30, paid ads is $80 — we're cheaper AND we
+    own the channel')."""
+    calls = int(((counts or {}).get("call") or {}).get("month", 0))
+    leads = int(((counts or {}).get("lead") or {}).get("month", 0))
+    contacts = max(calls, leads)
+    if contacts <= 0:
+        return {"cpl": None, "contacts": 0, "retainer": monthly_retainer}
+    return {
+        "cpl": round(monthly_retainer / contacts, 2),
+        "contacts": contacts,
+        "retainer": monthly_retainer,
+    }
+
+
+def annualized_value(attributed: dict) -> dict:
+    """Project the current month's attributed value forward 12mo. Frames
+    the retainer in annual terms — what feels small monthly feels big
+    yearly. Conservative: just monthly × 12, no growth assumption."""
+    monthly = int((attributed or {}).get("value") or 0)
+    return {"yearly_run_rate": monthly * 12, "monthly": monthly}
+
+
 async def counts_by_source(slug: str) -> dict:
     """Per-event-type counts grouped by `source` (gbp, website, ai_search,
     social, etc.). Powers the dashboard attribution view: 'this month's
