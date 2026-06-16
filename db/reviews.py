@@ -141,6 +141,33 @@ async def get_business(business_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
+async def review_counts_for_slug(slug: str) -> dict:
+    """Counts review_requests landing this calendar month / lifetime, matched
+    to a client by lower-case substring on business name. Powers the
+    dashboard 'reviews collected' card."""
+    s = (slug or "").strip().lower().replace("-", " ")
+    if not s:
+        return {"month": 0, "lifetime": 0, "google_routed_month": 0}
+    pat = f"%{s}%"
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT
+                  SUM(CASE WHEN strftime('%Y-%m', rr.rating_at) = strftime('%Y-%m','now') THEN 1 ELSE 0 END) AS month,
+                  SUM(CASE WHEN rr.rating_at IS NOT NULL THEN 1 ELSE 0 END) AS lifetime,
+                  SUM(CASE WHEN strftime('%Y-%m', rr.redirected_to_google_at) = strftime('%Y-%m','now') THEN 1 ELSE 0 END) AS google_routed
+               FROM review_requests rr
+               JOIN businesses b ON b.id = rr.business_id
+               WHERE LOWER(b.name) LIKE ?""",
+            (pat,),
+        ) as cur:
+            row = await cur.fetchone()
+    return {
+        "month": int((row[0] or 0) if row else 0),
+        "lifetime": int((row[1] or 0) if row else 0),
+        "google_routed_month": int((row[2] or 0) if row else 0),
+    }
+
+
 async def list_businesses() -> List[dict]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row

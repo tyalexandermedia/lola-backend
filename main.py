@@ -94,9 +94,14 @@ from db.tracking import (
     counts_for_slug,
     counts_by_source,
     attributed_value,
+    funnel_for_slug,
+    trend_deltas,
+    cost_per_lead,
+    annualized_value,
     recent_events,
     EVENT_TYPES,
 )
+from db.reviews import review_counts_for_slug
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -1799,6 +1804,9 @@ async def public_client_dashboard(slug: str):
     # Call / lead / click attribution — the billing-proof row.
     tracking = await counts_for_slug(slug)
     tracking_sources = await counts_by_source(slug)
+    funnel = await funnel_for_slug(slug)
+    trends = await trend_deltas(slug)
+    reviews = await review_counts_for_slug(slug)
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
@@ -1806,6 +1814,13 @@ async def public_client_dashboard(slug: str):
     rc = await _get_client(slug)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
+    # Map any active Lock tier → retainer $ for CPL math. Falls back to
+    # the Growth tier ($697) when no lock — the modal client price.
+    held = await locks_for_slug(slug, active_only=True)
+    tier = (held[0]["tier"] if held else "growth").lower()
+    retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
+    cpl = cost_per_lead(tracking, monthly_retainer=retainer)
+    annual = annualized_value(attributed)
 
     return {
         "slug": slug,
@@ -1817,7 +1832,12 @@ async def public_client_dashboard(slug: str):
         "share_of_voice": share_of_voice,
         "tracking": tracking,
         "tracking_sources": tracking_sources,
+        "tracking_trends": trends,
+        "funnel": funnel,
+        "reviews": reviews,
         "attributed_value": attributed,
+        "annualized": annual,
+        "cost_per_lead": cpl,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 

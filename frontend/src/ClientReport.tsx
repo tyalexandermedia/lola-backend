@@ -38,14 +38,15 @@ interface DashboardPayload {
   share_of_voice?: ShareOfVoice;
   tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
   tracking_sources?: Record<string, Record<string, number>>;
+  tracking_trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
+  funnel?: { view: number; click: number; call: number; lead: number; click_rate: number; call_rate: number; lead_rate: number; overall: number };
+  reviews?: { month: number; lifetime: number; google_routed_month: number };
   attributed_value?: {
-    value: number;
-    contacts: number;
-    calls: number;
-    leads: number;
-    close_rate: number;
-    avg_job_value: number;
+    value: number; contacts: number; calls: number; leads: number;
+    close_rate: number; avg_job_value: number;
   };
+  annualized?: { yearly_run_rate: number; monthly: number };
+  cost_per_lead?: { cpl: number | null; contacts: number; retainer: number };
   generated_at: string;
 }
 
@@ -104,11 +105,13 @@ export default function ClientReport({ slug }: { slug: string }) {
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
       {data.attributed_value && data.attributed_value.contacts > 0 && (
-        <AttributedValueCard a={data.attributed_value} />
+        <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
       )}
       {data.tracking && (
-        <TrackingRow tracking={data.tracking} sources={data.tracking_sources} />
+        <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
       )}
+      {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
+      {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
 
       {data.implementation && <WorkDelivered impl={data.implementation} />}
@@ -234,25 +237,130 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
 }
 
 /**
- * Attributed Value card — the dollar number that justifies the retainer.
- * Conservative formula (shown to the client so there's no black box):
- *   contacts × close_rate × avg_job_value = estimated revenue Lola drove
- * Renders only when there are actual contacts this month.
+ * Billing-proof row — three cards across the top of the dashboard:
+ *   1. Value Lola drove this month ($ — the headline number)
+ *   2. Cost per Lead (vs paid ads — the negotiation wedge)
+ *   3. Annualized run-rate (frames the retainer in yearly terms)
+ *
+ * Together: this is what justifies the retainer at renewal + raises.
  */
-function AttributedValueCard({ a }: { a: NonNullable<DashboardPayload['attributed_value']> }) {
+function BillingProofRow({
+  a, ann, cpl,
+}: {
+  a: NonNullable<DashboardPayload['attributed_value']>;
+  ann?: DashboardPayload['annualized'];
+  cpl?: DashboardPayload['cost_per_lead'];
+}) {
   const pct = Math.round(a.close_rate * 100);
+  const cplStr = cpl && cpl.cpl !== null ? `$${cpl.cpl.toLocaleString()}` : '—';
   return (
-    <section className="mb-6 rounded-2xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-5 shadow-[0_0_28px_rgba(212,175,55,0.12)] sm:p-7">
-      <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-        Estimated revenue Lola drove this month
+    <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+      {/* Headline $ value */}
+      <div className="rounded-2xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-5 shadow-[0_0_28px_rgba(212,175,55,0.12)] sm:p-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          Revenue Lola drove · this month
+        </p>
+        <p className="mt-2 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[48px]">
+          ${a.value.toLocaleString()}
+        </p>
+        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+          {a.contacts} contact{a.contacts === 1 ? '' : 's'} × {pct}% close × ${a.avg_job_value.toLocaleString()} avg job
+        </p>
+      </div>
+
+      {/* CPL — the comparison wedge */}
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] p-5 sm:p-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-300">
+          Cost per contact
+        </p>
+        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-emerald-300 sm:text-[48px]">
+          {cplStr}
+        </p>
+        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+          ${cpl?.retainer || 697}/mo retainer ÷ {cpl?.contacts || 0} contacts ·{' '}
+          <span className="text-emerald-300/85">Paid ads CPL: $50–$200</span>
+        </p>
+      </div>
+
+      {/* Annualized */}
+      <div className="rounded-2xl border border-[#93C5FD]/30 bg-[#93C5FD]/[0.03] p-5 sm:p-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#93C5FD]">
+          Tracking to · per year
+        </p>
+        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-[#93C5FD] sm:text-[48px]">
+          ${(ann?.yearly_run_rate || 0).toLocaleString()}
+        </p>
+        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+          At this month&apos;s pace × 12 mo · conservative no-growth projection
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Funnel card — View → Click → Call → Lead with drop-off %. Proves the
+ * system works at every stage of the customer journey, not just the
+ * end number. Worth its weight in renewal conversations.
+ */
+function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
+  const steps = [
+    { k: 'view', n: f.view, label: 'Views', accent: '#9CA3AF', rate: null as number | null },
+    { k: 'click', n: f.click, label: 'Clicks', accent: '#93C5FD', rate: f.click_rate },
+    { k: 'call', n: f.call, label: 'Calls', accent: '#6EE7B7', rate: f.call_rate },
+    { k: 'lead', n: f.lead, label: 'Leads', accent: '#F4D47C', rate: f.lead_rate },
+  ];
+  return (
+    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Conversion funnel · this month
       </p>
-      <p className="mt-2 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[44px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[56px]">
-        ${a.value.toLocaleString()}
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        {steps.map((s) => (
+          <div key={s.k} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{s.label}</p>
+            <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: s.accent }}>{s.n}</p>
+            {s.rate !== null && s.rate !== undefined && (
+              <p className="mt-1 text-[10px] text-[#6B7280]">{s.rate}% from prev</p>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[11px] text-[#6B7280]">
+        Overall view → contact: <span className="text-white">{f.overall}%</span>. Lola optimizes every step.
       </p>
-      <p className="mt-3 text-[12px] leading-[1.5] text-[#C8C0B0] sm:text-[13px]">
-        {a.contacts} contact{a.contacts === 1 ? '' : 's'} ({a.calls} call{a.calls === 1 ? '' : 's'} · {a.leads} lead{a.leads === 1 ? '' : 's'})
-        {' '}× {pct}% close rate × ${a.avg_job_value.toLocaleString()} avg job.{' '}
-        <span className="text-[#9CA3AF]">Conservative — actual close rate is whatever your crew runs.</span>
+    </section>
+  );
+}
+
+/**
+ * Reviews card — surfaces the existing reviews module's data per client
+ * (matched by business name). Reviews are the #2 ranking signal in
+ * local search after GBP completeness — counting them here proves we're
+ * actively building the asset.
+ */
+function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
+  return (
+    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Reviews collected
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">This month</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#F4D47C]">{r.month}</p>
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Lifetime</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-white">{r.lifetime}</p>
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">→ Google</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-emerald-300">{r.google_routed_month}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-[11px] text-[#6B7280]">
+        Star rating is the #1 conversion lever in local search. Lola routes 4–5★ to Google, 1–3★ to private feedback.
       </p>
     </section>
   );
@@ -266,10 +374,11 @@ function AttributedValueCard({ a }: { a: NonNullable<DashboardPayload['attribute
  * proof that "yes, this lead came from our system."
  */
 function TrackingRow({
-  tracking, sources,
+  tracking, sources, trends,
 }: {
   tracking: Record<string, { month: number; last_30d: number; lifetime: number }>;
   sources?: Record<string, Record<string, number>>;
+  trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
 }) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
@@ -293,10 +402,17 @@ function TrackingRow({
           const t = tracking[c.key] || { month: 0, last_30d: 0, lifetime: 0 };
           const src = (sources && sources[c.key]) || {};
           const srcEntries = Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 3);
+          const tr = trends?.[c.key];
+          const arrowColor = tr && tr.delta > 0 ? 'text-emerald-300' : tr && tr.delta < 0 ? 'text-red-300' : 'text-[#6B7280]';
           return (
             <div key={c.key} className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
               <p className="text-[11px] uppercase tracking-[0.12em] text-[#9CA3AF]">{c.emoji} {c.label}</p>
               <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{t.month}</p>
+              {tr && (
+                <p className={`mt-1 text-[11px] font-semibold ${arrowColor}`}>
+                  {tr.arrow} {tr.delta !== 0 ? `${tr.delta > 0 ? '+' : ''}${tr.delta}` : 'flat'} vs last mo
+                </p>
+              )}
               <p className="mt-2 text-[11px] text-[#6B7280]">30d: {t.last_30d} · all: {t.lifetime}</p>
               {srcEntries.length > 0 && (
                 <div className="mt-3 flex flex-wrap justify-center gap-1">
