@@ -41,6 +41,7 @@ interface DashboardPayload {
   tracking_trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
   funnel?: { view: number; click: number; call: number; lead: number; click_rate: number; call_rate: number; lead_rate: number; overall: number };
   reviews?: { month: number; lifetime: number; google_routed_month: number };
+  call_quality?: { month: number; qualified_month: number; long_month: number; lifetime: number; avg_duration_sec: number };
   attributed_value?: {
     value: number; contacts: number; calls: number; leads: number;
     close_rate: number; avg_job_value: number;
@@ -110,6 +111,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.tracking && (
         <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
       )}
+      {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
       {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
@@ -294,6 +296,48 @@ function BillingProofRow({
           At this month&apos;s pace × 12 mo · conservative no-growth projection
         </p>
       </div>
+    </section>
+  );
+}
+
+/**
+ * Call quality card — REAL tracked calls (via the Lola call-tracking
+ * number), counted by quality. No caller numbers here (PII → admin-only +
+ * private client report). 'Qualified' = answered & ≥30s; 'long' = ≥2min
+ * (almost always a real job conversation). avg duration in m:ss.
+ */
+function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality']> }) {
+  const mins = Math.floor(q.avg_duration_sec / 60);
+  const secs = q.avg_duration_sec % 60;
+  return (
+    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        📞 Tracked calls · this month
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+          real calls through your Lola tracking number
+        </span>
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Total calls</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-white">{q.month}</p>
+        </div>
+        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Qualified ≥30s</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-emerald-300">{q.qualified_month}</p>
+        </div>
+        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Long ≥2 min</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#6EE7B7]">{q.long_month}</p>
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Avg length</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#F4D47C]">{mins}:{String(secs).padStart(2, '0')}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-[11px] text-[#6B7280]">
+        Qualified + long calls are the ones most likely to be real jobs. Full caller log (with numbers) is in your private weekly report.
+      </p>
     </section>
   );
 }

@@ -40,15 +40,43 @@ CREATE_EVENTS_IDX = """
 CREATE INDEX IF NOT EXISTS idx_events_slug_type ON tracked_events(slug, event_type, created_at);
 """
 
+# Call-tracking table — one row per inbound call to a Lola tracking number.
+# Captures the ACTUAL caller ID + duration via the Twilio voice webhook, so
+# the client can see "(727) 555-0142 called for 4m12s on Tue" — undeniable
+# proof, not just a click count. Caller numbers are PII → never surfaced on
+# the public dashboard; admin-only + the client's own private report.
+CREATE_CALLS = """
+CREATE TABLE IF NOT EXISTS tracked_calls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,
+    call_sid TEXT UNIQUE,
+    caller_number TEXT,
+    caller_city TEXT,
+    caller_state TEXT,
+    tracking_number TEXT,
+    forwarded_to TEXT,
+    source TEXT,
+    status TEXT,
+    duration_sec INTEGER DEFAULT 0,
+    recording_url TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+"""
+
+CREATE_CALLS_IDX = """
+CREATE INDEX IF NOT EXISTS idx_calls_slug ON tracked_calls(slug, created_at);
+"""
+
 
 async def init_tracking_tables() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(CREATE_EVENTS)
-        for stmt in CREATE_EVENTS_IDX.strip().split(";"):
+        await db.execute(CREATE_CALLS)
+        for stmt in (CREATE_EVENTS_IDX + CREATE_CALLS_IDX).strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
         await db.commit()
-    print(f"✅ Tracking table ready at {DB_PATH}")
+    print(f"✅ Tracking tables ready at {DB_PATH}")
 
 
 def hash_ip(ip: Optional[str]) -> Optional[str]:
@@ -228,6 +256,99 @@ async def recent_events(slug: str, limit: int = 50) -> List[dict]:
         async with db.execute(
             """SELECT event_type, source, meta_json, created_at
                FROM tracked_events WHERE slug = ?
+               ORDER BY created_at DESC LIMIT ?""",
+            (slug.strip().lower(), limit),
+        ) as cur:
+            return [dict(r) for r in await cur.fetchall()]
+
+
+# ── Call tracking (Twilio-backed caller ID + duration) ────────────
+
+
+def mask_number(num: Optional[str]) -> str:
+    """(727) •••-••42 style mask. Used anywhere a number might reach a
+    semi-public surface. Admin log shows the full number."""
+    if not num:
+        return "Unknown"
+    digits = "".join(c for c in num if c.isdigit())
+    if len(digits) < 4:
+        return "Unknown"
+    last2 = digits[-2:]
+    area = digits[-10:-7] if len(digits) >= 10 else "•••"
+    return f"({area}) •••-••{last2}"
+
+
+async def log_call(
+    slug: str, call_sid: str, caller_number: Optional[str], tracking_number: Optional[str],
+    forwarded_to: Optional[str], source: Optional[str] = None,
+    caller_city: Optional[str] = None, caller_state: Optional[str] = None,
+) -> int:
+    """Insert (or no-op on duplicate SID) an inbound call at answer time.
+    Duration + recording land later via the status callback."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """INSERT INTO tracked_calls
+                 (slug, call_sid, caller_number, caller_city, caller_state,
+                  tracking_number, forwarded_to, source, status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ringing')
+               ON CONFLICT(call_sid) DO NOTHING""",
+            (slug.strip().lower(), call_sid, caller_number, caller_city, caller_state,
+             tracking_number, forwarded_to, source),
+        )
+        await db.commit()
+        return cur.lastrowid or 0
+
+
+async def update_call_status(call_sid: str, status: str, duration_sec: int = 0,
+                             recording_url: Optional[str] = None) -> bool:
+    """Status callback — stamps final disposition + duration (+ recording)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """UPDATE tracked_calls
+               SET status = ?, duration_sec = ?,
+                   recording_url = COALESCE(?, recording_url)
+               WHERE call_sid = ?""",
+            (status, int(duration_sec or 0), recording_url, call_sid),
+        )
+        await db.commit()
+        return (cur.rowcount or 0) > 0
+
+
+async def call_quality_stats(slug: str) -> dict:
+    """PUBLIC-safe call quality for the dashboard — counts + duration
+    buckets, NO caller numbers. 'Qualified' = answered & >= 30s (filters
+    out hangups/wrong numbers), the calls most likely to be real jobs."""
+    slug_l = slug.strip().lower()
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT
+                 SUM(CASE WHEN strftime('%Y-%m', created_at)=strftime('%Y-%m','now') THEN 1 ELSE 0 END) AS month,
+                 SUM(CASE WHEN strftime('%Y-%m', created_at)=strftime('%Y-%m','now') AND duration_sec>=30 THEN 1 ELSE 0 END) AS qualified_month,
+                 SUM(CASE WHEN strftime('%Y-%m', created_at)=strftime('%Y-%m','now') AND duration_sec>=120 THEN 1 ELSE 0 END) AS long_month,
+                 COUNT(*) AS lifetime,
+                 COALESCE(AVG(CASE WHEN duration_sec>0 THEN duration_sec END),0) AS avg_dur
+               FROM tracked_calls WHERE slug = ?""",
+            (slug_l,),
+        ) as cur:
+            r = await cur.fetchone()
+    return {
+        "month": int((r[0] or 0) if r else 0),
+        "qualified_month": int((r[1] or 0) if r else 0),
+        "long_month": int((r[2] or 0) if r else 0),
+        "lifetime": int((r[3] or 0) if r else 0),
+        "avg_duration_sec": int((r[4] or 0) if r else 0),
+    }
+
+
+async def recent_calls_admin(slug: str, limit: int = 50) -> List[dict]:
+    """ADMIN-only — full caller numbers + durations. For Coach Ty's review
+    and the client's private weekly report. Never hit from the public route."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT id, caller_number, caller_city, caller_state, source,
+                      status, duration_sec, recording_url, created_at
+               FROM tracked_calls WHERE slug = ?
                ORDER BY created_at DESC LIMIT ?""",
             (slug.strip().lower(), limit),
         ) as cur:

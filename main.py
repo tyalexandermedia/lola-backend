@@ -28,7 +28,7 @@ print(f"Loaded .env from {dotenv_path} (exists={dotenv_path.exists()})")
 
 import httpx
 from fastapi import FastAPI, HTTPException, Header, Request
-from fastapi.responses import RedirectResponse, Response
+from fastapi.responses import RedirectResponse, Response, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -99,6 +99,10 @@ from db.tracking import (
     cost_per_lead,
     annualized_value,
     recent_events,
+    log_call,
+    update_call_status,
+    call_quality_stats,
+    recent_calls_admin,
     EVENT_TYPES,
 )
 from db.reviews import review_counts_for_slug
@@ -1807,6 +1811,7 @@ async def public_client_dashboard(slug: str):
     funnel = await funnel_for_slug(slug)
     trends = await trend_deltas(slug)
     reviews = await review_counts_for_slug(slug)
+    call_quality = await call_quality_stats(slug)  # PUBLIC-safe — counts, no numbers
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
@@ -1835,6 +1840,7 @@ async def public_client_dashboard(slug: str):
         "tracking_trends": trends,
         "funnel": funnel,
         "reviews": reviews,
+        "call_quality": call_quality,
         "attributed_value": attributed,
         "annualized": annual,
         "cost_per_lead": cpl,
@@ -2470,6 +2476,107 @@ async def track_lead_beacon(slug: str, request: Request, source: str = "form"):
     await log_event(slug, "lead", source=source, ip=_client_ip(request))
     return Response(content=_PIXEL_GIF, media_type="image/gif",
                     headers={"Cache-Control": "no-store, max-age=0"})
+
+
+# ── CALL TRACKING — caller ID + duration via Twilio ─────────
+#
+# CallRail-grade: a Lola-provisioned Twilio number forwards to the client's
+# real phone and logs caller ID + duration + recording. Setup per client:
+#   1. Buy a Twilio number near the client's area code.
+#   2. Set its Voice webhook (A CALL COMES IN) to:
+#        https://<api>/twilio/voice/<slug>?source=gbp
+#   3. Set the call-status callback to /twilio/status/<slug>.
+#   4. Store the client's REAL number as forward_number (onboard or admin).
+#   5. Put the Twilio number on the client's GBP "Call" field.
+# Now every call is logged with the actual caller's number + how long they
+# talked — the undeniable proof. Caller numbers are PII: admin-only surface.
+
+
+def _twiml(xml_body: str) -> PlainTextResponse:
+    return PlainTextResponse(
+        content=f'<?xml version="1.0" encoding="UTF-8"?><Response>{xml_body}</Response>',
+        media_type="text/xml",
+    )
+
+
+@app.post("/twilio/voice/{slug}")
+async def twilio_voice(slug: str, request: Request, source: str = "gbp"):
+    """Twilio hits this when a call comes in to the tracking number. We log
+    the caller, then return TwiML that forwards to the client's real line +
+    records. Forwarding number comes from reporting_clients.forward_number."""
+    form = await request.form()
+    call_sid = str(form.get("CallSid") or "")
+    caller = str(form.get("From") or "")
+    tracking_number = str(form.get("To") or "")
+    caller_city = str(form.get("FromCity") or "") or None
+    caller_state = str(form.get("FromState") or "") or None
+
+    rc = await get_reporting_client_by_slug(slug)
+    forward = (rc or {}).get("forward_number")
+
+    if call_sid:
+        await log_call(
+            slug, call_sid=call_sid, caller_number=caller, tracking_number=tracking_number,
+            forwarded_to=forward, source=source, caller_city=caller_city, caller_state=caller_state,
+        )
+        # Also tick the generic 'call' event so the public counters move.
+        await log_event(slug, "call", source=source, meta={"sid": call_sid})
+
+    status_cb = f"{_public_api_base(request)}/twilio/status/{slug}"
+    if forward:
+        dial = (
+            f'<Dial record="record-from-answer-dual" '
+            f'recordingStatusCallback="{status_cb}" '
+            f'action="{status_cb}" method="POST" callerId="{tracking_number}">'
+            f"{_xml_escape(forward)}</Dial>"
+        )
+        return _twiml(dial)
+    # No forward set — don't drop the customer; say a graceful line.
+    return _twiml(
+        '<Say voice="alice">Thanks for calling. Please hold while we connect you, '
+        'or call back shortly.</Say>'
+    )
+
+
+@app.post("/twilio/status/{slug}")
+async def twilio_status(slug: str, request: Request):
+    """Call-status + recording callback. Stamps final duration + recording."""
+    form = await request.form()
+    call_sid = str(form.get("CallSid") or "")
+    status = str(form.get("DialCallStatus") or form.get("CallStatus") or "completed")
+    duration = int(form.get("DialCallDuration") or form.get("CallDuration") or 0)
+    recording = str(form.get("RecordingUrl") or "") or None
+    if call_sid:
+        await update_call_status(call_sid, status=status, duration_sec=duration, recording_url=recording)
+    return _twiml("")
+
+
+def _xml_escape(s: str) -> str:
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _public_api_base(request: Request) -> str:
+    """Best-effort public base URL for building callback URLs."""
+    env = os.getenv("PUBLIC_API_BASE")
+    if env:
+        return env.rstrip("/")
+    return str(request.base_url).rstrip("/")
+
+
+@app.get("/admin/calls/{slug}")
+async def admin_calls(
+    slug: str,
+    limit: int = 50,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """ADMIN-only full call log with real caller numbers + durations. Share
+    privately with the client; never exposed on the public dashboard."""
+    _check_admin(x_admin_key)
+    return {
+        "slug": slug,
+        "quality": await call_quality_stats(slug),
+        "calls": await recent_calls_admin(slug, limit=max(1, min(limit, 200))),
+    }
 
 
 @app.get("/admin/tracking/{slug}")
