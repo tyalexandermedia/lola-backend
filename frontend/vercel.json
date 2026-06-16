@@ -236,6 +236,10 @@
       "destination": "/lp/clients-admin.html"
     },
     {
+      "source": "/lp/outreach-admin",
+      "destination": "/lp/outreach-admin.html"
+    },
+    {
       "source": "/reviews/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
     },

@@ -79,6 +79,14 @@ from db.outreach import (
     stats as outreach_stats,
     recent_sends as outreach_recent_sends,
 )
+from db.prospects import (
+    init_prospect_tables,
+    upsert_prospect,
+    list_prospects,
+    update_prospect_status,
+    pipeline_stats,
+    STATUSES as PROSPECT_STATUSES,
+)
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -164,6 +172,7 @@ async def startup_event():
     await init_pricing_table()
     await init_cache_table()
     await init_outreach_tables()
+    await init_prospect_tables()
     await init_applications_table()
     await init_reviews_tables()
     await init_case_studies_table()
@@ -2170,6 +2179,179 @@ async def admin_release_lock(
     if not ok:
         raise HTTPException(status_code=404, detail="No active lock with that id")
     return {"ok": True, "released": lock_id}
+
+
+# ── PROSPECT PIPELINE — the sprint engine ───────────────────
+#
+# Batch-grade a list of local businesses with the real audit scoring (no
+# side effects — does NOT email the prospect or save a public audit), then
+# store each with a ready-to-send draft cold email. Work the hottest leads
+# (biggest revenue leak) first via /lp/outreach-admin.
+
+
+async def grade_prospect(
+    business_name: str, city: str, website: str, niche: str,
+) -> dict:
+    """
+    Side-effect-free grade of one prospect. Reuses the same Google-data
+    scoring as /audit but skips save_audit, the follow-up emails, and the
+    lead upsert — this is prospecting, not a customer audit. Skips the
+    competitors + on-page HTML pulls to keep the per-prospect API cost to
+    ~3 calls so a batch of 15 stays well under the daily ceiling.
+    """
+    bt = normalize_business_type(niche)
+    site = website.strip() if website and website.strip() else ""
+    site_url = site if site.startswith("http") else (f"https://{site}" if site else "")
+    budget = ApiBudget(4)
+
+    async with httpx.AsyncClient() as client:
+        page_speed_result, safe_browsing_result, business_info_result = await asyncio.gather(
+            get_page_speed(client, site_url, budget) if site_url else _noop_dict(),
+            get_safe_browsing(client, site_url, budget) if site_url else _noop_dict(),
+            get_business_info(client, business_name, city, budget),
+        )
+
+    total_score, _cats, _sigs = compute_home_services_score(
+        page_speed_result, business_info_result, safe_browsing_result,
+    )
+    incomplete = total_score < 0
+    scoring_score = 50 if incomplete else total_score
+    monthly_leak = calculate_revenue_leak(bt, scoring_score).get("monthly_leak", 0)
+    grade, _label = get_grade(total_score)
+    recs = generate_recommendations(business_info_result, page_speed_result, safe_browsing_result)
+    top = recs[0] if recs else None
+    found = bool(business_info_result.get("website") or business_info_result.get("place_id"))
+    resolved_site = site_url or (business_info_result.get("website") or "")
+
+    return {
+        "score": None if incomplete else total_score,
+        "grade": grade,
+        "monthly_leak": monthly_leak,
+        "top_fix": (top or {}).get("title") if isinstance(top, dict) else getattr(top, "title", None),
+        "top_fix_detail": (top or {}).get("detail") if isinstance(top, dict) else getattr(top, "detail", None),
+        "found_on_google": found,
+        "website": resolved_site,
+    }
+
+
+async def _noop_dict() -> dict:
+    return {"ok": False}
+
+
+def draft_outreach_email(
+    business_name: str, city: str, niche: str, score, monthly_leak: int,
+    top_fix: Optional[str],
+) -> tuple:
+    """Templated cold email from real audit data. Coach Ty voice — short,
+    specific, one ask. Returns (subject, body). No fabricated numbers; every
+    figure comes from the grade we just ran."""
+    niche_label = (niche or "local").strip()
+    score_line = f"a {score}/100 AI Visibility Score" if score is not None else "some gaps in your AI visibility"
+    leak_line = (
+        f"about ${monthly_leak:,}/mo in jobs slipping to competitors"
+        if monthly_leak else "jobs slipping to competitors who show up first"
+    )
+    fix_line = f"The #1 fix: {top_fix}." if top_fix else "There's a clear #1 fix we'd start with."
+
+    subject = f"{business_name} — invisible when people ask AI for a {niche_label} in {city}?"
+    body = (
+        f"Hey — Coach Ty here, Tampa.\n\n"
+        f"I ran {business_name} through our free AI Visibility Grader and you came back with "
+        f"{score_line}. When someone asks Google, ChatGPT, or Gemini for a {niche_label} in "
+        f"{city}, you're getting skipped — that's {leak_line}.\n\n"
+        f"{fix_line}\n\n"
+        f"I do this done-for-you for one {niche_label} per city (so I'd never take your "
+        f"competitor here). Want me to send your full scorecard + the 3 fixes worth the most? "
+        f"Or grab 15 min: https://calendar.app.google/J7idjUDitd2Hziuc7\n\n"
+        f"— Coach Ty\nLola — AI Leads Expert · Ty Alexander Media"
+    )
+    return subject, body
+
+
+class ProspectInput(BaseModel):
+    business_name: str
+    city: str
+    website: Optional[str] = None
+    niche: Optional[str] = None
+    email: Optional[str] = None
+
+
+class GradeBatchRequest(BaseModel):
+    businesses: List[ProspectInput]
+    default_niche: Optional[str] = None
+
+
+@app.post("/admin/prospects/grade-batch")
+async def admin_grade_batch(
+    body: GradeBatchRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Grade up to 15 prospects (real Google data, no side effects) and store
+    each with a draft cold email. Bounded concurrency keeps Google spend sane."""
+    _check_admin(x_admin_key)
+    items = body.businesses[:15]
+    if not items:
+        raise HTTPException(status_code=400, detail="Provide 1–15 businesses")
+
+    sem = asyncio.Semaphore(3)
+
+    async def _one(p: ProspectInput) -> dict:
+        niche = (p.niche or body.default_niche or "other").strip()
+        async with sem:
+            try:
+                g = await grade_prospect(p.business_name, p.city, p.website or "", niche)
+            except Exception as e:  # one bad prospect can't kill the batch
+                return {"business_name": p.business_name, "city": p.city, "ok": False, "error": str(e)}
+        subject, email_body = draft_outreach_email(
+            p.business_name, p.city, niche, g["score"], g["monthly_leak"], g["top_fix"],
+        )
+        pid = await upsert_prospect(
+            business_name=p.business_name, city=p.city, website=g["website"], niche=niche,
+            score=g["score"], grade=g["grade"], monthly_leak=g["monthly_leak"],
+            top_fix=g["top_fix"], top_fix_detail=g["top_fix_detail"],
+            draft_subject=subject, draft_body=email_body, found_on_google=g["found_on_google"],
+            email=(p.email or None),
+        )
+        return {
+            "id": pid, "business_name": p.business_name, "city": p.city, "ok": True,
+            "score": g["score"], "monthly_leak": g["monthly_leak"], "found_on_google": g["found_on_google"],
+        }
+
+    results = await asyncio.gather(*[_one(p) for p in items])
+    graded = [r for r in results if r.get("ok")]
+    return {"ok": True, "graded": len(graded), "results": results}
+
+
+@app.get("/admin/prospects")
+async def admin_list_prospects(
+    status: Optional[str] = None,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {
+        "stats": await pipeline_stats(),
+        "prospects": await list_prospects(status=status),
+    }
+
+
+class ProspectStatusUpdate(BaseModel):
+    status: str
+    notes: Optional[str] = None
+
+
+@app.post("/admin/prospects/{prospect_id}/status")
+async def admin_update_prospect(
+    prospect_id: int,
+    body: ProspectStatusUpdate,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    if body.status not in PROSPECT_STATUSES:
+        raise HTTPException(status_code=400, detail=f"status must be one of {list(PROSPECT_STATUSES)}")
+    ok = await update_prospect_status(prospect_id, body.status, body.notes)
+    if not ok:
+        raise HTTPException(status_code=404, detail="No such prospect")
+    return {"ok": True, "id": prospect_id, "status": body.status}
 
 
 class FoundingSignupRequest(BaseModel):
