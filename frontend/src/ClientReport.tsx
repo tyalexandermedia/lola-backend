@@ -37,6 +37,15 @@ interface DashboardPayload {
   implementation?: Implementation;
   share_of_voice?: ShareOfVoice;
   tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
+  tracking_sources?: Record<string, Record<string, number>>;
+  attributed_value?: {
+    value: number;
+    contacts: number;
+    calls: number;
+    leads: number;
+    close_rate: number;
+    avg_job_value: number;
+  };
   generated_at: string;
 }
 
@@ -94,7 +103,12 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
-      {data.tracking && <TrackingRow tracking={data.tracking} />}
+      {data.attributed_value && data.attributed_value.contacts > 0 && (
+        <AttributedValueCard a={data.attributed_value} />
+      )}
+      {data.tracking && (
+        <TrackingRow tracking={data.tracking} sources={data.tracking_sources} />
+      )}
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
 
       {data.implementation && <WorkDelivered impl={data.implementation} />}
@@ -220,17 +234,54 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
 }
 
 /**
+ * Attributed Value card — the dollar number that justifies the retainer.
+ * Conservative formula (shown to the client so there's no black box):
+ *   contacts × close_rate × avg_job_value = estimated revenue Lola drove
+ * Renders only when there are actual contacts this month.
+ */
+function AttributedValueCard({ a }: { a: NonNullable<DashboardPayload['attributed_value']> }) {
+  const pct = Math.round(a.close_rate * 100);
+  return (
+    <section className="mb-6 rounded-2xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-5 shadow-[0_0_28px_rgba(212,175,55,0.12)] sm:p-7">
+      <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+        Estimated revenue Lola drove this month
+      </p>
+      <p className="mt-2 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[44px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[56px]">
+        ${a.value.toLocaleString()}
+      </p>
+      <p className="mt-3 text-[12px] leading-[1.5] text-[#C8C0B0] sm:text-[13px]">
+        {a.contacts} contact{a.contacts === 1 ? '' : 's'} ({a.calls} call{a.calls === 1 ? '' : 's'} · {a.leads} lead{a.leads === 1 ? '' : 's'})
+        {' '}× {pct}% close rate × ${a.avg_job_value.toLocaleString()} avg job.{' '}
+        <span className="text-[#9CA3AF]">Conservative — actual close rate is whatever your crew runs.</span>
+      </p>
+    </section>
+  );
+}
+
+/**
  * Calls / Leads / Clicks billing row — the ROI proof at the top of the
  * dashboard. Shows "this month" big with last-30d + lifetime context.
- * Only the events captured via the client's tracked links populate here.
+ * Source breakdown below each metric so the client can see WHERE Lola
+ * earned the call (GBP, website, AI search, etc.) — the attribution
+ * proof that "yes, this lead came from our system."
  */
-function TrackingRow({ tracking }: { tracking: Record<string, { month: number; last_30d: number; lifetime: number }> }) {
+function TrackingRow({
+  tracking, sources,
+}: {
+  tracking: Record<string, { month: number; last_30d: number; lifetime: number }>;
+  sources?: Record<string, Record<string, number>>;
+}) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
     { key: 'lead', label: 'Leads', emoji: '📝', accent: '#F4D47C' },
     { key: 'click', label: 'Clicks', emoji: '👆', accent: '#93C5FD' },
   ];
   const anyData = cells.some((c) => (tracking[c.key]?.lifetime || 0) > 0);
+
+  const sourceLabel = (s: string): string => ({
+    gbp: 'GBP', website: 'Website', ai_search: 'AI Search',
+    social: 'Social', form: 'Form', '(direct)': 'Direct',
+  }[s] || s);
 
   return (
     <section className="mb-6 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-5 sm:p-6">
@@ -240,11 +291,22 @@ function TrackingRow({ tracking }: { tracking: Record<string, { month: number; l
       <div className="mt-4 grid grid-cols-3 gap-3">
         {cells.map((c) => {
           const t = tracking[c.key] || { month: 0, last_30d: 0, lifetime: 0 };
+          const src = (sources && sources[c.key]) || {};
+          const srcEntries = Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 3);
           return (
             <div key={c.key} className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
               <p className="text-[11px] uppercase tracking-[0.12em] text-[#9CA3AF]">{c.emoji} {c.label}</p>
               <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{t.month}</p>
               <p className="mt-2 text-[11px] text-[#6B7280]">30d: {t.last_30d} · all: {t.lifetime}</p>
+              {srcEntries.length > 0 && (
+                <div className="mt-3 flex flex-wrap justify-center gap-1">
+                  {srcEntries.map(([s, n]) => (
+                    <span key={s} className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#C8C0B0]">
+                      {sourceLabel(s)} {n}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}

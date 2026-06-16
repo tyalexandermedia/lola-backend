@@ -125,6 +125,27 @@ export default function CaseStudiesIndex() {
             </p>
           </a>
 
+          {/* Live dashboard card — public proof you can hand a prospect. */}
+          <a
+            href="/r/client/sandbar"
+            onClick={() => track('case_studies_card_clicked', { slug: 'sandbar', kind: 'live' })}
+            className="group relative flex flex-col rounded-[14px] border border-emerald-500/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#0A1410] p-6 shadow-[0_0_28px_rgba(16,185,129,0.10)] transition-all hover:-translate-y-1 hover:border-emerald-500/60 sm:p-7"
+          >
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+              <span aria-hidden className="mr-1">●</span>Live dashboard · updated weekly
+            </p>
+            <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
+              Sandbar Soft Wash — live data
+            </h2>
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+              The real ranking history, AI Share of Voice, and calls/leads/clicks Lola is driving
+              right now. No login. PII stripped. The dashboard we&apos;d hand your business too.
+            </p>
+            <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.06em] text-emerald-300 transition group-hover:translate-x-1">
+              Open the live dashboard →
+            </p>
+          </a>
+
           {/* Honest placeholder card — we're explicit it's coming, no
               fake business names or fabricated numbers. */}
           <div className="flex flex-col rounded-[14px] border border-dashed border-white/[0.10] bg-white/[0.01] p-6 sm:p-7">

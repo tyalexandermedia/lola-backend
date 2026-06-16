@@ -99,6 +99,49 @@ async def counts_for_slug(slug: str) -> dict:
     return out
 
 
+async def counts_by_source(slug: str) -> dict:
+    """Per-event-type counts grouped by `source` (gbp, website, ai_search,
+    social, etc.). Powers the dashboard attribution view: 'this month's
+    calls — 8 from GBP, 3 from website, 1 from AI search'.
+
+    Returns: { 'call': { 'gbp': 8, 'website': 3, 'ai_search': 1 }, ... }
+    only for the current calendar month."""
+    out: dict = {t: {} for t in EVENT_TYPES}
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT event_type, COALESCE(source,'(direct)') AS source, COUNT(*)
+               FROM tracked_events
+               WHERE slug = ?
+                 AND strftime('%Y-%m', created_at) = strftime('%Y-%m','now')
+               GROUP BY event_type, source""",
+            (slug.strip().lower(),),
+        ) as cur:
+            for et, src, n in await cur.fetchall():
+                if et in out:
+                    out[et][src] = int(n)
+    return out
+
+
+def attributed_value(counts: dict, avg_job_value: int = 400, close_rate: float = 0.30) -> dict:
+    """Estimated revenue Lola drove this month. Conservative: calls × close
+    rate × avg job value (no double-count of leads-that-also-called).
+    Returns the math so the client can see how we got there — no black box."""
+    calls = int(((counts or {}).get("call") or {}).get("month", 0))
+    leads = int(((counts or {}).get("lead") or {}).get("month", 0))
+    # Effective contacts = max(calls, leads) so we don't over-attribute a
+    # lead that also called. Same logic the leak calculator uses.
+    contacts = max(calls, leads)
+    closed_est = contacts * max(0.0, min(1.0, close_rate))
+    return {
+        "value": int(round(closed_est * max(0, avg_job_value))),
+        "contacts": contacts,
+        "calls": calls,
+        "leads": leads,
+        "close_rate": close_rate,
+        "avg_job_value": avg_job_value,
+    }
+
+
 async def recent_events(slug: str, limit: int = 50) -> List[dict]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
