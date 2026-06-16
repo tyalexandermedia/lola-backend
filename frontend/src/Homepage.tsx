@@ -397,6 +397,24 @@ export default function Homepage() {
         <span className="font-bold text-white">Real work or you walk.</span>
       </p>
 
+      {/* Outcome-tracking band — ties the offer to measurable results, the
+          thing that justifies the retainer. Mirrors the live dashboard. */}
+      <div className="mt-8 grid grid-cols-1 gap-3 rounded-2xl border border-[#D4AF37]/20 bg-white/[0.02] p-5 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-6 sm:p-6">
+        <div className="flex gap-3 sm:gap-4">
+          {[['📞', 'Calls'], ['📝', 'Leads'], ['👆', 'Clicks']].map(([e, l]) => (
+            <div key={l} className="flex flex-col items-center rounded-[10px] border border-white/[0.08] bg-[#0F0F12] px-4 py-2.5">
+              <span aria-hidden className="text-[18px]">{e}</span>
+              <span className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">{l}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
+          <span className="font-semibold text-white">You get a live dashboard</span> — every call,
+          lead, and click we drive, tracked and counted. Not vanity rankings: the calls that pay
+          your bills. <span className="text-[#D4AF37]">ROI you can see, not take on faith.</span>
+        </p>
+      </div>
+
       {/* ── 4. SCROLLING STATS MARQUEE ──────────────────────────────── */}
       <div className="relative left-1/2 right-1/2 mt-12 -mx-[50vw] w-screen sm:mt-16">
         <Marquee />

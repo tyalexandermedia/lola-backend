@@ -28,6 +28,7 @@ print(f"Loaded .env from {dotenv_path} (exists={dotenv_path.exists()})")
 
 import httpx
 from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi.responses import RedirectResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -86,6 +87,13 @@ from db.prospects import (
     update_prospect_status,
     pipeline_stats,
     STATUSES as PROSPECT_STATUSES,
+)
+from db.tracking import (
+    init_tracking_tables,
+    log_event,
+    counts_for_slug,
+    recent_events,
+    EVENT_TYPES,
 )
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
@@ -173,6 +181,7 @@ async def startup_event():
     await init_cache_table()
     await init_outreach_tables()
     await init_prospect_tables()
+    await init_tracking_tables()
     await init_applications_table()
     await init_reviews_tables()
     await init_case_studies_table()
@@ -1785,6 +1794,9 @@ async def public_client_dashboard(slug: str):
         "queries_tracked": len(ai_series),
     }
 
+    # Call / lead / click attribution — the billing-proof row.
+    tracking = await counts_for_slug(slug)
+
     return {
         "slug": slug,
         "client_name": cs.client_name,
@@ -1793,6 +1805,7 @@ async def public_client_dashboard(slug: str):
         "ai_mode": ai_series,
         "implementation": implementation,
         "share_of_voice": share_of_voice,
+        "tracking": tracking,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -2352,6 +2365,120 @@ async def admin_update_prospect(
     if not ok:
         raise HTTPException(status_code=404, detail="No such prospect")
     return {"ok": True, "id": prospect_id, "status": body.status}
+
+
+# ── CALL / LEAD / CLICK TRACKING — the billing-proof layer ──
+#
+# First-party tracked links the client puts on their GBP + site. Each hit
+# logs an event tied to the client slug, then redirects/responds so the
+# user never notices. Counts surface on /r/client/<slug> as the ROI proof
+# that justifies (and raises) the retainer. No 3rd-party call-tracking
+# vendor needed for v1 — these are click-to-call + tracked-link + form-post.
+
+_PIXEL_GIF = bytes.fromhex(
+    "47494638396101000100800000000000ffffff21f90401000000002c"
+    "00000000010001000002024401003b"
+)
+
+
+def _client_ip(request: Request) -> str:
+    xff = request.headers.get("x-forwarded-for", "")
+    return xff.split(",")[0].strip() if xff else (request.client.host if request.client else "")
+
+
+@app.get("/t/c/{slug}")
+async def track_call(slug: str, request: Request, to: str = "", source: str = "gbp"):
+    """Click-to-call tracker. Put https://lola.tyalexandermedia.com/t/c/<slug>?to=tel:+1727...
+    behind the client's 'Call' button. Logs a call event, 302s to the tel: link."""
+    await log_event(slug, "call", source=source, ip=_client_ip(request),
+                    meta={"to": to[:64]})
+    target = to if to.startswith("tel:") else (f"tel:{to}" if to else "/")
+    return RedirectResponse(url=target, status_code=302)
+
+
+@app.get("/t/go/{slug}")
+async def track_click(slug: str, request: Request, to: str = "", source: str = "website"):
+    """Tracked outbound/website link. Logs a click, 302s to ?to= URL."""
+    await log_event(slug, "click", source=source, ip=_client_ip(request),
+                    meta={"to": to[:200]})
+    target = to if to.startswith("http") else "/"
+    return RedirectResponse(url=target, status_code=302)
+
+
+@app.get("/t/pixel/{slug}.gif")
+async def track_pixel(slug: str, request: Request, source: str = "page"):
+    """1x1 view pixel. Embed <img src=".../t/pixel/<slug>.gif"> on the client page."""
+    await log_event(slug, "view", source=source, ip=_client_ip(request))
+    return Response(content=_PIXEL_GIF, media_type="image/gif",
+                    headers={"Cache-Control": "no-store, max-age=0"})
+
+
+class LeadEvent(BaseModel):
+    source: Optional[str] = "form"
+    name: Optional[str] = None
+    contact: Optional[str] = None
+    note: Optional[str] = None
+
+
+@app.post("/t/lead/{slug}")
+async def track_lead(slug: str, body: LeadEvent, request: Request):
+    """Form-submission tracker. Client's form posts here (CORS-open) to log
+    a lead. Stores only light metadata — never sensitive PII beyond contact."""
+    await log_event(slug, "lead", source=body.source or "form", ip=_client_ip(request),
+                    meta={"name": (body.name or "")[:80], "contact": (body.contact or "")[:120],
+                          "note": (body.note or "")[:200]})
+    return {"ok": True}
+
+
+@app.get("/t/lead/{slug}")
+async def track_lead_beacon(slug: str, request: Request, source: str = "form"):
+    """CORS-free lead beacon for cross-site embedding. Client's form fires
+    a fetch(..., {mode:'no-cors'}) or an <img> to this URL on submit. Returns
+    the 1x1 pixel so it doubles as an image beacon."""
+    await log_event(slug, "lead", source=source, ip=_client_ip(request))
+    return Response(content=_PIXEL_GIF, media_type="image/gif",
+                    headers={"Cache-Control": "no-store, max-age=0"})
+
+
+@app.get("/admin/tracking/{slug}")
+async def admin_tracking(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Per-client event counts + recent events for billing/QA."""
+    _check_admin(x_admin_key)
+    return {"slug": slug, "counts": await counts_for_slug(slug), "recent": await recent_events(slug)}
+
+
+@app.get("/admin/health/keys")
+async def admin_health_keys(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """One-glance check of which API keys are configured on this server.
+    Removes the #1 'why is the grader/snapshot empty' failure mode. Never
+    returns the key values — only configured true/false."""
+    _check_admin(x_admin_key)
+    keys = [
+        "GOOGLE_PLACES_API_KEY",
+        "GOOGLE_PAGESPEED_API_KEY",
+        "GOOGLE_SAFE_BROWSING_API_KEY",
+        "GOOGLE_CUSTOM_SEARCH_API_KEY",
+        "GOOGLE_CUSTOM_SEARCH_CX",
+        "ANTHROPIC_API_KEY",
+        "RESEND_API_KEY",
+        "BREVO_API_KEY",
+        "LOLA_SECRET_ADMIN_KEY",
+    ]
+    status = {k: bool(os.getenv(k, "").strip()) for k in keys}
+    # The two that gate the Grader + Sandbar snapshot — call them out.
+    grader_ready = status["GOOGLE_PLACES_API_KEY"]
+    snapshot_ready = status["GOOGLE_PLACES_API_KEY"] and status["GOOGLE_CUSTOM_SEARCH_API_KEY"] and status["ANTHROPIC_API_KEY"]
+    return {
+        "keys": status,
+        "grader_ready": grader_ready,
+        "ai_snapshot_ready": snapshot_ready,
+        "missing": [k for k, v in status.items() if not v],
+    }
 
 
 class FoundingSignupRequest(BaseModel):

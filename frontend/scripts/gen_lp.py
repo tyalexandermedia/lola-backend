@@ -976,9 +976,11 @@ def render_vercel(slugs):
     rewrites.append({"source": "/lp/reviews-admin", "destination": "/lp/reviews-admin.html"})
     rewrites.append({"source": "/lp/clients-admin", "destination": "/lp/clients-admin.html"})
     rewrites.append({"source": "/lp/outreach-admin", "destination": "/lp/outreach-admin.html"})
-    # 3. Reviews proxy — exactly as-is.
+    # 3. Backend proxies — reviews + tracking (/t/*) live on Railway.
     rewrites.append({"source": "/reviews/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/reviews/$1"})
+    rewrites.append({"source": "/t/(.*)",
+                     "destination": "https://lola-backend-production.up.railway.app/t/$1"})
     # 4. Catch-all LAST.
     rewrites.append({"source": "/(.*)", "destination": "/index.html"})
 
