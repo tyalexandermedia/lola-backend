@@ -42,6 +42,10 @@ interface DashboardPayload {
   funnel?: { view: number; click: number; call: number; lead: number; click_rate: number; call_rate: number; lead_rate: number; overall: number };
   reviews?: { month: number; lifetime: number; google_routed_month: number };
   call_quality?: { month: number; qualified_month: number; long_month: number; lifetime: number; avg_duration_sec: number };
+  gbp_performance?: { calls: number; website_clicks: number; direction_requests: number; impressions: number; window_days: number; fetched_at?: string } | null;
+  bing?: { clicks: number; impressions: number; ctr: number; fetched_at?: string } | null;
+  cwv_trend?: Array<{ performance: number; accessibility: number; seo: number; run_at: string }>;
+  lead_sources?: Record<string, number>;
   search_console?: {
     gsc?: { error?: string | null; clicks: number; impressions: number; ctr: number; position: number; clicks_prev: number; impressions_prev: number; top_queries: Array<{ query: string; clicks: number; impressions: number; ctr: number; position: number }>; top_pages: Array<{ page: string; clicks: number; impressions: number }> } | null;
     ga?: { error?: string | null; organic_sessions: number; organic_sessions_prev: number } | null;
@@ -116,7 +120,11 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.tracking && (
         <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
       )}
+      {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
       {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
+      {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
+      {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
+      {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
       {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
       {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
@@ -302,6 +310,135 @@ function BillingProofRow({
           At this month&apos;s pace × 12 mo · conservative no-growth projection
         </p>
       </div>
+    </section>
+  );
+}
+
+/**
+ * GBP Performance card — Google's OWN count of calls / website clicks /
+ * direction requests / impressions straight from the Maps listing. The
+ * single most credible call-proof: Google itself confirming the activity.
+ */
+function GbpCard({ g }: { g: NonNullable<DashboardPayload['gbp_performance']> }) {
+  const tiles = [
+    { label: 'Calls from listing', val: g.calls, accent: '#6EE7B7' },
+    { label: 'Website clicks', val: g.website_clicks, accent: '#93C5FD' },
+    { label: 'Direction requests', val: g.direction_requests, accent: '#F4D47C' },
+    { label: 'Listing impressions', val: g.impressions, accent: '#D4AF37' },
+  ];
+  return (
+    <section className="mt-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        📍 Google Business Profile · last {g.window_days || 30} days
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+          straight from Google — the unarguable call proof
+        </span>
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {tiles.map((t) => (
+          <div key={t.label} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{t.label}</p>
+            <p className="mt-1 text-[26px] font-extrabold leading-none" style={{ color: t.accent }}>
+              {(t.val || 0).toLocaleString()}
+            </p>
+          </div>
+        ))}
+      </div>
+      {g.fetched_at && <p className="mt-3 text-[10px] text-[#6B7280]">Updated {fmtDateTime(g.fetched_at)}</p>}
+    </section>
+  );
+}
+
+/** Bing Webmaster card — captures the Bing/Copilot/ChatGPT-Search index. */
+function BingCard({ b }: { b: NonNullable<DashboardPayload['bing']> }) {
+  return (
+    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Ⓑ Bing / Copilot search
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+          the index behind ChatGPT Search + Copilot
+        </span>
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Clicks</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#6EE7B7]">{b.clicks.toLocaleString()}</p>
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Impressions</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#93C5FD]">{b.impressions.toLocaleString()}</p>
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">CTR</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#F4D47C]">{b.ctr}%</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Lead-source rollup — where every call + lead came from this month. */
+function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
+  const total = Object.values(sources).reduce((a, b) => a + b, 0);
+  const label = (s: string) => ({ gbp: 'Google Business', gbp_form: 'GBP form', website: 'Website', ai_search: 'AI Search', social: 'Social', form: 'Web form', '(direct)': 'Direct' }[s] || s);
+  const palette = ['#6EE7B7', '#93C5FD', '#F4D47C', '#D4AF37', '#FCA5A5', '#C4B5FD'];
+  const rows = Object.entries(sources).sort((a, b) => b[1] - a[1]);
+  return (
+    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Where your contacts came from · this month
+      </p>
+      {/* Stacked bar */}
+      <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-[#0F0F12]">
+        {rows.map(([s, n], i) => (
+          <div key={s} title={`${label(s)}: ${n}`} style={{ width: `${(n / total) * 100}%`, background: palette[i % palette.length] }} />
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+        {rows.map(([s, n], i) => (
+          <span key={s} className="flex items-center gap-1.5 text-[12px] text-[#C8C0B0]">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: palette[i % palette.length] }} />
+            {label(s)} <span className="text-white font-semibold">{n}</span>
+            <span className="text-[#6B7280]">({Math.round((n / total) * 100)}%)</span>
+          </span>
+        ))}
+      </div>
+      <p className="mt-3 text-[11px] text-[#6B7280]">Every contact, attributed to the channel Lola earned it through.</p>
+    </section>
+  );
+}
+
+/** Core Web Vitals trend — proves "we made your site faster too." */
+function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_trend']> }) {
+  const latest = series[series.length - 1];
+  const first = series[0];
+  const metric = (key: 'performance' | 'accessibility' | 'seo', label: string, accent: string) => {
+    const now = latest[key] || 0;
+    const was = first[key] || 0;
+    const delta = now - was;
+    return (
+      <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
+        <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
+        <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: accent }}>{now}</p>
+        {series.length > 1 && (
+          <p className={`mt-1 text-[11px] font-semibold ${delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#6B7280]'}`}>
+            {delta > 0 ? '↑' : delta < 0 ? '↓' : '·'} {delta !== 0 ? Math.abs(delta) : 'flat'}
+          </p>
+        )}
+      </div>
+    );
+  };
+  return (
+    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Site health (Google PageSpeed) · {series.length} snapshot{series.length === 1 ? '' : 's'}
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        {metric('performance', 'Performance', '#6EE7B7')}
+        {metric('seo', 'SEO', '#F4D47C')}
+        {metric('accessibility', 'Accessibility', '#93C5FD')}
+      </div>
+      <p className="mt-3 text-[11px] text-[#6B7280]">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
     </section>
   );
 }

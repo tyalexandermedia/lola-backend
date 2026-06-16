@@ -398,3 +398,85 @@ async def get_gsc_snapshot(slug: str) -> Optional[dict]:
         return data
     except Exception:
         return None
+
+
+# ── Generic provider snapshots (gbp / bing / cwv / …) ─────────────
+# One table, keyed by (slug, provider). Lets us cache any external
+# metric source the same way as GSC without a table per provider.
+CREATE_PROVIDER = """
+CREATE TABLE IF NOT EXISTS provider_snapshots (
+    slug TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    fetched_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (slug, provider)
+);
+"""
+
+
+async def save_provider_snapshot(slug: str, provider: str, data: dict) -> None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(CREATE_PROVIDER)
+        await db.execute(
+            """INSERT INTO provider_snapshots (slug, provider, data_json, fetched_at)
+               VALUES (?, ?, ?, datetime('now'))
+               ON CONFLICT(slug, provider) DO UPDATE SET
+                 data_json = excluded.data_json, fetched_at = datetime('now')""",
+            (slug.strip().lower(), provider, json.dumps(data)[:20000]),
+        )
+        await db.commit()
+
+
+async def get_provider_snapshot(slug: str, provider: str) -> Optional[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(CREATE_PROVIDER)
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT data_json, fetched_at FROM provider_snapshots WHERE slug = ? AND provider = ?",
+            (slug.strip().lower(), provider),
+        ) as cur:
+            row = await cur.fetchone()
+    if not row:
+        return None
+    try:
+        d = json.loads(row["data_json"])
+        d["fetched_at"] = row["fetched_at"]
+        return d
+    except Exception:
+        return None
+
+
+async def cwv_history(slug: str, limit: int = 12) -> List[dict]:
+    """Core Web Vitals snapshots over time for the trend sparkline. Stored
+    as provider='cwv' but we keep a rolling series in a dedicated table so
+    we can chart the trend (provider_snapshots only holds the latest)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS cwv_series (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                slug TEXT NOT NULL,
+                performance INTEGER, accessibility INTEGER, seo INTEGER,
+                run_at TEXT DEFAULT (datetime('now'))
+            )""")
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT performance, accessibility, seo, run_at FROM cwv_series WHERE slug = ? ORDER BY run_at ASC LIMIT ?",
+            (slug.strip().lower(), limit),
+        ) as cur:
+            return [dict(r) for r in await cur.fetchall()]
+
+
+async def save_cwv(slug: str, performance: int, accessibility: int, seo: int) -> None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS cwv_series (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                slug TEXT NOT NULL,
+                performance INTEGER, accessibility INTEGER, seo INTEGER,
+                run_at TEXT DEFAULT (datetime('now'))
+            )""")
+        await db.execute(
+            "INSERT INTO cwv_series (slug, performance, accessibility, seo) VALUES (?, ?, ?, ?)",
+            (slug.strip().lower(), performance, accessibility, seo),
+        )
+        await db.commit()
