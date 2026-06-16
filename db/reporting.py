@@ -132,6 +132,10 @@ def normalize_city(s: str) -> str:
 _ADD_COLUMNS = [
     "ALTER TABLE reporting_clients ADD COLUMN target_url TEXT",
     "ALTER TABLE reporting_clients ADD COLUMN ai_mode_prompts_json TEXT NOT NULL DEFAULT '[]'",
+    # Call-tracking forward number: the client's REAL phone that a Lola
+    # Twilio tracking number forwards to. NULL = call tracking not set up.
+    "ALTER TABLE reporting_clients ADD COLUMN forward_number TEXT",
+    "ALTER TABLE reporting_clients ADD COLUMN tracking_number TEXT",
 ]
 
 
