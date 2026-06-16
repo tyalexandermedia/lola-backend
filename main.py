@@ -106,6 +106,7 @@ from db.reporting import (
     release_lock,
     locks_for_slug,
     list_all_locks,
+    recent_locks_public,
     LOCK_TIER_QUOTAS,
 )
 from agents.reporting_agent.main import run_for_client, run_weekly_for_all_active
@@ -2101,6 +2102,14 @@ async def public_check_lock(niche: str, city: str):
         "available": held is None,
         "tier": (held or {}).get("tier") if held else None,
     }
+
+
+@app.get("/locks/recent")
+async def public_recent_locks(limit: int = 8):
+    """Anonymized recent locks for the homepage social-proof ticker.
+    No client identities — just niche + city + tier. Empty list when no
+    locks exist yet (front-end hides the ticker)."""
+    return {"locks": await recent_locks_public(limit)}
 
 
 @app.get("/admin/locks")
