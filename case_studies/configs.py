@@ -21,8 +21,34 @@ class CaseStudy:
 
 
 CASE_STUDIES: dict[str, CaseStudy] = {
-    # The first real Lola case study — Coach Ty's father's operation.
-    # Day 0: 2026-05-25. Day 30 target: 2026-06-23.
+    # Clean client-facing slug → share https://lola.tyalexandermedia.com/r/client/sandbar
+    # Tracks the whole Sandbar business (not just the roof-cleaning page).
+    # Renders the dashboard shell immediately; ranking lines + AI Share of
+    # Voice populate after the first snapshot:
+    #   POST /admin/case-study/sandbar/run   (X-Admin-Key header)
+    "sandbar": CaseStudy(
+        slug="sandbar",
+        client_name="Sandbar Soft Wash",
+        target_url="https://www.sandbarsoftwash.com",
+        target_domain="sandbarsoftwash.com",
+        google_queries=[
+            "pressure washing palm harbor fl",
+            "soft wash palm harbor",
+            "house washing palm harbor fl",
+            "roof cleaning palm harbor fl",
+            "paver sealing palm harbor",
+            "best pressure washing near palm harbor",
+        ],
+        ai_mode_prompts=[
+            "Who's the best pressure washing company near Palm Harbor, Florida? List 3.",
+            "Recommend a soft wash / house washing company in Palm Harbor, FL.",
+            "Best roof cleaning company in Palm Harbor FL?",
+        ],
+    ),
+    # The original page-level case study — Coach Ty's father's operation.
+    # Day 0: 2026-05-25. Day 30 target: 2026-06-23. Kept for granular
+    # roof-cleaning-page tracking (internal); 'sandbar' above is the
+    # client-facing dashboard.
     "sandbar-roof-cleaning": CaseStudy(
         slug="sandbar-roof-cleaning",
         client_name="Sandbar Soft Wash",
