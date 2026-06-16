@@ -244,6 +244,10 @@
       "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
     },
     {
+      "source": "/t/(.*)",
+      "destination": "https://lola-backend-production.up.railway.app/t/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

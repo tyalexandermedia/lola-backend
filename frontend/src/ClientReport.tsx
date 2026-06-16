@@ -36,6 +36,7 @@ interface DashboardPayload {
   ai_mode: Series[];
   implementation?: Implementation;
   share_of_voice?: ShareOfVoice;
+  tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
   generated_at: string;
 }
 
@@ -93,6 +94,7 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
+      {data.tracking && <TrackingRow tracking={data.tracking} />}
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
 
       {data.implementation && <WorkDelivered impl={data.implementation} />}
@@ -213,6 +215,45 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
           <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.lifetime.pct}%</p>
         </div>
       </div>
+    </section>
+  );
+}
+
+/**
+ * Calls / Leads / Clicks billing row — the ROI proof at the top of the
+ * dashboard. Shows "this month" big with last-30d + lifetime context.
+ * Only the events captured via the client's tracked links populate here.
+ */
+function TrackingRow({ tracking }: { tracking: Record<string, { month: number; last_30d: number; lifetime: number }> }) {
+  const cells = [
+    { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
+    { key: 'lead', label: 'Leads', emoji: '📝', accent: '#F4D47C' },
+    { key: 'click', label: 'Clicks', emoji: '👆', accent: '#93C5FD' },
+  ];
+  const anyData = cells.some((c) => (tracking[c.key]?.lifetime || 0) > 0);
+
+  return (
+    <section className="mb-6 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        Results this month — calls · leads · clicks
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {cells.map((c) => {
+          const t = tracking[c.key] || { month: 0, last_30d: 0, lifetime: 0 };
+          return (
+            <div key={c.key} className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-[#9CA3AF]">{c.emoji} {c.label}</p>
+              <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{t.month}</p>
+              <p className="mt-2 text-[11px] text-[#6B7280]">30d: {t.last_30d} · all: {t.lifetime}</p>
+            </div>
+          );
+        })}
+      </div>
+      {!anyData && (
+        <p className="mt-3 text-[11px] leading-[1.5] text-[#6B7280]">
+          Tracking links not live yet — once your Call button + website link route through Lola, calls, leads, and clicks land here automatically.
+        </p>
+      )}
     </section>
   );
 }
