@@ -2651,6 +2651,13 @@ async def admin_metrics_run(
     rc = await get_reporting_client_by_slug(slug)
     if not rc:
         raise HTTPException(status_code=404, detail="Onboard the client first")
+    return {"ok": True, "slug": slug, "results": await _refresh_client_metrics(slug, rc)}
+
+
+async def _refresh_client_metrics(slug: str, rc: dict) -> dict:
+    """Pull + cache every external metric source for one client. Each source
+    is independently try/except'd so one failure never blocks the others.
+    Shared by the per-client and run-all endpoints + the weekly cron."""
     site = rc.get("site_url") or rc.get("target_url") or ""
     out: dict = {}
 
@@ -2692,7 +2699,32 @@ async def admin_metrics_run(
     except Exception as e:
         out["cwv"] = f"error: {str(e)[:80]}"
 
-    return {"ok": True, "slug": slug, "results": out}
+    return out
+
+
+@app.post("/admin/metrics/run-all")
+async def admin_metrics_run_all(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Refresh metrics for EVERY active client. This is the single URL the
+    weekly cron hits — also pulls a fresh ranking + AI-mode snapshot per
+    client so the whole dashboard stays live without per-client cron jobs."""
+    _check_admin(x_admin_key)
+    clients = await get_active_clients()
+    results: dict = {}
+    for rc in clients:
+        slug = rc.get("slug")
+        if not slug:
+            continue
+        metrics = await _refresh_client_metrics(slug, rc)
+        # Also refresh rankings + AI Share of Voice (same cadence).
+        try:
+            await run_case_study_snapshot(slug, notes="weekly cron")
+            metrics["rankings"] = "ok"
+        except Exception as e:
+            metrics["rankings"] = f"error: {str(e)[:60]}"
+        results[slug] = metrics
+    return {"ok": True, "clients": len(clients), "results": results}
 
 
 @app.get("/admin/calls/{slug}")

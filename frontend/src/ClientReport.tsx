@@ -172,12 +172,38 @@ export default function ClientReport({ slug }: { slug: string }) {
   );
 }
 
+/**
+ * Live-data freshness pill — green "Live" dot if data refreshed < 8 days
+ * ago, amber if staler. Signals to the client the dashboard is a living
+ * system, not a one-time report. Drives the "open it every Monday" habit.
+ */
+function FreshnessPill({ iso }: { iso: string }) {
+  let label = 'Live';
+  let fresh = true;
+  try {
+    const days = (Date.now() - new Date(iso).getTime()) / 86400000;
+    fresh = days < 8;
+    label = days < 1 ? 'Updated today' : days < 8 ? `Updated ${Math.round(days)}d ago` : `Stale — ${Math.round(days)}d`;
+  } catch { /* keep defaults */ }
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
+      fresh ? 'border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-300' : 'border-[#F59E0B]/40 bg-[#F59E0B]/[0.08] text-[#F59E0B]'
+    }`}>
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${fresh ? 'bg-emerald-400 animate-pulse' : 'bg-[#F59E0B]'}`} />
+      {label}
+    </span>
+  );
+}
+
 function Header({ data }: { data: DashboardPayload }) {
   return (
     <header className="mb-8 rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">
-        Retainer Dashboard
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">
+          Retainer Dashboard
+        </p>
+        <FreshnessPill iso={data.generated_at} />
+      </div>
       <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{data.client_name}</h1>
       {data.target_url && (
         <a
