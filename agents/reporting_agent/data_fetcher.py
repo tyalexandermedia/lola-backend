@@ -255,3 +255,80 @@ def pct_delta(this_week: int, prev_week: int) -> float:
     if prev_week == 0:
         return 100.0 if this_week > 0 else 0.0
     return round((this_week - prev_week) / prev_week * 100, 1)
+
+
+async def fetch_search_metrics(
+    site_url: str,
+    gsc_property: Optional[str] = None,
+    ga_property_id: Optional[str] = None,
+    money_keywords: Optional[list[str]] = None,
+) -> dict:
+    """
+    Dashboard-grade 28-day Search Console + Analytics summary. Cached by the
+    /admin/gsc/{slug}/run endpoint so the public dashboard reads instantly.
+
+    Returns:
+      gsc: { clicks, impressions, ctr, position, clicks_prev, impressions_prev,
+             top_queries:[{query,clicks,impressions,ctr,position}],
+             top_pages:[{page,clicks,impressions}], error }
+      ga:  { organic_sessions, organic_sessions_prev, error }
+    """
+    out: dict = {"gsc": None, "ga": None}
+
+    # ── GSC: 28d vs prior 28d ──────────────────────────────────
+    if GSC_CREDENTIALS_PATH:
+        try:
+            from google.oauth2 import service_account  # type: ignore
+            from googleapiclient.discovery import build  # type: ignore
+
+            today = date.today()
+            this_end = today - timedelta(days=1)
+            this_start = this_end - timedelta(days=27)
+            prev_end = this_start - timedelta(days=1)
+            prev_start = prev_end - timedelta(days=27)
+            prop = gsc_property or f"sc-domain:{site_url.replace('https://','').replace('http://','').replace('www.','').rstrip('/')}"
+
+            creds = service_account.Credentials.from_service_account_file(
+                GSC_CREDENTIALS_PATH, scopes=["https://www.googleapis.com/auth/webmasters.readonly"],
+            )
+            svc = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+
+            def _q(start, end, dims, n=25):
+                return svc.searchanalytics().query(siteUrl=prop, body={
+                    "startDate": start.isoformat(), "endDate": end.isoformat(),
+                    "dimensions": dims, "rowLimit": n,
+                }).execute()
+
+            def _totals(start, end):
+                rows = (_q(start, end, [], 1).get("rows") or [{}])
+                r = rows[0] if rows else {}
+                return (int(r.get("clicks", 0)), int(r.get("impressions", 0)),
+                        round(float(r.get("ctr", 0)) * 100, 2), round(float(r.get("position", 0)), 1))
+
+            c, i, ctr, pos = _totals(this_start, this_end)
+            pc, pi, _pctr, _ppos = _totals(prev_start, prev_end)
+            top_q = [{"query": r["keys"][0], "clicks": int(r.get("clicks", 0)),
+                      "impressions": int(r.get("impressions", 0)),
+                      "ctr": round(float(r.get("ctr", 0)) * 100, 1),
+                      "position": round(float(r.get("position", 0)), 1)}
+                     for r in (_q(this_start, this_end, ["query"], 8).get("rows") or [])]
+            top_p = [{"page": r["keys"][0], "clicks": int(r.get("clicks", 0)),
+                      "impressions": int(r.get("impressions", 0))}
+                     for r in (_q(this_start, this_end, ["page"], 5).get("rows") or [])]
+            out["gsc"] = {
+                "error": None, "clicks": c, "impressions": i, "ctr": ctr, "position": pos,
+                "clicks_prev": pc, "impressions_prev": pi,
+                "top_queries": top_q, "top_pages": top_p,
+            }
+        except Exception as e:
+            out["gsc"] = {"error": f"{type(e).__name__}: {str(e)[:160]}"}
+
+    # ── GA: reuse the weekly organic-sessions fetcher (28d-ish) ──
+    if GA_CREDENTIALS_PATH and ga_property_id:
+        ga = await fetch_ga(ga_property_id)
+        out["ga"] = {
+            "error": ga.get("error"),
+            "organic_sessions": ga.get("organic_sessions_this_week", 0),
+            "organic_sessions_prev": ga.get("organic_sessions_prev_week", 0),
+        }
+    return out

@@ -169,6 +169,14 @@ label{display:block;font-size:12px;font-weight:600;color:#C8C0B0;margin-bottom:4
           <input id="o-ga" placeholder="properties/123456789">
         </div>
       </div>
+      <div class="row">
+        <div>
+          <label>Forward number <span class="muted">(Growth/Pro call tracking)</span></label>
+          <input id="o-forward" placeholder="+17273006573">
+          <p class="hint">Client's REAL phone. The Twilio tracking number forwards here. Leave blank on Starter.</p>
+        </div>
+        <div></div>
+      </div>
 
       <!-- Live playbook preview -->
       <div id="o-preview" class="preview" style="display:none">
@@ -337,6 +345,7 @@ async function onboard() {
     city: document.getElementById('o-city').value.trim() || null,
     gsc_property: document.getElementById('o-gsc').value.trim() || null,
     ga_property_id: document.getElementById('o-ga').value.trim() || null,
+    forward_number: document.getElementById('o-forward').value.trim() || null,
     seed_tasks: true,
   };
   if (!slug.match(/^[a-z0-9-]+$/)) return toast('Slug must be lowercase letters / numbers / hyphens', true);

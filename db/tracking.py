@@ -353,3 +353,48 @@ async def recent_calls_admin(slug: str, limit: int = 50) -> List[dict]:
             (slug.strip().lower(), limit),
         ) as cur:
             return [dict(r) for r in await cur.fetchall()]
+
+
+# ── Google Search Console snapshots (free data, cached) ───────────
+# GSC is the client's REAL Google performance — impressions, clicks, CTR,
+# avg position, top queries. Free from Google once the client adds our
+# service account to their property. We cache the latest pull per slug so
+# the public dashboard reads instantly (never hits the GSC API per view).
+CREATE_GSC = """
+CREATE TABLE IF NOT EXISTS gsc_snapshots (
+    slug TEXT PRIMARY KEY,
+    data_json TEXT NOT NULL,
+    fetched_at TEXT DEFAULT (datetime('now'))
+);
+"""
+
+
+async def save_gsc_snapshot(slug: str, data: dict) -> None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(CREATE_GSC)
+        await db.execute(
+            """INSERT INTO gsc_snapshots (slug, data_json, fetched_at)
+               VALUES (?, ?, datetime('now'))
+               ON CONFLICT(slug) DO UPDATE SET data_json=excluded.data_json, fetched_at=datetime('now')""",
+            (slug.strip().lower(), json.dumps(data)[:20000]),
+        )
+        await db.commit()
+
+
+async def get_gsc_snapshot(slug: str) -> Optional[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(CREATE_GSC)
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT data_json, fetched_at FROM gsc_snapshots WHERE slug = ?",
+            (slug.strip().lower(),),
+        ) as cur:
+            row = await cur.fetchone()
+    if not row:
+        return None
+    try:
+        data = json.loads(row["data_json"])
+        data["fetched_at"] = row["fetched_at"]
+        return data
+    except Exception:
+        return None

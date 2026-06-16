@@ -103,9 +103,12 @@ from db.tracking import (
     update_call_status,
     call_quality_stats,
     recent_calls_admin,
+    save_gsc_snapshot,
+    get_gsc_snapshot,
     EVENT_TYPES,
 )
 from db.reviews import review_counts_for_slug
+from agents.reporting_agent.data_fetcher import fetch_search_metrics
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -1811,7 +1814,6 @@ async def public_client_dashboard(slug: str):
     funnel = await funnel_for_slug(slug)
     trends = await trend_deltas(slug)
     reviews = await review_counts_for_slug(slug)
-    call_quality = await call_quality_stats(slug)  # PUBLIC-safe — counts, no numbers
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
@@ -1827,10 +1829,18 @@ async def public_client_dashboard(slug: str):
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 
+    # Tier gating: call tracking + GSC are premium (Growth + Pro). Starter
+    # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
+    call_tracking_on = tier in ("growth", "pro")
+    call_quality = await call_quality_stats(slug) if call_tracking_on else None
+    gsc = await get_gsc_snapshot(slug) if tier in ("growth", "pro") else None
+
     return {
         "slug": slug,
         "client_name": cs.client_name,
         "target_url": cs.target_url,
+        "tier": tier,
+        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
         "google": google_series,
         "ai_mode": ai_series,
         "implementation": implementation,
@@ -1841,6 +1851,7 @@ async def public_client_dashboard(slug: str):
         "funnel": funnel,
         "reviews": reviews,
         "call_quality": call_quality,
+        "search_console": gsc,
         "attributed_value": attributed,
         "annualized": annual,
         "cost_per_lead": cpl,
@@ -2053,6 +2064,7 @@ class OnboardClientRequest(BaseModel):
     target_url: Optional[str] = None
     gsc_property: Optional[str] = None
     ga_property_id: Optional[str] = None
+    forward_number: Optional[str] = None  # client's real phone for call-tracking forward (Growth/Pro)
     conversion_rate: float = 0.03
     avg_job_value: int = 400
     seed_tasks: bool = True            # seed the tier playbook into reporting_tasks
@@ -2118,6 +2130,7 @@ async def admin_onboard_client(
         active=True,
         target_url=body.target_url or body.site_url,
         ai_mode_prompts=prompts,
+        forward_number=body.forward_number,
     )
 
     seeded = 0
@@ -2561,6 +2574,28 @@ def _public_api_base(request: Request) -> str:
     if env:
         return env.rstrip("/")
     return str(request.base_url).rstrip("/")
+
+
+@app.post("/admin/gsc/{slug}/run")
+async def admin_gsc_run(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Pull a fresh Search Console + Analytics snapshot for a client and
+    cache it. Run weekly via cron (same cadence as ranking snapshots). The
+    public dashboard reads the cached blob — never hits Google live."""
+    _check_admin(x_admin_key)
+    rc = await get_reporting_client_by_slug(slug)
+    if not rc:
+        raise HTTPException(status_code=404, detail="Onboard the client first (no reporting_clients row)")
+    data = await fetch_search_metrics(
+        site_url=rc.get("site_url") or rc.get("target_url") or "",
+        gsc_property=rc.get("gsc_property"),
+        ga_property_id=rc.get("ga_property_id"),
+        money_keywords=rc.get("money_keywords") or [],
+    )
+    await save_gsc_snapshot(slug, data)
+    return {"ok": True, "slug": slug, "snapshot": data}
 
 
 @app.get("/admin/calls/{slug}")
