@@ -529,12 +529,20 @@ async def webhook_callrail(request: Request):
 
 
 # ── Sandbar onboarding seed ─────────────────────────────────
-# Onboards the Sandbar client record on boot IF it doesn't already
-# exist, so the dashboard renders immediately without a manual
-# /admin/reporting/onboard call. Idempotent: skips entirely once the
-# row exists, so any later manual edits to the client config are never
-# overwritten. FastAPI's include_router propagates this router's
-# on_startup handlers to the app, so it runs on every deploy.
+# Onboards / wires up the Sandbar client record on boot. Idempotent:
+# re-applies until BOTH analytics properties (GSC + GA4 Data API) are
+# present, then leaves the row alone so manual dashboard edits stick.
+# Any existing tuned values (conversion rate, avg job value, keywords)
+# are preserved on re-seed — only the missing analytics wiring is added.
+# FastAPI's include_router propagates this router's on_startup handlers
+# to the app, so it runs on every deploy.
+#
+# Note: the GSC property is derivable from the domain, so it's hardcoded.
+# The GA4 *Data API* property id is numeric ("properties/123456789"), is
+# NOT the G-XXXXXXXX Measurement ID, and is read from the
+# SANDBAR_GA_PROPERTY_ID env var so it can be set without a code change.
+# (forward_number is configured in CallRail, not stored here — it is not
+# a column on reporting_clients, so it must NOT be passed to upsert_client.)
 
 _SANDBAR_SEED = {
     "slug": "sandbar",
@@ -550,28 +558,36 @@ _SANDBAR_SEED = {
     ],
     "conversion_rate": 0.35,
     "avg_job_value": 650,
-    "forward_number": "7277126281",
+    "gsc_property": "sc-domain:sandbarsoftwash.com",
 }
 
 
 @router.on_event("startup")
 async def _seed_sandbar_client() -> None:
     try:
+        ga_property_id = (os.getenv("SANDBAR_GA_PROPERTY_ID") or "").strip() or None
         existing = await get_client_by_slug(_SANDBAR_SEED["slug"])
-        if existing:
+        # Stop once the row exists AND both analytics props are wired up.
+        if existing and existing.get("gsc_property") and existing.get("ga_property_id"):
             return
+        # Preserve any already-tuned values; fall back to seed defaults.
+        src = existing or {}
         await upsert_client(
             slug=_SANDBAR_SEED["slug"],
-            client_name=_SANDBAR_SEED["client_name"],
-            client_email=_SANDBAR_SEED["client_email"],
-            site_url=_SANDBAR_SEED["site_url"],
-            money_keywords=_SANDBAR_SEED["money_keywords"],
-            conversion_rate=_SANDBAR_SEED["conversion_rate"],
-            avg_job_value=_SANDBAR_SEED["avg_job_value"],
+            client_name=src.get("client_name") or _SANDBAR_SEED["client_name"],
+            client_email=src.get("client_email") or _SANDBAR_SEED["client_email"],
+            site_url=src.get("site_url") or _SANDBAR_SEED["site_url"],
+            money_keywords=src.get("money_keywords") or _SANDBAR_SEED["money_keywords"],
+            conversion_rate=src.get("conversion_rate") or _SANDBAR_SEED["conversion_rate"],
+            avg_job_value=src.get("avg_job_value") or _SANDBAR_SEED["avg_job_value"],
             active=True,
-            target_url=_SANDBAR_SEED["site_url"],
-            forward_number=_SANDBAR_SEED["forward_number"],
+            target_url=src.get("target_url") or _SANDBAR_SEED["site_url"],
+            gsc_property=src.get("gsc_property") or _SANDBAR_SEED["gsc_property"],
+            ga_property_id=ga_property_id or src.get("ga_property_id"),
         )
-        print("[seed] Onboarded Sandbar reporting client (first boot)")
+        print(
+            "[seed] Onboarded/updated Sandbar reporting client "
+            f"(gsc={_SANDBAR_SEED['gsc_property']}, ga={ga_property_id or 'unset'})"
+        )
     except Exception as e:  # never block app startup on a seed failure
         print(f"[seed] Sandbar seed skipped: {e}")
