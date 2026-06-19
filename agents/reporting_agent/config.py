@@ -36,8 +36,14 @@ GA4_PROPERTY_ID = (
 GA_CREDENTIALS_PATH = os.getenv("GA_CREDENTIALS_PATH", "").strip() or None
 GA_DEFAULT_PROPERTY_ID = GA4_PROPERTY_ID  # alias — code that imported the old name still works
 
-GSC_SERVICE_ACCOUNT_JSON = (os.getenv("GSC_SERVICE_ACCOUNT_JSON") or "").strip() or None
-GSC_CREDENTIALS_PATH = os.getenv("GSC_CREDENTIALS_PATH", "").strip() or None
+# GSC creds fall back to the GA4 service-account JSON — the same service
+# account normally has access to both APIs, so you only need to set one var.
+GSC_SERVICE_ACCOUNT_JSON = (
+    os.getenv("GSC_SERVICE_ACCOUNT_JSON") or os.getenv("GA4_SERVICE_ACCOUNT_JSON") or ""
+).strip() or None
+GSC_CREDENTIALS_PATH = (
+    os.getenv("GSC_CREDENTIALS_PATH") or os.getenv("GA_CREDENTIALS_PATH") or ""
+).strip() or None
 
 # Alert email Ty receives if any step fails for a client.
 ALERT_EMAIL = os.getenv("REPORTING_ALERT_EMAIL", "ty@tyalexandermedia.com").strip()
