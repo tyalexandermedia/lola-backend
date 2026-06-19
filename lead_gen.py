@@ -87,6 +87,65 @@ async def ga4_connection_test():
         },
     }
 
+
+@router.get("/setup-status")
+async def setup_status():
+    """
+    Whole-integration readiness check in ONE call — open this after setting env
+    vars to see exactly what's live and what's still missing:
+        https://lola-backend-production.up.railway.app/lead-gen/setup-status
+
+    Each section returns ok=true/false plus a human 'detail'. No secret values
+    are ever returned — only booleans + GA4/GSC's own error strings.
+    """
+    import os as _os
+    from agents.reporting_agent.data_fetcher import fetch_ga, fetch_gsc
+
+    checks: dict = {}
+
+    # 1. Dashboard client seed — is 'sandbar' in reporting_clients and wired?
+    try:
+        client = await get_client_by_slug("sandbar")
+        if client:
+            checks["dashboard_client"] = {
+                "ok": True,
+                "detail": "sandbar client seeded",
+                "gsc_property": client.get("gsc_property"),
+                "ga_property_id": client.get("ga_property_id"),
+            }
+        else:
+            checks["dashboard_client"] = {
+                "ok": False,
+                "detail": "sandbar client NOT found — seed did not run (check Railway startup logs)",
+            }
+    except Exception as e:
+        checks["dashboard_client"] = {"ok": False, "detail": f"{type(e).__name__}: {e}"}
+
+    # 2. GA4 Measurement Protocol — validate the secret against GA4's debug
+    #    endpoint (server-side lead/call conversions ride on this).
+    checks["ga4_measurement_protocol"] = await _ga4_mp_validate()
+
+    # 3. GA4 Data API — live organic-sessions query.
+    ga = await fetch_ga()
+    checks["ga4_data_api"] = {
+        "ok": ga.get("error") is None,
+        "detail": ga.get("error") or f"ok ({ga.get('organic_sessions_this_week')} organic sessions this week)",
+    }
+
+    # 4. Search Console — live organic-clicks query.
+    gsc = await fetch_gsc(
+        "https://www.sandbarsoftwash.com",
+        ["roof cleaning palm harbor fl"],
+        "sc-domain:sandbarsoftwash.com",
+    )
+    checks["search_console"] = {
+        "ok": gsc.get("error") is None,
+        "detail": gsc.get("error") or f"ok ({gsc.get('organic_clicks_this_week')} organic clicks this week)",
+    }
+
+    all_ok = all(c.get("ok") for c in checks.values())
+    return {"all_ok": all_ok, "checks": checks}
+
 # GA4 Measurement Protocol — sends server-side conversion events (leads +
 # calls) into GA4 so they show up alongside web analytics. No-op until both
 # env vars are set on Railway, so the webhooks keep working regardless.
@@ -114,6 +173,32 @@ async def _ga4_event(
             await client.post(url, json=payload)
     except Exception:
         pass
+
+
+async def _ga4_mp_validate() -> dict:
+    """Validate the Measurement Protocol creds via GA4's /debug/mp/collect.
+    Returns {ok, detail} without exposing the secret. Empty validationMessages
+    from GA4 means the event/credentials are accepted."""
+    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
+        return {"ok": False, "detail": "GA4_MEASUREMENT_ID / GA4_API_SECRET not set"}
+    url = (
+        "https://www.google-analytics.com/debug/mp/collect"
+        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+    )
+    payload = {
+        "client_id": "setup.status.check",
+        "events": [{"name": "phone_call", "params": {"engagement_time_msec": 1}}],
+    }
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.post(url, json=payload)
+        data = resp.json()
+        msgs = data.get("validationMessages", []) or []
+        if msgs:
+            return {"ok": False, "detail": "; ".join(m.get("description", str(m)) for m in msgs)}
+        return {"ok": True, "detail": "credentials valid — events accepted by GA4"}
+    except Exception as e:
+        return {"ok": False, "detail": f"{type(e).__name__}: {str(e)[:200]}"}
 
 
 class LeadGenRequest(BaseModel):
