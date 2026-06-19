@@ -947,3 +947,105 @@ async def import_leads_batch(
         except Exception as e:
             print(f"[import/leads] ERROR: {type(e).__name__}: {e}")
     return {"ok": True, "slug": slug, "imported": imported, "submitted": len(body.leads)}
+
+
+@router.post("/import/all/{slug}")
+async def import_all_in_one(
+    slug: str,
+    days: int = 30,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    One-shot 'finalize the dashboard' endpoint. Runs in order:
+      1. CallRail history import (last `days` of calls — skipped if creds unset)
+      2. External metrics refresh (GSC, GA4, GBP, Bing, Core Web Vitals)
+      3. Fresh ranking + AI Share-of-Voice snapshot
+
+    Designed for the one-curl handoff at client kickoff. Every step is
+    independent try/except'd — one failure never blocks the others, and
+    the response includes a status per step so the caller knows what
+    succeeded.
+    """
+    _check_admin_key(x_admin_key)
+    results: dict = {}
+
+    # 1. CallRail history
+    callrail_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
+    callrail_acct = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    if callrail_key and callrail_acct:
+        try:
+            cr = await import_callrail_history(slug=slug, days=days, x_admin_key=x_admin_key)
+            results["callrail"] = {"ok": True, "imported": cr.get("imported", 0)}
+        except HTTPException as he:
+            results["callrail"] = {"ok": False, "detail": str(he.detail)[:200]}
+        except Exception as e:
+            results["callrail"] = {"ok": False, "detail": f"{type(e).__name__}: {e}"[:200]}
+    else:
+        results["callrail"] = {"ok": False, "detail": "skipped — set CALLRAIL_API_KEY + CALLRAIL_ACCOUNT_ID on Railway"}
+
+    # 2 + 3. Metrics + rankings refresh — delegate to the canonical handler
+    #        in main.py so we don't duplicate the source-by-source pulls.
+    try:
+        import importlib
+        main_mod = importlib.import_module("main")
+        rc = await get_client_by_slug(slug)
+        if not rc:
+            results["metrics"] = {"ok": False, "detail": "client not seeded"}
+        else:
+            results["metrics"] = await main_mod._refresh_client_metrics(slug, rc)
+        try:
+            await main_mod.run_case_study_snapshot(slug, notes="kickoff backfill")
+            results["rankings"] = "ok"
+        except Exception as e:
+            results["rankings"] = f"error: {str(e)[:80]}"
+    except Exception as e:
+        results["metrics"] = {"ok": False, "detail": f"{type(e).__name__}: {e}"[:200]}
+
+    return {"ok": True, "slug": slug, "days": days, "results": results}
+
+
+# ── Auto-refresh on startup ─────────────────────────────────
+# Every deploy triggers a fresh pull of external metrics (GSC / GA4 /
+# GBP / Bing / CWV) for Sandbar IF the last refresh is stale (> 12h).
+# Keeps the public dashboard live without needing the weekly cron to
+# have fired yet. Idempotent + non-blocking — a failure here can never
+# stop app boot.
+
+_AUTO_REFRESH_STALE_HOURS = 12
+
+
+async def _do_sandbar_refresh() -> None:
+    try:
+        rc = await get_client_by_slug("sandbar")
+        if not rc:
+            return  # seed handler runs first and would create it
+        # Cheap freshness probe — read a single GSC snapshot timestamp.
+        try:
+            from db.tracking import get_gsc_snapshot
+            snap = await get_gsc_snapshot("sandbar")
+            fetched_at = (snap or {}).get("fetched_at")
+            if fetched_at:
+                hrs = (datetime.utcnow() - datetime.fromisoformat(fetched_at.replace("Z", "").replace(" ", "T")[:19])).total_seconds() / 3600.0
+                if hrs < _AUTO_REFRESH_STALE_HOURS:
+                    return  # still fresh
+        except Exception:
+            pass  # if probe fails, just refresh
+        import importlib
+        main_mod = importlib.import_module("main")
+        await main_mod._refresh_client_metrics("sandbar", rc)
+        try:
+            await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
+        except Exception as e:
+            print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
+        print("[auto-refresh] Sandbar metrics refreshed on startup.")
+    except Exception as e:
+        # Never block app boot on a refresh failure.
+        import traceback
+        print(f"[auto-refresh] ERROR: {type(e).__name__}: {e}")
+        traceback.print_exc()
+
+
+@router.on_event("startup")
+async def _auto_refresh_sandbar_metrics() -> None:
+    # Run in background so a slow external API never blocks healthchecks.
+    asyncio.create_task(_do_sandbar_refresh())
