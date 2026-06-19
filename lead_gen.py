@@ -16,7 +16,7 @@ import os
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/lead-gen", tags=["lead-gen"])
@@ -352,3 +352,177 @@ Format as actionable checkbox list:
 - IF revenue > $1,000: Allocate to next month""",
         max_tokens=800,
     )
+
+
+# ============================================================
+# Lead-tracking webhooks + Sandbar onboarding seed
+# ------------------------------------------------------------
+# These ride on the lead-gen router (already imported + included
+# by main.py), so they need no change to main.py. Because the
+# router carries the prefix "/lead-gen", the live paths are:
+#     POST /lead-gen/webhook/form
+#     POST /lead-gen/webhook/call?slug=sandbar
+# Both write to db.tracking, which feeds the public dashboard
+# funnel + cost-per-lead. slug defaults to "sandbar" but is
+# overridable (body or ?slug=) so the same endpoints serve any
+# future client.
+# ============================================================
+
+from db.tracking import log_event, log_call, update_call_status  # noqa: E402
+from db.reporting import get_client_by_slug, upsert_client  # noqa: E402
+
+
+class FormWebhookPayload(BaseModel):
+    client_slug: str = "sandbar"
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    service: Optional[str] = None
+    quoted_range: Optional[str] = None
+    source_url: Optional[str] = None
+    source_medium: Optional[str] = None
+
+
+@router.post("/webhook/form")
+async def webhook_form(body: FormWebhookPayload, request: Request):
+    """
+    Form-submission webhook from any client site (Astro, Next, etc).
+    Logs a 'lead' event so the dashboard funnel + CPL update in real time.
+    Fire-and-forget from the site, so it always returns 200 quickly.
+    """
+    slug = (body.client_slug or "sandbar").strip().lower()
+    meta = {
+        k: v
+        for k, v in {
+            "name": body.name,
+            "phone": body.phone,
+            "email": body.email,
+            "address": body.address,
+            "service": body.service,
+            "quoted_range": body.quoted_range,
+            "source_url": body.source_url,
+        }.items()
+        if v
+    }
+    ip = request.client.host if request.client else None
+    try:
+        eid = await log_event(
+            slug, "lead", source=body.source_medium or "website", meta=meta, ip=ip
+        )
+    except Exception as e:  # never break the caller's submit flow
+        return {"ok": False, "error": str(e)[:200]}
+    return {"ok": True, "event_id": eid}
+
+
+@router.post("/webhook/call")
+async def webhook_callrail(request: Request):
+    """
+    CallRail 'Call Completed' webhook receiver.
+    In CallRail: Settings -> Integrations -> Webhooks -> Call Completed
+    URL: https://lola-backend.up.railway.app/lead-gen/webhook/call?slug=sandbar
+
+    Accepts JSON or form-encoded. Maps CallRail's payload to a tracked_calls
+    row (caller number, city, duration, recording) and a 'call' event.
+    """
+    ct = request.headers.get("content-type", "")
+    if "json" in ct:
+        body: dict = await request.json()
+    else:
+        form = await request.form()
+        body = dict(form)
+
+    slug = str(
+        body.get("slug") or request.query_params.get("slug") or "sandbar"
+    ).strip().lower()
+    call_sid = str(body.get("id") or body.get("call_id") or "")
+    if not call_sid:
+        return {"ok": False, "reason": "missing_call_id"}
+
+    caller_number = str(
+        body.get("customer_phone_number") or body.get("caller_id") or ""
+    ) or None
+    tracking_number = str(
+        body.get("tracking_phone_number") or body.get("tracking_number") or ""
+    ) or None
+    forwarded_to = str(
+        body.get("business_phone_number") or body.get("forwarded_to") or ""
+    ) or None
+    caller_city = str(body.get("caller_city") or "") or None
+    caller_state = str(body.get("caller_state") or "") or None
+    try:
+        duration_sec = int(
+            body.get("duration") or body.get("duration_in_seconds") or 0
+        )
+    except (TypeError, ValueError):
+        duration_sec = 0
+    recording_url = str(
+        body.get("recording") or body.get("recording_url") or ""
+    ) or None
+    source = str(
+        body.get("utm_source") or body.get("first_call_actions") or "callrail"
+    )
+    direction = str(body.get("direction") or "inbound")
+
+    try:
+        await log_call(
+            slug, call_sid, caller_number, tracking_number, forwarded_to,
+            source, caller_city, caller_state,
+        )
+        await update_call_status(call_sid, direction, duration_sec, recording_url)
+        await log_event(
+            slug, "call", source=source,
+            meta={"caller_city": caller_city, "duration_sec": duration_sec},
+        )
+    except Exception as e:
+        return {"ok": False, "error": str(e)[:200]}
+    return {"ok": True, "slug": slug, "call_sid": call_sid}
+
+
+# ── Sandbar onboarding seed ─────────────────────────
+# Onboards the Sandbar client record on boot IF it doesn't already
+# exist, so the dashboard renders immediately without a manual
+# /admin/reporting/onboard call. Idempotent: skips entirely once the
+# row exists, so any later manual edits to the client config are never
+# overwritten. FastAPI's include_router propagates this router's
+# on_startup handlers to the app, so it runs on every deploy.
+
+_SANDBAR_SEED = {
+    "slug": "sandbar",
+    "client_name": "Sandbar Soft Wash",
+    "client_email": "ty@tyalexandermedia.com",
+    "site_url": "https://www.sandbarsoftwash.com",
+    "money_keywords": [
+        "roof cleaning Tampa Bay",
+        "house soft wash Holiday FL",
+        "pool cage cleaning Pinellas County",
+        "pressure washing Palm Harbor FL",
+        "soft wash Holiday FL",
+    ],
+    "conversion_rate": 0.35,
+    "avg_job_value": 650,
+    "forward_number": "7277126281",
+}
+
+
+@router.on_event("startup")
+async def _seed_sandbar_client() -> None:
+    try:
+        existing = await get_client_by_slug(_SANDBAR_SEED["slug"])
+        if existing:
+            return
+        await upsert_client(
+            slug=_SANDBAR_SEED["slug"],
+            client_name=_SANDBAR_SEED["client_name"],
+            client_email=_SANDBAR_SEED["client_email"],
+            site_url=_SANDBAR_SEED["site_url"],
+            money_keywords=_SANDBAR_SEED["money_keywords"],
+            conversion_rate=_SANDBAR_SEED["conversion_rate"],
+            avg_job_value=_SANDBAR_SEED["avg_job_value"],
+            active=True,
+            target_url=_SANDBAR_SEED["site_url"],
+            forward_number=_SANDBAR_SEED["forward_number"],
+        )
+        print("[seed] Onboarded Sandbar reporting client (first boot)")
+    except Exception as e:  # never block app startup on a seed failure
+        print(f"[seed] Sandbar seed skipped: {e}")
