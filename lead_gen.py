@@ -742,3 +742,208 @@ async def _seed_sandbar_client() -> None:
         import traceback
         print(f"[seed] ERROR: Sandbar seed failed — {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+# ============================================================
+# Historical backfill endpoints — pull the last N days of real
+# data into the dashboard so a brand-new client doesn't see an
+# empty dashboard on day one.
+#
+# All endpoints require X-Admin-Key. They write to the same
+# tracked_events / tracked_calls tables that the live webhooks
+# use, so the dashboard surfaces backfilled data the same way
+# it surfaces real-time data.
+# ============================================================
+
+from fastapi import Header  # noqa: E402
+from datetime import datetime, timedelta  # noqa: E402
+import aiosqlite  # noqa: E402
+
+
+def _check_admin_key(key: str) -> None:
+    expected = (os.getenv("LOLA_SECRET_ADMIN_KEY") or "").strip()
+    if not expected or key != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@router.post("/import/callrail/{slug}")
+async def import_callrail_history(
+    slug: str,
+    days: int = 30,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Backfill the last `days` of calls from CallRail's REST API.
+
+    Requires two env vars on Railway:
+      CALLRAIL_API_KEY   = the API token from CallRail → Settings → API access
+      CALLRAIL_ACCOUNT_ID = the numeric account id (visible in the dashboard URL)
+
+    Idempotent: tracked_calls.call_sid is UNIQUE so re-running this
+    endpoint won't duplicate calls. Newer calls flow in via the
+    webhook; this just fills in the gap before the webhook was wired.
+    """
+    _check_admin_key(x_admin_key)
+    api_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
+    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    if not api_key or not account_id:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "CALLRAIL_API_KEY and CALLRAIL_ACCOUNT_ID must be set on Railway. "
+                "Get the API key from CallRail → Settings → API access. The "
+                "account id is the number in your CallRail dashboard URL."
+            ),
+        )
+
+    start_date = (datetime.utcnow() - timedelta(days=max(1, min(days, 365)))).strftime("%Y-%m-%d")
+    end_date = datetime.utcnow().strftime("%Y-%m-%d")
+    url = f"https://api.callrail.com/v3/a/{account_id}/calls.json"
+
+    imported = 0
+    skipped = 0
+    page = 1
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        while True:
+            resp = await client.get(
+                url,
+                params={
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "per_page": 100,
+                    "page": page,
+                    "fields": "duration,direction,recording,first_call,utm_source,utm_medium",
+                },
+                headers={"Authorization": f"Token token={api_key}"},
+            )
+            if resp.status_code == 401:
+                raise HTTPException(status_code=502, detail="CallRail rejected the API key (401).")
+            if resp.status_code != 200:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"CallRail returned HTTP {resp.status_code}: {resp.text[:200]}",
+                )
+            data = resp.json()
+            calls = data.get("calls", []) or []
+            if not calls:
+                break
+
+            for c in calls:
+                call_sid = str(c.get("id") or "")
+                if not call_sid:
+                    skipped += 1
+                    continue
+                caller_number = c.get("customer_phone_number") or c.get("caller_id")
+                tracking_number = c.get("tracking_phone_number") or c.get("tracking_number")
+                forwarded_to = c.get("business_phone_number") or c.get("forwarded_to")
+                caller_city = c.get("customer_city") or c.get("caller_city")
+                caller_state = c.get("customer_state") or c.get("caller_state")
+                try:
+                    duration_sec = int(c.get("duration") or c.get("duration_in_seconds") or 0)
+                except (TypeError, ValueError):
+                    duration_sec = 0
+                recording_url = c.get("recording") or c.get("recording_url")
+                source = c.get("utm_source") or c.get("first_call_actions") or "callrail"
+                direction = c.get("direction") or "inbound"
+                created_at = c.get("start_time") or c.get("created_at")
+
+                try:
+                    await log_call(
+                        slug, call_sid, caller_number, tracking_number, forwarded_to,
+                        source, caller_city, caller_state,
+                    )
+                    await update_call_status(call_sid, direction, duration_sec, recording_url)
+                    # Override created_at on both rows so historical calls land
+                    # in the correct month (otherwise they'd all bunch up today).
+                    if created_at:
+                        async with aiosqlite.connect(os.getenv("DB_PATH", "lola.db")) as db:
+                            await db.execute(
+                                "UPDATE tracked_calls SET created_at = ? WHERE call_sid = ?",
+                                (created_at, call_sid),
+                            )
+                            await db.commit()
+                    eid = await log_event(
+                        slug, "call", source=source,
+                        meta={"caller_city": caller_city, "duration_sec": duration_sec, "imported": True},
+                    )
+                    if eid and created_at:
+                        async with aiosqlite.connect(os.getenv("DB_PATH", "lola.db")) as db:
+                            await db.execute(
+                                "UPDATE tracked_events SET created_at = ? WHERE id = ?",
+                                (created_at, eid),
+                            )
+                            await db.commit()
+                    imported += 1
+                except Exception as e:
+                    print(f"[import/callrail] ERROR call {call_sid}: {type(e).__name__}: {e}")
+                    skipped += 1
+
+            # CallRail paginates — keep going until we get less than per_page.
+            if len(calls) < 100:
+                break
+            page += 1
+            if page > 50:  # safety cap: 5000 calls per backfill run
+                break
+
+    return {
+        "ok": True, "slug": slug,
+        "window": {"start": start_date, "end": end_date, "days": days},
+        "imported": imported, "skipped": skipped,
+    }
+
+
+class HistoricalLead(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    service: Optional[str] = None
+    quoted_range: Optional[str] = None
+    source: Optional[str] = "website"
+    created_at: Optional[str] = None  # ISO 8601; defaults to now
+
+
+class HistoricalLeadsBatch(BaseModel):
+    leads: list[HistoricalLead]
+
+
+@router.post("/import/leads/{slug}")
+async def import_leads_batch(
+    slug: str,
+    body: HistoricalLeadsBatch,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Bulk-import historical quote-form leads. Accepts a JSON array of
+    leads; writes one 'lead' tracked_event per row. Use this for the
+    leads sitting in the client's CRM / email inbox / spreadsheet
+    before the live webhook was wired up.
+
+    Idempotent only by your own care — there's no natural dedupe key
+    on form leads. If you re-run, you'll double-count.
+    """
+    _check_admin_key(x_admin_key)
+    imported = 0
+    for ld in body.leads:
+        meta = {
+            k: v for k, v in {
+                "name": ld.name, "email": ld.email, "phone": ld.phone,
+                "address": ld.address, "service": ld.service,
+                "quoted_range": ld.quoted_range, "imported": True,
+            }.items() if v
+        }
+        try:
+            eid = await log_event(
+                slug, "lead", source=ld.source or "website", meta=meta,
+            )
+            if eid and ld.created_at:
+                async with aiosqlite.connect(os.getenv("DB_PATH", "lola.db")) as db:
+                    await db.execute(
+                        "UPDATE tracked_events SET created_at = ? WHERE id = ?",
+                        (ld.created_at, eid),
+                    )
+                    await db.commit()
+            imported += 1
+        except Exception as e:
+            print(f"[import/leads] ERROR: {type(e).__name__}: {e}")
+    return {"ok": True, "slug": slug, "imported": imported, "submitted": len(body.leads)}
