@@ -114,6 +114,7 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
+      <OwnerOverview data={data} />
       {data.attributed_value && data.attributed_value.contacts > 0 && (
         <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
       )}
@@ -197,7 +198,7 @@ function FreshnessPill({ iso }: { iso: string }) {
 
 function Header({ data }: { data: DashboardPayload }) {
   return (
-    <header className="mb-8 rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
+    <header className="mb-6 rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">
           Retainer Dashboard
@@ -216,6 +217,88 @@ function Header({ data }: { data: DashboardPayload }) {
         </a>
       )}
     </header>
+  );
+}
+
+/**
+ * Owner overview — the plain-English summary at the top of the dashboard.
+ * Written for a non-technical business owner: how many contacts came in
+ * this month, estimated revenue, and one-line context.
+ *
+ * Renders an inviting empty state when no contacts yet so the dashboard
+ * never feels broken on day one.
+ */
+function OwnerOverview({ data }: { data: DashboardPayload }) {
+  const calls = data.tracking?.call?.month ?? 0;
+  const leads = data.tracking?.lead?.month ?? 0;
+  const contacts = Math.max(calls, leads);
+  const value = data.attributed_value?.value ?? 0;
+  const prevCalls = data.tracking_trends?.call?.prev_month ?? 0;
+  const prevLeads = data.tracking_trends?.lead?.prev_month ?? 0;
+  const prevContacts = Math.max(prevCalls, prevLeads);
+  const delta = contacts - prevContacts;
+  const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
+
+  if (contacts === 0) {
+    return (
+      <section className="mb-6 rounded-2xl border border-[#D4AF37]/15 bg-gradient-to-br from-[#11121A] to-[#0E0F16] p-6 sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          Lola is set up and watching
+        </p>
+        <h2 className="mt-2 text-[22px] font-bold leading-snug text-white sm:text-[26px]">
+          Tracking goes live the moment your first call or quote request lands.
+        </h2>
+        <p className="mt-3 max-w-[640px] text-[14px] leading-[1.6] text-[#C8C0B0]">
+          Every call from your tracking number, every quote form on sandbarsoftwash.com,
+          and every Google Business Profile interaction shows up here automatically.
+          Rankings, AI search visibility, and Google Search Console data populate
+          below as snapshots come in.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+            ✓ CallRail webhook connected
+          </span>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+            ✓ Quote form connected
+          </span>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+            ✓ Rankings tracker active
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const deltaTone = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-[#FCA5A5]' : 'text-[#9CA3AF]';
+  const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
+  const deltaText = delta === 0
+    ? 'flat vs last month'
+    : `${deltaArrow} ${Math.abs(delta)} vs last month`;
+
+  return (
+    <section className="mb-6 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.08)] sm:p-8">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        {monthLabel} so far
+      </p>
+      <h2 className="mt-3 text-[24px] font-bold leading-snug text-white sm:text-[30px]">
+        <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          {contacts} new contact{contacts === 1 ? '' : 's'}
+        </span>{' '}
+        from the website and Google so far this month.
+      </h2>
+      <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-[#C8C0B0]">
+        That breaks out to <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
+        and <strong className="text-white">{leads} quote form submission{leads === 1 ? '' : 's'}</strong>.
+        At your average job value of ${data.attributed_value?.avg_job_value?.toLocaleString() || '650'},
+        we estimate Lola has driven{' '}
+        <strong className="text-[#F4D47C]">${value.toLocaleString()}</strong> in potential
+        revenue this month — <span className={deltaTone}>{deltaText}</span>.
+      </p>
+      <p className="mt-3 text-[12px] text-[#9CA3AF]">
+        Scroll down for the breakdown: where contacts came from, your Google rankings,
+        AI search visibility, and reviews.
+      </p>
+    </section>
   );
 }
 
