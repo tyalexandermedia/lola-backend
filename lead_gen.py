@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import uuid
 from typing import Optional
 
 import httpx
@@ -23,6 +24,34 @@ router = APIRouter(prefix="/lead-gen", tags=["lead-gen"])
 
 ANTHROPIC_API_KEY = (os.getenv("ANTHROPIC_API_KEY") or "").strip() or None
 LEADGEN_MODEL = os.getenv("LEADGEN_MODEL", "claude-opus-4-7").strip()
+
+# GA4 Measurement Protocol — sends server-side conversion events (leads +
+# calls) into GA4 so they show up alongside web analytics. No-op until both
+# env vars are set on Railway, so the webhooks keep working regardless.
+GA4_MEASUREMENT_ID = (os.getenv("GA4_MEASUREMENT_ID") or "").strip() or None
+GA4_API_SECRET = (os.getenv("GA4_API_SECRET") or "").strip() or None
+
+
+async def _ga4_event(
+    name: str, params: dict, client_id: Optional[str] = None
+) -> None:
+    """Fire a single GA4 event via the Measurement Protocol. Best-effort:
+    swallows all errors so a tracking hiccup never affects the lead flow."""
+    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
+        return
+    payload = {
+        "client_id": client_id or uuid.uuid4().hex,
+        "events": [{"name": name, "params": params}],
+    }
+    url = (
+        "https://www.google-analytics.com/mp/collect"
+        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            await client.post(url, json=payload)
+    except Exception:
+        pass
 
 
 class LeadGenRequest(BaseModel):
@@ -412,6 +441,15 @@ async def webhook_form(body: FormWebhookPayload, request: Request):
         )
     except Exception as e:  # never break the caller's submit flow
         return {"ok": False, "error": str(e)[:200]}
+    # Mirror to GA4 as a conversion (no-op unless GA4 env vars are set).
+    await _ga4_event(
+        "generate_lead",
+        {
+            "service": body.service or "",
+            "source": body.source_medium or "website",
+            "engagement_time_msec": 1,
+        },
+    )
     return {"ok": True, "event_id": eid}
 
 
@@ -476,10 +514,21 @@ async def webhook_callrail(request: Request):
         )
     except Exception as e:
         return {"ok": False, "error": str(e)[:200]}
+    # Mirror to GA4 as a phone-call conversion (no-op unless GA4 env vars set).
+    await _ga4_event(
+        "phone_call",
+        {
+            "duration_sec": duration_sec,
+            "caller_city": caller_city or "",
+            "source": source,
+            "engagement_time_msec": 1,
+        },
+        client_id=call_sid,
+    )
     return {"ok": True, "slug": slug, "call_sid": call_sid}
 
 
-# ── Sandbar onboarding seed ─────────────────────────
+# ── Sandbar onboarding seed ─────────────────────────────────
 # Onboards the Sandbar client record on boot IF it doesn't already
 # exist, so the dashboard renders immediately without a manual
 # /admin/reporting/onboard call. Idempotent: skips entirely once the
