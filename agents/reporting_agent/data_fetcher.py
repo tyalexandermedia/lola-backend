@@ -21,8 +21,11 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from agents.reporting_agent.config import (
-    GSC_CREDENTIALS_PATH,
+    GA4_SERVICE_ACCOUNT_JSON,
+    GA4_PROPERTY_ID,
     GA_CREDENTIALS_PATH,
+    GSC_SERVICE_ACCOUNT_JSON,
+    GSC_CREDENTIALS_PATH,
 )
 
 
@@ -39,6 +42,18 @@ def _last_week_window(today: Optional[date] = None) -> tuple[date, date, date, d
     return this_start, this_end, prev_start, prev_end
 
 
+def _gsc_creds():
+    """Return GSC service-account credentials, preferring inline JSON env var."""
+    from google.oauth2 import service_account  # type: ignore
+    scopes = ["https://www.googleapis.com/auth/webmasters.readonly"]
+    if GSC_SERVICE_ACCOUNT_JSON:
+        info = json.loads(GSC_SERVICE_ACCOUNT_JSON)
+        return service_account.Credentials.from_service_account_info(info, scopes=scopes)
+    if GSC_CREDENTIALS_PATH:
+        return service_account.Credentials.from_service_account_file(GSC_CREDENTIALS_PATH, scopes=scopes)
+    raise ValueError("Neither GSC_SERVICE_ACCOUNT_JSON nor GSC_CREDENTIALS_PATH is set")
+
+
 async def fetch_gsc(
     site_url: str,
     money_keywords: list[str],
@@ -51,13 +66,14 @@ async def fetch_gsc(
       - top_keywords: list[{keyword, clicks, impressions, ctr, position}]
       - money_keyword_ranks: list[{keyword, position_this, position_prev, delta}]
       - error: str | None
+    Env vars (one required): GSC_SERVICE_ACCOUNT_JSON or GSC_CREDENTIALS_PATH
     """
-    if not GSC_CREDENTIALS_PATH:
-        return {"error": "GSC_CREDENTIALS_PATH not configured", "organic_clicks_this_week": 0,
-                "organic_clicks_prev_week": 0, "top_keywords": [], "money_keyword_ranks": []}
+    if not GSC_SERVICE_ACCOUNT_JSON and not GSC_CREDENTIALS_PATH:
+        return {"error": "GSC creds not configured (set GSC_SERVICE_ACCOUNT_JSON)",
+                "organic_clicks_this_week": 0, "organic_clicks_prev_week": 0,
+                "top_keywords": [], "money_keyword_ranks": []}
 
     try:
-        from google.oauth2 import service_account  # type: ignore
         from googleapiclient.discovery import build  # type: ignore
     except ImportError:
         return {
@@ -72,10 +88,7 @@ async def fetch_gsc(
     property_id = gsc_property or f"sc-domain:{site_url.replace('https://', '').replace('http://', '').replace('www.', '').rstrip('/')}"
 
     try:
-        creds = service_account.Credentials.from_service_account_file(
-            GSC_CREDENTIALS_PATH,
-            scopes=["https://www.googleapis.com/auth/webmasters.readonly"],
-        )
+        creds = _gsc_creds()
         service = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
 
         def _query(start: date, end: date, dimensions: list[str], row_limit: int = 25):
@@ -143,22 +156,55 @@ async def fetch_gsc(
         }
 
 
-async def fetch_ga(ga_property_id: Optional[str]) -> dict:
+def _ga4_creds():
+    """Return GA4 Data API service-account credentials, preferring inline JSON env var."""
+    from google.oauth2 import service_account  # type: ignore
+    scopes = ["https://www.googleapis.com/auth/analytics.readonly"]
+    if GA4_SERVICE_ACCOUNT_JSON:
+        info = json.loads(GA4_SERVICE_ACCOUNT_JSON)
+        return service_account.Credentials.from_service_account_info(info, scopes=scopes)
+    if GA_CREDENTIALS_PATH:
+        return service_account.Credentials.from_service_account_file(GA_CREDENTIALS_PATH, scopes=scopes)
+    raise ValueError("Neither GA4_SERVICE_ACCOUNT_JSON nor GA_CREDENTIALS_PATH is set")
+
+
+async def fetch_ga(ga_property_id: Optional[str] = None) -> dict:
     """
-    Returns dict with:
+    Returns organic session counts from the GA4 Data API.
       - organic_sessions_this_week: int
       - organic_sessions_prev_week: int
       - error: str | None
+
+    Required env vars (one of):
+      GA4_SERVICE_ACCOUNT_JSON  — service-account JSON as a single-line string (preferred)
+      GA_CREDENTIALS_PATH       — path to the same JSON on disk (legacy / local dev)
+
+    Also required (one of):
+      GA4_PROPERTY_ID           — numeric GA4 property id, e.g. "properties/123456789"
+      ga_property_id arg        — per-client override (takes precedence)
     """
-    if not GA_CREDENTIALS_PATH or not ga_property_id:
-        return {"error": "GA_CREDENTIALS_PATH or ga_property_id missing",
-                "organic_sessions_this_week": 0, "organic_sessions_prev_week": 0}
+    prop_id = ga_property_id or GA4_PROPERTY_ID
+    has_creds = bool(GA4_SERVICE_ACCOUNT_JSON or GA_CREDENTIALS_PATH)
+    if not has_creds or not prop_id:
+        missing = []
+        if not has_creds:
+            missing.append("GA4_SERVICE_ACCOUNT_JSON")
+        if not prop_id:
+            missing.append("GA4_PROPERTY_ID")
+        return {
+            "error": f"GA4 not configured — set: {', '.join(missing)}",
+            "organic_sessions_this_week": 0,
+            "organic_sessions_prev_week": 0,
+        }
+
+    # Normalise: GA4 Data API expects "properties/123456789"
+    if not prop_id.startswith("properties/"):
+        prop_id = f"properties/{prop_id}"
 
     try:
-        from google.oauth2 import service_account  # type: ignore
         from google.analytics.data_v1beta import BetaAnalyticsDataClient  # type: ignore
         from google.analytics.data_v1beta.types import (  # type: ignore
-            DateRange, Dimension, Metric, RunReportRequest, Filter, FilterExpression,
+            DateRange, Dimension, Metric, RunReportRequest,
         )
     except ImportError:
         return {
@@ -170,20 +216,17 @@ async def fetch_ga(ga_property_id: Optional[str]) -> dict:
     this_start, this_end, prev_start, prev_end = _last_week_window()
 
     try:
-        creds = service_account.Credentials.from_service_account_file(
-            GA_CREDENTIALS_PATH,
-            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
-        )
-        client = BetaAnalyticsDataClient(credentials=creds)
+        creds = _ga4_creds()
+        ga_client = BetaAnalyticsDataClient(credentials=creds)
 
         def _organic_sessions(start: date, end: date) -> int:
             req = RunReportRequest(
-                property=ga_property_id,
+                property=prop_id,
                 date_ranges=[DateRange(start_date=start.isoformat(), end_date=end.isoformat())],
                 dimensions=[Dimension(name="sessionDefaultChannelGroup")],
                 metrics=[Metric(name="sessions")],
             )
-            resp = client.run_report(req)
+            resp = ga_client.run_report(req)
             for row in resp.rows:
                 if row.dimension_values[0].value == "Organic Search":
                     return int(row.metric_values[0].value)
@@ -196,7 +239,7 @@ async def fetch_ga(ga_property_id: Optional[str]) -> dict:
         }
     except Exception as e:
         return {
-            "error": f"GA fetch error: {type(e).__name__}: {str(e)[:200]}",
+            "error": f"GA4 fetch error: {type(e).__name__}: {str(e)[:200]}",
             "organic_sessions_this_week": 0,
             "organic_sessions_prev_week": 0,
         }

@@ -25,6 +25,24 @@ router = APIRouter(prefix="/lead-gen", tags=["lead-gen"])
 ANTHROPIC_API_KEY = (os.getenv("ANTHROPIC_API_KEY") or "").strip() or None
 LEADGEN_MODEL = os.getenv("LEADGEN_MODEL", "claude-opus-4-7").strip()
 
+
+@router.get("/health")
+async def lead_gen_health():
+    """
+    Lightweight liveness probe for the lead-gen router.
+    Returns which env vars are set so you can confirm Railway has the right config
+    without exposing secret values.  Call:
+        curl https://lola-backend.up.railway.app/lead-gen/health
+    """
+    return {
+        "ok": True,
+        "env": {
+            "ANTHROPIC_API_KEY": bool(ANTHROPIC_API_KEY),
+            "GA4_MEASUREMENT_ID": bool(GA4_MEASUREMENT_ID),
+            "GA4_API_SECRET": bool(GA4_API_SECRET),
+        },
+    }
+
 # GA4 Measurement Protocol — sends server-side conversion events (leads +
 # calls) into GA4 so they show up alongside web analytics. No-op until both
 # env vars are set on Railway, so the webhooks keep working regardless.
@@ -440,6 +458,7 @@ async def webhook_form(body: FormWebhookPayload, request: Request):
             slug, "lead", source=body.source_medium or "website", meta=meta, ip=ip
         )
     except Exception as e:  # never break the caller's submit flow
+        print(f"[webhook/form] ERROR log_event({slug}): {type(e).__name__}: {e}")
         return {"ok": False, "error": str(e)[:200]}
     # Mirror to GA4 as a conversion (no-op unless GA4 env vars are set).
     await _ga4_event(
@@ -513,6 +532,7 @@ async def webhook_callrail(request: Request):
             meta={"caller_city": caller_city, "duration_sec": duration_sec},
         )
     except Exception as e:
+        print(f"[webhook/call] ERROR db({slug}, {call_sid}): {type(e).__name__}: {e}")
         return {"ok": False, "error": str(e)[:200]}
     # Mirror to GA4 as a phone-call conversion (no-op unless GA4 env vars set).
     await _ga4_event(
@@ -590,4 +610,6 @@ async def _seed_sandbar_client() -> None:
             f"(gsc={_SANDBAR_SEED['gsc_property']}, ga={ga_property_id or 'unset'})"
         )
     except Exception as e:  # never block app startup on a seed failure
-        print(f"[seed] Sandbar seed skipped: {e}")
+        import traceback
+        print(f"[seed] ERROR: Sandbar seed failed — {type(e).__name__}: {e}")
+        traceback.print_exc()
