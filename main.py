@@ -1752,7 +1752,9 @@ async def public_client_dashboard(slug: str):
         raise HTTPException(status_code=404, detail="No such client dashboard")
     series = await get_all_history_for_slug(slug)
     google_series = [s for s in series if s["source"] == "google_organic"]
-    ai_series = [s for s in series if s["source"] == "claude_ai_mode"]
+    # Aggregate every AI Mode provider (Claude, ChatGPT, future Gemini, etc.)
+    # so Share of Voice represents AI search visibility as a whole, not just one.
+    ai_series = [s for s in series if str(s.get("source", "")).endswith("_ai_mode")]
     # Work-delivered feed — proves the retainer is doing the work between
     # ranking snapshots. Empty/absent until tasks are logged for this slug.
     implementation = await reporting_tasks_grouped(slug)
@@ -1859,6 +1861,10 @@ async def public_client_dashboard(slug: str):
         "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
         "google": google_series,
         "ai_mode": ai_series,
+        "verified_wins": {
+            "organic": list(getattr(cs, "verified_organic_wins", []) or []),
+            "map_pack": list(getattr(cs, "verified_map_pack_wins", []) or []),
+        },
         "implementation": implementation,
         "share_of_voice": share_of_voice,
         "tracking": tracking,
