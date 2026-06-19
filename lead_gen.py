@@ -43,6 +43,50 @@ async def lead_gen_health():
         },
     }
 
+
+@router.get("/ga4-test")
+async def ga4_connection_test():
+    """
+    One-shot verification of the GA4 Data API + Search Console service-account
+    wiring. Hit this AFTER setting GA4_SERVICE_ACCOUNT_JSON / GA4_PROPERTY_ID /
+    GSC_SERVICE_ACCOUNT_JSON in Railway:
+        curl https://lola-backend-production.up.railway.app/lead-gen/ga4-test
+
+    Reads which env vars are present (booleans only — no secret values), then
+    runs a live test query against each API and returns the result or the exact
+    error string, so misconfig (wrong property id, SA not added as Viewer,
+    API not enabled) is obvious without digging through Railway logs.
+    """
+    import os as _os
+    from agents.reporting_agent.data_fetcher import fetch_ga, fetch_gsc
+
+    env_present = {
+        "GA4_SERVICE_ACCOUNT_JSON": bool((_os.getenv("GA4_SERVICE_ACCOUNT_JSON") or "").strip()),
+        "GA4_PROPERTY_ID": (_os.getenv("GA4_PROPERTY_ID") or _os.getenv("GA_DEFAULT_PROPERTY_ID") or "").strip() or None,
+        "GSC_SERVICE_ACCOUNT_JSON": bool((_os.getenv("GSC_SERVICE_ACCOUNT_JSON") or "").strip()),
+        "SANDBAR_GA_PROPERTY_ID": (_os.getenv("SANDBAR_GA_PROPERTY_ID") or "").strip() or None,
+    }
+
+    ga = await fetch_ga()
+    gsc = await fetch_gsc(
+        "https://www.sandbarsoftwash.com",
+        ["roof cleaning palm harbor fl"],
+        "sc-domain:sandbarsoftwash.com",
+    )
+    return {
+        "env_present": env_present,
+        "ga4_data_api": {
+            "ok": ga.get("error") is None,
+            "error": ga.get("error"),
+            "organic_sessions_this_week": ga.get("organic_sessions_this_week"),
+        },
+        "search_console": {
+            "ok": gsc.get("error") is None,
+            "error": gsc.get("error"),
+            "organic_clicks_this_week": gsc.get("organic_clicks_this_week"),
+        },
+    }
+
 # GA4 Measurement Protocol — sends server-side conversion events (leads +
 # calls) into GA4 so they show up alongside web analytics. No-op until both
 # env vars are set on Railway, so the webhooks keep working regardless.
