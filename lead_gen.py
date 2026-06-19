@@ -1077,3 +1077,96 @@ async def _do_sandbar_refresh() -> None:
 async def _auto_refresh_sandbar_metrics() -> None:
     # Run in background so a slow external API never blocks healthchecks.
     asyncio.create_task(_do_sandbar_refresh())
+
+
+# ── Diagnostic + test-call endpoints ────────────────────────────────────────
+# Used once to verify the full pipeline (env vars → DB → dashboard) without
+# needing a real inbound call. Safe to leave in — both require the admin key.
+
+
+@router.get("/diagnostic/{slug}")
+async def diagnostic(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Full health check for a client slug. Reports:
+      - Which env vars are configured (values redacted)
+      - Call + lead counts currently in the DB
+      - Most recent call record (if any)
+      - Whether the client seed row exists in reporting_clients
+    Use from /docs → Try it out to confirm setup before going live.
+    """
+    _check_admin_key(x_admin_key)
+    from db.tracking import counts_for_slug, recent_events
+    from db.reporting import get_client_by_slug as _get_client
+
+    counts = await counts_for_slug(slug)
+    events = await recent_events(slug, limit=5)
+    rc = await _get_client(slug)
+
+    callrail_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
+    callrail_acct = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+
+    return {
+        "slug": slug,
+        "env": {
+            "CALLRAIL_API_KEY": f"set ({callrail_key[:6]}...)" if callrail_key else "NOT SET",
+            "CALLRAIL_ACCOUNT_ID": callrail_acct if callrail_acct else "NOT SET",
+            "GA4_MEASUREMENT_ID": bool((os.getenv("GA4_MEASUREMENT_ID") or "").strip()),
+            "GA4_API_SECRET": bool((os.getenv("GA4_API_SECRET") or "").strip()),
+            "LOLA_SECRET_ADMIN_KEY": "set" if (os.getenv("LOLA_SECRET_ADMIN_KEY") or "").strip() else "NOT SET",
+        },
+        "client_seeded": rc is not None,
+        "avg_job_value": int((rc or {}).get("avg_job_value") or 400),
+        "counts": counts,
+        "recent_events": events,
+    }
+
+
+@router.post("/test-call/{slug}")
+async def inject_test_call(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Injects a synthetic 'completed' call into tracked_calls + tracked_events
+    so you can verify the full DB → dashboard pipeline without placing a real
+    call. The fake call is clearly labelled (caller_number = +10000000000,
+    source = 'test_inject') so it's easy to identify and exclude later if
+    needed.
+
+    Steps to test the full pipeline:
+      1. POST /lead-gen/test-call/sandbar  (X-Admin-Key header)
+      2. Open https://lola.tyalexandermedia.com/r/client/sandbar
+      3. You should see call count increment in the Tracking row
+    """
+    _check_admin_key(x_admin_key)
+    from db.tracking import log_call, update_call_status, log_event
+
+    test_sid = f"TEST-{uuid.uuid4().hex[:12].upper()}"
+    await log_call(
+        slug=slug,
+        call_sid=test_sid,
+        caller_number="+10000000000",
+        tracking_number="TEST",
+        forwarded_to=None,
+        source="test_inject",
+        caller_city="Palm Harbor",
+        caller_state="FL",
+    )
+    await update_call_status(test_sid, status="completed", duration_sec=90)
+    eid = await log_event(
+        slug=slug,
+        event_type="call",
+        source="callrail",
+        medium="test_inject",
+        properties={"call_sid": test_sid, "duration_sec": 90, "note": "synthetic test call"},
+    )
+    return {
+        "ok": True,
+        "note": "Synthetic test call injected — refresh the dashboard to see it.",
+        "call_sid": test_sid,
+        "event_id": eid,
+        "dashboard": f"https://lola.tyalexandermedia.com/r/client/sandbar",
+    }
