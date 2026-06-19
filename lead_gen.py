@@ -608,8 +608,11 @@ async def webhook_callrail(request: Request):
     In CallRail: Settings -> Integrations -> Webhooks -> Call Completed
     URL: https://lola-backend-production.up.railway.app/lead-gen/webhook/call?slug=sandbar
 
-    Accepts JSON or form-encoded. Maps CallRail's payload to a tracked_calls
-    row (caller number, city, duration, recording) and a 'call' event.
+    Accepts JSON or form-encoded (CallRail's "post_call" webhook is form-
+    encoded). Field names below match CallRail's real payload — note it sends
+    customer_city / customer_state / customer_name (NOT caller_*). Maps it to a
+    tracked_calls row + a 'call' event so the dashboard funnel + billing-proof
+    (number, city, duration, recording) update in real time.
     """
     ct = request.headers.get("content-type", "")
     if "json" in ct:
@@ -634,8 +637,14 @@ async def webhook_callrail(request: Request):
     forwarded_to = str(
         body.get("business_phone_number") or body.get("forwarded_to") or ""
     ) or None
-    caller_city = str(body.get("caller_city") or "") or None
-    caller_state = str(body.get("caller_state") or "") or None
+    # CallRail sends customer_city / customer_state; keep caller_* as fallback.
+    caller_city = str(
+        body.get("customer_city") or body.get("caller_city") or ""
+    ) or None
+    caller_state = str(
+        body.get("customer_state") or body.get("caller_state") or ""
+    ) or None
+    customer_name = str(body.get("customer_name") or "") or None
     try:
         duration_sec = int(
             body.get("duration") or body.get("duration_in_seconds") or 0
@@ -646,9 +655,12 @@ async def webhook_callrail(request: Request):
         body.get("recording") or body.get("recording_url") or ""
     ) or None
     source = str(
-        body.get("utm_source") or body.get("first_call_actions") or "callrail"
+        body.get("utm_source") or body.get("tracking_source") or "callrail"
     )
     direction = str(body.get("direction") or "inbound")
+    # answered + first_call drive billable-lead quality on the dashboard.
+    answered = str(body.get("answered") or "").lower() in ("true", "1", "yes")
+    first_call = str(body.get("first_call") or "").lower() in ("true", "1", "yes")
 
     try:
         await log_call(
@@ -658,7 +670,21 @@ async def webhook_callrail(request: Request):
         await update_call_status(call_sid, direction, duration_sec, recording_url)
         await log_event(
             slug, "call", source=source,
-            meta={"caller_city": caller_city, "duration_sec": duration_sec},
+            meta={
+                "caller_number": caller_number,
+                "customer_name": customer_name,
+                "caller_city": caller_city,
+                "caller_state": caller_state,
+                "duration_sec": duration_sec,
+                "answered": answered,
+                "first_call": first_call,
+                "recording_url": recording_url,
+            },
+        )
+        print(
+            f"[webhook/call] logged {slug} call {call_sid} "
+            f"from {caller_number or '?'} ({caller_city or '?'}, {caller_state or '?'}) "
+            f"{duration_sec}s answered={answered} first={first_call}"
         )
     except Exception as e:
         print(f"[webhook/call] ERROR db({slug}, {call_sid}): {type(e).__name__}: {e}")
