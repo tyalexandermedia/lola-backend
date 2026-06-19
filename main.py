@@ -1861,6 +1861,10 @@ async def public_client_dashboard(slug: str):
         "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
         "google": google_series,
         "ai_mode": ai_series,
+        "verified_wins": {
+            "organic": list(getattr(cs, "verified_organic_wins", []) or []),
+            "map_pack": list(getattr(cs, "verified_map_pack_wins", []) or []),
+        },
         "implementation": implementation,
         "share_of_voice": share_of_voice,
         "tracking": tracking,

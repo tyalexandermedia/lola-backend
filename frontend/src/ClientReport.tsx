@@ -34,6 +34,7 @@ interface DashboardPayload {
   target_url: string;
   google: Series[];
   ai_mode: Series[];
+  verified_wins?: { organic: string[]; map_pack: string[] };
   implementation?: Implementation;
   share_of_voice?: ShareOfVoice;
   tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
@@ -115,7 +116,7 @@ export default function ClientReport({ slug }: { slug: string }) {
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
       <OwnerOverview data={data} />
-      <TopWinsCard google={data.google} aiMode={data.ai_mode} />
+      <TopWinsCard google={data.google} aiMode={data.ai_mode} verifiedWins={data.verified_wins} />
       {data.attributed_value && data.attributed_value.contacts > 0 && (
         <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
       )}
@@ -309,7 +310,15 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
  * "almost there" #2-#3 placements and AI mentions. Empty state shows
  * nothing so the dashboard isn't padded with zero-state noise.
  */
-function TopWinsCard({ google, aiMode }: { google: Series[]; aiMode: Series[] }) {
+function TopWinsCard({
+  google,
+  aiMode,
+  verifiedWins,
+}: {
+  google: Series[];
+  aiMode: Series[];
+  verifiedWins?: { organic: string[]; map_pack: string[] };
+}) {
   const num1 = google.filter(s => s.current.position === 1);
   const top3 = google.filter(s => {
     const p = s.current.position;
@@ -323,9 +332,15 @@ function TopWinsCard({ google, aiMode }: { google: Series[]; aiMode: Series[] })
   const totalTrackedG = google.length;
   const totalTrackedAi = aiMode.length;
 
-  if (num1.length === 0 && top3.length === 0 && aiWins.length === 0) {
+  const verifiedOrganic = verifiedWins?.organic ?? [];
+  const verifiedMapPack = verifiedWins?.map_pack ?? [];
+  const totalVerified = verifiedOrganic.length + verifiedMapPack.length;
+
+  if (num1.length === 0 && top3.length === 0 && aiWins.length === 0 && totalVerified === 0) {
     return null;
   }
+
+  const num1Count = num1.length + verifiedOrganic.length + verifiedMapPack.length;
 
   return (
     <section className="mb-6 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#15110A] via-[#11121A] to-[#0E0F16] p-6 shadow-[0_0_36px_rgba(212,175,55,0.12)] sm:p-8">
@@ -336,34 +351,83 @@ function TopWinsCard({ google, aiMode }: { google: Series[]; aiMode: Series[] })
         </p>
       </div>
 
-      {num1.length > 0 && (
+      {num1Count > 0 && (
         <>
           <h2 className="mt-3 text-[24px] font-bold leading-snug text-white sm:text-[30px]">
             <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
-              {num1.length} keyword{num1.length === 1 ? '' : 's'} ranked #1
+              {num1Count} #1 placement{num1Count === 1 ? '' : 's'}
             </span>{' '}
-            on Google.
+            across Google organic + map packs.
           </h2>
           <p className="mt-2 max-w-[640px] text-[13px] leading-[1.6] text-[#C8C0B0] sm:text-[14px]">
-            When customers in Pinellas County search these terms, your site is the first
-            organic result they see. That's the position competitors pay $5–$15 per click for.
+            When customers across Pinellas County search these terms, Sandbar is the first
+            result they see — the position competitors pay $5–$15 per click for.
           </p>
 
-          <ul className="mt-5 space-y-2.5">
-            {num1.map(s => (
-              <li
-                key={`win-${s.query}`}
-                className="flex items-center gap-3 rounded-[10px] border border-[#D4AF37]/20 bg-gradient-to-r from-[#D4AF37]/[0.08] to-transparent px-3 py-2.5 sm:px-4 sm:py-3"
-              >
-                <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
-                  #1
-                </span>
-                <span className="text-[14px] font-medium text-white sm:text-[15px]">
-                  {s.query}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {verifiedOrganic.length > 0 && (
+            <>
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+                #1 Organic Rankings · Confirmed
+              </p>
+              <ul className="mt-2 space-y-2">
+                {verifiedOrganic.map(label => (
+                  <li
+                    key={`vo-${label}`}
+                    className="flex items-center gap-3 rounded-[10px] border border-[#D4AF37]/20 bg-gradient-to-r from-[#D4AF37]/[0.10] to-transparent px-3 py-2.5 sm:px-4 sm:py-3"
+                  >
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
+                      #1
+                    </span>
+                    <span className="text-[14px] font-medium text-white sm:text-[15px]">{label}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {verifiedMapPack.length > 0 && (
+            <>
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+                #1 in Google Map Pack · Confirmed
+              </p>
+              <ul className="mt-2 space-y-2">
+                {verifiedMapPack.map(label => (
+                  <li
+                    key={`vm-${label}`}
+                    className="flex items-center gap-3 rounded-[10px] border border-emerald-500/25 bg-gradient-to-r from-emerald-500/[0.08] to-transparent px-3 py-2.5 sm:px-4 sm:py-3"
+                  >
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[12px] font-extrabold text-[#0E0F16] shadow-[0_0_12px_rgba(16,185,129,0.4)]">
+                      📍
+                    </span>
+                    <span className="text-[14px] font-medium text-white sm:text-[15px]">{label}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {num1.length > 0 && (
+            <>
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+                Auto-tracked #1 Rankings · This Week
+              </p>
+              <ul className="mt-2 space-y-2">
+                {num1.map(s => (
+                  <li
+                    key={`win-${s.query}`}
+                    className="flex items-center gap-3 rounded-[10px] border border-[#D4AF37]/15 bg-white/[0.02] px-3 py-2.5 sm:px-4 sm:py-3"
+                  >
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
+                      #1
+                    </span>
+                    <span className="text-[14px] font-medium text-white sm:text-[15px]">
+                      {s.query}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </>
       )}
 
