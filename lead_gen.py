@@ -32,7 +32,7 @@ async def lead_gen_health():
     Lightweight liveness probe for the lead-gen router.
     Returns which env vars are set so you can confirm Railway has the right config
     without exposing secret values.  Call:
-        curl https://lola-backend.up.railway.app/lead-gen/health
+        curl https://lola-backend-production.up.railway.app/lead-gen/health
     """
     return {
         "ok": True,
@@ -477,7 +477,7 @@ async def webhook_callrail(request: Request):
     """
     CallRail 'Call Completed' webhook receiver.
     In CallRail: Settings -> Integrations -> Webhooks -> Call Completed
-    URL: https://lola-backend.up.railway.app/lead-gen/webhook/call?slug=sandbar
+    URL: https://lola-backend-production.up.railway.app/lead-gen/webhook/call?slug=sandbar
 
     Accepts JSON or form-encoded. Maps CallRail's payload to a tracked_calls
     row (caller number, city, duration, recording) and a 'call' event.
