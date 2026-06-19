@@ -23,6 +23,8 @@ GOOGLE_CUSTOM_SEARCH_KEY = os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY", "").strip()
 GOOGLE_CUSTOM_SEARCH_CX = os.getenv("GOOGLE_CUSTOM_SEARCH_CX", "").strip() or None
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip() or None
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip() or None
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
 
 
 async def _google_rank(
@@ -163,6 +165,65 @@ async def _claude_ai_mode(
         return False, f"exception: {e}", []
 
 
+async def _chatgpt_ai_mode(
+    client: httpx.AsyncClient,
+    prompt: str,
+    client_name: str,
+    target_domain: str,
+) -> tuple[bool, str, list[str]]:
+    """
+    Ask ChatGPT (OpenAI) the same recommendation prompt. Returns
+    (mentioned, raw_excerpt, competitors) using the same RECOMMENDED_JSON
+    contract as the Claude path. Skipped silently if OPENAI_API_KEY isn't set.
+    """
+    if not OPENAI_API_KEY:
+        return False, "OpenAI key not configured", []
+    structured_prompt = (
+        f"{prompt}\n\n"
+        "After your answer, on a new final line, output ONLY a JSON array of the "
+        "specific business/company names you recommended (most relevant first), e.g.\n"
+        'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
+        "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
+    )
+    try:
+        resp = await client.post(
+            "https://api.openai.com/v1/chat/completions",
+            json={
+                "model": OPENAI_MODEL,
+                "max_tokens": 640,
+                "messages": [{"role": "user", "content": structured_prompt}],
+            },
+            headers={
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            timeout=30.0,
+        )
+        if resp.status_code != 200:
+            return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
+        data = resp.json()
+        text = (
+            data.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
+        )
+
+        recommended = _extract_recommended(text)
+        mentioned_in_list = any(
+            _name_matches(client_name, target_domain, r) for r in recommended
+        )
+        mentioned_in_text = (
+            client_name.lower() in text.lower()
+            or target_domain.lower() in text.lower()
+        )
+        mentioned = mentioned_in_list or mentioned_in_text
+        competitors = [
+            r for r in recommended
+            if not _name_matches(client_name, target_domain, r)
+        ]
+        return mentioned, text[:500], competitors
+    except Exception as e:
+        return False, f"exception: {e}", []
+
+
 def _domain_from_url(url: str) -> str:
     """Pull `host.tld` out of an http(s) URL; tolerates plain domains."""
     s = (url or "").strip()
@@ -239,9 +300,11 @@ async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
                 "snippet": snippet[:120],
             })
 
-        # AI Mode (Claude) — does it mention us? If not, who DID it recommend?
+        # AI Mode — ask BOTH Claude and ChatGPT the same prompt. Each becomes
+        # its own snapshot row so the dashboard can show per-provider mentions
+        # AND aggregate share of voice across all AI search assistants.
         for p in cs.ai_mode_prompts:
-            mentioned, excerpt, competitors = await _claude_ai_mode(
+            mentioned_c, excerpt_c, competitors_c = await _claude_ai_mode(
                 http, p, cs.client_name, cs.target_domain
             )
             await save_ranking(
@@ -249,17 +312,41 @@ async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
                 query=p,
                 source="claude_ai_mode",
                 position=None,
-                mentioned=mentioned,
+                mentioned=mentioned_c,
                 found_url="",
-                raw_excerpt=excerpt,
+                raw_excerpt=excerpt_c,
                 notes=notes,
-                competitors=competitors,
+                competitors=competitors_c,
             )
             summary["ai_mode"].append({
                 "prompt": p[:80],
-                "mentioned": mentioned,
-                "competitors": competitors,
-                "excerpt": excerpt[:200],
+                "provider": "claude",
+                "mentioned": mentioned_c,
+                "competitors": competitors_c,
+                "excerpt": excerpt_c[:200],
             })
+
+            if OPENAI_API_KEY:
+                mentioned_g, excerpt_g, competitors_g = await _chatgpt_ai_mode(
+                    http, p, cs.client_name, cs.target_domain
+                )
+                await save_ranking(
+                    slug=slug,
+                    query=p,
+                    source="chatgpt_ai_mode",
+                    position=None,
+                    mentioned=mentioned_g,
+                    found_url="",
+                    raw_excerpt=excerpt_g,
+                    notes=notes,
+                    competitors=competitors_g,
+                )
+                summary["ai_mode"].append({
+                    "prompt": p[:80],
+                    "provider": "chatgpt",
+                    "mentioned": mentioned_g,
+                    "competitors": competitors_g,
+                    "excerpt": excerpt_g[:200],
+                })
 
     return summary
