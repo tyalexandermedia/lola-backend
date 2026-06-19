@@ -714,7 +714,9 @@ _SANDBAR_SEED = {
 @router.on_event("startup")
 async def _seed_sandbar_client() -> None:
     try:
-        ga_property_id = (os.getenv("SANDBAR_GA_PROPERTY_ID") or "").strip() or None
+        ga_property_id = (
+            os.getenv("SANDBAR_GA_PROPERTY_ID") or os.getenv("GA4_PROPERTY_ID") or ""
+        ).strip() or None
         existing = await get_client_by_slug(_SANDBAR_SEED["slug"])
         # Stop once the row exists AND both analytics props are wired up.
         if existing and existing.get("gsc_property") and existing.get("ga_property_id"):
