@@ -1825,6 +1825,8 @@ async def public_client_dashboard(slug: str):
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
+    from db.tracking import won_jobs_stats as _won_jobs_stats
+    won_jobs = await _won_jobs_stats(slug)
     from db.reporting import get_client_by_slug as _get_client
     rc = await _get_client(slug)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
@@ -1902,6 +1904,7 @@ async def public_client_dashboard(slug: str):
         "annualized": annual,
         "cost_per_lead": cpl,
         "integrations": integrations,
+        "won_jobs": won_jobs,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -2847,6 +2850,72 @@ async def admin_gbp_pick(
         raise HTTPException(status_code=404, detail="Onboard the client first")
     _GBP_PENDING_TOKENS.pop(slug, None)
     return {"ok": True, "slug": slug, "gbp_connected": True, "location_id": body.location_id}
+
+
+class WonJobRequest(BaseModel):
+    job_value: int               # dollars, e.g. 650
+    service_type: Optional[str] = None   # "roof cleaning", "soft wash", etc.
+    source: Optional[str] = None         # gbp / callrail / website / ai_search
+    call_sid: Optional[str] = None       # link to specific tracked_calls row
+    notes: Optional[str] = None
+
+
+@app.post("/admin/won-jobs/{slug}")
+async def admin_log_won_job(
+    slug: str,
+    body: WonJobRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Record a confirmed won/closed job for a client. Use this to track
+    ACTUAL revenue separately from the estimated attribution model.
+
+    Example — log a $750 roof cleaning that came from a CallRail call:
+        POST /admin/won-jobs/sandbar
+        { "job_value": 750, "service_type": "roof cleaning", "source": "callrail" }
+
+    The dashboard's Won Jobs card shows real vs estimated revenue so the
+    client (and operator) can see the actual ROI, not just a model estimate.
+    """
+    _check_admin(x_admin_key)
+    if body.job_value <= 0:
+        raise HTTPException(status_code=400, detail="job_value must be > 0")
+    from db.tracking import won_jobs_stats
+    import aiosqlite
+    db_path = os.getenv("DB_PATH", "lola.db")
+    async with aiosqlite.connect(db_path) as db:
+        await db.execute(
+            """INSERT INTO won_jobs (slug, call_sid, job_value, service_type, source, notes)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (
+                slug.strip().lower(),
+                (body.call_sid or "").strip() or None,
+                body.job_value,
+                (body.service_type or "").strip() or None,
+                (body.source or "").strip() or None,
+                (body.notes or "").strip() or None,
+            ),
+        )
+        await db.commit()
+    stats = await won_jobs_stats(slug)
+    return {
+        "ok": True,
+        "slug": slug,
+        "jobs_this_month": stats["month"],
+        "revenue_this_month": stats["revenue_month"],
+        "lifetime_jobs": stats["lifetime"],
+        "lifetime_revenue": stats["revenue_lifetime"],
+    }
+
+
+@app.get("/admin/won-jobs/{slug}")
+async def admin_list_won_jobs(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """List all recorded won jobs for a slug."""
+    _check_admin(x_admin_key)
+    from db.tracking import won_jobs_stats
+    return await won_jobs_stats(slug)
 
 
 @app.post("/admin/metrics/{slug}/run")
