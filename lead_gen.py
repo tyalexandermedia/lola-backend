@@ -44,6 +44,37 @@ async def lead_gen_health():
     }
 
 
+@router.get("/whoami")
+async def whoami():
+    """
+    Returns the Railway service identity of whichever instance answered this
+    request. Useful when more than one Railway service runs the same code
+    (e.g. a stale duplicate deploy) and you need to confirm which database
+    a write/read actually hit.
+
+    The canonical production service for the Sandbar dashboard is
+    'lola-backend-production' — its public domain is what every Vercel
+    rewrite, the CallRail webhook, and the GBP OAuth callback point at.
+    If `public_domain` here returns anything else, the env vars + CallRail
+    webhook are pointed at the wrong service.
+    """
+    return {
+        "service": os.getenv("RAILWAY_SERVICE_NAME") or "unknown",
+        "project": os.getenv("RAILWAY_PROJECT_NAME") or "unknown",
+        "environment": os.getenv("RAILWAY_ENVIRONMENT_NAME") or "unknown",
+        "public_domain": os.getenv("RAILWAY_PUBLIC_DOMAIN") or "unknown",
+        "git_commit": (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "")[:12] or "unknown",
+        "is_canonical_lola_backend": (
+            (os.getenv("RAILWAY_PUBLIC_DOMAIN") or "").lower()
+            == "lola-backend-production.up.railway.app"
+        ),
+        "callrail_configured": bool(
+            (os.getenv("CALLRAIL_API_KEY") or "").strip()
+            and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+        ),
+    }
+
+
 @router.get("/ga4-test")
 async def ga4_connection_test():
     """
