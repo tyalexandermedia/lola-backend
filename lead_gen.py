@@ -1172,6 +1172,25 @@ async def _do_sandbar_refresh() -> None:
             await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
         except Exception as e:
             print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
+
+        # CallRail auto-finalize: if both env vars are set we wire the webhook
+        # (idempotent — no-op if already wired) and backfill the last 30 days
+        # of calls. Lets the operator finish the loop by JUST setting Railway
+        # env vars + redeploying — no manual /finalize curl needed.
+        if (os.getenv("CALLRAIL_API_KEY") or "").strip() and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip():
+            admin_key = (os.getenv("LOLA_SECRET_ADMIN_KEY") or "").strip()
+            if admin_key:
+                try:
+                    res = await callrail_setup_webhook(slug="sandbar", x_admin_key=admin_key)
+                    print(f"[auto-refresh] CallRail webhook: {res}")
+                except Exception as e:
+                    print(f"[auto-refresh] CallRail webhook setup failed: {type(e).__name__}: {e}")
+                try:
+                    res = await import_callrail_history(slug="sandbar", days=30, x_admin_key=admin_key)
+                    print(f"[auto-refresh] CallRail backfill: imported {res.get('imported', '?')} calls")
+                except Exception as e:
+                    print(f"[auto-refresh] CallRail backfill failed: {type(e).__name__}: {e}")
+
         print("[auto-refresh] Sandbar metrics refreshed on startup.")
     except Exception as e:
         # Never block app boot on a refresh failure.
