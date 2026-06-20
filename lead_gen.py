@@ -17,7 +17,7 @@ import uuid
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/lead-gen", tags=["lead-gen"])
@@ -880,13 +880,17 @@ async def _seed_sandbar_client() -> None:
     values (conversion_rate, avg_job_value, gsc_property, ga_property_id,
     forward_number) are preserved when present.
     """
+    print("[seed] _seed_sandbar_client starting…")
     try:
         # Pull the canonical 19 keywords + 6 AI prompts from the config so
         # we never drift between the tracker config and the dashboard seed.
         from case_studies.configs import CASE_STUDIES as _CONFIG
         sandbar_cfg = _CONFIG.get("sandbar")
-        canonical_keywords = list(sandbar_cfg.google_queries) if sandbar_cfg else []
-        canonical_prompts = list(sandbar_cfg.ai_mode_prompts) if sandbar_cfg else []
+        if not sandbar_cfg:
+            print("[seed] WARNING: CASE_STUDIES['sandbar'] missing — aborting seed (would have wiped keywords)")
+            return
+        canonical_keywords = list(sandbar_cfg.google_queries)
+        canonical_prompts = list(sandbar_cfg.ai_mode_prompts)
 
         ga_property_id = (
             os.getenv("SANDBAR_GA_PROPERTY_ID") or os.getenv("GA4_PROPERTY_ID") or ""
@@ -919,6 +923,31 @@ async def _seed_sandbar_client() -> None:
         import traceback
         print(f"[seed] ERROR: Sandbar seed failed — {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+@router.post("/reseed/sandbar")
+async def manual_reseed_sandbar(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """
+    Manually re-runs the Sandbar seed without waiting for a Railway redeploy.
+    Useful after editing keywords/prompts in case_studies/configs.py and
+    needing the dashboard to reflect the change immediately. Returns the
+    resolved CaseStudy + the freshly-saved row so the operator can confirm.
+    """
+    _check_admin_key(x_admin_key)
+    await _seed_sandbar_client()
+    from case_studies.tracker import _load_case_study
+    cs = await _load_case_study("sandbar")
+    row = await get_client_by_slug("sandbar")
+    return {
+        "ok": True,
+        "case_study_loaded": cs is not None,
+        "google_queries_count": len(cs.google_queries) if cs else 0,
+        "ai_mode_prompts_count": len(cs.ai_mode_prompts) if cs else 0,
+        "first_3_queries": cs.google_queries[:3] if cs else [],
+        "db_row_present": row is not None,
+        "db_money_keywords_count": len(row.get("money_keywords", [])) if row else 0,
+        "db_ai_prompts_count": len(row.get("ai_mode_prompts", [])) if row else 0,
+    }
 
 
 # ============================================================
