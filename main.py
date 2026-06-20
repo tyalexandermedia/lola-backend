@@ -1853,6 +1853,26 @@ async def public_client_dashboard(slug: str):
         for src, n in (tracking_sources.get(et) or {}).items():
             lead_sources[src] = lead_sources.get(src, 0) + n
 
+    # Live integration status — drives the "✓ connected" chips in the empty
+    # state so we never lie green when CallRail/GA4 env vars aren't set on
+    # this Railway service. Booleans only; no secret values leave the server.
+    integrations = {
+        "callrail": bool(
+            (os.getenv("CALLRAIL_API_KEY") or "").strip()
+            and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+        ),
+        "ga4_measurement_protocol": bool(
+            (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+            and (os.getenv("GA4_API_SECRET") or "").strip()
+        ),
+        "rankings_tracker": bool(
+            (os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY") or "").strip()
+            and (os.getenv("GOOGLE_CUSTOM_SEARCH_CX") or "").strip()
+        ),
+        "gbp": bool((rc or {}).get("gbp_refresh_token")),
+        "bing": bool((os.getenv("BING_WEBMASTER_API_KEY") or "").strip()),
+    }
+
     return {
         "slug": slug,
         "client_name": cs.client_name,
@@ -1881,6 +1901,7 @@ async def public_client_dashboard(slug: str):
         "attributed_value": attributed,
         "annualized": annual,
         "cost_per_lead": cpl,
+        "integrations": integrations,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 

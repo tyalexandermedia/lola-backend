@@ -35,6 +35,13 @@ interface DashboardPayload {
   google: Series[];
   ai_mode: Series[];
   verified_wins?: { organic: string[]; map_pack: string[] };
+  integrations?: {
+    callrail?: boolean;
+    ga4_measurement_protocol?: boolean;
+    rankings_tracker?: boolean;
+    gbp?: boolean;
+    bing?: boolean;
+  };
   implementation?: Implementation;
   share_of_voice?: ShareOfVoice;
   tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
@@ -223,6 +230,27 @@ function Header({ data }: { data: DashboardPayload }) {
 }
 
 /**
+ * Live integration chip — green when the backend confirms the integration
+ * is wired (env vars set, credentials stored), amber when it isn't. Stops
+ * the empty state from lying about "✓ connected" before Railway env vars
+ * land on the right service.
+ */
+function StatusChip({ label, on }: { label: string; on: boolean }) {
+  if (on) {
+    return (
+      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+        ✓ {label} connected
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-amber-300">
+      … {label} pending
+    </span>
+  );
+}
+
+/**
  * Owner overview — the plain-English summary at the top of the dashboard.
  * Written for a non-technical business owner: how many contacts came in
  * this month, estimated revenue, and one-line context.
@@ -257,15 +285,15 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
           below as snapshots come in.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ CallRail webhook connected
-          </span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ Quote form connected
-          </span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ Rankings tracker active
-          </span>
+          <StatusChip label="CallRail webhook" on={data.integrations?.callrail ?? false} />
+          <StatusChip label="Quote form" on={true} />
+          <StatusChip label="Rankings tracker" on={data.integrations?.rankings_tracker ?? false} />
+          {data.integrations?.gbp !== undefined && (
+            <StatusChip label="Google Business Profile" on={data.integrations.gbp} />
+          )}
+          {data.integrations?.bing !== undefined && (
+            <StatusChip label="Bing Webmaster" on={data.integrations.bing} />
+          )}
         </div>
       </section>
     );
