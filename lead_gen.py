@@ -1296,9 +1296,15 @@ async def inject_test_call(
     eid = await log_event(
         slug=slug,
         event_type="call",
-        source="callrail",
-        medium="test_inject",
-        properties={"call_sid": test_sid, "duration_sec": 90, "note": "synthetic test call"},
+        source="test_inject",
+        meta={
+            "call_sid": test_sid,
+            "duration_sec": 90,
+            "caller_number": "+10000000000",
+            "caller_city": "Palm Harbor",
+            "caller_state": "FL",
+            "note": "synthetic test call",
+        },
     )
     return {
         "ok": True,
