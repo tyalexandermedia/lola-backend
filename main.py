@@ -1798,10 +1798,15 @@ async def public_client_dashboard(slug: str):
     from datetime import timezone
 
     def _to_dt(iso: str):
+        # SQLite's datetime('now') returns "YYYY-MM-DD HH:MM:SS" (naive). The
+        # CallRail backfill writes ISO 8601 with "Z" (aware). Normalize both to
+        # timezone-aware UTC so window comparisons don't TypeError when a slug
+        # has a mix of webhook and backfilled rows.
         try:
-            return datetime.fromisoformat(iso.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
         except (ValueError, AttributeError):
             return None
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
 
     now = datetime.now(timezone.utc)
     cutoff_30 = now - timedelta(days=30)
