@@ -2644,6 +2644,190 @@ async def admin_gbp_token(
     return {"ok": True, "slug": slug, "gbp_connected": True}
 
 
+# ── GBP OAuth helper flow ──────────────────────────────────────────────────
+# Removes the manual consent-dance friction. After the env vars
+# GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are set on Railway,
+# the operator opens /admin/gbp/oauth/url?slug=X (admin-keyed), pastes the
+# returned URL into a browser as the GBP owner, and is redirected back to
+# /admin/gbp/oauth/callback. The callback does the code→refresh_token
+# exchange, lists the connected locations, persists everything, and returns
+# the picked location_id so the operator can confirm.
+
+_GBP_OAUTH_SCOPES = "https://www.googleapis.com/auth/business.manage"
+# Google's OAuth redirect must match the Cloud Console "Authorized redirect URIs"
+# list exactly. We default to the Railway domain but allow override.
+_GBP_OAUTH_REDIRECT = (
+    os.getenv("GBP_OAUTH_REDIRECT_URI")
+    or "https://lola-backend-production.up.railway.app/admin/gbp/oauth/callback"
+).strip()
+
+# In-memory holding pen for refresh tokens returned by the OAuth callback,
+# keyed by slug. Lets the operator finish the multi-location case via a
+# second admin-keyed call without ever exposing the raw token in a URL or
+# response body. Cleared on every successful POST /admin/gbp/{slug}/pick.
+_GBP_PENDING_TOKENS: dict[str, str] = {}
+
+
+@app.get("/admin/gbp/oauth/url")
+async def admin_gbp_oauth_url(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Returns the Google consent URL to open as the GBP owner. After they
+    approve, Google redirects to /admin/gbp/oauth/callback?code=...&state=...
+    which finishes the exchange."""
+    _check_admin(x_admin_key)
+    from urllib.parse import urlencode
+    client_id = (os.getenv("GOOGLE_OAUTH_CLIENT_ID") or "").strip()
+    if not client_id:
+        raise HTTPException(
+            status_code=503,
+            detail="GOOGLE_OAUTH_CLIENT_ID not set on Railway",
+        )
+    qs = urlencode({
+        "client_id": client_id,
+        "redirect_uri": _GBP_OAUTH_REDIRECT,
+        "response_type": "code",
+        "scope": _GBP_OAUTH_SCOPES,
+        # access_type=offline + prompt=consent guarantees a refresh_token even
+        # for accounts that have previously authorized this app.
+        "access_type": "offline",
+        "prompt": "consent",
+        "include_granted_scopes": "true",
+        "state": slug,
+    })
+    return {
+        "consent_url": f"https://accounts.google.com/o/oauth2/v2/auth?{qs}",
+        "redirect_uri": _GBP_OAUTH_REDIRECT,
+        "slug": slug,
+        "note": "Open consent_url in a browser signed in as the GBP owner.",
+    }
+
+
+@app.get("/admin/gbp/oauth/callback")
+async def admin_gbp_oauth_callback(code: str = "", state: str = "", error: str = ""):
+    """Google redirects here after the owner grants consent. Exchanges the
+    auth code for a refresh_token, lists the owner's GBP accounts +
+    locations, stores everything against `state` (the slug) if a single
+    location is obvious, and returns the full picker payload so the
+    operator can confirm which location_id to keep."""
+    if error:
+        raise HTTPException(status_code=400, detail=f"Google OAuth error: {error}")
+    if not code or not state:
+        raise HTTPException(status_code=400, detail="Missing code or state")
+
+    client_id = (os.getenv("GOOGLE_OAUTH_CLIENT_ID") or "").strip()
+    client_secret = (os.getenv("GOOGLE_OAUTH_CLIENT_SECRET") or "").strip()
+    if not (client_id and client_secret):
+        raise HTTPException(
+            status_code=503,
+            detail="GOOGLE_OAUTH_CLIENT_ID/SECRET not set on Railway",
+        )
+
+    async with httpx.AsyncClient(timeout=15.0) as http:
+        tok = await http.post("https://oauth2.googleapis.com/token", data={
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": _GBP_OAUTH_REDIRECT,
+            "grant_type": "authorization_code",
+        })
+        if tok.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"token exchange failed: {tok.text[:200]}")
+        tok_body = tok.json()
+        refresh_token = tok_body.get("refresh_token")
+        access_token = tok_body.get("access_token")
+        if not refresh_token:
+            raise HTTPException(
+                status_code=400,
+                detail="Google did not return a refresh_token — revoke the app at "
+                       "myaccount.google.com/permissions and retry.",
+            )
+
+        # List accounts → locations. Some GBP owners only manage one location,
+        # in which case we auto-pick it and store everything.
+        accounts: list = []
+        try:
+            a = await http.get(
+                "https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            if a.status_code == 200:
+                accounts = a.json().get("accounts", []) or []
+        except Exception:
+            pass
+
+        locations: list = []
+        for acct in accounts:
+            try:
+                l = await http.get(
+                    f"https://mybusinessbusinessinformation.googleapis.com/v1/{acct.get('name')}/locations",
+                    params={"readMask": "name,title,storefrontAddress,phoneNumbers"},
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                if l.status_code == 200:
+                    for loc in (l.json().get("locations", []) or []):
+                        locations.append({
+                            "account": acct.get("name"),
+                            "location_id": loc.get("name"),  # 'locations/123…'
+                            "title": loc.get("title"),
+                            "phone": ((loc.get("phoneNumbers") or {}).get("primaryPhone")),
+                        })
+            except Exception:
+                continue
+
+    saved_location = None
+    if len(locations) == 1:
+        saved_location = locations[0]["location_id"]
+        await set_gbp_credentials(state, saved_location, refresh_token)
+        _GBP_PENDING_TOKENS.pop(state, None)
+    else:
+        # Multi-location case: stash the token by slug so the operator can
+        # finish via POST /admin/gbp/{slug}/pick without re-doing OAuth.
+        _GBP_PENDING_TOKENS[state] = refresh_token
+
+    return {
+        "ok": True,
+        "slug": state,
+        "refresh_token_captured": True,
+        "auto_saved_location_id": saved_location,
+        "locations": locations,
+        "next_step": (
+            f"Single location auto-saved — try POST /admin/metrics/{state}/run."
+            if saved_location
+            else f"Multiple locations — POST /admin/gbp/{state}/pick "
+                 "with {\"location_id\": \"locations/...\"} to finish."
+        ),
+    }
+
+
+class GbpPickRequest(BaseModel):
+    location_id: str
+
+
+@app.post("/admin/gbp/{slug}/pick")
+async def admin_gbp_pick(
+    slug: str,
+    body: GbpPickRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Finish the multi-location OAuth flow: pulls the stashed refresh
+    token from the prior /admin/gbp/oauth/callback hit and saves it
+    against the chosen location_id."""
+    _check_admin(x_admin_key)
+    refresh_token = _GBP_PENDING_TOKENS.get(slug)
+    if not refresh_token:
+        raise HTTPException(
+            status_code=409,
+            detail=f"No pending OAuth session for slug={slug}. Re-run /admin/gbp/oauth/url first.",
+        )
+    ok = await set_gbp_credentials(slug, body.location_id.strip(), refresh_token)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Onboard the client first")
+    _GBP_PENDING_TOKENS.pop(slug, None)
+    return {"ok": True, "slug": slug, "gbp_connected": True, "location_id": body.location_id}
+
+
 @app.post("/admin/metrics/{slug}/run")
 async def admin_metrics_run(
     slug: str,

@@ -25,6 +25,16 @@ os.environ["DB_PATH"] = _TMP.name
 
 
 async def main() -> int:
+    # Force every external creds to unset so setup_status takes the
+    # "missing env var" branch for every integration (no live API calls).
+    for k in (
+        "GA4_MEASUREMENT_ID", "GA4_API_SECRET",
+        "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET",
+        "BING_WEBMASTER_API_KEY",
+        "CALLRAIL_API_KEY", "CALLRAIL_ACCOUNT_ID",
+    ):
+        os.environ.pop(k, None)
+
     from db.tracking import log_event, init_tracking_tables
 
     await init_tracking_tables()
@@ -64,7 +74,31 @@ async def main() -> int:
         ip="127.0.0.1",
     )
 
-    print("OK: log_event() signature matches every call site in lead_gen.py")
+    # Setup-status: every integration must be enumerated and missing-env-vars
+    # must be reported. This guards against silently dropping an integration
+    # (e.g. removing the Bing block) when refactoring lead_gen.py.
+    from lead_gen import setup_status
+    status = await setup_status("sandbar")
+    required_checks = {
+        "dashboard_client", "ga4_measurement_protocol", "ga4_data_api",
+        "search_console", "gbp_performance", "bing_webmaster", "callrail",
+    }
+    missing = required_checks - set(status.get("checks", {}).keys())
+    if missing:
+        print(f"FAIL: setup-status dropped checks: {missing}")
+        return 1
+    expected_missing = {
+        "BING_WEBMASTER_API_KEY",
+        "CALLRAIL_API_KEY", "CALLRAIL_ACCOUNT_ID",
+        "GA4_MEASUREMENT_ID", "GA4_API_SECRET",
+        "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET",
+    }
+    reported_missing = set(status.get("summary", {}).get("missing_env_vars", []))
+    if not expected_missing <= reported_missing:
+        print(f"FAIL: setup-status missed env vars: {expected_missing - reported_missing}")
+        return 1
+
+    print("OK: log_event() signature + setup-status shape match every call site")
     return 0
 
 
