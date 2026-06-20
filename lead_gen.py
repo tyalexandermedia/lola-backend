@@ -999,7 +999,9 @@ async def import_callrail_history(
     """
     _check_admin_key(x_admin_key)
     api_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
-    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    # Strip dashes: CallRail displays the account ID as "512-138-905" in the UI
+    # but the REST API path requires the plain digits "512138905".
+    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip().replace("-", "")
     if not api_key or not account_id:
         raise HTTPException(
             status_code=503,
@@ -1273,8 +1275,13 @@ async def _do_sandbar_refresh(force: bool = False) -> None:
     try:
         rc = await get_client_by_slug("sandbar")
         if not rc:
-            print("[auto-refresh] no sandbar client row yet — seed will create it")
-            return
+            print("[auto-refresh] no sandbar client row — seeding now before refresh…")
+            await _seed_sandbar_client()
+            rc = await get_client_by_slug("sandbar")
+            if not rc:
+                print("[auto-refresh] seed completed but still no row — aborting")
+                return
+            print("[auto-refresh] seed complete — continuing refresh")
 
         # ── Metrics: GSC / GA4 / GBP / Bing / CWV ──
         # Freshness probe via GSC snapshot. Skipped only when fresh AND not
@@ -1396,7 +1403,8 @@ async def callrail_setup_webhook(
     """
     _check_admin_key(x_admin_key)
     api_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
-    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    # Strip dashes — CallRail UI shows "512-138-905" but the API needs "512138905".
+    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip().replace("-", "")
     if not api_key or not account_id:
         raise HTTPException(
             status_code=503,
