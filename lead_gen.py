@@ -857,18 +857,11 @@ async def webhook_callrail(request: Request):
 # (forward_number is configured in CallRail, not stored here — it is not
 # a column on reporting_clients, so it must NOT be passed to upsert_client.)
 
-_SANDBAR_SEED = {
+_SANDBAR_SEED_DEFAULTS = {
     "slug": "sandbar",
     "client_name": "Sandbar Soft Wash",
     "client_email": "ty@tyalexandermedia.com",
     "site_url": "https://www.sandbarsoftwash.com",
-    "money_keywords": [
-        "roof cleaning Tampa Bay",
-        "house soft wash Holiday FL",
-        "pool cage cleaning Pinellas County",
-        "pressure washing Palm Harbor FL",
-        "soft wash Holiday FL",
-    ],
     "conversion_rate": 0.35,
     "avg_job_value": 650,
     "gsc_property": "sc-domain:sandbarsoftwash.com",
@@ -877,32 +870,50 @@ _SANDBAR_SEED = {
 
 @router.on_event("startup")
 async def _seed_sandbar_client() -> None:
+    """
+    Reseeds the Sandbar reporting_clients row on every deploy.
+
+    Keywords + AI Mode prompts are the single source of truth in
+    case_studies/configs.py — they get force-synced here on every boot so
+    a code change to the keyword list takes effect on the next deploy
+    without a manual /admin/reporting/onboard call. Operator-customized
+    values (conversion_rate, avg_job_value, gsc_property, ga_property_id,
+    forward_number) are preserved when present.
+    """
     try:
+        # Pull the canonical 19 keywords + 6 AI prompts from the config so
+        # we never drift between the tracker config and the dashboard seed.
+        from case_studies.configs import CASE_STUDIES as _CONFIG
+        sandbar_cfg = _CONFIG.get("sandbar")
+        canonical_keywords = list(sandbar_cfg.google_queries) if sandbar_cfg else []
+        canonical_prompts = list(sandbar_cfg.ai_mode_prompts) if sandbar_cfg else []
+
         ga_property_id = (
             os.getenv("SANDBAR_GA_PROPERTY_ID") or os.getenv("GA4_PROPERTY_ID") or ""
         ).strip() or None
-        existing = await get_client_by_slug(_SANDBAR_SEED["slug"])
-        # Stop once the row exists AND both analytics props are wired up.
-        if existing and existing.get("gsc_property") and existing.get("ga_property_id"):
-            return
-        # Preserve any already-tuned values; fall back to seed defaults.
+        existing = await get_client_by_slug(_SANDBAR_SEED_DEFAULTS["slug"])
         src = existing or {}
+
         await upsert_client(
-            slug=_SANDBAR_SEED["slug"],
-            client_name=src.get("client_name") or _SANDBAR_SEED["client_name"],
-            client_email=src.get("client_email") or _SANDBAR_SEED["client_email"],
-            site_url=src.get("site_url") or _SANDBAR_SEED["site_url"],
-            money_keywords=src.get("money_keywords") or _SANDBAR_SEED["money_keywords"],
-            conversion_rate=src.get("conversion_rate") or _SANDBAR_SEED["conversion_rate"],
-            avg_job_value=src.get("avg_job_value") or _SANDBAR_SEED["avg_job_value"],
+            slug=_SANDBAR_SEED_DEFAULTS["slug"],
+            client_name=src.get("client_name") or _SANDBAR_SEED_DEFAULTS["client_name"],
+            client_email=src.get("client_email") or _SANDBAR_SEED_DEFAULTS["client_email"],
+            site_url=src.get("site_url") or _SANDBAR_SEED_DEFAULTS["site_url"],
+            # FORCE-SYNC: always use the config — DB list is overwritten.
+            money_keywords=canonical_keywords,
+            conversion_rate=src.get("conversion_rate") or _SANDBAR_SEED_DEFAULTS["conversion_rate"],
+            avg_job_value=src.get("avg_job_value") or _SANDBAR_SEED_DEFAULTS["avg_job_value"],
             active=True,
-            target_url=src.get("target_url") or _SANDBAR_SEED["site_url"],
-            gsc_property=src.get("gsc_property") or _SANDBAR_SEED["gsc_property"],
+            target_url=src.get("target_url") or _SANDBAR_SEED_DEFAULTS["site_url"],
+            gsc_property=src.get("gsc_property") or _SANDBAR_SEED_DEFAULTS["gsc_property"],
             ga_property_id=ga_property_id or src.get("ga_property_id"),
+            # FORCE-SYNC AI prompts too.
+            ai_mode_prompts=canonical_prompts,
         )
         print(
-            "[seed] Onboarded/updated Sandbar reporting client "
-            f"(gsc={_SANDBAR_SEED['gsc_property']}, ga={ga_property_id or 'unset'})"
+            f"[seed] Sandbar reporting client synced — "
+            f"{len(canonical_keywords)} keywords, {len(canonical_prompts)} AI prompts "
+            f"(gsc={_SANDBAR_SEED_DEFAULTS['gsc_property']}, ga={ga_property_id or 'unset'})"
         )
     except Exception as e:  # never block app startup on a seed failure
         import traceback
