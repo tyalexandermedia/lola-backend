@@ -868,7 +868,6 @@ _SANDBAR_SEED_DEFAULTS = {
 }
 
 
-@router.on_event("startup")
 async def _seed_sandbar_client() -> None:
     """
     Reseeds the Sandbar reporting_clients row on every deploy.
@@ -923,6 +922,15 @@ async def _seed_sandbar_client() -> None:
         import traceback
         print(f"[seed] ERROR: Sandbar seed failed — {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+@router.on_event("startup")
+async def _kick_seed_in_background() -> None:
+    """Fire the Sandbar seed as a background task so a slow or hung DB
+    call can never block FastAPI from accepting requests. Combined with
+    the defensive /reporting/public/{slug} fallback to CASE_STUDIES, this
+    means the dashboard renders even if the seed never finishes."""
+    asyncio.create_task(_seed_sandbar_client())
 
 
 @router.post("/reseed/sandbar")
