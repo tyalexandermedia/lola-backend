@@ -103,7 +103,11 @@ function App() {
       : 'max-w-[640px] pt-8 sm:pt-10';
 
   return (
-    <div className="min-h-screen scroll-smooth bg-[#0A0A0B] text-white">
+    /* overflow-x-clip kills the mobile left-right jiggle caused by the
+       oversized radial-glow elements on the hero sections. `clip` (not
+       `hidden`) prevents a scroll container so the sticky header keeps
+       working. Invisible on desktop — nothing overflows there. */
+    <div className="min-h-screen scroll-smooth overflow-x-clip bg-[#0A0A0B] text-white">
       <Header />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
@@ -291,8 +295,12 @@ function Header() {
           aria-label="Lola — AI Leads Expert — home"
         >
           <span aria-hidden className="text-[16px] leading-none">🐾</span>
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[14px]">
-            LOLA <span aria-hidden className="text-[#D4AF37]/55">—</span> AI LEADS EXPERT
+          {/* Mobile: short "LOLA LEADS" (no overlap/wrap). Desktop: full wordmark — unchanged. */}
+          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text font-bold uppercase tracking-[0.18em] text-transparent">
+            <span className="text-[14px] sm:hidden">LOLA LEADS</span>
+            <span className="hidden text-[14px] sm:inline">
+              LOLA <span aria-hidden className="text-[#D4AF37]/55">—</span> AI LEADS EXPERT
+            </span>
           </span>
         </a>
 
