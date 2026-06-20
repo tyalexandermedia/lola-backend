@@ -319,9 +319,10 @@ async def fetch_search_metrics(
     out: dict = {"gsc": None, "ga": None}
 
     # ── GSC: 28d vs prior 28d ──────────────────────────────────
-    if GSC_CREDENTIALS_PATH:
+    # Uses the shared _gsc_creds() helper so inline-JSON (GSC_SERVICE_ACCOUNT_JSON)
+    # AND file-path (GSC_CREDENTIALS_PATH) creds both work.
+    if GSC_SERVICE_ACCOUNT_JSON or GSC_CREDENTIALS_PATH:
         try:
-            from google.oauth2 import service_account  # type: ignore
             from googleapiclient.discovery import build  # type: ignore
 
             today = date.today()
@@ -331,9 +332,7 @@ async def fetch_search_metrics(
             prev_start = prev_end - timedelta(days=27)
             prop = gsc_property or f"sc-domain:{site_url.replace('https://','').replace('http://','').replace('www.','').rstrip('/')}"
 
-            creds = service_account.Credentials.from_service_account_file(
-                GSC_CREDENTIALS_PATH, scopes=["https://www.googleapis.com/auth/webmasters.readonly"],
-            )
+            creds = _gsc_creds()
             svc = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
 
             def _q(start, end, dims, n=25):
@@ -366,8 +365,9 @@ async def fetch_search_metrics(
         except Exception as e:
             out["gsc"] = {"error": f"{type(e).__name__}: {str(e)[:160]}"}
 
-    # ── GA: reuse the weekly organic-sessions fetcher (28d-ish) ──
-    if GA_CREDENTIALS_PATH and ga_property_id:
+    # ── GA: reuse the weekly organic-sessions fetcher ──────────
+    # fetch_ga() handles inline-JSON creds + GA4_PROPERTY_ID fallback itself.
+    if GA4_SERVICE_ACCOUNT_JSON or GA_CREDENTIALS_PATH:
         ga = await fetch_ga(ga_property_id)
         out["ga"] = {
             "error": ga.get("error"),

@@ -30,8 +30,16 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
     a: "One business per niche per city. When you lock a market, Lola won't run our playbook for your direct competitor in the same city + niche — we say no, in writing. WHAT WE PROMISE: visibility (Google + AI search), clicks to your site, calls to your phone, form fills in your CRM. WHAT WE DON'T PROMISE: closing the lead. That's your craft — your sales process, your follow-up, your trust-building. We get the customer to your door; you earn the job.",
   },
   {
+    q: 'What do I actually get? Is the website included?',
+    a: "Every plan includes a done-for-you AI website (built + hosted, no setup fee), local SEO across Google + AI search, weekly Google Business Profile management, and a live dashboard showing your calls, leads, and clicks. You don't manage anything — it's set-it-and-forget-it. Higher tiers add more cities + deeper AI tracking.",
+  },
+  {
     q: 'Which plan should I pick?',
     a: "Starter ($297) if you operate in one city. Growth ($697) if your vans cover 3–5 cities — that's most home-service businesses. Pro ($997) if you have multiple locations or you serve a whole region/state. Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+  },
+  {
+    q: 'Do you handle social media posting too?',
+    a: "Yes — as a $197/mo add-on. We post to your Google Business, Facebook, and Instagram for you (YouTube + TikTok on request). You or we supply the photos/clips; Lola schedules and publishes. It's posting only — we're not editing video — so your channels stay active without you lifting a finger. Bolt it onto any plan.",
   },
   {
     q: 'What if a competitor locks my market before I do?',
@@ -175,6 +183,29 @@ export default function PricingPage() {
         </p>
       </section>
 
+      {/* ── 1b. EVERY PLAN INCLUDES — instant bundle clarity ──────────
+          So a texted link reads in 5 seconds: this is what you get, every
+          tier. Website is included, no setup fee. */}
+      <section className="mt-10">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
+          Every plan includes — no setup fee
+        </p>
+        <div className="mx-auto mt-4 grid max-w-[760px] grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { emoji: '🌐', t: 'AI website', s: 'Built + hosted for you' },
+            { emoji: '🔎', t: 'Local SEO', s: 'Google + AI search' },
+            { emoji: '📍', t: 'Google Business', s: 'Managed weekly' },
+            { emoji: '📊', t: 'Live dashboard', s: 'Calls · leads · clicks' },
+          ].map((x) => (
+            <div key={x.t} className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-4 text-center">
+              <div aria-hidden className="text-[22px]">{x.emoji}</div>
+              <p className="mt-2 text-[14px] font-semibold text-white">{x.t}</p>
+              <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{x.s}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── 2. 3-TIER GRID ─────────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
         {/* DOM order: Starter, Growth, Pro (desktop left→right value ladder).
@@ -271,6 +302,47 @@ export default function PricingPage() {
         </p>
       </section>
 
+      {/* ── 2b. ADD-ONS — expansion revenue, plain English ──────────── */}
+      <section className="mt-14 sm:mt-16">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          Add-ons — bolt onto any plan
+        </p>
+        <div className="mx-auto mt-6 grid max-w-[820px] grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Social posting — the flagship add-on */}
+          <div className="flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-white/[0.02] p-6">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                📣 Social Posting
+              </p>
+              <p className="text-[20px] font-extrabold text-white">+$197<span className="text-[12px] font-medium text-[#9CA3AF]">/mo</span></p>
+            </div>
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
+              We post for you — Google Business, Facebook, and Instagram. You (or we) supply the
+              photos/clips; Lola schedules + publishes. Set it and forget it. Posting only, no editing.
+            </p>
+            <p className="mt-3 text-[12px] text-[#8A8F98]">YouTube + TikTok available on request.</p>
+          </div>
+
+          {/* Extra market / location */}
+          <div className="flex flex-col rounded-[14px] border border-white/[0.10] bg-white/[0.02] p-6">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                📍 Extra location / market
+              </p>
+              <p className="text-[20px] font-extrabold text-white">Custom</p>
+            </div>
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
+              Second storefront or a new city beyond your plan&apos;s Lock radius? We add the
+              location pages, GBP, and tracking. Priced on the call.
+            </p>
+            <p className="mt-3 text-[12px] text-[#8A8F98]">Pro plans include up to 10 cities already.</p>
+          </div>
+        </div>
+        <p className="mx-auto mt-4 max-w-[680px] text-center text-[12px] text-[#8A8F98]">
+          Add any of these when you book — or anytime after. No contracts on add-ons either.
+        </p>
+      </section>
+
       {/* ── 3. GUARANTEES ─────────────────────────────────────────── */}
       <section ref={promiseRef} className="mt-16 sm:mt-20">
         <p className="mx-auto max-w-[680px] text-center text-[14px] italic leading-[1.6] text-[#C5C5C8]">
@@ -318,7 +390,7 @@ export default function PricingPage() {
 
       {/* ── 4. TRUST STRIP ──────────────────────────────────────────── */}
       <div className="mx-auto mt-10 max-w-[680px] text-center text-[12px] leading-[1.7] text-[#8A8F98] sm:text-[13px]">
-        ✓ No setup fee · ✓ Cancel anytime · ✓ Month-to-month · ✓ Real work or you walk
+        ✓ Website included · ✓ No setup fee · ✓ Cancel anytime · ✓ Month-to-month · ✓ Real work or you walk
       </div>
 
       {/* ── 5. 3-COLUMN COMPARISON TABLE ──────────────────────────── */}
