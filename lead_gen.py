@@ -261,36 +261,67 @@ GA4_API_SECRET = (os.getenv("GA4_API_SECRET") or "").strip() or None
 
 
 async def _ga4_event(
-    name: str, params: dict, client_id: Optional[str] = None
-) -> None:
+    name: str, params: dict, client_id: Optional[str] = None,
+    debug_mode: bool = False,
+) -> dict:
     """Fire a single GA4 event via the Measurement Protocol. Best-effort:
-    swallows all errors so a tracking hiccup never affects the lead flow."""
-    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
-        return
+    catches all errors so a tracking hiccup never affects the lead flow.
+
+    Returns a small status dict (also logged) so the caller can see what
+    happened — used by /lead-gen/ga4-fire-test to surface live failures
+    instead of swallowing them silently.
+
+    Env vars are re-read on every call so a post-startup Railway env-var
+    change takes effect on the next event without requiring a redeploy.
+    """
+    mid = (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+    secret = (os.getenv("GA4_API_SECRET") or "").strip()
+    if not mid or not secret:
+        return {"ok": False, "reason": "env_vars_not_set",
+                "have_mid": bool(mid), "have_secret": bool(secret)}
+    # debug_mode=1 makes the event show up in GA4 DebugView. Pass through
+    # for ad-hoc tests; leave off for production events so they don't
+    # pollute DebugView for the actual analyst.
+    event_params = dict(params or {})
+    if debug_mode:
+        event_params["debug_mode"] = 1
     payload = {
         "client_id": client_id or uuid.uuid4().hex,
-        "events": [{"name": name, "params": params}],
+        "events": [{"name": name, "params": event_params}],
     }
     url = (
         "https://www.google-analytics.com/mp/collect"
-        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+        f"?measurement_id={mid}&api_secret={secret}"
     )
     try:
         async with httpx.AsyncClient(timeout=8.0) as client:
-            await client.post(url, json=payload)
-    except Exception:
-        pass
+            resp = await client.post(url, json=payload)
+        # MP /collect returns 204 on success with no body. Anything else
+        # means GA4 rejected the request — log it so a real failure isn't
+        # silent.
+        if resp.status_code not in (200, 204):
+            print(f"[ga4] event={name} rejected: HTTP {resp.status_code} body={resp.text[:200]}")
+            return {"ok": False, "reason": "http_error",
+                    "status": resp.status_code, "body": resp.text[:200]}
+        return {"ok": True, "status": resp.status_code, "event": name}
+    except Exception as e:
+        print(f"[ga4] event={name} exception: {type(e).__name__}: {e}")
+        return {"ok": False, "reason": "exception",
+                "error": f"{type(e).__name__}: {e}"}
 
 
 async def _ga4_mp_validate() -> dict:
     """Validate the Measurement Protocol creds via GA4's /debug/mp/collect.
     Returns {ok, detail} without exposing the secret. Empty validationMessages
-    from GA4 means the event/credentials are accepted."""
-    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
+    from GA4 means the event/credentials are accepted. Env vars re-read on
+    every call so a post-deploy change takes effect immediately."""
+    mid = (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+    secret = (os.getenv("GA4_API_SECRET") or "").strip()
+    if not mid or not secret:
         return {"ok": False, "detail": "GA4_MEASUREMENT_ID / GA4_API_SECRET not set"}
     url = (
         "https://www.google-analytics.com/debug/mp/collect"
-        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+        f"?measurement_id={mid}&api_secret={secret}"
     )
     payload = {
         "client_id": "setup.status.check",
@@ -1008,6 +1039,19 @@ async def import_callrail_history(
                                 (created_at, eid),
                             )
                             await db.commit()
+                    # Mirror to GA4 so backfilled calls show up alongside
+                    # live webhook events. No-op when GA4 env vars unset.
+                    await _ga4_event(
+                        "phone_call",
+                        {
+                            "duration_sec": duration_sec,
+                            "caller_city": caller_city or "",
+                            "source": source,
+                            "imported": 1,
+                            "engagement_time_msec": 1,
+                        },
+                        client_id=call_sid,
+                    )
                     imported += 1
                 except Exception as e:
                     print(f"[import/callrail] ERROR call {call_sid}: {type(e).__name__}: {e}")
@@ -1432,12 +1476,79 @@ async def inject_test_call(
             "note": "synthetic test call",
         },
     )
+    # Fire GA4 too — labelled with test=1 + debug_mode so it lands in
+    # DebugView and won't be confused with real traffic in production reports.
+    ga4_res = await _ga4_event(
+        "phone_call",
+        {
+            "duration_sec": 90,
+            "caller_city": "Palm Harbor",
+            "source": "test_inject",
+            "test": 1,
+            "engagement_time_msec": 1,
+        },
+        client_id=test_sid,
+        debug_mode=True,
+    )
     return {
         "ok": True,
         "note": "Synthetic test call injected — refresh the dashboard to see it.",
         "call_sid": test_sid,
         "event_id": eid,
+        "ga4": ga4_res,
         "dashboard": f"https://lola.tyalexandermedia.com/r/client/sandbar",
+    }
+
+
+@router.post("/ga4-fire-test")
+async def ga4_fire_test(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    event_name: str = "phone_call",
+):
+    """
+    Fires a REAL GA4 Measurement Protocol event (not the /debug/mp/collect
+    validator) with debug_mode=1 so it shows up in GA4 DebugView within ~30
+    seconds. Use this to confirm end-to-end that:
+      1. The server can read GA4_MEASUREMENT_ID + GA4_API_SECRET
+      2. GA4 accepts the credentials (HTTP 204)
+      3. The event lands in DebugView
+
+    Open GA4 → Reports → Realtime / Configure → DebugView BEFORE firing,
+    then refresh after ~10-30s and look for `phone_call` from client_id
+    `ga4-fire-test`.
+
+    Returns:
+      ok=true  → GA4 accepted the request (204 No Content)
+      ok=false → either env vars missing or GA4 rejected (full body returned)
+
+    Note: GA4 returns 204 even for invalid measurement IDs that *look*
+    well-formed, so a 204 doesn't fully prove your stream is wired —
+    pair this with the /lead-gen/setup-status validate check (which uses
+    /debug/mp/collect and DOES return validation errors).
+    """
+    _check_admin_key(x_admin_key)
+    live_result = await _ga4_event(
+        event_name,
+        {
+            "test": 1,
+            "source": "ga4_fire_test",
+            "engagement_time_msec": 1,
+        },
+        client_id="ga4-fire-test",
+        debug_mode=True,
+    )
+    # Also hit /debug/mp/collect so we get GA4's validation feedback — this
+    # is the only path that returns actionable error messages (the real
+    # /mp/collect just returns 204 silently for almost everything).
+    validate_result = await _ga4_mp_validate()
+    return {
+        "live_fire": live_result,
+        "validate": validate_result,
+        "instructions": (
+            "Open GA4 → Admin → Data Streams → your stream → DebugView. "
+            "Refresh after 10-30 seconds. Look for client_id=ga4-fire-test "
+            "and event=" + event_name + " with test=1, debug_mode=1."
+        ),
     }
 
 
