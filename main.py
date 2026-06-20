@@ -3176,22 +3176,6 @@ async def admin_metrics_run_all(
     return {"ok": True, "clients": len(clients), "results": results}
 
 
-@app.get("/admin/calls/{slug}")
-async def admin_calls(
-    slug: str,
-    limit: int = 50,
-    x_admin_key: str = Header(..., alias="X-Admin-Key"),
-):
-    """ADMIN-only full call log with real caller numbers + durations. Share
-    privately with the client; never exposed on the public dashboard."""
-    _check_admin(x_admin_key)
-    return {
-        "slug": slug,
-        "quality": await call_quality_stats(slug),
-        "calls": await recent_calls_admin(slug, limit=max(1, min(limit, 200))),
-    }
-
-
 @app.get("/admin/tracking/{slug}")
 async def admin_tracking(
     slug: str,
