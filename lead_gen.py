@@ -1241,54 +1241,127 @@ async def import_all_in_one(
 _AUTO_REFRESH_STALE_HOURS = 12
 
 
-async def _do_sandbar_refresh() -> None:
+async def _has_recent_ranking_snapshot(slug: str, hours: int) -> bool:
+    """Per-subsystem freshness probe — checks the most recent
+    case_study_rankings row for the slug. Independent of GSC's freshness
+    so a recent GSC snapshot can't accidentally suppress the ranking
+    refresh."""
+    try:
+        import aiosqlite
+        async with aiosqlite.connect(os.getenv("DB_PATH", "lola.db")) as db:
+            async with db.execute(
+                "SELECT MAX(run_at) FROM case_study_rankings WHERE slug = ?",
+                (slug,),
+            ) as cur:
+                row = await cur.fetchone()
+                if not row or not row[0]:
+                    return False
+                latest = row[0]
+        dt = datetime.fromisoformat(latest.replace("Z", "").replace(" ", "T")[:19])
+        return (datetime.utcnow() - dt).total_seconds() / 3600.0 < hours
+    except Exception:
+        return False
+
+
+async def _do_sandbar_refresh(force: bool = False) -> None:
+    """Background refresh entry point.
+
+    Each subsystem has its OWN freshness check now so a recent GSC pull
+    can't suppress the ranking snapshot or the CallRail import. force=True
+    overrides every freshness check and runs everything.
+    """
     try:
         rc = await get_client_by_slug("sandbar")
         if not rc:
-            return  # seed handler runs first and would create it
-        # Cheap freshness probe — read a single GSC snapshot timestamp.
-        try:
-            from db.tracking import get_gsc_snapshot
-            snap = await get_gsc_snapshot("sandbar")
-            fetched_at = (snap or {}).get("fetched_at")
-            if fetched_at:
-                hrs = (datetime.utcnow() - datetime.fromisoformat(fetched_at.replace("Z", "").replace(" ", "T")[:19])).total_seconds() / 3600.0
-                if hrs < _AUTO_REFRESH_STALE_HOURS:
-                    return  # still fresh
-        except Exception:
-            pass  # if probe fails, just refresh
+            print("[auto-refresh] no sandbar client row yet — seed will create it")
+            return
+
+        # ── Metrics: GSC / GA4 / GBP / Bing / CWV ──
+        # Freshness probe via GSC snapshot. Skipped only when fresh AND not
+        # forced. Other subsystems below are NOT gated by this check.
+        skip_metrics = False
+        if not force:
+            try:
+                from db.tracking import get_gsc_snapshot
+                snap = await get_gsc_snapshot("sandbar")
+                fetched_at = (snap or {}).get("fetched_at")
+                if fetched_at:
+                    hrs = (datetime.utcnow() - datetime.fromisoformat(fetched_at.replace("Z", "").replace(" ", "T")[:19])).total_seconds() / 3600.0
+                    if hrs < _AUTO_REFRESH_STALE_HOURS:
+                        skip_metrics = True
+                        print(f"[auto-refresh] metrics fresh ({hrs:.1f}h old) — skipping GSC/GA4/GBP/Bing/CWV")
+            except Exception:
+                pass
+
         import importlib
         main_mod = importlib.import_module("main")
-        await main_mod._refresh_client_metrics("sandbar", rc)
-        try:
-            await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
-        except Exception as e:
-            print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
+        if not skip_metrics:
+            try:
+                await main_mod._refresh_client_metrics("sandbar", rc)
+                print("[auto-refresh] metrics refresh OK")
+            except Exception as e:
+                print(f"[auto-refresh] metrics refresh failed: {type(e).__name__}: {e}")
 
-        # CallRail auto-finalize: if both env vars are set we wire the webhook
-        # (idempotent — no-op if already wired) and backfill the last 30 days
-        # of calls. Lets the operator finish the loop by JUST setting Railway
-        # env vars + redeploying — no manual /finalize curl needed.
+        # ── Rankings snapshot ── independent freshness probe.
+        # The 19 keywords + Claude + ChatGPT calls take 30-60s; skip if a
+        # recent snapshot already exists (or always run on force).
+        if force or not await _has_recent_ranking_snapshot("sandbar", _AUTO_REFRESH_STALE_HOURS):
+            try:
+                summary = await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
+                g_count = len(summary.get("google", []) or [])
+                ai_count = len(summary.get("ai_mode", []) or [])
+                print(f"[auto-refresh] rankings snapshot OK — {g_count} google, {ai_count} AI mode rows")
+            except Exception as e:
+                print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
+        else:
+            print("[auto-refresh] rankings fresh — skipping snapshot")
+
+        # ── CallRail webhook + backfill ── ALWAYS run if env vars are
+        # present. Webhook setup is idempotent; backfill is idempotent
+        # via the UNIQUE call_sid constraint. No freshness gate here —
+        # this is what brings the 3 historical calls into the dashboard
+        # right after env vars get set on Railway.
         if (os.getenv("CALLRAIL_API_KEY") or "").strip() and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip():
             admin_key = (os.getenv("LOLA_SECRET_ADMIN_KEY") or "").strip()
             if admin_key:
                 try:
                     res = await callrail_setup_webhook(slug="sandbar", x_admin_key=admin_key)
-                    print(f"[auto-refresh] CallRail webhook: {res}")
+                    print(f"[auto-refresh] CallRail webhook setup: {res}")
                 except Exception as e:
                     print(f"[auto-refresh] CallRail webhook setup failed: {type(e).__name__}: {e}")
                 try:
                     res = await import_callrail_history(slug="sandbar", days=30, x_admin_key=admin_key)
-                    print(f"[auto-refresh] CallRail backfill: imported {res.get('imported', '?')} calls")
+                    print(f"[auto-refresh] CallRail backfill: imported={res.get('imported', '?')} skipped={res.get('skipped', '?')}")
                 except Exception as e:
                     print(f"[auto-refresh] CallRail backfill failed: {type(e).__name__}: {e}")
+            else:
+                print("[auto-refresh] CallRail keys set but LOLA_SECRET_ADMIN_KEY missing — skipping backfill")
+        else:
+            print("[auto-refresh] CallRail env vars not set — skipping webhook + backfill")
 
-        print("[auto-refresh] Sandbar metrics refreshed on startup.")
+        print("[auto-refresh] Sandbar refresh complete.")
     except Exception as e:
         # Never block app boot on a refresh failure.
         import traceback
         print(f"[auto-refresh] ERROR: {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+@router.post("/refresh/sandbar")
+async def force_refresh_sandbar(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Force-run the full Sandbar refresh pipeline (metrics + rankings +
+    CallRail backfill). Bypasses every freshness probe so it runs even
+    if a recent snapshot exists. Use this when env vars just changed on
+    Railway and you want the dashboard populated immediately."""
+    _check_admin_key(x_admin_key)
+    # Fire-and-forget so the HTTP response returns instantly; tail Railway
+    # logs to see progress (`[auto-refresh] …`).
+    asyncio.create_task(_do_sandbar_refresh(force=True))
+    return {
+        "ok": True,
+        "message": "Refresh kicked off in background — check dashboard in ~60s.",
+        "next_step": "Tail Railway logs and grep '[auto-refresh]' for per-subsystem status.",
+    }
 
 
 @router.on_event("startup")
