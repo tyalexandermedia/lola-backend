@@ -1747,10 +1747,20 @@ async def public_client_dashboard(slug: str):
     with their team — they see ranking history per tracked keyword and
     AI-mode mention rate, no login. Safe fields only.
     """
+    # Hardened: any individual DB or downstream call that fails returns its
+    # empty default rather than 500ing the entire dashboard. As long as the
+    # case study config exists in code, the dashboard renders.
+    async def _safe(coro, default):
+        try:
+            return await coro
+        except Exception as e:
+            print(f"[public_dashboard:{slug}] sub-call failed → using default: {type(e).__name__}: {e}")
+            return default
+
     cs = await _load_case_study(slug)
     if not cs:
         raise HTTPException(status_code=404, detail="No such client dashboard")
-    series = await get_all_history_for_slug(slug)
+    series = await _safe(get_all_history_for_slug(slug), [])
     # Filter to ONLY queries/prompts currently in the case study config so
     # stale rows from a prior keyword set don't pollute the dashboard.
     # Comparison is case-insensitive + trimmed since CallRail / config /
@@ -1773,7 +1783,10 @@ async def public_client_dashboard(slug: str):
     ]
     # Work-delivered feed — proves the retainer is doing the work between
     # ranking snapshots. Empty/absent until tasks are logged for this slug.
-    implementation = await reporting_tasks_grouped(slug)
+    implementation = await _safe(
+        reporting_tasks_grouped(slug),
+        {"done": [], "in_progress": [], "next_up": [], "counts": {}},
+    )
 
     # ── Share of Voice (the killer Profound-style metric) ──────
     # SoV = % of (query, run) pairs in claude_ai_mode where the client
@@ -1833,23 +1846,25 @@ async def public_client_dashboard(slug: str):
     }
 
     # Call / lead / click attribution — the billing-proof row.
-    tracking = await counts_for_slug(slug)
-    tracking_sources = await counts_by_source(slug)
-    funnel = await funnel_for_slug(slug)
-    trends = await trend_deltas(slug)
-    reviews = await review_counts_for_slug(slug)
+    # Every downstream call wrapped in _safe so one broken table or missing
+    # snapshot can't cascade into a 500. Empty defaults gracefully degrade.
+    tracking = await _safe(counts_for_slug(slug), {})
+    tracking_sources = await _safe(counts_by_source(slug), {})
+    funnel = await _safe(funnel_for_slug(slug), {"view": 0, "click": 0, "call": 0, "lead": 0, "click_rate": 0, "call_rate": 0, "lead_rate": 0, "overall": 0})
+    trends = await _safe(trend_deltas(slug), {})
+    reviews = await _safe(review_counts_for_slug(slug), {"month": 0, "lifetime": 0, "google_routed_month": 0})
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
     from db.tracking import won_jobs_stats as _won_jobs_stats
-    won_jobs = await _won_jobs_stats(slug)
+    won_jobs = await _safe(_won_jobs_stats(slug), {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []})
     from db.reporting import get_client_by_slug as _get_client
-    rc = await _get_client(slug)
+    rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
     # Map any active Lock tier → retainer $ for CPL math. Falls back to
     # the Growth tier ($697) when no lock — the modal client price.
-    held = await locks_for_slug(slug, active_only=True)
+    held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
     retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
@@ -1859,11 +1874,11 @@ async def public_client_dashboard(slug: str):
     # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
     call_tracking_on = tier in ("growth", "pro")
     premium = tier in ("growth", "pro")
-    call_quality = await call_quality_stats(slug) if call_tracking_on else None
-    gsc = await get_gsc_snapshot(slug) if premium else None
-    gbp = await get_provider_snapshot(slug, "gbp") if premium else None
-    bing = await get_provider_snapshot(slug, "bing") if premium else None
-    cwv = await cwv_history(slug)  # CWV trend is fine for all tiers
+    call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
+    gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
+    gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
+    bing = await _safe(get_provider_snapshot(slug, "bing"), None) if premium else None
+    cwv = await _safe(cwv_history(slug), [])
     # Lead-source rollup: collapse this-month source counts across call+lead
     # into a single 'where contacts came from' map for the pie.
     lead_sources: dict = {}
