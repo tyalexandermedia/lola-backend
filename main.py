@@ -1751,10 +1751,26 @@ async def public_client_dashboard(slug: str):
     if not cs:
         raise HTTPException(status_code=404, detail="No such client dashboard")
     series = await get_all_history_for_slug(slug)
-    google_series = [s for s in series if s["source"] == "google_organic"]
+    # Filter to ONLY queries/prompts currently in the case study config so
+    # stale rows from a prior keyword set don't pollute the dashboard.
+    # Comparison is case-insensitive + trimmed since CallRail / config /
+    # operator-entered queries occasionally drift on casing.
+    _current_queries = {(q or "").strip().lower() for q in (cs.google_queries or [])}
+    _current_prompts = {(p or "").strip().lower() for p in (cs.ai_mode_prompts or [])}
+    def _query_matches(s: dict, allowed: set) -> bool:
+        if not allowed:
+            return True  # no config = no filter
+        return (s.get("query") or "").strip().lower() in allowed
+    google_series = [
+        s for s in series
+        if s["source"] == "google_organic" and _query_matches(s, _current_queries)
+    ]
     # Aggregate every AI Mode provider (Claude, ChatGPT, future Gemini, etc.)
     # so Share of Voice represents AI search visibility as a whole, not just one.
-    ai_series = [s for s in series if str(s.get("source", "")).endswith("_ai_mode")]
+    ai_series = [
+        s for s in series
+        if str(s.get("source", "")).endswith("_ai_mode") and _query_matches(s, _current_prompts)
+    ]
     # Work-delivered feed — proves the retainer is doing the work between
     # ranking snapshots. Empty/absent until tasks are logged for this slug.
     implementation = await reporting_tasks_grouped(slug)
@@ -1942,7 +1958,7 @@ async def admin_upsert_reporting_client(
         client_name=body.client_name,
         client_email=body.client_email,
         site_url=body.site_url,
-        money_keywords=body.money_keywords[:5],
+        money_keywords=body.money_keywords,
         conversion_rate=body.conversion_rate,
         avg_job_value=body.avg_job_value,
         brevo_template_id=body.brevo_template_id,
@@ -2172,7 +2188,7 @@ async def admin_onboard_client(
         client_name=body.client_name,
         client_email=body.client_email,
         site_url=body.site_url,
-        money_keywords=keywords[:5],
+        money_keywords=keywords,
         conversion_rate=body.conversion_rate,
         avg_job_value=body.avg_job_value,
         gsc_property=body.gsc_property,
