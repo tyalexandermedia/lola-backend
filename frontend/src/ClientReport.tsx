@@ -5,7 +5,7 @@ type RankPoint = { position: number | null; mentioned: boolean; competitors?: st
 
 interface Series {
   query: string;
-  source: 'google_organic' | 'claude_ai_mode';
+  source: 'google_organic' | 'claude_ai_mode' | 'chatgpt_ai_mode' | string;
   current: RankPoint;
   history: RankPoint[];
   run_count: number;
@@ -35,6 +35,13 @@ interface DashboardPayload {
   google: Series[];
   ai_mode: Series[];
   verified_wins?: { organic: string[]; map_pack: string[] };
+  integrations?: {
+    callrail?: boolean;
+    ga4_measurement_protocol?: boolean;
+    rankings_tracker?: boolean;
+    gbp?: boolean;
+    bing?: boolean;
+  };
   implementation?: Implementation;
   share_of_voice?: ShareOfVoice;
   tracking?: Record<string, { month: number; last_30d: number; lifetime: number }>;
@@ -58,6 +65,11 @@ interface DashboardPayload {
   };
   annualized?: { yearly_run_rate: number; monthly: number };
   cost_per_lead?: { cpl: number | null; contacts: number; retainer: number };
+  won_jobs?: {
+    month: number; lifetime: number;
+    revenue_month: number; revenue_lifetime: number;
+    jobs: Array<{ id: number; job_value: number; service_type?: string; source?: string; notes?: string; created_at: string }>;
+  };
   generated_at: string;
 }
 
@@ -120,6 +132,9 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.attributed_value && data.attributed_value.contacts > 0 && (
         <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
       )}
+      {data.won_jobs && data.won_jobs.lifetime > 0 && (
+        <WonJobsCard wonJobs={data.won_jobs} estimated={data.attributed_value} />
+      )}
       {data.tracking && (
         <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
       )}
@@ -131,13 +146,24 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
       {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
+
+      {/* Rankings: compact table first, then per-keyword sparkline cards */}
+      <RankingsTable google={data.google} verifiedWins={data.verified_wins} />
+
       <SummaryStrip google={data.google} aiMode={data.ai_mode} />
 
       {data.implementation && <WorkDelivered impl={data.implementation} />}
 
+      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
+        <ShareOfVoiceCard sov={data.share_of_voice} />
+      )}
+
+      {/* AI visibility: per-platform card replaces the merged AIModeTable */}
+      <AIVisibilityCard series={data.ai_mode} />
+
       <section className="mt-8">
-        <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
-          Google Search Rankings
+        <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#9AA0A6]">
+          Rankings · Detailed History
         </h2>
         {data.google.length === 0 ? (
           <EmptyHint label="No ranking snapshots yet — the first run lands as soon as the tracker runs." />
@@ -147,24 +173,6 @@ export default function ClientReport({ slug }: { slug: string }) {
               <RankingCard key={`g-${s.query}`} series={s} />
             ))}
           </div>
-        )}
-      </section>
-
-      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
-        <ShareOfVoiceCard sov={data.share_of_voice} />
-      )}
-
-      <section className="mt-10">
-        <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
-          AI Search Visibility
-          <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
-            Are AI assistants recommending you?
-          </span>
-        </h2>
-        {data.ai_mode.length === 0 ? (
-          <EmptyHint label="No AI Mode snapshots yet." />
-        ) : (
-          <AIModeTable series={data.ai_mode} />
         )}
       </section>
 
@@ -223,6 +231,27 @@ function Header({ data }: { data: DashboardPayload }) {
 }
 
 /**
+ * Live integration chip — green when the backend confirms the integration
+ * is wired (env vars set, credentials stored), amber when it isn't. Stops
+ * the empty state from lying about "✓ connected" before Railway env vars
+ * land on the right service.
+ */
+function StatusChip({ label, on }: { label: string; on: boolean }) {
+  if (on) {
+    return (
+      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+        ✓ {label} connected
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-amber-300">
+      … {label} pending
+    </span>
+  );
+}
+
+/**
  * Owner overview — the plain-English summary at the top of the dashboard.
  * Written for a non-technical business owner: how many contacts came in
  * this month, estimated revenue, and one-line context.
@@ -257,15 +286,15 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
           below as snapshots come in.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ CallRail webhook connected
-          </span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ Quote form connected
-          </span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-            ✓ Rankings tracker active
-          </span>
+          <StatusChip label="CallRail webhook" on={data.integrations?.callrail ?? false} />
+          <StatusChip label="Quote form" on={true} />
+          <StatusChip label="Rankings tracker" on={data.integrations?.rankings_tracker ?? false} />
+          {data.integrations?.gbp !== undefined && (
+            <StatusChip label="Google Business Profile" on={data.integrations.gbp} />
+          )}
+          {data.integrations?.bing !== undefined && (
+            <StatusChip label="Bing Webmaster" on={data.integrations.bing} />
+          )}
         </div>
       </section>
     );
@@ -1230,6 +1259,299 @@ function TaskColumn({
         </ul>
       )}
     </div>
+  );
+}
+
+/**
+ * RankingsTable — compact scannable table of every tracked keyword showing
+ * the live position number, colour-coded tier, trend arrow, and a map-pack
+ * badge where a confirmed map-pack win exists. Much easier to scan than the
+ * individual RankingCard walls — one glance shows the full keyword portfolio.
+ *
+ * Map-pack matching: a keyword gets a 📍 badge if any entry in
+ * verified_wins.map_pack contains a city word that also appears in the query.
+ */
+function RankingsTable({
+  google,
+  verifiedWins,
+}: {
+  google: Series[];
+  verifiedWins?: { organic: string[]; map_pack: string[] };
+}) {
+  if (google.length === 0) return null;
+
+  // Build a quick-lookup of which queries have a confirmed map-pack win.
+  // Strategy: extract city names from the map_pack strings (e.g. "Holiday —
+  // pressure washing" → "holiday") and check if the query contains that city.
+  const mapPackCities = useMemo(() => {
+    return (verifiedWins?.map_pack ?? []).map(s =>
+      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
+    );
+  }, [verifiedWins]);
+
+  const hasMapPack = (query: string) => {
+    const q = query.toLowerCase();
+    return mapPackCities.some(city => city && q.includes(city));
+  };
+
+  const posTier = (p: number | null) => {
+    if (p === null) return { label: '—', color: '#6B7280', bg: 'rgba(107,114,128,0.08)' };
+    if (p === 1)    return { label: '#1', color: '#FFD166', bg: 'rgba(212,175,55,0.12)' };
+    if (p <= 3)     return { label: `#${p}`, color: '#6EE7B7', bg: 'rgba(16,185,129,0.10)' };
+    if (p <= 10)    return { label: `#${p}`, color: '#93C5FD', bg: 'rgba(147,197,253,0.08)' };
+    return { label: `#${p}`, color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' };
+  };
+
+  // Trend: compare current position to oldest non-null position in history.
+  const trend = (s: Series) => {
+    const cur = s.current?.position;
+    if (cur === null || cur === undefined) return null;
+    const oldest = [...s.history].reverse().find(h => h.position !== null)?.position ?? null;
+    if (oldest === null) return null;
+    const d = oldest - cur; // positive = improved (lower position number)
+    return d === 0 ? null : d;
+  };
+
+  // Sort: ranked keywords first (by position asc), then unranked.
+  const sorted = [...google].sort((a, b) => {
+    const pa = a.current?.position ?? 999;
+    const pb = b.current?.position ?? 999;
+    return pa - pb;
+  });
+
+  return (
+    <section className="mt-8">
+      <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Organic Rankings · Full Keyword List
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+          live positions across {google.length} tracked keywords
+        </span>
+      </h2>
+      <div className="overflow-hidden rounded-[14px] border border-white/10">
+        {/* Header */}
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 border-b border-white/10 bg-[#0F0F12] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#6B7280]">
+          <span>Keyword</span>
+          <span className="text-right">Map Pack</span>
+          <span className="text-right w-12">Trend</span>
+          <span className="text-right w-14">Position</span>
+        </div>
+        {sorted.map((s, idx) => {
+          const tier = posTier(s.current?.position ?? null);
+          const t = trend(s);
+          const mp = hasMapPack(s.query);
+          return (
+            <div
+              key={s.query}
+              className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 px-4 py-3 ${idx < sorted.length - 1 ? 'border-b border-white/[0.05]' : ''} ${idx % 2 === 0 ? 'bg-[#11121A]' : 'bg-[#0F0F12]'}`}
+            >
+              <span className="text-[13px] font-medium text-[#E5E7EB] leading-tight">{s.query}</span>
+              <span className="text-center">
+                {mp && (
+                  <span title="Confirmed #1 in Google Map Pack" className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                    📍 Map Pack
+                  </span>
+                )}
+              </span>
+              <span className="w-12 text-right text-[12px] font-semibold">
+                {t !== null && (
+                  <span className={t > 0 ? 'text-emerald-300' : 'text-red-300'}>
+                    {t > 0 ? `↑${t}` : `↓${Math.abs(t)}`}
+                  </span>
+                )}
+              </span>
+              <span
+                className="inline-flex w-14 items-center justify-center rounded-[8px] px-2.5 py-1 text-[13px] font-bold"
+                style={{ color: tier.color, background: tier.bg }}
+              >
+                {tier.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-[10px] text-[#6B7280]">
+        📍 = confirmed #1 in Google Map Pack · trend arrow vs first recorded snapshot
+      </p>
+    </section>
+  );
+}
+
+/**
+ * AIVisibilityCard — per-platform breakdown of Claude vs ChatGPT AI search
+ * visibility. Shows each tested prompt with win/lose status and (on lose) who
+ * the AI recommended instead. Replaces the single merged AIModeTable so the
+ * client can see whether visibility differs across AI providers.
+ */
+function AIVisibilityCard({ series }: { series: Series[] }) {
+  if (series.length === 0) return null;
+
+  const byPlatform = useMemo(() => {
+    const claude = series.filter(s => s.source === 'claude_ai_mode');
+    const chatgpt = series.filter(s => s.source === 'chatgpt_ai_mode');
+    // Merge: for each unique query, try to pair claude + chatgpt rows
+    const queries = [...new Map(series.map(s => [s.query, s])).keys()];
+    return { claude, chatgpt, queries };
+  }, [series]);
+
+  const winRate = (rows: Series[]) => {
+    if (!rows.length) return null;
+    const wins = rows.filter(s => s.current?.mentioned).length;
+    return { wins, total: rows.length, pct: Math.round(100 * wins / rows.length) };
+  };
+
+  const claudeRate = winRate(byPlatform.claude);
+  const chatgptRate = winRate(byPlatform.chatgpt);
+
+  const PlatformChip = ({ label, icon, rate, color }: { label: string; icon: string; rate: ReturnType<typeof winRate>; color: string }) => {
+    if (!rate) return null;
+    return (
+      <div className="flex-1 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color }}>{icon} {label}</p>
+        <p className="mt-2 text-[36px] font-extrabold leading-none" style={{ color }}>{rate.pct}%</p>
+        <p className="mt-1 text-[11px] text-[#9CA3AF]">{rate.wins}/{rate.total} prompts recommended you</p>
+      </div>
+    );
+  };
+
+  // Group all series rows by query so we can show one row per prompt
+  const byQuery = useMemo(() => {
+    const map: Record<string, { claude?: Series; chatgpt?: Series }> = {};
+    for (const s of series) {
+      if (!map[s.query]) map[s.query] = {};
+      if (s.source === 'claude_ai_mode') map[s.query].claude = s;
+      if (s.source === 'chatgpt_ai_mode') map[s.query].chatgpt = s;
+    }
+    return map;
+  }, [series]);
+
+  const prompts = Object.entries(byQuery);
+
+  return (
+    <section className="mt-10">
+      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        AI Search Visibility
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+          Are AI assistants recommending you?
+        </span>
+      </h2>
+
+      {/* Per-platform win rates */}
+      <div className="flex gap-3">
+        <PlatformChip label="Claude" icon="⚡" rate={claudeRate} color="#C4B5FD" />
+        <PlatformChip label="ChatGPT" icon="✦" rate={chatgptRate} color="#6EE7B7" />
+      </div>
+
+      {/* Per-prompt breakdown */}
+      <div className="mt-4 space-y-3">
+        {prompts.map(([query, { claude, chatgpt }]) => {
+          const claudeWin = claude?.current?.mentioned ?? null;
+          const chatgptWin = chatgpt?.current?.mentioned ?? null;
+          // Aggregate competitors across both platforms
+          const allCompetitors = [
+            ...(claudeWin === false ? claude?.current?.competitors ?? [] : []),
+            ...(chatgptWin === false ? chatgpt?.current?.competitors ?? [] : []),
+          ].filter((v, i, a) => a.indexOf(v) === i); // dedupe
+
+          const anyWin = claudeWin || chatgptWin;
+          const anyLoss = claudeWin === false || chatgptWin === false;
+
+          return (
+            <div key={query} className={`rounded-[12px] border p-4 ${anyWin ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : 'border-white/10 bg-[#11121A]'}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <p className="flex-1 text-[13px] font-medium leading-snug text-[#E5E7EB]">{query}</p>
+                <div className="flex shrink-0 items-center gap-2">
+                  {claude && (
+                    <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${claudeWin ? 'bg-purple-500/15 text-purple-300' : 'bg-red-500/10 text-red-300'}`}>
+                      ⚡ Claude {claudeWin ? '✓' : '✗'}
+                    </span>
+                  )}
+                  {chatgpt && (
+                    <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${chatgptWin ? 'bg-emerald-500/15 text-emerald-300' : 'bg-red-500/10 text-red-300'}`}>
+                      ✦ ChatGPT {chatgptWin ? '✓' : '✗'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {anyLoss && allCompetitors.length > 0 && (
+                <div className="mt-3 rounded-[8px] border border-amber-500/20 bg-amber-500/[0.05] px-3 py-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-amber-300/80">AI recommended instead:</p>
+                  <p className="mt-1 flex flex-wrap gap-x-3 text-[12px] text-[#E5E7EB]">
+                    {allCompetitors.map(c => <span key={c}>· {c}</span>)}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * WonJobsCard — shows ACTUAL closed/won jobs logged by the operator vs the
+ * estimated attribution model. The gap between them is the most honest
+ * number in the whole dashboard: "our model estimates $X; you confirmed $Y."
+ *
+ * The operator logs won jobs via:
+ *   POST /admin/won-jobs/{slug}  { job_value, service_type, source }
+ */
+function WonJobsCard({
+  wonJobs,
+  estimated,
+}: {
+  wonJobs: NonNullable<DashboardPayload['won_jobs']>;
+  estimated?: NonNullable<DashboardPayload['attributed_value']>;
+}) {
+  if (wonJobs.lifetime === 0) return null;
+  const recentJobs = wonJobs.jobs.slice(0, 5);
+  const fmtDate = (iso: string) => {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+    catch { return iso.slice(0, 10); }
+  };
+  return (
+    <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-[#11121A] p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+            💰 Confirmed Won Jobs · this month
+          </p>
+          <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
+            ${wonJobs.revenue_month.toLocaleString()}
+          </p>
+          <p className="mt-1 text-[12px] text-[#9CA3AF]">
+            {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} confirmed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
+          </p>
+        </div>
+        {estimated && estimated.contacts > 0 && (
+          <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-right">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Model estimate</p>
+            <p className="mt-1 text-[22px] font-bold text-[#F4D47C]">${estimated.value.toLocaleString()}</p>
+            <p className="mt-0.5 text-[10px] text-[#6B7280]">
+              {estimated.contacts} contacts × {Math.round(estimated.close_rate * 100)}% est. close
+            </p>
+          </div>
+        )}
+      </div>
+      {recentJobs.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent confirmed jobs</p>
+          {recentJobs.map(j => (
+            <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
+              <div className="flex items-center gap-3">
+                <span className="text-[12px] font-semibold text-emerald-300">${j.job_value.toLocaleString()}</span>
+                {j.service_type && <span className="text-[11px] text-[#C8C0B0]">{j.service_type}</span>}
+                {j.source && <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.1em] text-[#9CA3AF]">{j.source}</span>}
+              </div>
+              <span className="text-[11px] text-[#6B7280]">{fmtDate(j.created_at)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <p className="mt-3 text-[10px] leading-[1.5] text-[#6B7280]">
+        Log a won job: <code className="rounded bg-white/5 px-1 py-0.5 text-[9px]">POST /admin/won-jobs/{'{slug}'}</code> with job_value, service_type, source
+      </p>
+    </section>
   );
 }
 

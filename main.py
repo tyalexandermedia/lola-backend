@@ -1825,6 +1825,8 @@ async def public_client_dashboard(slug: str):
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
+    from db.tracking import won_jobs_stats as _won_jobs_stats
+    won_jobs = await _won_jobs_stats(slug)
     from db.reporting import get_client_by_slug as _get_client
     rc = await _get_client(slug)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
@@ -1852,6 +1854,26 @@ async def public_client_dashboard(slug: str):
     for et in ("call", "lead"):
         for src, n in (tracking_sources.get(et) or {}).items():
             lead_sources[src] = lead_sources.get(src, 0) + n
+
+    # Live integration status — drives the "✓ connected" chips in the empty
+    # state so we never lie green when CallRail/GA4 env vars aren't set on
+    # this Railway service. Booleans only; no secret values leave the server.
+    integrations = {
+        "callrail": bool(
+            (os.getenv("CALLRAIL_API_KEY") or "").strip()
+            and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+        ),
+        "ga4_measurement_protocol": bool(
+            (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+            and (os.getenv("GA4_API_SECRET") or "").strip()
+        ),
+        "rankings_tracker": bool(
+            (os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY") or "").strip()
+            and (os.getenv("GOOGLE_CUSTOM_SEARCH_CX") or "").strip()
+        ),
+        "gbp": bool((rc or {}).get("gbp_refresh_token")),
+        "bing": bool((os.getenv("BING_WEBMASTER_API_KEY") or "").strip()),
+    }
 
     return {
         "slug": slug,
@@ -1881,6 +1903,8 @@ async def public_client_dashboard(slug: str):
         "attributed_value": attributed,
         "annualized": annual,
         "cost_per_lead": cpl,
+        "integrations": integrations,
+        "won_jobs": won_jobs,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -2642,6 +2666,256 @@ async def admin_gbp_token(
     if not ok:
         raise HTTPException(status_code=404, detail="Onboard the client first")
     return {"ok": True, "slug": slug, "gbp_connected": True}
+
+
+# ── GBP OAuth helper flow ──────────────────────────────────────────────────
+# Removes the manual consent-dance friction. After the env vars
+# GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are set on Railway,
+# the operator opens /admin/gbp/oauth/url?slug=X (admin-keyed), pastes the
+# returned URL into a browser as the GBP owner, and is redirected back to
+# /admin/gbp/oauth/callback. The callback does the code→refresh_token
+# exchange, lists the connected locations, persists everything, and returns
+# the picked location_id so the operator can confirm.
+
+_GBP_OAUTH_SCOPES = "https://www.googleapis.com/auth/business.manage"
+# Google's OAuth redirect must match the Cloud Console "Authorized redirect URIs"
+# list exactly. We default to the Railway domain but allow override.
+_GBP_OAUTH_REDIRECT = (
+    os.getenv("GBP_OAUTH_REDIRECT_URI")
+    or "https://lola-backend-production.up.railway.app/admin/gbp/oauth/callback"
+).strip()
+
+# In-memory holding pen for refresh tokens returned by the OAuth callback,
+# keyed by slug. Lets the operator finish the multi-location case via a
+# second admin-keyed call without ever exposing the raw token in a URL or
+# response body. Cleared on every successful POST /admin/gbp/{slug}/pick.
+_GBP_PENDING_TOKENS: dict[str, str] = {}
+
+
+@app.get("/admin/gbp/oauth/url")
+async def admin_gbp_oauth_url(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Returns the Google consent URL to open as the GBP owner. After they
+    approve, Google redirects to /admin/gbp/oauth/callback?code=...&state=...
+    which finishes the exchange."""
+    _check_admin(x_admin_key)
+    from urllib.parse import urlencode
+    client_id = (os.getenv("GOOGLE_OAUTH_CLIENT_ID") or "").strip()
+    if not client_id:
+        raise HTTPException(
+            status_code=503,
+            detail="GOOGLE_OAUTH_CLIENT_ID not set on Railway",
+        )
+    qs = urlencode({
+        "client_id": client_id,
+        "redirect_uri": _GBP_OAUTH_REDIRECT,
+        "response_type": "code",
+        "scope": _GBP_OAUTH_SCOPES,
+        # access_type=offline + prompt=consent guarantees a refresh_token even
+        # for accounts that have previously authorized this app.
+        "access_type": "offline",
+        "prompt": "consent",
+        "include_granted_scopes": "true",
+        "state": slug,
+    })
+    return {
+        "consent_url": f"https://accounts.google.com/o/oauth2/v2/auth?{qs}",
+        "redirect_uri": _GBP_OAUTH_REDIRECT,
+        "slug": slug,
+        "note": "Open consent_url in a browser signed in as the GBP owner.",
+    }
+
+
+@app.get("/admin/gbp/oauth/callback")
+async def admin_gbp_oauth_callback(code: str = "", state: str = "", error: str = ""):
+    """Google redirects here after the owner grants consent. Exchanges the
+    auth code for a refresh_token, lists the owner's GBP accounts +
+    locations, stores everything against `state` (the slug) if a single
+    location is obvious, and returns the full picker payload so the
+    operator can confirm which location_id to keep."""
+    if error:
+        raise HTTPException(status_code=400, detail=f"Google OAuth error: {error}")
+    if not code or not state:
+        raise HTTPException(status_code=400, detail="Missing code or state")
+
+    client_id = (os.getenv("GOOGLE_OAUTH_CLIENT_ID") or "").strip()
+    client_secret = (os.getenv("GOOGLE_OAUTH_CLIENT_SECRET") or "").strip()
+    if not (client_id and client_secret):
+        raise HTTPException(
+            status_code=503,
+            detail="GOOGLE_OAUTH_CLIENT_ID/SECRET not set on Railway",
+        )
+
+    async with httpx.AsyncClient(timeout=15.0) as http:
+        tok = await http.post("https://oauth2.googleapis.com/token", data={
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": _GBP_OAUTH_REDIRECT,
+            "grant_type": "authorization_code",
+        })
+        if tok.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"token exchange failed: {tok.text[:200]}")
+        tok_body = tok.json()
+        refresh_token = tok_body.get("refresh_token")
+        access_token = tok_body.get("access_token")
+        if not refresh_token:
+            raise HTTPException(
+                status_code=400,
+                detail="Google did not return a refresh_token — revoke the app at "
+                       "myaccount.google.com/permissions and retry.",
+            )
+
+        # List accounts → locations. Some GBP owners only manage one location,
+        # in which case we auto-pick it and store everything.
+        accounts: list = []
+        try:
+            a = await http.get(
+                "https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            if a.status_code == 200:
+                accounts = a.json().get("accounts", []) or []
+        except Exception:
+            pass
+
+        locations: list = []
+        for acct in accounts:
+            try:
+                l = await http.get(
+                    f"https://mybusinessbusinessinformation.googleapis.com/v1/{acct.get('name')}/locations",
+                    params={"readMask": "name,title,storefrontAddress,phoneNumbers"},
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                if l.status_code == 200:
+                    for loc in (l.json().get("locations", []) or []):
+                        locations.append({
+                            "account": acct.get("name"),
+                            "location_id": loc.get("name"),  # 'locations/123…'
+                            "title": loc.get("title"),
+                            "phone": ((loc.get("phoneNumbers") or {}).get("primaryPhone")),
+                        })
+            except Exception:
+                continue
+
+    saved_location = None
+    if len(locations) == 1:
+        saved_location = locations[0]["location_id"]
+        await set_gbp_credentials(state, saved_location, refresh_token)
+        _GBP_PENDING_TOKENS.pop(state, None)
+    else:
+        # Multi-location case: stash the token by slug so the operator can
+        # finish via POST /admin/gbp/{slug}/pick without re-doing OAuth.
+        _GBP_PENDING_TOKENS[state] = refresh_token
+
+    return {
+        "ok": True,
+        "slug": state,
+        "refresh_token_captured": True,
+        "auto_saved_location_id": saved_location,
+        "locations": locations,
+        "next_step": (
+            f"Single location auto-saved — try POST /admin/metrics/{state}/run."
+            if saved_location
+            else f"Multiple locations — POST /admin/gbp/{state}/pick "
+                 "with {\"location_id\": \"locations/...\"} to finish."
+        ),
+    }
+
+
+class GbpPickRequest(BaseModel):
+    location_id: str
+
+
+@app.post("/admin/gbp/{slug}/pick")
+async def admin_gbp_pick(
+    slug: str,
+    body: GbpPickRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Finish the multi-location OAuth flow: pulls the stashed refresh
+    token from the prior /admin/gbp/oauth/callback hit and saves it
+    against the chosen location_id."""
+    _check_admin(x_admin_key)
+    refresh_token = _GBP_PENDING_TOKENS.get(slug)
+    if not refresh_token:
+        raise HTTPException(
+            status_code=409,
+            detail=f"No pending OAuth session for slug={slug}. Re-run /admin/gbp/oauth/url first.",
+        )
+    ok = await set_gbp_credentials(slug, body.location_id.strip(), refresh_token)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Onboard the client first")
+    _GBP_PENDING_TOKENS.pop(slug, None)
+    return {"ok": True, "slug": slug, "gbp_connected": True, "location_id": body.location_id}
+
+
+class WonJobRequest(BaseModel):
+    job_value: int               # dollars, e.g. 650
+    service_type: Optional[str] = None   # "roof cleaning", "soft wash", etc.
+    source: Optional[str] = None         # gbp / callrail / website / ai_search
+    call_sid: Optional[str] = None       # link to specific tracked_calls row
+    notes: Optional[str] = None
+
+
+@app.post("/admin/won-jobs/{slug}")
+async def admin_log_won_job(
+    slug: str,
+    body: WonJobRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Record a confirmed won/closed job for a client. Use this to track
+    ACTUAL revenue separately from the estimated attribution model.
+
+    Example — log a $750 roof cleaning that came from a CallRail call:
+        POST /admin/won-jobs/sandbar
+        { "job_value": 750, "service_type": "roof cleaning", "source": "callrail" }
+
+    The dashboard's Won Jobs card shows real vs estimated revenue so the
+    client (and operator) can see the actual ROI, not just a model estimate.
+    """
+    _check_admin(x_admin_key)
+    if body.job_value <= 0:
+        raise HTTPException(status_code=400, detail="job_value must be > 0")
+    from db.tracking import won_jobs_stats
+    import aiosqlite
+    db_path = os.getenv("DB_PATH", "lola.db")
+    async with aiosqlite.connect(db_path) as db:
+        await db.execute(
+            """INSERT INTO won_jobs (slug, call_sid, job_value, service_type, source, notes)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (
+                slug.strip().lower(),
+                (body.call_sid or "").strip() or None,
+                body.job_value,
+                (body.service_type or "").strip() or None,
+                (body.source or "").strip() or None,
+                (body.notes or "").strip() or None,
+            ),
+        )
+        await db.commit()
+    stats = await won_jobs_stats(slug)
+    return {
+        "ok": True,
+        "slug": slug,
+        "jobs_this_month": stats["month"],
+        "revenue_this_month": stats["revenue_month"],
+        "lifetime_jobs": stats["lifetime"],
+        "lifetime_revenue": stats["revenue_lifetime"],
+    }
+
+
+@app.get("/admin/won-jobs/{slug}")
+async def admin_list_won_jobs(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """List all recorded won jobs for a slug."""
+    _check_admin(x_admin_key)
+    from db.tracking import won_jobs_stats
+    return await won_jobs_stats(slug)
 
 
 @app.post("/admin/metrics/{slug}/run")

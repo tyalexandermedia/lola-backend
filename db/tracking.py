@@ -67,6 +67,23 @@ CREATE_CALLS_IDX = """
 CREATE INDEX IF NOT EXISTS idx_calls_slug ON tracked_calls(slug, created_at);
 """
 
+CREATE_WON_JOBS = """
+CREATE TABLE IF NOT EXISTS won_jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,
+    call_sid TEXT,           -- optional link to tracked_calls row
+    job_value INTEGER NOT NULL,
+    service_type TEXT,       -- e.g. "roof cleaning", "soft wash"
+    source TEXT,             -- gbp / callrail / website / ai_search
+    notes TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+"""
+
+CREATE_WON_JOBS_IDX = """
+CREATE INDEX IF NOT EXISTS idx_won_jobs_slug ON won_jobs(slug, created_at);
+"""
+
 
 async def init_tracking_tables() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
@@ -75,6 +92,8 @@ async def init_tracking_tables() -> None:
         for stmt in (CREATE_EVENTS_IDX + CREATE_CALLS_IDX).strip().split(";"):
             if stmt.strip():
                 await db.execute(stmt)
+        await db.execute(CREATE_WON_JOBS)
+        await db.execute(CREATE_WON_JOBS_IDX)
         await db.commit()
     print(f"✅ Tracking tables ready at {DB_PATH}")
 
@@ -197,6 +216,44 @@ def cost_per_lead(counts: dict, monthly_retainer: int) -> dict:
         "contacts": contacts,
         "retainer": monthly_retainer,
     }
+
+
+async def won_jobs_stats(slug: str) -> dict:
+    """Actual closed-deal stats for the client. Separate from attributed_value
+    (which is estimated from contacts × close_rate); this is the REAL number
+    when the operator logs a confirmed won job."""
+    slug_l = slug.strip().lower()
+    out = {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []}
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT id, call_sid, job_value, service_type, source, notes, created_at
+               FROM won_jobs WHERE slug = ? ORDER BY created_at DESC""",
+            (slug_l,),
+        ) as cur:
+            rows = await cur.fetchall()
+    for r in rows:
+        val = int(r["job_value"] or 0)
+        out["lifetime"] += 1
+        out["revenue_lifetime"] += val
+        # "this month" = same calendar month as today
+        try:
+            from datetime import date
+            ca = r["created_at"][:7]  # YYYY-MM
+            if ca == date.today().strftime("%Y-%m"):
+                out["month"] += 1
+                out["revenue_month"] += val
+        except Exception:
+            pass
+        out["jobs"].append({
+            "id": r["id"],
+            "job_value": val,
+            "service_type": r["service_type"],
+            "source": r["source"],
+            "notes": r["notes"],
+            "created_at": r["created_at"],
+        })
+    return out
 
 
 def annualized_value(attributed: dict) -> dict:

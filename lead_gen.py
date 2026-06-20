@@ -44,6 +44,37 @@ async def lead_gen_health():
     }
 
 
+@router.get("/whoami")
+async def whoami():
+    """
+    Returns the Railway service identity of whichever instance answered this
+    request. Useful when more than one Railway service runs the same code
+    (e.g. a stale duplicate deploy) and you need to confirm which database
+    a write/read actually hit.
+
+    The canonical production service for the Sandbar dashboard is
+    'lola-backend-production' — its public domain is what every Vercel
+    rewrite, the CallRail webhook, and the GBP OAuth callback point at.
+    If `public_domain` here returns anything else, the env vars + CallRail
+    webhook are pointed at the wrong service.
+    """
+    return {
+        "service": os.getenv("RAILWAY_SERVICE_NAME") or "unknown",
+        "project": os.getenv("RAILWAY_PROJECT_NAME") or "unknown",
+        "environment": os.getenv("RAILWAY_ENVIRONMENT_NAME") or "unknown",
+        "public_domain": os.getenv("RAILWAY_PUBLIC_DOMAIN") or "unknown",
+        "git_commit": (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "")[:12] or "unknown",
+        "is_canonical_lola_backend": (
+            (os.getenv("RAILWAY_PUBLIC_DOMAIN") or "").lower()
+            == "lola-backend-production.up.railway.app"
+        ),
+        "callrail_configured": bool(
+            (os.getenv("CALLRAIL_API_KEY") or "").strip()
+            and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+        ),
+    }
+
+
 @router.get("/ga4-test")
 async def ga4_connection_test():
     """
@@ -89,41 +120,55 @@ async def ga4_connection_test():
 
 
 @router.get("/setup-status")
-async def setup_status():
+async def setup_status(slug: str = "sandbar"):
     """
     Whole-integration readiness check in ONE call — open this after setting env
     vars to see exactly what's live and what's still missing:
         https://lola-backend-production.up.railway.app/lead-gen/setup-status
 
-    Each section returns ok=true/false plus a human 'detail'. No secret values
-    are ever returned — only booleans + GA4/GSC's own error strings.
+    Each section returns ok=true/false plus a human 'detail' and (where
+    helpful) a 'needs' list of the env vars still missing. No secret values
+    are ever returned — only booleans + the upstream API's own error strings.
     """
     import os as _os
     from agents.reporting_agent.data_fetcher import fetch_ga, fetch_gsc
+    from api_clients.search_providers import (
+        fetch_gbp_performance, fetch_bing_webmaster,
+    )
 
     checks: dict = {}
 
-    # 1. Dashboard client seed — is 'sandbar' in reporting_clients and wired?
+    # 1. Dashboard client seed — is the client row present and wired?
     try:
-        client = await get_client_by_slug("sandbar")
+        client = await get_client_by_slug(slug)
         if client:
             checks["dashboard_client"] = {
                 "ok": True,
-                "detail": "sandbar client seeded",
+                "detail": f"{slug} client seeded",
                 "gsc_property": client.get("gsc_property"),
                 "ga_property_id": client.get("ga_property_id"),
+                "gbp_location_id": client.get("gbp_location_id"),
+                "gbp_token_stored": bool(client.get("gbp_refresh_token")),
             }
         else:
             checks["dashboard_client"] = {
                 "ok": False,
-                "detail": "sandbar client NOT found — seed did not run (check Railway startup logs)",
+                "detail": f"{slug} client NOT found — seed did not run (check Railway startup logs)",
             }
+            client = {}
     except Exception as e:
         checks["dashboard_client"] = {"ok": False, "detail": f"{type(e).__name__}: {e}"}
+        client = {}
 
     # 2. GA4 Measurement Protocol — validate the secret against GA4's debug
     #    endpoint (server-side lead/call conversions ride on this).
-    checks["ga4_measurement_protocol"] = await _ga4_mp_validate()
+    mp_check = await _ga4_mp_validate()
+    if not mp_check.get("ok"):
+        mp_check["needs"] = [
+            v for v in ("GA4_MEASUREMENT_ID", "GA4_API_SECRET")
+            if not (_os.getenv(v) or "").strip()
+        ] or None
+    checks["ga4_measurement_protocol"] = mp_check
 
     # 3. GA4 Data API — live organic-sessions query.
     ga = await fetch_ga()
@@ -133,18 +178,80 @@ async def setup_status():
     }
 
     # 4. Search Console — live organic-clicks query.
-    gsc = await fetch_gsc(
-        "https://www.sandbarsoftwash.com",
-        ["roof cleaning palm harbor fl"],
-        "sc-domain:sandbarsoftwash.com",
-    )
+    site = (client.get("site_url") if isinstance(client, dict) else None) or "https://www.sandbarsoftwash.com"
+    gsc_prop = (client.get("gsc_property") if isinstance(client, dict) else None) or "sc-domain:sandbarsoftwash.com"
+    gsc = await fetch_gsc(site, ["roof cleaning palm harbor fl"], gsc_prop)
     checks["search_console"] = {
         "ok": gsc.get("error") is None,
         "detail": gsc.get("error") or f"ok ({gsc.get('organic_clicks_this_week')} organic clicks this week)",
     }
 
+    # 5. Google Business Profile Performance — needs OAuth client creds + a
+    #    stored refresh token per client.
+    gbp_needs = [
+        v for v in ("GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET")
+        if not (_os.getenv(v) or "").strip()
+    ]
+    loc_id = (client.get("gbp_location_id") if isinstance(client, dict) else None) or ""
+    refresh = (client.get("gbp_refresh_token") if isinstance(client, dict) else None) or ""
+    if not refresh:
+        gbp_needs.append(f"refresh_token (POST /admin/gbp/{slug}/token after OAuth)")
+    if gbp_needs:
+        checks["gbp_performance"] = {
+            "ok": False,
+            "detail": "GBP not connected — missing " + ", ".join(gbp_needs),
+            "needs": gbp_needs,
+        }
+    else:
+        gbp = await fetch_gbp_performance(loc_id, refresh)
+        checks["gbp_performance"] = {
+            "ok": gbp.get("error") is None,
+            "detail": gbp.get("error") or (
+                f"ok ({gbp.get('calls')} calls, {gbp.get('website_clicks')} site clicks, "
+                f"{gbp.get('impressions')} impressions over last 30 days)"
+            ),
+        }
+
+    # 6. Bing Webmaster — free API key, drives the ChatGPT/Copilot proxy card.
+    if not (_os.getenv("BING_WEBMASTER_API_KEY") or "").strip():
+        checks["bing_webmaster"] = {
+            "ok": False,
+            "detail": "BING_WEBMASTER_API_KEY not set",
+            "needs": ["BING_WEBMASTER_API_KEY"],
+        }
+    else:
+        bing = await fetch_bing_webmaster(site)
+        checks["bing_webmaster"] = {
+            "ok": bing.get("error") is None,
+            "detail": bing.get("error") or (
+                f"ok ({bing.get('clicks')} clicks, {bing.get('impressions')} impressions)"
+            ),
+        }
+
+    # 7. CallRail — webhook + history backfill depend on these.
+    cr_needs = [
+        v for v in ("CALLRAIL_API_KEY", "CALLRAIL_ACCOUNT_ID")
+        if not (_os.getenv(v) or "").strip()
+    ]
+    checks["callrail"] = {
+        "ok": not cr_needs,
+        "detail": (
+            "CallRail keys missing — " + ", ".join(cr_needs)
+            if cr_needs else "CALLRAIL_API_KEY + CALLRAIL_ACCOUNT_ID set"
+        ),
+        "needs": cr_needs or None,
+    }
+
     all_ok = all(c.get("ok") for c in checks.values())
-    return {"all_ok": all_ok, "checks": checks}
+    summary = {
+        "ready": all_ok,
+        "missing_env_vars": sorted({
+            v for c in checks.values()
+            for v in (c.get("needs") or [])
+            if isinstance(v, str) and v.replace("_", "").isalnum()  # env-var-shaped only
+        }),
+    }
+    return {"all_ok": all_ok, "summary": summary, "checks": checks}
 
 # GA4 Measurement Protocol — sends server-side conversion events (leads +
 # calls) into GA4 so they show up alongside web analytics. No-op until both
@@ -1296,9 +1403,15 @@ async def inject_test_call(
     eid = await log_event(
         slug=slug,
         event_type="call",
-        source="callrail",
-        medium="test_inject",
-        properties={"call_sid": test_sid, "duration_sec": 90, "note": "synthetic test call"},
+        source="test_inject",
+        meta={
+            "call_sid": test_sid,
+            "duration_sec": 90,
+            "caller_number": "+10000000000",
+            "caller_city": "Palm Harbor",
+            "caller_state": "FL",
+            "note": "synthetic test call",
+        },
     )
     return {
         "ok": True,
@@ -1307,3 +1420,5 @@ async def inject_test_call(
         "event_id": eid,
         "dashboard": f"https://lola.tyalexandermedia.com/r/client/sandbar",
     }
+
+
