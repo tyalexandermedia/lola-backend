@@ -8,6 +8,7 @@ import Homepage from './Homepage';
 const AuditFlow = lazy(() => import('./AuditFlow'));
 const SharedReport = lazy(() => import('./SharedReport'));
 const AdminLeads = lazy(() => import('./AdminLeads'));
+const AdminCalls = lazy(() => import('./AdminCalls'));
 const PricingPage = lazy(() => import('./PricingPage'));
 const RetainerPage = lazy(() => import('./RetainerPage'));
 const ApplyPage = lazy(() => import('./ApplyPage'));
@@ -38,6 +39,7 @@ type Route =
   | { name: 'report'; auditId: string }
   | { name: 'client-report'; slug: string }
   | { name: 'admin' }
+  | { name: 'admin-calls'; slug: string }
   | { name: 'unknown' };
 
 function parseRoute(pathname: string): Route {
@@ -54,6 +56,8 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
   if (pathname === '/admin/leads') return { name: 'admin' };
+  const adminCallsMatch = pathname.match(/^\/admin\/calls\/([^/]+)\/?$/);
+  if (adminCallsMatch) return { name: 'admin-calls', slug: decodeURIComponent(adminCallsMatch[1]) };
   if (pathname === '/vs' || pathname === '/vs/') return { name: 'vs-hub' };
   const vsMatch = pathname.match(/^\/vs\/([^/]+)\/?$/);
   if (vsMatch) return { name: 'vs', slug: decodeURIComponent(vsMatch[1]) };
@@ -78,7 +82,7 @@ function App() {
   // Tighter top padding on /audit — Step 5 CTA must be above the fold at 375x667.
   // Other routes keep generous breathing room.
   const containerCls =
-    route.name === 'report' || route.name === 'admin'
+    route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
       : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
@@ -128,6 +132,7 @@ function App() {
           {route.name === 'report' && <SharedReport auditId={route.auditId} />}
           {route.name === 'client-report' && <ClientReport slug={route.slug} />}
           {route.name === 'admin' && <AdminLeads />}
+          {route.name === 'admin-calls' && <AdminCalls slug={route.slug} />}
           {route.name === 'unknown' && <NotFound />}
         </Suspense>
       </div>
@@ -165,7 +170,7 @@ function RouteFallback() {
 function SiteFooter({ route }: { route: Route }) {
   // Routes that own their own bottom-of-page footer or shouldn't have a
   // global one (admin / report dashboards / interactive tools).
-  const HIDE = new Set(['admin', 'report', 'client-report', 'audit', 'lead-gen', 'swarm']);
+  const HIDE = new Set(['admin', 'admin-calls', 'report', 'client-report', 'audit', 'lead-gen', 'swarm']);
   if (HIDE.has(route.name)) return null;
 
   return (
