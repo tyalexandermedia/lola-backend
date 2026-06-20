@@ -2949,6 +2949,144 @@ async def admin_list_won_jobs(
     return await won_jobs_stats(slug)
 
 
+@app.get("/admin/calls/{slug}")
+async def admin_list_calls(
+    slug: str,
+    days: int = 30,
+    limit: int = 100,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Operator-only call log — returns every tracked call for the slug with
+    full caller info (number, name, city/state, duration, recording, first-
+    call flag, source) so the operator can identify who called and decide
+    whether it became a paying job.
+
+    Pair with POST /admin/won-jobs/{slug} — pass the call_sid from this
+    response so the won-job revenue ties back to the specific call that
+    earned it. Then the dashboard's WonJobsCard shows actual vs estimated
+    revenue with attribution down to the originating call.
+
+    Caller info is PII so this is admin-keyed and NEVER surfaced on the
+    public dashboard.
+
+    Example:
+        curl https://lola-backend-production.up.railway.app/admin/calls/sandbar?days=30 \
+          -H "X-Admin-Key: <key>"
+
+    Returns:
+        {
+          "total": <count of calls in window>,
+          "window_days": 30,
+          "calls": [
+            {
+              "call_sid": "CR-1234567890",
+              "created_at": "2026-06-19T14:32:11",
+              "caller_number": "+17275550142",
+              "customer_name": "John Smith",
+              "caller_city": "Palm Harbor",
+              "caller_state": "FL",
+              "duration_sec": 240,
+              "answered": true,
+              "first_call": true,
+              "recording_url": "https://...",
+              "source": "gbp",
+              "tracking_number": "+17275559999",
+              "won_job_logged": false  # whether a won_jobs row links to this call_sid
+            },
+            ...
+          ]
+        }
+    """
+    _check_admin(x_admin_key)
+    import aiosqlite, json as _json
+    db_path = os.getenv("DB_PATH", "lola.db")
+    slug_l = slug.strip().lower()
+    days_clamped = max(1, min(days, 365))
+    limit_clamped = max(1, min(limit, 500))
+
+    out: dict = {"slug": slug_l, "window_days": days_clamped, "total": 0, "calls": []}
+
+    async with aiosqlite.connect(db_path) as db:
+        db.row_factory = aiosqlite.Row
+        # 1. Pull call rows from tracked_calls (basic call metadata).
+        async with db.execute(
+            f"""SELECT call_sid, caller_number, caller_city, caller_state,
+                       tracking_number, forwarded_to, source, status,
+                       duration_sec, recording_url, created_at
+                FROM tracked_calls
+                WHERE slug = ? AND created_at >= datetime('now', '-{days_clamped} days')
+                ORDER BY created_at DESC
+                LIMIT ?""",
+            (slug_l, limit_clamped),
+        ) as cur:
+            call_rows = [dict(r) for r in await cur.fetchall()]
+
+        if not call_rows:
+            return out
+
+        # 2. Pull matching tracked_events 'call' rows to extract customer_name +
+        #    answered + first_call from meta_json (the webhook stores these in
+        #    the event meta, not on the call row itself).
+        sids = [c["call_sid"] for c in call_rows]
+        placeholders = ",".join("?" * len(sids))
+        meta_by_sid: dict = {}
+        try:
+            async with db.execute(
+                f"""SELECT meta_json FROM tracked_events
+                    WHERE slug = ? AND event_type = 'call'
+                      AND meta_json LIKE '%call_sid%'""",
+                (slug_l,),
+            ) as cur:
+                for r in await cur.fetchall():
+                    try:
+                        m = _json.loads(r["meta_json"] or "{}")
+                        sid = m.get("call_sid")
+                        if sid in sids:
+                            meta_by_sid[sid] = m
+                    except Exception:
+                        continue
+        except Exception:
+            pass  # event meta is enrichment — never block the response
+
+        # 3. Pull won_jobs.call_sid set so we can flag which calls have
+        #    already been logged as paying jobs (avoid double-attribution).
+        won_call_sids: set = set()
+        try:
+            async with db.execute(
+                f"""SELECT DISTINCT call_sid FROM won_jobs
+                    WHERE slug = ? AND call_sid IS NOT NULL
+                      AND call_sid IN ({placeholders})""",
+                (slug_l, *sids),
+            ) as cur:
+                won_call_sids = {r["call_sid"] for r in await cur.fetchall()}
+        except Exception:
+            pass
+
+    # Merge everything into one operator-friendly row per call.
+    for c in call_rows:
+        sid = c["call_sid"]
+        meta = meta_by_sid.get(sid, {})
+        out["calls"].append({
+            "call_sid": sid,
+            "created_at": c.get("created_at"),
+            "caller_number": c.get("caller_number"),
+            "customer_name": meta.get("customer_name"),
+            "caller_city": c.get("caller_city"),
+            "caller_state": c.get("caller_state"),
+            "duration_sec": c.get("duration_sec") or 0,
+            "answered": meta.get("answered"),
+            "first_call": meta.get("first_call"),
+            "recording_url": c.get("recording_url") or meta.get("recording_url"),
+            "source": c.get("source") or meta.get("source"),
+            "tracking_number": c.get("tracking_number"),
+            "forwarded_to": c.get("forwarded_to"),
+            "won_job_logged": sid in won_call_sids,
+        })
+    out["total"] = len(out["calls"])
+    return out
+
+
 @app.post("/admin/metrics/{slug}/run")
 async def admin_metrics_run(
     slug: str,
