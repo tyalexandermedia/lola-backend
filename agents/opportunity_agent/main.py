@@ -62,7 +62,13 @@ async def run_for_client(slug: str) -> list[dict]:
     if gsc_data:
         all_opps.extend(detect_city_page_gaps(gsc_data, avg_job_value=avg_job_value, monthly_fee=monthly_fee))
 
-    # 4. Static opportunity: ensure basic attribution is set up
+    # 4. AI-visibility gaps → auto-draft AEO blocks (Issue #007 loop)
+    try:
+        all_opps.extend(await _ai_visibility_opps(slug, client))
+    except Exception as e:
+        logger.warning("opportunity_agent ai-visibility step error: %s", e)
+
+    # 5. Static opportunity: ensure basic attribution is set up
     if not client.get("tracking_number"):
         all_opps.append({
             "type": "setup",
@@ -90,6 +96,54 @@ async def run_for_client(slug: str) -> list[dict]:
 
     logger.info("opportunity_agent %s: %d opportunities found", slug_l, len(all_opps))
     return all_opps
+
+
+async def _ai_visibility_opps(slug: str, client: dict) -> list[dict]:
+    """
+    Read the latest AI-visibility checks; for each money query the client is
+    NOT cited for, draft an AEO block and create an opportunity.
+    """
+    from db.ai_visibility import get_latest_checks
+    from agents.opportunity_agent.aeo_drafter import draft_aeo_block
+
+    avg_job_value = int(client.get("avg_job_value") or 400)
+    business_name = client.get("client_name", slug)
+    checks = await get_latest_checks(slug)
+    if not checks:
+        return []
+
+    # Group by query: a query is "uncited" if NO engine cited it
+    by_query: dict[str, bool] = {}
+    for c in checks:
+        q = c.get("query", "")
+        cited = bool(c.get("cited"))
+        by_query[q] = by_query.get(q, False) or cited
+
+    opps = []
+    for query, cited_anywhere in by_query.items():
+        if cited_anywhere:
+            continue  # already cited somewhere — skip
+        draft = await draft_aeo_block(query, business_name, avg_job_value=avg_job_value)
+        # Estimate: getting cited in AI search for a money query is high-value
+        est_revenue = int(round(avg_job_value * 0.5))
+        opps.append({
+            "type": "ai_visibility",
+            "title": f'Not cited in AI search for "{query}" — publish AEO block',
+            "query_or_gap": query,
+            "est_monthly_clicks": 0,  # AI citations aren't click-measured the same way
+            "est_jobs_won": 0.5,
+            "est_revenue": est_revenue,
+            "effort_days": 1,
+            "impact_score": round(est_revenue / 1 / max(int(client.get("fee_monthly") or 697), 1) * 1000, 2) + 20,
+            "recommended_action": (
+                f"Publish the drafted AEO answer block for \"{query}\" on the relevant "
+                f"service page, then re-run AI visibility to confirm the citation. "
+                f"Draft is attached (review before publishing — never publish unedited)."
+            ),
+            "aeo_draft": draft,
+            "data": {"query": query, "cited_anywhere": False},
+        })
+    return opps
 
 
 async def _safe_gsc(client: dict) -> dict:

@@ -140,7 +140,36 @@ _ADD_COLUMNS = [
     # numeric location id. NULL = GBP not connected (card hidden).
     "ALTER TABLE reporting_clients ADD COLUMN gbp_location_id TEXT",
     "ALTER TABLE reporting_clients ADD COLUMN gbp_refresh_token TEXT",
+    # Monthly retainer fee — drives MRR + ROI multiple on the exec dashboard
+    # and the client ROI strip. Default 697 (Retainer tier).
+    "ALTER TABLE reporting_clients ADD COLUMN fee_monthly INTEGER NOT NULL DEFAULT 697",
+    # Read-only client portal token — bookmarkable URL /portal/{slug}?token=...
+    "ALTER TABLE reporting_clients ADD COLUMN portal_token TEXT",
 ]
+
+
+async def set_portal_token(slug: str, token: str) -> bool:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "UPDATE reporting_clients SET portal_token = ?, updated_at = datetime('now') WHERE slug = ?",
+            (token, slug.strip().lower()),
+        )
+        await db.commit()
+        return (cur.rowcount or 0) > 0
+
+
+async def get_client_by_portal_token(slug: str, token: str) -> Optional[dict]:
+    """Return the client row only if the token matches — for portal auth."""
+    if not token:
+        return None
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM reporting_clients WHERE slug = ? AND portal_token = ?",
+            (slug.strip().lower(), token),
+        ) as cur:
+            row = await cur.fetchone()
+    return _hydrate_client_row(row) if row else None
 
 
 async def set_gbp_credentials(slug: str, location_id: str, refresh_token: str) -> bool:

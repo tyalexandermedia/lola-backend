@@ -577,3 +577,24 @@ These three actions unblock everything else. All have zero build time — they'r
 ---
 
 *Roadmap prepared from `LOLA_SYSTEM_AUDIT.md` (2026-06-21). All issues reference verified repo evidence — no speculative claims. Execute in priority order; do not skip Actions 1–2 or the remaining 8 issues are building on a dark system.*
+
+---
+
+## Build Status (updated after implementation pass)
+
+| Issue | Status | What shipped |
+|-------|--------|--------------|
+| #001 Revenue Agent | ✅ **Built** | `agents/revenue_agent/` (collectors, funnel, main) + `db/revenue.py` + `POST /admin/revenue/run/{slug}`, `GET /admin/revenue/{slug}`, `GET /admin/revenue` |
+| #002 ROI strip | ✅ **Built** | Email: `prompt_builder.py` injects ROI + leads email; UI: `GET /reporting/public/{slug}/roi` + ClientPortal ROI card |
+| #003 Executive Dashboard | ✅ **Built** | `GET /admin/exec/summary` + `frontend/src/ExecDashboard.tsx` at `/admin/exec` |
+| #004 Opportunity Engine | ✅ **Built** | `agents/opportunity_agent/` (gsc_miner, gbp_gaps, city_pages, main) + `db/opportunities.py` + endpoints |
+| #005 Sandbar roof page + gallery | ⏳ **Blocked** | Needs sandbar-site repo access — `sandbar-push.sh` ready to run |
+| #006 AI Visibility Agent | ✅ **Built** | `agents/ai_visibility_agent/` (chatgpt, perplexity, util, main) + `db/ai_visibility.py` + endpoints |
+| #007 AEO auto-draft | ✅ **Built** | `agents/opportunity_agent/aeo_drafter.py` wired into Opportunity Engine (uncited query → draft) |
+| #008 API health gate | ✅ **Built** | `GET /admin/health/keys/v2` (8 groups, overall status, per-subsystem readiness) |
+| #009 Client Portal | ✅ **Built** | `POST /admin/reporting/clients/{slug}/token` + `GET /portal/{slug}` + `frontend/src/ClientPortal.tsx` |
+| #010 Sandbar case study | ⏳ **Data-gated** | Component exists; needs day-0→day-30 real data (Actions 1–2) |
+
+**Tests:** `test_revenue_opportunity_logic.py` — 6 suites covering the funnel math, striking-distance mining, GBP gap detection, city-page detection, domain extraction, and AEO fallback. All passing.
+
+**Remaining to go live:** Set the API keys (Action 1) — then run `POST /admin/revenue/run/sandbar`, `POST /admin/opportunities/run/sandbar`, `POST /admin/ai-visibility/run/sandbar` to populate the dashboards. Issues #005/#010 need the sandbar-site push + 30 days of real data.

@@ -17,6 +17,7 @@ from datetime import date
 
 from agents.ai_visibility_agent.chatgpt_checker import check_chatgpt
 from agents.ai_visibility_agent.perplexity_checker import check_perplexity
+from agents.ai_visibility_agent.util import extract_domain
 from db.ai_visibility import (
     init_ai_visibility_tables,
     save_check,
@@ -47,7 +48,7 @@ async def run_for_client(slug: str) -> dict:
 
     business_name = client.get("client_name", slug)
     site_url = client.get("site_url", "")
-    domain = _extract_domain(site_url)
+    domain = extract_domain(site_url)
     service_area = "Tampa Bay, Florida"  # TODO: pull from client config
 
     money_keywords = client.get("money_keywords_json", [])
@@ -124,11 +125,3 @@ async def run_for_client(slug: str) -> dict:
         "engines": list(engines_seen),
         "business_name": business_name,
     }
-
-
-def _extract_domain(url: str) -> str:
-    if not url:
-        return ""
-    import re
-    m = re.search(r"(?:https?://)?(?:www\.)?([^/]+)", url)
-    return m.group(1) if m else ""

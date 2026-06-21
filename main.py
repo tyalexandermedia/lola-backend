@@ -3489,6 +3489,98 @@ async def admin_ai_visibility_get(
 
 
 # ---------------------------------------------------------------------------
+# Client Portal — read-only token URL (Issue #009)
+# ---------------------------------------------------------------------------
+
+@app.post("/admin/reporting/clients/{slug}/token")
+async def admin_generate_portal_token(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Generate (or rotate) a read-only portal token for a client."""
+    _check_admin(x_admin_key)
+    import secrets
+    from db.reporting import set_portal_token, get_client_by_slug
+    client = await get_client_by_slug(slug)
+    if not client:
+        raise HTTPException(status_code=404, detail="client not found")
+    token = secrets.token_urlsafe(24)
+    await set_portal_token(slug, token)
+    return {
+        "ok": True,
+        "slug": slug,
+        "token": token,
+        "portal_url": f"/portal/{slug}?token={token}",
+    }
+
+
+@app.get("/portal/{slug}")
+async def client_portal(slug: str, token: str = ""):
+    """
+    Read-only client portal — no admin key. Token-gated.
+    Bundles ROI strip + rankings + AI visibility + opportunity backlog.
+    """
+    from db.reporting import get_client_by_portal_token
+    client = await get_client_by_portal_token(slug, token)
+    if not client:
+        raise HTTPException(status_code=403, detail="Invalid or missing token")
+
+    slug_l = slug.strip().lower()
+    # ROI
+    revenue = await get_revenue_snapshot(slug_l)
+    revenue_trend = await get_revenue_trend(slug_l, limit=4)
+    # AI visibility
+    aiv_index = await get_aiv_index(slug_l)
+    aiv_checks = await get_aiv_checks(slug_l)
+    # Opportunities (only show non-sensitive fields)
+    opps = await get_opportunities(slug_l, status="open", limit=8)
+    public_opps = [
+        {
+            "title": o.get("title"),
+            "type": o.get("type"),
+            "est_revenue": o.get("est_revenue"),
+            "recommended_action": o.get("recommended_action"),
+        }
+        for o in opps
+    ]
+
+    return {
+        "slug": slug_l,
+        "client_name": client.get("client_name", slug_l),
+        "roi": revenue,
+        "roi_trend": revenue_trend,
+        "ai_visibility": {"index": aiv_index, "checks": aiv_checks},
+        "opportunities": public_opps,
+        "monthly_fee": int(client.get("fee_monthly") or 697),
+    }
+
+
+@app.get("/reporting/public/{slug}/roi")
+async def public_roi_strip(slug: str):
+    """
+    Lightweight ROI strip for embedding in the public client report.
+    No auth — only returns the headline ROI numbers, no PII.
+    """
+    slug_l = slug.strip().lower()
+    revenue = await get_revenue_snapshot(slug_l)
+    if not revenue or revenue.get("revenue_influenced", 0) <= 0:
+        return {"slug": slug_l, "has_data": False}
+    return {
+        "slug": slug_l,
+        "has_data": True,
+        "calls": revenue.get("calls", 0),
+        "leads": revenue.get("leads", 0),
+        "jobs_won": revenue.get("jobs_won", 0),
+        "revenue_influenced": revenue.get("revenue_influenced", 0),
+        "monthly_fee": revenue.get("monthly_fee", 0),
+        "roi_multiple": revenue.get("roi_multiple", 0),
+        "confidence": revenue.get("confidence", "low"),
+        "period_start": revenue.get("period_start"),
+        "period_end": revenue.get("period_end"),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Executive Dashboard summary endpoint
 # ---------------------------------------------------------------------------
 
