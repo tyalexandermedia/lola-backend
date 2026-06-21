@@ -162,6 +162,9 @@ from agents.enhancement_agent.enhancer import (
     EnhancementError,
     ANTHROPIC_MODEL as ENHANCEMENT_MODEL,
 )
+from db.revenue import init_revenue_tables, save_snapshot as save_revenue_snapshot, get_latest_snapshot as get_revenue_snapshot, get_trend as get_revenue_trend, get_all_latest as get_all_revenue
+from db.opportunities import init_opportunity_tables, get_opportunities, update_status as update_opp_status
+from db.ai_visibility import init_ai_visibility_tables, get_latest_index as get_aiv_index, get_latest_checks as get_aiv_checks, get_trend as get_aiv_trend
 
 app = FastAPI(title="Lola SEO", version="4.0")
 
@@ -209,6 +212,9 @@ async def startup_event():
     await init_enhancements_table()
     await init_swarm_tables()
     await cache_purge_expired()
+    await init_revenue_tables()
+    await init_opportunity_tables()
+    await init_ai_visibility_tables()
 
 
 app.include_router(reviews_router)
@@ -2072,8 +2078,16 @@ async def admin_delete_reporting_task(
 async def admin_run_reporting_weekly(
     x_admin_key: str = Header(..., alias="X-Admin-Key"),
 ):
-    """Endpoint cron-job.org hits every Monday 7am ET. Runs ALL active clients."""
+    """Endpoint cron-job.org hits every Monday 7am ET.
+    Runs Revenue Agent first (so the email leads with ROI), then Reporting Agent."""
     _check_admin(x_admin_key)
+    # Revenue Agent runs first so report_generator can include ROI in email
+    try:
+        from agents.revenue_agent.main import run_for_all_active as _rev_all
+        await _rev_all()
+    except Exception as _rev_err:
+        import logging as _log
+        _log.getLogger(__name__).warning("Revenue Agent weekly run error: %s", _rev_err)
     return await run_weekly_for_all_active()
 
 
@@ -3364,6 +3378,255 @@ async def outreach_stats_endpoint(
     if verbose:
         payload["recent"] = await outreach_recent_sends(limit=25)
     return payload
+
+
+# ---------------------------------------------------------------------------
+# Revenue Agent endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/admin/revenue/run/{slug}")
+async def admin_revenue_run(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    days: int = 30,
+):
+    """Run the Revenue Agent for a client slug and persist a snapshot."""
+    _check_admin(x_admin_key)
+    from agents.revenue_agent.main import run_for_client as _revenue_run
+    snapshot = await _revenue_run(slug, days=days)
+    return snapshot.to_dict()
+
+
+@app.get("/admin/revenue/{slug}")
+async def admin_revenue_get(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Return the latest Revenue snapshot + 4-week trend for a client."""
+    _check_admin(x_admin_key)
+    latest = await get_revenue_snapshot(slug)
+    trend = await get_revenue_trend(slug, limit=4)
+    return {"slug": slug, "latest": latest, "trend": trend}
+
+
+@app.get("/admin/revenue")
+async def admin_revenue_all(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Return latest revenue snapshot for every client — for exec dashboard."""
+    _check_admin(x_admin_key)
+    return {"snapshots": await get_all_revenue()}
+
+
+# ---------------------------------------------------------------------------
+# Opportunity Agent endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/admin/opportunities/run/{slug}")
+async def admin_opportunities_run(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Run the Opportunity Engine for a client and persist the backlog."""
+    _check_admin(x_admin_key)
+    from agents.opportunity_agent.main import run_for_client as _opp_run
+    opps = await _opp_run(slug)
+    return {"slug": slug, "count": len(opps), "opportunities": opps}
+
+
+@app.get("/admin/opportunities/{slug}")
+async def admin_opportunities_get(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    status: str = "open",
+    limit: int = 20,
+):
+    """Return the ranked opportunity backlog for a client."""
+    _check_admin(x_admin_key)
+    opps = await get_opportunities(slug, status=status, limit=limit)
+    return {"slug": slug, "count": len(opps), "opportunities": opps}
+
+
+@app.patch("/admin/opportunities/{opp_id}/status")
+async def admin_opportunity_update_status(
+    opp_id: int,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    status: str = "done",
+):
+    """Mark an opportunity as done / in_progress / dismissed."""
+    _check_admin(x_admin_key)
+    await update_opp_status(opp_id, status)
+    return {"ok": True, "opp_id": opp_id, "status": status}
+
+
+# ---------------------------------------------------------------------------
+# AI Visibility Agent endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/admin/ai-visibility/run/{slug}")
+async def admin_ai_visibility_run(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Run AI visibility checks (ChatGPT + Perplexity) for a client."""
+    _check_admin(x_admin_key)
+    from agents.ai_visibility_agent.main import run_for_client as _aiv_run
+    result = await _aiv_run(slug)
+    return result
+
+
+@app.get("/admin/ai-visibility/{slug}")
+async def admin_ai_visibility_get(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Return the latest AI Visibility Index + per-query checks for a client."""
+    _check_admin(x_admin_key)
+    index = await get_aiv_index(slug)
+    checks = await get_aiv_checks(slug)
+    trend = await get_aiv_trend(slug, limit=4)
+    return {"slug": slug, "index": index, "checks": checks, "trend": trend}
+
+
+# ---------------------------------------------------------------------------
+# Executive Dashboard summary endpoint
+# ---------------------------------------------------------------------------
+
+@app.get("/admin/exec/summary")
+async def admin_exec_summary(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Single endpoint for the Executive Dashboard.
+    Returns: active clients, MRR, pipeline, per-client ROI, health status.
+    """
+    _check_admin(x_admin_key)
+    from db.reporting import get_active_clients
+
+    clients = await get_active_clients()
+    revenue_rows = await get_all_revenue()
+    rev_by_slug = {r["slug"]: r for r in revenue_rows}
+
+    # Health: check for placeholder/missing keys
+    _placeholder_patterns = ("your_key", "change_me", "placeholder", "xxx", "your_")
+    key_names = [
+        "GOOGLE_PLACES_API_KEY", "GOOGLE_CUSTOM_SEARCH_API_KEY",
+        "ANTHROPIC_API_KEY", "RESEND_API_KEY", "BREVO_API_KEY",
+        "LOLA_SECRET_ADMIN_KEY", "TWILIO_ACCOUNT_SID",
+    ]
+    key_status = {}
+    for k in key_names:
+        v = os.getenv(k, "")
+        if not v:
+            key_status[k] = "missing"
+        elif any(p in v.lower() for p in _placeholder_patterns):
+            key_status[k] = "placeholder"
+        else:
+            key_status[k] = "ok"
+    missing_keys = [k for k, s in key_status.items() if s != "ok"]
+    overall_health = "healthy" if not missing_keys else ("critical" if len(missing_keys) > 3 else "degraded")
+
+    # MRR: sum of fee_monthly for active clients
+    mrr = sum(int(c.get("fee_monthly") or 0) for c in clients)
+
+    # Per-client ROI table with alerts
+    client_table = []
+    for c in clients:
+        slug = c.get("slug", "")
+        rev = rev_by_slug.get(slug, {})
+        roi = float(rev.get("roi_multiple") or 0)
+        last_run = rev.get("created_at", "never")
+        alert = None
+        if roi > 0 and roi < 1.0:
+            alert = "roi_below_1x"
+        elif not rev:
+            alert = "no_revenue_snapshot"
+        client_table.append({
+            "slug": slug,
+            "client_name": c.get("client_name", slug),
+            "fee_monthly": int(c.get("fee_monthly") or 0),
+            "roi_multiple": roi,
+            "revenue_influenced": int(rev.get("revenue_influenced") or 0),
+            "confidence": rev.get("confidence", "none"),
+            "last_revenue_run": last_run,
+            "alert": alert,
+        })
+
+    alerts = [f"{c['slug']}: {c['alert']}" for c in client_table if c.get("alert")]
+    if missing_keys:
+        alerts = [f"key_missing: {k}" for k in missing_keys] + alerts
+
+    return {
+        "mrr": mrr,
+        "active_clients": len(clients),
+        "clients": client_table,
+        "health": {"overall": overall_health, "keys": key_status, "missing_keys": missing_keys},
+        "alerts": alerts,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Updated health/keys endpoint — full integration status
+# ---------------------------------------------------------------------------
+
+@app.get("/admin/health/keys/v2")
+async def admin_health_keys_v2(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Extended health check — covers all integrations.
+    Returns green/red per key + overall status. Never returns key values.
+    """
+    _check_admin(x_admin_key)
+    _placeholder_patterns = ("your_key", "change_me", "placeholder", "xxx", "your_")
+
+    all_keys = {
+        "google": ["GOOGLE_PLACES_API_KEY", "GOOGLE_PAGESPEED_API_KEY",
+                   "GOOGLE_SAFE_BROWSING_API_KEY", "GOOGLE_CUSTOM_SEARCH_API_KEY",
+                   "GOOGLE_CUSTOM_SEARCH_CX"],
+        "anthropic": ["ANTHROPIC_API_KEY"],
+        "twilio": ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN"],
+        "email": ["RESEND_API_KEY", "BREVO_API_KEY"],
+        "stripe": ["STRIPE_PRICE_STARTER", "STRIPE_PRICE_SPRINT",
+                   "STRIPE_PRICE_RETAINER", "STRIPE_PRICE_PRO"],
+        "gsc_ga4": ["GSC_SERVICE_ACCOUNT_JSON", "GA4_PROPERTY_ID"],
+        "admin": ["LOLA_SECRET_ADMIN_KEY"],
+        "ai_visibility": ["OPENAI_API_KEY", "PERPLEXITY_API_KEY"],
+    }
+
+    result = {}
+    for group, keys in all_keys.items():
+        result[group] = {}
+        for k in keys:
+            v = os.getenv(k, "")
+            if not v:
+                result[group][k] = "missing"
+            elif any(p in v.lower() for p in _placeholder_patterns):
+                result[group][k] = "placeholder"
+            else:
+                result[group][k] = "ok"
+
+    flat = {k: s for g in result.values() for k, s in g.items()}
+    missing = [k for k, s in flat.items() if s != "ok"]
+    critical = ["ANTHROPIC_API_KEY", "GOOGLE_PLACES_API_KEY", "LOLA_SECRET_ADMIN_KEY"]
+    critical_missing = [k for k in critical if flat.get(k) != "ok"]
+
+    overall = "healthy"
+    if critical_missing:
+        overall = "critical"
+    elif missing:
+        overall = "degraded"
+
+    return {
+        "overall": overall,
+        "groups": result,
+        "missing": missing,
+        "critical_missing": critical_missing,
+        "audit_ready": flat.get("GOOGLE_PLACES_API_KEY") == "ok",
+        "reporting_ready": flat.get("GSC_SERVICE_ACCOUNT_JSON") == "ok" and flat.get("ANTHROPIC_API_KEY") == "ok",
+        "ai_visibility_ready": flat.get("OPENAI_API_KEY") == "ok" or flat.get("PERPLEXITY_API_KEY") == "ok",
+        "outreach_ready": flat.get("RESEND_API_KEY") == "ok" and flat.get("ANTHROPIC_API_KEY") == "ok",
+    }
 
 
 @app.get("/")

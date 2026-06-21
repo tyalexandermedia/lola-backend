@@ -78,10 +78,19 @@ async def run_for_client(slug: str) -> dict:
         avg_job_value=int(client.get("avg_job_value", 400)),
     )
 
+    # Pull latest Revenue Agent snapshot (pre-computed by weekly cron before this runs)
+    revenue_snapshot = None
+    try:
+        from db.revenue import get_latest_snapshot as _get_rev
+        revenue_snapshot = await _get_rev(slug)
+    except Exception:
+        pass
+
     # 2. Build prompt + call Claude (3-retry exp backoff in claude_client)
     payload = build_user_payload(
         client=client, gsc=gsc, ga=ga, implementation=impl,
         estimated_revenue=est_rev, traffic_delta_pct=delta_pct,
+        revenue_snapshot=revenue_snapshot,
     )
     try:
         body = await generate_email_body(build_messages(payload))
