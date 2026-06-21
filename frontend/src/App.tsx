@@ -16,6 +16,7 @@ const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
+const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
@@ -26,6 +27,7 @@ type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'start' }
   | { name: 'methodology' }
   | { name: 'case-studies-index' }
   | { name: 'case-study'; slug: string }
@@ -46,6 +48,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/case-studies' || pathname === '/case-studies/') return { name: 'case-studies-index' };
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
@@ -90,6 +93,8 @@ function App() {
       ? 'max-w-[640px] pt-3 sm:pt-6'
       : route.name === 'grader'
       ? 'max-w-[820px] pt-6 sm:pt-10'
+      : route.name === 'start'
+      ? 'max-w-[820px] pt-2 sm:pt-6'
       : route.name === 'methodology'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'case-study' || route.name === 'case-studies-index'
@@ -118,6 +123,7 @@ function App() {
           {route.name === 'home' && <Homepage />}
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
+          {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
           {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
@@ -170,7 +176,7 @@ function RouteFallback() {
 function SiteFooter({ route }: { route: Route }) {
   // Routes that own their own bottom-of-page footer or shouldn't have a
   // global one (admin / report dashboards / interactive tools).
-  const HIDE = new Set(['admin', 'admin-calls', 'report', 'client-report', 'audit', 'lead-gen', 'swarm']);
+  const HIDE = new Set(['admin', 'admin-calls', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
   if (HIDE.has(route.name)) return null;
 
   return (

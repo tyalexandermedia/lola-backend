@@ -932,6 +932,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 def render_sitemap(slugs):
     core = [
         ("/", "weekly", "1.0"),
+        ("/start", "monthly", "0.95"),    # dead-simple texted front door
         ("/grader", "weekly", "0.95"),    # primary lead magnet
         ("/audit", "monthly", "0.9"),
         ("/pricing", "monthly", "0.9"),
