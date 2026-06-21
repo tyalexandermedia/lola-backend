@@ -22,9 +22,15 @@ from db.reporting import get_client_by_slug
 GOOGLE_CUSTOM_SEARCH_KEY = os.getenv("GOOGLE_CUSTOM_SEARCH_API_KEY", "").strip() or None
 GOOGLE_CUSTOM_SEARCH_CX = os.getenv("GOOGLE_CUSTOM_SEARCH_CX", "").strip() or None
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip() or None
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001").strip()
+# Use a model that supports the web_search tool — local-business prompts
+# return 0 without live web access (the model just refuses to name companies
+# from training data alone). Default to Sonnet 4.6; override via env if needed.
+ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip() or None
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
+# search-preview gives the model live web search — same reason as above.
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-search-preview").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or None
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
 
 
 async def _google_rank(
@@ -117,6 +123,7 @@ async def _claude_ai_mode(
         return False, "Anthropic key not configured", []
     structured_prompt = (
         f"{prompt}\n\n"
+        "Use the web_search tool to find current real businesses serving that area. "
         "After your answer, on a new final line, output ONLY a JSON array of the "
         "specific business/company names you recommended (most relevant first), e.g.\n"
         'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
@@ -127,15 +134,16 @@ async def _claude_ai_mode(
             "https://api.anthropic.com/v1/messages",
             json={
                 "model": ANTHROPIC_MODEL,
-                "max_tokens": 640,
+                "max_tokens": 1024,
                 "messages": [{"role": "user", "content": structured_prompt}],
+                "tools": [{"type": "web_search_20250305", "name": "web_search", "max_uses": 3}],
             },
             headers={
                 "x-api-key": ANTHROPIC_API_KEY,
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json",
             },
-            timeout=30.0,
+            timeout=60.0,
         )
         if resp.status_code != 200:
             return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
@@ -180,24 +188,31 @@ async def _chatgpt_ai_mode(
         return False, "OpenAI key not configured", []
     structured_prompt = (
         f"{prompt}\n\n"
+        "Search the web for current real businesses serving that area. "
         "After your answer, on a new final line, output ONLY a JSON array of the "
         "specific business/company names you recommended (most relevant first), e.g.\n"
         'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
         "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
     )
+    # gpt-4o-search-preview enables live web search; it rejects max_tokens
+    # and temperature, so build the payload conditionally for that model.
+    payload: dict = {
+        "model": OPENAI_MODEL,
+        "messages": [{"role": "user", "content": structured_prompt}],
+    }
+    if "search" in OPENAI_MODEL:
+        payload["web_search_options"] = {}
+    else:
+        payload["max_tokens"] = 640
     try:
         resp = await client.post(
             "https://api.openai.com/v1/chat/completions",
-            json={
-                "model": OPENAI_MODEL,
-                "max_tokens": 640,
-                "messages": [{"role": "user", "content": structured_prompt}],
-            },
+            json=payload,
             headers={
                 "Authorization": f"Bearer {OPENAI_API_KEY}",
                 "Content-Type": "application/json",
             },
-            timeout=30.0,
+            timeout=60.0,
         )
         if resp.status_code != 200:
             return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
@@ -205,6 +220,65 @@ async def _chatgpt_ai_mode(
         text = (
             data.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
         )
+
+        recommended = _extract_recommended(text)
+        mentioned_in_list = any(
+            _name_matches(client_name, target_domain, r) for r in recommended
+        )
+        mentioned_in_text = (
+            client_name.lower() in text.lower()
+            or target_domain.lower() in text.lower()
+        )
+        mentioned = mentioned_in_list or mentioned_in_text
+        competitors = [
+            r for r in recommended
+            if not _name_matches(client_name, target_domain, r)
+        ]
+        return mentioned, text[:500], competitors
+    except Exception as e:
+        return False, f"exception: {e}", []
+
+
+async def _gemini_ai_mode(
+    client: httpx.AsyncClient,
+    prompt: str,
+    client_name: str,
+    target_domain: str,
+) -> tuple[bool, str, list[str]]:
+    """
+    Ask Gemini with Google Search grounding. Grounding pulls real-time results
+    from Google's index — the most relevant signal for local-business AI
+    recommendations because it mirrors what AI Overviews show in regular search.
+    """
+    if not GEMINI_API_KEY:
+        return False, "Gemini key not configured", []
+    structured_prompt = (
+        f"{prompt}\n\n"
+        "Use Google Search to find current real businesses serving that area. "
+        "After your answer, on a new final line, output ONLY a JSON array of the "
+        "specific business/company names you recommended (most relevant first), e.g.\n"
+        'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
+        "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
+    )
+    try:
+        resp = await client.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent",
+            params={"key": GEMINI_API_KEY},
+            json={
+                "contents": [{"role": "user", "parts": [{"text": structured_prompt}]}],
+                "tools": [{"google_search": {}}],
+                "generationConfig": {"maxOutputTokens": 1024},
+            },
+            timeout=60.0,
+        )
+        if resp.status_code != 200:
+            return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
+        data = resp.json()
+        text = ""
+        for cand in data.get("candidates", []) or []:
+            for part in (cand.get("content") or {}).get("parts", []) or []:
+                if "text" in part:
+                    text += part["text"]
 
         recommended = _extract_recommended(text)
         mentioned_in_list = any(
@@ -327,53 +401,40 @@ async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
                 "snippet": snippet[:120],
             })
 
-        # AI Mode — ask BOTH Claude and ChatGPT the same prompt. Each becomes
-        # its own snapshot row so the dashboard can show per-provider mentions
-        # AND aggregate share of voice across all AI search assistants.
+        # AI Mode — ask every configured assistant the same prompt. Each
+        # becomes its own snapshot row so the dashboard can show per-provider
+        # mentions AND aggregate share of voice across all AI search assistants.
+        # Skip a provider entirely when its key isn't set so we don't pollute
+        # the SOV denominator with phantom-miss rows.
+        providers = [
+            ("claude_ai_mode", "claude", ANTHROPIC_API_KEY, _claude_ai_mode),
+            ("chatgpt_ai_mode", "chatgpt", OPENAI_API_KEY, _chatgpt_ai_mode),
+            ("gemini_ai_mode", "gemini", GEMINI_API_KEY, _gemini_ai_mode),
+        ]
         for p in cs.ai_mode_prompts:
-            mentioned_c, excerpt_c, competitors_c = await _claude_ai_mode(
-                http, p, cs.client_name, cs.target_domain
-            )
-            await save_ranking(
-                slug=slug,
-                query=p,
-                source="claude_ai_mode",
-                position=None,
-                mentioned=mentioned_c,
-                found_url="",
-                raw_excerpt=excerpt_c,
-                notes=notes,
-                competitors=competitors_c,
-            )
-            summary["ai_mode"].append({
-                "prompt": p[:80],
-                "provider": "claude",
-                "mentioned": mentioned_c,
-                "competitors": competitors_c,
-                "excerpt": excerpt_c[:200],
-            })
-
-            if OPENAI_API_KEY:
-                mentioned_g, excerpt_g, competitors_g = await _chatgpt_ai_mode(
+            for source, label, key, fn in providers:
+                if not key:
+                    continue
+                mentioned, excerpt, competitors = await fn(
                     http, p, cs.client_name, cs.target_domain
                 )
                 await save_ranking(
                     slug=slug,
                     query=p,
-                    source="chatgpt_ai_mode",
+                    source=source,
                     position=None,
-                    mentioned=mentioned_g,
+                    mentioned=mentioned,
                     found_url="",
-                    raw_excerpt=excerpt_g,
+                    raw_excerpt=excerpt,
                     notes=notes,
-                    competitors=competitors_g,
+                    competitors=competitors,
                 )
                 summary["ai_mode"].append({
                     "prompt": p[:80],
-                    "provider": "chatgpt",
-                    "mentioned": mentioned_g,
-                    "competitors": competitors_g,
-                    "excerpt": excerpt_g[:200],
+                    "provider": label,
+                    "mentioned": mentioned,
+                    "competitors": competitors,
+                    "excerpt": excerpt[:200],
                 })
 
     return summary

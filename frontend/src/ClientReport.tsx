@@ -1366,9 +1366,9 @@ function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoic
   const byPlatform = useMemo(() => {
     const claude = series.filter(s => s.source === 'claude_ai_mode');
     const chatgpt = series.filter(s => s.source === 'chatgpt_ai_mode');
-    // Merge: for each unique query, try to pair claude + chatgpt rows
+    const gemini = series.filter(s => s.source === 'gemini_ai_mode');
     const queries = [...new Map(series.map(s => [s.query, s])).keys()];
-    return { claude, chatgpt, queries };
+    return { claude, chatgpt, gemini, queries };
   }, [series]);
 
   const winRate = (rows: Series[]) => {
@@ -1379,6 +1379,7 @@ function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoic
 
   const claudeRate = winRate(byPlatform.claude);
   const chatgptRate = winRate(byPlatform.chatgpt);
+  const geminiRate = winRate(byPlatform.gemini);
 
   const PlatformChip = ({ label, icon, rate, color }: { label: string; icon: string; rate: ReturnType<typeof winRate>; color: string }) => {
     if (!rate) return null;
@@ -1393,11 +1394,12 @@ function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoic
 
   // Group all series rows by query so we can show one row per prompt
   const byQuery = useMemo(() => {
-    const map: Record<string, { claude?: Series; chatgpt?: Series }> = {};
+    const map: Record<string, { claude?: Series; chatgpt?: Series; gemini?: Series }> = {};
     for (const s of series) {
       if (!map[s.query]) map[s.query] = {};
       if (s.source === 'claude_ai_mode') map[s.query].claude = s;
       if (s.source === 'chatgpt_ai_mode') map[s.query].chatgpt = s;
+      if (s.source === 'gemini_ai_mode') map[s.query].gemini = s;
     }
     return map;
   }, [series]);
@@ -1431,30 +1433,32 @@ function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoic
       )}
 
       {/* Per-platform win rates */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <PlatformChip label="Claude" icon="⚡" rate={claudeRate} color="#C4B5FD" />
         <PlatformChip label="ChatGPT" icon="✦" rate={chatgptRate} color="#6EE7B7" />
+        <PlatformChip label="Gemini" icon="✧" rate={geminiRate} color="#93C5FD" />
       </div>
 
       {/* Per-prompt breakdown */}
       <div className="mt-4 space-y-3">
-        {prompts.map(([query, { claude, chatgpt }]) => {
+        {prompts.map(([query, { claude, chatgpt, gemini }]) => {
           const claudeWin = claude?.current?.mentioned ?? null;
           const chatgptWin = chatgpt?.current?.mentioned ?? null;
-          // Aggregate competitors across both platforms
+          const geminiWin = gemini?.current?.mentioned ?? null;
           const allCompetitors = [
             ...(claudeWin === false ? claude?.current?.competitors ?? [] : []),
             ...(chatgptWin === false ? chatgpt?.current?.competitors ?? [] : []),
-          ].filter((v, i, a) => a.indexOf(v) === i); // dedupe
+            ...(geminiWin === false ? gemini?.current?.competitors ?? [] : []),
+          ].filter((v, i, a) => a.indexOf(v) === i);
 
-          const anyWin = claudeWin || chatgptWin;
-          const anyLoss = claudeWin === false || chatgptWin === false;
+          const anyWin = claudeWin || chatgptWin || geminiWin;
+          const anyLoss = claudeWin === false || chatgptWin === false || geminiWin === false;
 
           return (
             <div key={query} className={`rounded-[12px] border p-4 ${anyWin ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : 'border-white/10 bg-[#11121A]'}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <p className="flex-1 text-[13px] font-medium leading-snug text-[#E5E7EB]">{query}</p>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {claude && (
                     <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${claudeWin ? 'bg-purple-500/15 text-purple-300' : 'bg-red-500/10 text-red-300'}`}>
                       ⚡ Claude {claudeWin ? '✓' : '✗'}
@@ -1463,6 +1467,11 @@ function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoic
                   {chatgpt && (
                     <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${chatgptWin ? 'bg-emerald-500/15 text-emerald-300' : 'bg-red-500/10 text-red-300'}`}>
                       ✦ ChatGPT {chatgptWin ? '✓' : '✗'}
+                    </span>
+                  )}
+                  {gemini && (
+                    <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${geminiWin ? 'bg-blue-500/15 text-blue-300' : 'bg-red-500/10 text-red-300'}`}>
+                      ✧ Gemini {geminiWin ? '✓' : '✗'}
                     </span>
                   )}
                 </div>

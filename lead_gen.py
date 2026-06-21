@@ -242,6 +242,25 @@ async def setup_status(slug: str = "sandbar"):
         "needs": cr_needs or None,
     }
 
+    # 8. AI search visibility — per-provider keys for Claude / ChatGPT / Gemini.
+    #    At least one is required for the AI Visibility card to populate.
+    ai_providers = [
+        ("ANTHROPIC_API_KEY", "Claude (web_search tool)"),
+        ("OPENAI_API_KEY", "ChatGPT (search-preview model)"),
+        ("GEMINI_API_KEY", "Gemini (Google Search grounding)"),
+    ]
+    ai_set = [(label, bool((_os.getenv(env) or "").strip())) for env, label in ai_providers]
+    ai_missing = [env for env, _ in ai_providers if not (_os.getenv(env) or "").strip()]
+    any_ai = any(on for _, on in ai_set)
+    checks["ai_search_visibility"] = {
+        "ok": any_ai,
+        "detail": (
+            ", ".join(f"{label}={'on' if on else 'off'}" for label, on in ai_set)
+            if any_ai else "no AI keys set — AI Visibility card will be empty"
+        ),
+        "needs": ai_missing or None,
+    }
+
     all_ok = all(c.get("ok") for c in checks.values())
     summary = {
         "ready": all_ok,
