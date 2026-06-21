@@ -152,28 +152,18 @@ export default function ClientReport({ slug }: { slug: string }) {
       )}
 
       {anyTracking && (
-        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
+        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} callQuality={data.call_quality} funnel={data.funnel} />
       )}
       {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
       {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
       {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
       {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
       {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
-      {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
-      {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
-
-      {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
-
-      {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
 
       {anyWork && <WorkDelivered impl={data.implementation!} />}
 
-      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
-        <ShareOfVoiceCard sov={data.share_of_voice} />
-      )}
-
-      {anyAi && <AIVisibilityCard series={data.ai_mode} />}
+      {anyAi && <AIVisibilityCard series={data.ai_mode} sov={data.share_of_voice} />}
 
       {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
       {anyRankings && <RankingMomentum google={data.google} />}
@@ -609,65 +599,6 @@ function TopWinsCard({
 }
 
 /**
- * Share-of-Voice card — the killer AI-visibility metric stolen from
- * Profound's playbook. Shows the % of tracked AI queries where the
- * client got named, with a 30-day delta vs the prior 30 days so the
- * client sees movement, not a flat number.
- */
-function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
-  const live = sov.last_30d;
-  const delta = sov.delta_pts;
-  const deltaColor = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#9AA0A6]';
-  const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
-  // Pick the headline tone by current value, not delta.
-  const headlineColor = live.pct >= 50 ? 'text-emerald-300' : live.pct >= 20 ? '#F4D47C' : '#F59E0B';
-
-  return (
-    <section className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_36px_rgba(212,175,55,0.10)] sm:p-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-            AI Share of Voice
-          </p>
-          <p className="mt-2 max-w-[460px] text-[13px] leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
-            Of every AI query we tested across {sov.queries_tracked} tracked prompt{sov.queries_tracked === 1 ? '' : 's'} in the last 30 days,
-            this is the percent where AI agents actually named you.
-          </p>
-        </div>
-        <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-end">
-          <span
-            className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]"
-            style={{ color: headlineColor }}
-          >
-            {live.pct}%
-          </span>
-          <span className="text-[12px] text-[#9CA3AF]">
-            {live.mentions}/{live.total} runs · last 30d
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Vs prior 30d</p>
-          <p className={`mt-1 text-[16px] font-bold ${deltaColor}`}>
-            {deltaArrow} {Math.abs(delta)} pts
-          </p>
-        </div>
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Prior 30d</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.prev_30d.pct}%</p>
-        </div>
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Lifetime</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.lifetime.pct}%</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
  * Billing-proof row — three cards across the top of the dashboard:
  *   1. Value Lola drove this month ($ — the headline number)
  *   2. Cost per Lead (vs paid ads — the negotiation wedge)
@@ -874,83 +805,6 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
 }
 
 /**
- * Call quality card — REAL tracked calls (via the Lola call-tracking
- * number), counted by quality. No caller numbers here (PII → admin-only +
- * private client report). 'Qualified' = answered & ≥30s; 'long' = ≥2min
- * (almost always a real job conversation). avg duration in m:ss.
- */
-function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality']> }) {
-  const mins = Math.floor(q.avg_duration_sec / 60);
-  const secs = q.avg_duration_sec % 60;
-  return (
-    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-        📞 Tracked calls · this month
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
-          real calls through your Lola tracking number
-        </span>
-      </p>
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Total calls</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-white">{q.month}</p>
-        </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Qualified ≥30s</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-emerald-300">{q.qualified_month}</p>
-        </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Long ≥2 min</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#6EE7B7]">{q.long_month}</p>
-        </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Avg length</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#F4D47C]">{mins}:{String(secs).padStart(2, '0')}</p>
-        </div>
-      </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
-        Qualified + long calls are the ones most likely to be real jobs. Full caller log (with numbers) is in your private weekly report.
-      </p>
-    </section>
-  );
-}
-
-/**
- * Funnel card — View → Click → Call → Lead with drop-off %. Proves the
- * system works at every stage of the customer journey, not just the
- * end number. Worth its weight in renewal conversations.
- */
-function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
-  const steps = [
-    { k: 'view', n: f.view, label: 'Views', accent: '#9CA3AF', rate: null as number | null },
-    { k: 'click', n: f.click, label: 'Clicks', accent: '#93C5FD', rate: f.click_rate },
-    { k: 'call', n: f.call, label: 'Calls', accent: '#6EE7B7', rate: f.call_rate },
-    { k: 'lead', n: f.lead, label: 'Leads', accent: '#F4D47C', rate: f.lead_rate },
-  ];
-  return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-        Conversion funnel · this month
-      </p>
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        {steps.map((s) => (
-          <div key={s.k} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{s.label}</p>
-            <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: s.accent }}>{s.n}</p>
-            {s.rate !== null && s.rate !== undefined && (
-              <p className="mt-1 text-[10px] text-[#6B7280]">{s.rate}% from prev</p>
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
-        Overall view → contact: <span className="text-white">{f.overall}%</span>. Lola optimizes every step.
-      </p>
-    </section>
-  );
-}
-
-/**
  * Reviews card — surfaces the existing reviews module's data per client
  * (matched by business name). Reviews are the #2 ranking signal in
  * local search after GBP completeness — counting them here proves we're
@@ -991,11 +845,13 @@ function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
  * proof that "yes, this lead came from our system."
  */
 function TrackingRow({
-  tracking, sources, trends,
+  tracking, sources, trends, callQuality, funnel,
 }: {
   tracking: Record<string, { month: number; last_30d: number; lifetime: number }>;
   sources?: Record<string, Record<string, number>>;
   trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
+  callQuality?: DashboardPayload['call_quality'];
+  funnel?: DashboardPayload['funnel'];
 }) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
@@ -1040,49 +896,27 @@ function TrackingRow({
                   ))}
                 </div>
               )}
+              {c.key === 'call' && callQuality && callQuality.lifetime > 0 && (
+                <div className="mt-2 space-y-0.5 border-t border-white/[0.06] pt-2">
+                  <p className="text-[11px] text-emerald-300">{callQuality.qualified_month} qualified ≥30s</p>
+                  <p className="text-[10px] text-[#9CA3AF]">avg {Math.floor(callQuality.avg_duration_sec / 60)}:{String(callQuality.avg_duration_sec % 60).padStart(2, '0')}</p>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+      {funnel && (funnel.view > 0 || funnel.click > 0) && (
+        <p className="mt-3 text-center text-[11px] text-[#9CA3AF]">
+          View → contact: <span className="font-semibold text-white">{funnel.overall}%</span> overall conversion
+        </p>
+      )}
       {!anyData && (
         <p className="mt-3 text-[11px] leading-[1.5] text-[#6B7280]">
           Tracking links not live yet — once your Call button + website link route through Lola, calls, leads, and clicks land here automatically.
         </p>
       )}
     </section>
-  );
-}
-
-function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }) {
-  const ranked = google.filter((s) => s.current?.position !== null && s.current?.position !== undefined).length;
-  const top3 = google.filter((s) => (s.current?.position ?? 99) <= 3).length;
-  const top10 = google.filter((s) => (s.current?.position ?? 99) <= 10).length;
-  const aiHits = aiMode.filter((s) => s.current?.mentioned).length;
-
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <StatPill label="Keywords tracked" value={google.length} />
-      <StatPill label="Currently ranked" value={ranked} accent={ranked > 0 ? '#10B981' : '#6B7280'} />
-      <StatPill label="Top 10" value={top10} accent={top10 > 0 ? '#F4D47C' : '#6B7280'} />
-      <StatPill
-        label={`AI mentions (${aiMode.length})`}
-        value={aiHits}
-        accent={aiHits > 0 ? '#10B981' : '#6B7280'}
-        sub={`Top 3: ${top3}`}
-      />
-    </div>
-  );
-}
-
-function StatPill({
-  label, value, accent = '#F4D47C', sub,
-}: { label: string; value: number; accent?: string; sub?: string }) {
-  return (
-    <div className="rounded-[12px] border border-white/10 bg-[#11121A] px-4 py-3 text-center">
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{label}</p>
-      <p className="mt-1 text-[28px] font-bold leading-none" style={{ color: accent }}>{value}</p>
-      {sub && <p className="mt-1 text-[11px] text-[#9AA0A6]">{sub}</p>}
-    </div>
   );
 }
 
@@ -1521,126 +1355,12 @@ function TaskColumn({
 }
 
 /**
- * RankingsTable — compact scannable table of every tracked keyword showing
- * the live position number, colour-coded tier, trend arrow, and a map-pack
- * badge where a confirmed map-pack win exists. Much easier to scan than the
- * individual RankingCard walls — one glance shows the full keyword portfolio.
- *
- * Map-pack matching: a keyword gets a 📍 badge if any entry in
- * verified_wins.map_pack contains a city word that also appears in the query.
- */
-function RankingsTable({
-  google,
-  verifiedWins,
-}: {
-  google: Series[];
-  verifiedWins?: { organic: string[]; map_pack: string[] };
-}) {
-  if (google.length === 0) return null;
-
-  // Build a quick-lookup of which queries have a confirmed map-pack win.
-  // Strategy: extract city names from the map_pack strings (e.g. "Holiday —
-  // pressure washing" → "holiday") and check if the query contains that city.
-  const mapPackCities = useMemo(() => {
-    return (verifiedWins?.map_pack ?? []).map(s =>
-      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
-    );
-  }, [verifiedWins]);
-
-  const hasMapPack = (query: string) => {
-    const q = query.toLowerCase();
-    return mapPackCities.some(city => city && q.includes(city));
-  };
-
-  const posTier = (p: number | null) => {
-    if (p === null) return { label: '—', color: '#6B7280', bg: 'rgba(107,114,128,0.08)' };
-    if (p === 1)    return { label: '#1', color: '#FFD166', bg: 'rgba(212,175,55,0.12)' };
-    if (p <= 3)     return { label: `#${p}`, color: '#6EE7B7', bg: 'rgba(16,185,129,0.10)' };
-    if (p <= 10)    return { label: `#${p}`, color: '#93C5FD', bg: 'rgba(147,197,253,0.08)' };
-    return { label: `#${p}`, color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' };
-  };
-
-  // Trend: compare current position to oldest non-null position in history.
-  const trend = (s: Series) => {
-    const cur = s.current?.position;
-    if (cur === null || cur === undefined) return null;
-    const oldest = [...s.history].reverse().find(h => h.position !== null)?.position ?? null;
-    if (oldest === null) return null;
-    const d = oldest - cur; // positive = improved (lower position number)
-    return d === 0 ? null : d;
-  };
-
-  // Sort: ranked keywords first (by position asc), then unranked.
-  const sorted = [...google].sort((a, b) => {
-    const pa = a.current?.position ?? 999;
-    const pb = b.current?.position ?? 999;
-    return pa - pb;
-  });
-
-  return (
-    <section className="mt-8">
-      <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
-        Organic Rankings · Full Keyword List
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
-          live positions across {google.length} tracked keywords
-        </span>
-      </h2>
-      <div className="overflow-hidden rounded-[14px] border border-white/10">
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 border-b border-white/10 bg-[#0F0F12] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#6B7280]">
-          <span>Keyword</span>
-          <span className="text-right">Map Pack</span>
-          <span className="text-right w-12">Trend</span>
-          <span className="text-right w-14">Position</span>
-        </div>
-        {sorted.map((s, idx) => {
-          const tier = posTier(s.current?.position ?? null);
-          const t = trend(s);
-          const mp = hasMapPack(s.query);
-          return (
-            <div
-              key={s.query}
-              className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 px-4 py-3 ${idx < sorted.length - 1 ? 'border-b border-white/[0.05]' : ''} ${idx % 2 === 0 ? 'bg-[#11121A]' : 'bg-[#0F0F12]'}`}
-            >
-              <span className="text-[13px] font-medium text-[#E5E7EB] leading-tight">{s.query}</span>
-              <span className="text-center">
-                {mp && (
-                  <span title="Confirmed #1 in Google Map Pack" className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                    📍 Map Pack
-                  </span>
-                )}
-              </span>
-              <span className="w-12 text-right text-[12px] font-semibold">
-                {t !== null && (
-                  <span className={t > 0 ? 'text-emerald-300' : 'text-red-300'}>
-                    {t > 0 ? `↑${t}` : `↓${Math.abs(t)}`}
-                  </span>
-                )}
-              </span>
-              <span
-                className="inline-flex w-14 items-center justify-center rounded-[8px] px-2.5 py-1 text-[13px] font-bold"
-                style={{ color: tier.color, background: tier.bg }}
-              >
-                {tier.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <p className="mt-2 text-[10px] text-[#6B7280]">
-        📍 = confirmed #1 in Google Map Pack · trend arrow vs first recorded snapshot
-      </p>
-    </section>
-  );
-}
-
-/**
  * AIVisibilityCard — per-platform breakdown of Claude vs ChatGPT AI search
  * visibility. Shows each tested prompt with win/lose status and (on lose) who
  * the AI recommended instead. Replaces the single merged AIModeTable so the
  * client can see whether visibility differs across AI providers.
  */
-function AIVisibilityCard({ series }: { series: Series[] }) {
+function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoice | null }) {
   if (series.length === 0) return null;
 
   const byPlatform = useMemo(() => {
@@ -1692,6 +1412,23 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
           Are AI assistants recommending you?
         </span>
       </h2>
+
+      {sov && sov.last_30d.total > 0 && (
+        <div className="mb-4 flex items-center justify-between rounded-[12px] border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] px-4 py-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#D4AF37]">Share of Voice · last 30d</p>
+            <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{sov.queries_tracked} prompts · {sov.last_30d.mentions}/{sov.last_30d.total} named you</p>
+          </div>
+          <div className="text-right">
+            <span className="text-[36px] font-extrabold leading-none text-[#F4D47C]">{sov.last_30d.pct}%</span>
+            {sov.delta_pts !== 0 && (
+              <p className={`mt-0.5 text-[11px] font-semibold ${sov.delta_pts > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                {sov.delta_pts > 0 ? '↑' : '↓'} {Math.abs(sov.delta_pts)} pts vs prior 30d
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Per-platform win rates */}
       <div className="flex gap-3">
