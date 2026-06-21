@@ -59,12 +59,6 @@ interface DashboardPayload {
     ga?: { error?: string | null; organic_sessions: number; organic_sessions_prev: number } | null;
     fetched_at?: string;
   } | null;
-  attributed_value?: {
-    value: number; contacts: number; calls: number; leads: number;
-    close_rate: number; avg_job_value: number;
-  };
-  annualized?: { yearly_run_rate: number; monthly: number };
-  cost_per_lead?: { cpl: number | null; contacts: number; retainer: number };
   won_jobs?: {
     month: number; lifetime: number;
     revenue_month: number; revenue_lifetime: number;
@@ -142,11 +136,8 @@ export default function ClientReport({ slug }: { slug: string }) {
       <Header data={data} />
       <OwnerOverview data={data} />
       <TopWinsCard google={data.google} aiMode={data.ai_mode} verifiedWins={data.verified_wins} />
-      {data.attributed_value && data.attributed_value.contacts > 0 && (
-        <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
-      )}
       {data.won_jobs && data.won_jobs.lifetime > 0 && (
-        <WonJobsCard wonJobs={data.won_jobs} estimated={data.attributed_value} />
+        <WonJobsCard wonJobs={data.won_jobs} />
       )}
 
       {/* No live data yet → show the "what we're watching" value card so the
@@ -273,11 +264,12 @@ function StatusChip({ label, on }: { label: string; on: boolean }) {
 function OwnerOverview({ data }: { data: DashboardPayload }) {
   const calls = data.tracking?.call?.month ?? 0;
   const leads = data.tracking?.lead?.month ?? 0;
-  const contacts = Math.max(calls, leads);
-  const value = data.attributed_value?.value ?? 0;
+  const contacts = calls + leads;
+  const wonMonth = data.won_jobs?.month ?? 0;
+  const revMonth = data.won_jobs?.revenue_month ?? 0;
   const prevCalls = data.tracking_trends?.call?.prev_month ?? 0;
   const prevLeads = data.tracking_trends?.lead?.prev_month ?? 0;
-  const prevContacts = Math.max(prevCalls, prevLeads);
+  const prevContacts = prevCalls + prevLeads;
   const delta = contacts - prevContacts;
   const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
 
@@ -326,19 +318,16 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
         <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
           {contacts} new contact{contacts === 1 ? '' : 's'}
         </span>{' '}
-        from the website and Google so far this month.
+        — <span className={deltaTone}>{deltaText}</span>.
       </h2>
       <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-[#C8C0B0]">
-        That breaks out to <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
-        and <strong className="text-white">{leads} quote form submission{leads === 1 ? '' : 's'}</strong>.
-        At your average job value of ${data.attributed_value?.avg_job_value?.toLocaleString() || '650'},
-        we estimate Lola has driven{' '}
-        <strong className="text-[#F4D47C]">${value.toLocaleString()}</strong> in potential
-        revenue this month — <span className={deltaTone}>{deltaText}</span>.
-      </p>
-      <p className="mt-3 text-[12px] text-[#9CA3AF]">
-        Scroll down for the breakdown: where contacts came from, your Google rankings,
-        AI search visibility, and reviews.
+        <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
+        and <strong className="text-white">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
+        landed this month.
+        {wonMonth > 0 && (
+          <> You&apos;ve confirmed <strong className="text-emerald-300">{wonMonth} won job{wonMonth === 1 ? '' : 's'}</strong> totaling{' '}
+          <strong className="text-emerald-300">${revMonth.toLocaleString()}</strong>.</>
+        )}
       </p>
     </section>
   );
@@ -686,60 +675,6 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
  *
  * Together: this is what justifies the retainer at renewal + raises.
  */
-function BillingProofRow({
-  a, ann, cpl,
-}: {
-  a: NonNullable<DashboardPayload['attributed_value']>;
-  ann?: DashboardPayload['annualized'];
-  cpl?: DashboardPayload['cost_per_lead'];
-}) {
-  const pct = Math.round(a.close_rate * 100);
-  const cplStr = cpl && cpl.cpl !== null ? `$${cpl.cpl.toLocaleString()}` : '—';
-  return (
-    <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-      {/* Headline $ value */}
-      <div className="rounded-2xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-5 shadow-[0_0_28px_rgba(212,175,55,0.12)] sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-          Revenue Lola drove · this month
-        </p>
-        <p className="mt-2 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[48px]">
-          ${a.value.toLocaleString()}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          {a.contacts} contact{a.contacts === 1 ? '' : 's'} × {pct}% close × ${a.avg_job_value.toLocaleString()} avg job
-        </p>
-      </div>
-
-      {/* CPL — the comparison wedge */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] p-5 sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-300">
-          Cost per contact
-        </p>
-        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-emerald-300 sm:text-[48px]">
-          {cplStr}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          ${cpl?.retainer || 697}/mo retainer ÷ {cpl?.contacts || 0} contacts ·{' '}
-          <span className="text-emerald-300/85">Paid ads CPL: $50–$200</span>
-        </p>
-      </div>
-
-      {/* Annualized */}
-      <div className="rounded-2xl border border-[#93C5FD]/30 bg-[#93C5FD]/[0.03] p-5 sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#93C5FD]">
-          Tracking to · per year
-        </p>
-        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-[#93C5FD] sm:text-[48px]">
-          ${(ann?.yearly_run_rate || 0).toLocaleString()}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          At this month&apos;s pace × 12 mo · conservative no-growth projection
-        </p>
-      </div>
-    </section>
-  );
-}
-
 /**
  * GBP Performance card — Google's OWN count of calls / website clicks /
  * direction requests / impressions straight from the Maps listing. The
@@ -1821,10 +1756,8 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
  */
 function WonJobsCard({
   wonJobs,
-  estimated,
 }: {
   wonJobs: NonNullable<DashboardPayload['won_jobs']>;
-  estimated?: NonNullable<DashboardPayload['attributed_value']>;
 }) {
   if (wonJobs.lifetime === 0) return null;
   const recentJobs = wonJobs.jobs.slice(0, 5);
@@ -1834,31 +1767,18 @@ function WonJobsCard({
   };
   return (
     <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-[#11121A] p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-            💰 Confirmed Won Jobs · this month
-          </p>
-          <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
-            ${wonJobs.revenue_month.toLocaleString()}
-          </p>
-          <p className="mt-1 text-[12px] text-[#9CA3AF]">
-            {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} confirmed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
-          </p>
-        </div>
-        {estimated && estimated.contacts > 0 && (
-          <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-right">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Model estimate</p>
-            <p className="mt-1 text-[22px] font-bold text-[#F4D47C]">${estimated.value.toLocaleString()}</p>
-            <p className="mt-0.5 text-[10px] text-[#6B7280]">
-              {estimated.contacts} contacts × {Math.round(estimated.close_rate * 100)}% est. close
-            </p>
-          </div>
-        )}
-      </div>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        💰 Confirmed revenue · this month
+      </p>
+      <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
+        ${wonJobs.revenue_month.toLocaleString()}
+      </p>
+      <p className="mt-1 text-[12px] text-[#9CA3AF]">
+        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} closed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
+      </p>
       {recentJobs.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent confirmed jobs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent closed jobs</p>
           {recentJobs.map(j => (
             <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
               <div className="flex items-center gap-3">
@@ -1871,9 +1791,6 @@ function WonJobsCard({
           ))}
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-[1.5] text-[#6B7280]">
-        Log a won job: <code className="rounded bg-white/5 px-1 py-0.5 text-[9px]">POST /admin/won-jobs/{'{slug}'}</code> with job_value, service_type, source
-      </p>
     </section>
   );
 }
