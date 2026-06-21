@@ -184,18 +184,8 @@ export default function ClientReport({ slug }: { slug: string }) {
 
       {anyAi && <AIVisibilityCard series={data.ai_mode} />}
 
-      {anyRankings && (
-        <section className="mt-8">
-          <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#9AA0A6]">
-            Rankings · Detailed History
-          </h2>
-          <div className="space-y-4">
-            {data.google.map((s) => (
-              <RankingCard key={`g-${s.query}`} series={s} />
-            ))}
-          </div>
-        </section>
-      )}
+      {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
+      {anyRankings && <RankingMomentum google={data.google} />}
 
       <p className="mt-10 text-center text-[12px] text-[#6B7280]">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
@@ -1161,151 +1151,356 @@ function StatPill({
   );
 }
 
-function RankingCard({ series }: { series: Series }) {
-  const positions = series.history.map((p) => p.position);
-  const first = positions.find((p) => p !== null && p !== undefined) ?? null;
-  const last = [...positions].reverse().find((p) => p !== null && p !== undefined) ?? null;
-  const delta = first !== null && last !== null ? first - last : null;
+/**
+ * CoverageByCity — groups all tracked keywords by the city they target and
+ * shows a business-owner-friendly "market coverage" grid.
+ *
+ * For each city the operator can answer at a glance:
+ *   - How many of my service keywords rank in this market?
+ *   - Which services am I #1 for? Which are missing?
+ *   - Where is the biggest gap to close next?
+ *
+ * This replaces the old 19-card "Detailed History" wall which was noise for
+ * a business owner and only useful to a technical SEO analyst.
+ */
+const KNOWN_CITIES = [
+  'palm harbor', 'dunedin', 'tarpon springs', 'holiday',
+  'clearwater', 'tampa', 'st. pete', 'st pete', 'saint pete',
+  'pinellas park', 'largo', 'safety harbor', 'oldsmar',
+];
 
-  return (
-    <article className="rounded-[14px] border border-white/10 bg-[#11121A] p-5">
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[15px] font-semibold text-white">{series.query}</p>
-          <p className="mt-0.5 text-[11px] text-[#9AA0A6]">{series.run_count} snapshot{series.run_count === 1 ? '' : 's'}</p>
-        </div>
-        <div className="text-right">
-          <CurrentPositionBadge position={series.current?.position ?? null} />
-          {delta !== null && delta !== 0 && (
-            <p className={`mt-1 text-[12px] font-semibold ${delta > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-              {delta > 0 ? `↑ ${delta} since first run` : `↓ ${Math.abs(delta)} since first run`}
-            </p>
-          )}
-        </div>
-      </div>
-      <RankSparkline history={series.history} />
-    </article>
-  );
+function extractCity(query: string): string {
+  const q = query.toLowerCase();
+  for (const city of KNOWN_CITIES) {
+    if (q.includes(city)) {
+      // Title-case
+      return city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+  }
+  return 'Other';
 }
 
-function CurrentPositionBadge({ position }: { position: number | null }) {
-  if (position === null || position === undefined) {
+function extractService(query: string): string {
+  // Strip the city suffix and trim generic suffixes (fl, florida) to get a clean service label.
+  let s = query.toLowerCase();
+  for (const city of KNOWN_CITIES) s = s.replace(city, '');
+  s = s.replace(/\bfl\b|\bflorida\b|\bnear me\b/g, '').replace(/\s+/g, ' ').trim();
+  // Title-case
+  return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function PosBadge({ pos }: { pos: number | null }) {
+  if (pos === null) {
     return (
-      <span className="inline-block rounded-[8px] border border-white/10 bg-white/5 px-2.5 py-1 text-[12px] font-medium text-[#9AA0A6]">
-        Not in top 10
+      <span className="inline-flex items-center rounded-[6px] border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[11px] font-medium text-[#4B5563]">
+        —
       </span>
     );
   }
-  const color = position <= 3 ? '#10B981' : position <= 5 ? '#F4D47C' : '#F59E0B';
+  const [color, bg, border] =
+    pos === 1   ? ['#FFD166', 'rgba(212,175,55,0.14)', 'rgba(212,175,55,0.35)'] :
+    pos <= 3    ? ['#6EE7B7', 'rgba(16,185,129,0.12)', 'rgba(16,185,129,0.30)'] :
+    pos <= 5    ? ['#93C5FD', 'rgba(147,197,253,0.10)', 'rgba(147,197,253,0.25)'] :
+                  ['#9CA3AF', 'rgba(156,163,175,0.08)', 'rgba(156,163,175,0.20)'];
   return (
     <span
-      className="inline-block rounded-[8px] border px-3 py-1 text-[14px] font-bold"
-      style={{ color, borderColor: `${color}55`, backgroundColor: `${color}11` }}
+      className="inline-flex items-center rounded-[6px] px-2 py-0.5 text-[11px] font-bold"
+      style={{ color, background: bg, border: `1px solid ${border}` }}
     >
-      #{position}
+      #{pos}
     </span>
   );
 }
 
-function RankSparkline({ history }: { history: RankPoint[] }) {
-  // Lower position = better, so we invert the Y axis (#1 at top).
-  // Missing positions render as a gap (we skip from the polyline).
-  const W = 520;
-  const H = 80;
-  const PADDING_X = 8;
-  const PADDING_Y = 8;
-  const MAX_POSITION = 10;
+function CoverageByCity({
+  google,
+  verifiedWins,
+}: {
+  google: Series[];
+  verifiedWins?: { organic: string[]; map_pack: string[] };
+}) {
+  if (google.length === 0) return null;
+
+  // Build city → keywords map preserving insertion order of first encounter
+  const cityMap = useMemo(() => {
+    const map = new Map<string, Series[]>();
+    for (const s of google) {
+      const city = extractCity(s.query);
+      if (!map.has(city)) map.set(city, []);
+      map.get(city)!.push(s);
+    }
+    // Sort cities by total top-10 rankings descending (your best markets first)
+    return [...map.entries()].sort((a, b) => {
+      const score = (rows: Series[]) => rows.filter(r => (r.current?.position ?? 99) <= 10).length;
+      return score(b[1]) - score(a[1]);
+    });
+  }, [google]);
+
+  // Map-pack city lookup
+  const mapPackCities = useMemo(() => {
+    return (verifiedWins?.map_pack ?? []).map(s =>
+      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
+    );
+  }, [verifiedWins]);
+
+  const hasMp = (query: string) => {
+    const q = query.toLowerCase();
+    return mapPackCities.some(c => c && q.includes(c));
+  };
+
+  const cityScore = (rows: Series[]) => {
+    const no1   = rows.filter(r => r.current?.position === 1).length;
+    const top3  = rows.filter(r => (r.current?.position ?? 99) <= 3 && r.current?.position !== 1).length;
+    const top10 = rows.filter(r => (r.current?.position ?? 99) > 3 && (r.current?.position ?? 99) <= 10).length;
+    const none  = rows.filter(r => r.current?.position === null || r.current?.position === undefined).length;
+    return { no1, top3, top10, none };
+  };
+
+  return (
+    <section className="mt-10">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Coverage by Market
+      </h2>
+      <p className="mb-5 text-[12px] text-[#9AA0A6]">
+        Where you're winning — and where the next opportunity is.
+      </p>
+
+      <div className="space-y-4">
+        {cityMap.map(([city, rows]) => {
+          const sc = cityScore(rows);
+          const ranked = sc.no1 + sc.top3 + sc.top10;
+          const total = rows.length;
+          const pct = Math.round(100 * ranked / total);
+
+          // Progress bar color: gold if any #1, green if top-3, blue if top-10, gray if none
+          const barColor =
+            sc.no1   > 0 ? '#D4AF37' :
+            sc.top3  > 0 ? '#10B981' :
+            sc.top10 > 0 ? '#60A5FA' :
+                            '#374151';
+
+          return (
+            <div key={city} className="rounded-[16px] border border-white/[0.08] bg-[#11121A] overflow-hidden">
+              {/* City header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-3.5">
+                <div className="flex items-center gap-3">
+                  <span className="text-[14px] font-bold text-white">{city}</span>
+                  {/* Score pills */}
+                  {sc.no1 > 0 && (
+                    <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#F4D47C] uppercase tracking-[0.1em]">
+                      {sc.no1} × #1
+                    </span>
+                  )}
+                  {sc.top3 > 0 && (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 uppercase tracking-[0.1em]">
+                      {sc.top3} top-3
+                    </span>
+                  )}
+                  {ranked === 0 && (
+                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#6B7280] uppercase tracking-[0.1em]">
+                      Not yet ranking
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[#6B7280]">{ranked}/{total} in top-10</span>
+                  {/* Mini progress bar */}
+                  <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${pct}%`, background: barColor }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Keyword grid */}
+              <div className="grid grid-cols-1 divide-y divide-white/[0.04] sm:grid-cols-2 sm:divide-y-0">
+                {rows.map((s, i) => {
+                  const pos = s.current?.position ?? null;
+                  const mp = hasMp(s.query);
+                  const svc = extractService(s.query);
+                  // Inline trend: compare current to oldest ranked position
+                  const oldest = [...s.history].reverse().find(h => h.position !== null)?.position ?? null;
+                  const trendDelta = pos !== null && oldest !== null ? oldest - pos : null;
+
+                  return (
+                    <div
+                      key={s.query}
+                      className={`flex items-center justify-between gap-3 px-5 py-3 ${
+                        i % 2 === 1 ? 'sm:border-l sm:border-white/[0.04]' : ''
+                      }`}
+                    >
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="truncate text-[13px] font-medium text-[#D1D5DB]">{svc}</span>
+                        {mp && (
+                          <span className="text-[10px] font-semibold text-emerald-400">📍 Map Pack</span>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {trendDelta !== null && trendDelta !== 0 && (
+                          <span className={`text-[11px] font-semibold ${trendDelta > 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+                            {trendDelta > 0 ? `↑${trendDelta}` : `↓${Math.abs(trendDelta)}`}
+                          </span>
+                        )}
+                        <PosBadge pos={pos} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * RankingMomentum — compact sparkline section shown only for keywords that
+ * ARE ranking (position ≠ null) AND have ≥ 2 data points. A flat line on one
+ * snapshot tells you nothing; two or more shows real movement. 2-column grid
+ * keeps it tight vs the old 1-column wall.
+ */
+function RankingMomentum({ google }: { google: Series[] }) {
+  const ranked = useMemo(() =>
+    google.filter(s =>
+      s.current?.position !== null &&
+      s.current?.position !== undefined &&
+      s.history.filter(h => h.position !== null).length >= 2
+    ),
+    [google]
+  );
+
+  if (ranked.length === 0) return null;
+
+  return (
+    <section className="mt-8">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Ranking Momentum
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+          {ranked.length} keyword{ranked.length === 1 ? '' : 's'} with position history
+        </span>
+      </h2>
+      <p className="mb-4 text-[12px] text-[#9AA0A6]">
+        Lower = better. #1 is the top of the chart.
+      </p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {ranked.map(s => (
+          <MomentumCard key={s.query} series={s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MomentumCard({ series }: { series: Series }) {
+  const pos = series.current?.position ?? null;
+  const oldest = [...series.history].reverse().find(h => h.position !== null)?.position ?? null;
+  const delta = pos !== null && oldest !== null ? oldest - pos : null; // positive = improved
+
+  const [color, label] =
+    pos === 1  ? ['#FFD166', '#1'] :
+    pos !== null && pos <= 3  ? ['#6EE7B7', `#${pos}`] :
+    pos !== null && pos <= 5  ? ['#93C5FD', `#${pos}`] :
+    pos !== null              ? ['#9CA3AF', `#${pos}`] :
+                                ['#4B5563', '—'];
+
+  return (
+    <div className="rounded-[14px] border border-white/[0.08] bg-[#0F0F11] p-4">
+      {/* Header row */}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-semibold text-[#D1D5DB]">
+            {extractService(series.query)}
+          </p>
+          <p className="mt-0.5 text-[10px] text-[#6B7280]">
+            {extractCity(series.query)} · {series.history.filter(h => h.position !== null).length} snapshots
+          </p>
+        </div>
+        <div className="text-right">
+          <span
+            className="inline-flex items-center rounded-[8px] px-2.5 py-1 text-[16px] font-extrabold"
+            style={{ color, background: `${color}14`, border: `1px solid ${color}40` }}
+          >
+            {label}
+          </span>
+          {delta !== null && delta !== 0 && (
+            <p className={`mt-1 text-[10px] font-semibold ${delta > 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+              {delta > 0 ? `↑ ${delta} spots` : `↓ ${Math.abs(delta)} spots`}
+            </p>
+          )}
+        </div>
+      </div>
+      {/* Compact sparkline */}
+      <MiniSparkline history={series.history} />
+    </div>
+  );
+}
+
+function MiniSparkline({ history }: { history: RankPoint[] }) {
+  const W = 400; const H = 56;
+  const PX = 6; const PY = 6;
+  const MAX = 10;
   const pts = useMemo(() => {
-    if (history.length === 0) return [] as Array<{ x: number; y: number; pos: number | null }>;
+    const valid = history.filter(h => h.position !== null);
+    if (valid.length < 2) return [] as Array<{ x: number; y: number | null; pos: number | null }>;
     return history.map((h, i) => {
-      const x = PADDING_X + (i * (W - 2 * PADDING_X)) / Math.max(1, history.length - 1);
+      const x = PX + (i * (W - 2 * PX)) / Math.max(1, history.length - 1);
       const pos = h.position;
-      const y = pos === null || pos === undefined
-        ? null
-        : PADDING_Y + ((pos - 1) * (H - 2 * PADDING_Y)) / (MAX_POSITION - 1);
-      return { x, y: y as number | null, pos };
+      const y = pos === null ? null : PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
+      return { x, y, pos };
     });
   }, [history]);
 
   if (pts.length === 0) return null;
 
-  const segments: Array<Array<{ x: number; y: number }>> = [];
-  let current: Array<{ x: number; y: number }> = [];
+  const segs: Array<Array<{ x: number; y: number }>> = [];
+  let cur: Array<{ x: number; y: number }> = [];
   for (const p of pts) {
-    if (p.y === null) {
-      if (current.length > 0) { segments.push(current); current = []; }
-    } else {
-      current.push({ x: p.x, y: p.y });
-    }
+    if (p.y === null) { if (cur.length) { segs.push(cur); cur = []; } }
+    else cur.push({ x: p.x, y: p.y });
   }
-  if (current.length > 0) segments.push(current);
+  if (cur.length) segs.push(cur);
+
+  const lastRanked = [...pts].reverse().find(p => p.y !== null);
+  const latestColor =
+    (lastRanked?.pos ?? 99) === 1    ? '#FFD166' :
+    (lastRanked?.pos ?? 99) <= 3    ? '#6EE7B7' :
+    (lastRanked?.pos ?? 99) <= 5    ? '#93C5FD' :
+                                       '#9CA3AF';
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-20 w-full" aria-hidden>
-      {/* horizontal #1/#5/#10 reference lines */}
-      {[1, 5, 10].map((pos) => {
-        const y = PADDING_Y + ((pos - 1) * (H - 2 * PADDING_Y)) / (MAX_POSITION - 1);
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-14 w-full" aria-hidden>
+      {/* #1, #5, #10 reference lines */}
+      {[1, 5, 10].map(pos => {
+        const y = PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
         return (
           <g key={pos}>
-            <line x1={PADDING_X} x2={W - PADDING_X} y1={y} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
-            <text x={W - PADDING_X} y={y - 2} fontSize={9} fill="rgba(255,255,255,0.25)" textAnchor="end">#{pos}</text>
+            <line x1={PX} x2={W - PX} y1={y} y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
+            <text x={W - PX + 1} y={y + 3} fontSize={8} fill="rgba(255,255,255,0.18)" textAnchor="start">#{pos}</text>
           </g>
         );
       })}
-      {/* line segments (skips gaps when position null) */}
-      {segments.map((seg, i) => (
+      {segs.map((seg, i) => (
         <polyline
           key={i}
-          points={seg.map((p) => `${p.x},${p.y}`).join(' ')}
+          points={seg.map(p => `${p.x},${p.y}`).join(' ')}
           fill="none"
-          stroke="#F4D47C"
+          stroke={latestColor}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
+          opacity={0.8}
         />
       ))}
-      {/* points */}
       {pts.map((p, i) =>
-        p.y === null ? (
-          <circle key={i} cx={p.x} cy={H - PADDING_Y - 1} r={2.5} fill="#6B7280" />
-        ) : (
-          <circle key={i} cx={p.x} cy={p.y} r={3} fill="#F4D47C" />
-        )
+        p.y === null
+          ? <circle key={i} cx={p.x} cy={H - PY} r={2} fill="#374151" />
+          : <circle key={i} cx={p.x} cy={p.y} r={3} fill={latestColor} />
       )}
     </svg>
-  );
-}
-
-function AIModeTable({ series }: { series: Series[] }) {
-  return (
-    <div className="space-y-3">
-      {series.map((s) => {
-        const hits = s.history.filter((h) => h.mentioned).length;
-        const rate = s.history.length === 0 ? 0 : Math.round((hits / s.history.length) * 100);
-        const competitors = s.current?.competitors || [];
-        return (
-          <div key={`ai-${s.query}`} className="rounded-[12px] border border-white/10 bg-[#11121A] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[14px] font-medium text-white">{s.query}</p>
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[#9AA0A6]">{rate}% hit · {s.history.length} run{s.history.length === 1 ? '' : 's'}</span>
-                {s.current?.mentioned ? (
-                  <span className="rounded-[6px] bg-emerald-500/15 px-2.5 py-1 text-[12px] font-bold text-emerald-300">RECOMMENDED ✓</span>
-                ) : (
-                  <span className="rounded-[6px] bg-red-500/10 px-2.5 py-1 text-[12px] font-bold text-red-300">NOT MENTIONED</span>
-                )}
-              </div>
-            </div>
-            {!s.current?.mentioned && competitors.length > 0 && (
-              <div className="mt-3 rounded-[8px] border border-amber-500/20 bg-amber-500/5 px-3 py-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-amber-300/90">AI recommended instead:</p>
-                <p className="mt-1 text-[13px] text-[#E5E7EB]">{competitors.join(' · ')}</p>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
