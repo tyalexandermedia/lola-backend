@@ -152,13 +152,11 @@ export default function ClientReport({ slug }: { slug: string }) {
       )}
 
       {anyTracking && (
-        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} callQuality={data.call_quality} funnel={data.funnel} />
+        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} callQuality={data.call_quality} />
       )}
       {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
       {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
-      {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
       {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
-      {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
 
       {anyWork && <WorkDelivered impl={data.implementation!} />}
@@ -166,7 +164,6 @@ export default function ClientReport({ slug }: { slug: string }) {
       {anyAi && <AIVisibilityCard series={data.ai_mode} sov={data.share_of_voice} />}
 
       {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
-      {anyRankings && <RankingMomentum google={data.google} />}
 
       <p className="mt-10 text-center text-[12px] text-[#6B7280]">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
@@ -641,34 +638,6 @@ function GbpCard({ g }: { g: NonNullable<DashboardPayload['gbp_performance']> })
   );
 }
 
-/** Bing Webmaster card — captures the Bing/Copilot/ChatGPT-Search index. */
-function BingCard({ b }: { b: NonNullable<DashboardPayload['bing']> }) {
-  return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-        Ⓑ Bing / Copilot search
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
-          the index behind ChatGPT Search + Copilot
-        </span>
-      </p>
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Clicks</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#6EE7B7]">{b.clicks.toLocaleString()}</p>
-        </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Impressions</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#93C5FD]">{b.impressions.toLocaleString()}</p>
-        </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">CTR</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#F4D47C]">{b.ctr}%</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /** Lead-source rollup — where every call + lead came from this month. */
 function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
   const total = Object.values(sources).reduce((a, b) => a + b, 0);
@@ -700,41 +669,6 @@ function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
   );
 }
 
-/** Core Web Vitals trend — proves "we made your site faster too." */
-function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_trend']> }) {
-  const latest = series[series.length - 1];
-  const first = series[0];
-  const metric = (key: 'performance' | 'accessibility' | 'seo', label: string, accent: string) => {
-    const now = latest[key] || 0;
-    const was = first[key] || 0;
-    const delta = now - was;
-    return (
-      <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
-        <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: accent }}>{now}</p>
-        {series.length > 1 && (
-          <p className={`mt-1 text-[11px] font-semibold ${delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#6B7280]'}`}>
-            {delta > 0 ? '↑' : delta < 0 ? '↓' : '·'} {delta !== 0 ? Math.abs(delta) : 'flat'}
-          </p>
-        )}
-      </div>
-    );
-  };
-  return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-        Site health (Google PageSpeed) · {series.length} snapshot{series.length === 1 ? '' : 's'}
-      </p>
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        {metric('performance', 'Performance', '#6EE7B7')}
-        {metric('seo', 'SEO', '#F4D47C')}
-        {metric('accessibility', 'Accessibility', '#93C5FD')}
-      </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
-    </section>
-  );
-}
-
 /**
  * Search Console + Analytics card — the client's REAL Google performance,
  * free data they rarely see clean. 28-day clicks / impressions / CTR / avg
@@ -752,20 +686,18 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
   const cd = delta(g.clicks, g.clicks_prev);
   const idl = delta(g.impressions, g.impressions_prev);
   const tiles = [
-    { label: 'Clicks', val: g.clicks.toLocaleString(), d: cd, accent: '#6EE7B7' },
-    { label: 'Impressions', val: g.impressions.toLocaleString(), d: idl, accent: '#93C5FD' },
-    { label: 'CTR', val: `${g.ctr}%`, d: null, accent: '#F4D47C' },
-    { label: 'Avg position', val: g.position ? g.position.toFixed(1) : '—', d: null, accent: '#D4AF37', lowerBetter: true },
+    { label: 'Clicks to site', val: g.clicks.toLocaleString(), d: cd, accent: '#6EE7B7' },
+    { label: 'Times shown', val: g.impressions.toLocaleString(), d: idl, accent: '#93C5FD' },
   ];
   return (
     <section className="mt-6 rounded-2xl border border-[#93C5FD]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1018] p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#93C5FD]">
-        🔎 Google Search Console · last 28 days
+        🔎 Google Search · last 28 days
         <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
-          your real Google performance
+          how Google is sending you traffic
         </span>
       </p>
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         {tiles.map((t) => (
           <div key={t.label} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
             <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{t.label}</p>
@@ -786,12 +718,12 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
       )}
       {g.top_queries && g.top_queries.length > 0 && (
         <div className="mt-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Top queries bringing you traffic</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">What people typed to find you</p>
           <div className="mt-2 space-y-1.5">
             {g.top_queries.slice(0, 5).map((q) => (
               <div key={q.query} className="flex items-center justify-between gap-3 rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
                 <span className="truncate text-[13px] text-white">{q.query}</span>
-                <span className="shrink-0 text-[11px] text-[#9CA3AF]">{q.clicks} clicks · #{q.position}</span>
+                <span className="shrink-0 text-[11px] text-[#9CA3AF]">{q.clicks} click{q.clicks === 1 ? '' : 's'}</span>
               </div>
             ))}
           </div>
@@ -845,13 +777,12 @@ function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
  * proof that "yes, this lead came from our system."
  */
 function TrackingRow({
-  tracking, sources, trends, callQuality, funnel,
+  tracking, sources, trends, callQuality,
 }: {
   tracking: Record<string, { month: number; last_30d: number; lifetime: number }>;
   sources?: Record<string, Record<string, number>>;
   trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
   callQuality?: DashboardPayload['call_quality'];
-  funnel?: DashboardPayload['funnel'];
 }) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
@@ -906,11 +837,6 @@ function TrackingRow({
           );
         })}
       </div>
-      {funnel && (funnel.view > 0 || funnel.click > 0) && (
-        <p className="mt-3 text-center text-[11px] text-[#9CA3AF]">
-          View → contact: <span className="font-semibold text-white">{funnel.overall}%</span> overall conversion
-        </p>
-      )}
       {!anyData && (
         <p className="mt-3 text-[11px] leading-[1.5] text-[#6B7280]">
           Tracking links not live yet — once your Call button + website link route through Lola, calls, leads, and clicks land here automatically.
@@ -1123,153 +1049,6 @@ function CoverageByCity({
         })}
       </div>
     </section>
-  );
-}
-
-/**
- * RankingMomentum — compact sparkline section shown only for keywords that
- * ARE ranking (position ≠ null) AND have ≥ 2 data points. A flat line on one
- * snapshot tells you nothing; two or more shows real movement. 2-column grid
- * keeps it tight vs the old 1-column wall.
- */
-function RankingMomentum({ google }: { google: Series[] }) {
-  const ranked = useMemo(() =>
-    google.filter(s =>
-      s.current?.position !== null &&
-      s.current?.position !== undefined &&
-      s.history.filter(h => h.position !== null).length >= 2
-    ),
-    [google]
-  );
-
-  if (ranked.length === 0) return null;
-
-  return (
-    <section className="mt-8">
-      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
-        Ranking Momentum
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
-          {ranked.length} keyword{ranked.length === 1 ? '' : 's'} with position history
-        </span>
-      </h2>
-      <p className="mb-4 text-[12px] text-[#9AA0A6]">
-        Lower = better. #1 is the top of the chart.
-      </p>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {ranked.map(s => (
-          <MomentumCard key={s.query} series={s} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function MomentumCard({ series }: { series: Series }) {
-  const pos = series.current?.position ?? null;
-  const oldest = [...series.history].reverse().find(h => h.position !== null)?.position ?? null;
-  const delta = pos !== null && oldest !== null ? oldest - pos : null; // positive = improved
-
-  const [color, label] =
-    pos === 1  ? ['#FFD166', '#1'] :
-    pos !== null && pos <= 3  ? ['#6EE7B7', `#${pos}`] :
-    pos !== null && pos <= 5  ? ['#93C5FD', `#${pos}`] :
-    pos !== null              ? ['#9CA3AF', `#${pos}`] :
-                                ['#4B5563', '—'];
-
-  return (
-    <div className="rounded-[14px] border border-white/[0.08] bg-[#0F0F11] p-4">
-      {/* Header row */}
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate text-[12px] font-semibold text-[#D1D5DB]">
-            {extractService(series.query)}
-          </p>
-          <p className="mt-0.5 text-[10px] text-[#6B7280]">
-            {extractCity(series.query)} · {series.history.filter(h => h.position !== null).length} snapshots
-          </p>
-        </div>
-        <div className="text-right">
-          <span
-            className="inline-flex items-center rounded-[8px] px-2.5 py-1 text-[16px] font-extrabold"
-            style={{ color, background: `${color}14`, border: `1px solid ${color}40` }}
-          >
-            {label}
-          </span>
-          {delta !== null && delta !== 0 && (
-            <p className={`mt-1 text-[10px] font-semibold ${delta > 0 ? 'text-emerald-300' : 'text-red-400'}`}>
-              {delta > 0 ? `↑ ${delta} spots` : `↓ ${Math.abs(delta)} spots`}
-            </p>
-          )}
-        </div>
-      </div>
-      {/* Compact sparkline */}
-      <MiniSparkline history={series.history} />
-    </div>
-  );
-}
-
-function MiniSparkline({ history }: { history: RankPoint[] }) {
-  const W = 400; const H = 56;
-  const PX = 6; const PY = 6;
-  const MAX = 10;
-  const pts = useMemo(() => {
-    const valid = history.filter(h => h.position !== null);
-    if (valid.length < 2) return [] as Array<{ x: number; y: number | null; pos: number | null }>;
-    return history.map((h, i) => {
-      const x = PX + (i * (W - 2 * PX)) / Math.max(1, history.length - 1);
-      const pos = h.position;
-      const y = pos === null ? null : PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
-      return { x, y, pos };
-    });
-  }, [history]);
-
-  if (pts.length === 0) return null;
-
-  const segs: Array<Array<{ x: number; y: number }>> = [];
-  let cur: Array<{ x: number; y: number }> = [];
-  for (const p of pts) {
-    if (p.y === null) { if (cur.length) { segs.push(cur); cur = []; } }
-    else cur.push({ x: p.x, y: p.y });
-  }
-  if (cur.length) segs.push(cur);
-
-  const lastRanked = [...pts].reverse().find(p => p.y !== null);
-  const latestColor =
-    (lastRanked?.pos ?? 99) === 1    ? '#FFD166' :
-    (lastRanked?.pos ?? 99) <= 3    ? '#6EE7B7' :
-    (lastRanked?.pos ?? 99) <= 5    ? '#93C5FD' :
-                                       '#9CA3AF';
-
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-14 w-full" aria-hidden>
-      {/* #1, #5, #10 reference lines */}
-      {[1, 5, 10].map(pos => {
-        const y = PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
-        return (
-          <g key={pos}>
-            <line x1={PX} x2={W - PX} y1={y} y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
-            <text x={W - PX + 1} y={y + 3} fontSize={8} fill="rgba(255,255,255,0.18)" textAnchor="start">#{pos}</text>
-          </g>
-        );
-      })}
-      {segs.map((seg, i) => (
-        <polyline
-          key={i}
-          points={seg.map(p => `${p.x},${p.y}`).join(' ')}
-          fill="none"
-          stroke={latestColor}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.8}
-        />
-      ))}
-      {pts.map((p, i) =>
-        p.y === null
-          ? <circle key={i} cx={p.x} cy={H - PY} r={2} fill="#374151" />
-          : <circle key={i} cx={p.x} cy={p.y} r={3} fill={latestColor} />
-      )}
-    </svg>
   );
 }
 
