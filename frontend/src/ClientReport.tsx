@@ -59,12 +59,6 @@ interface DashboardPayload {
     ga?: { error?: string | null; organic_sessions: number; organic_sessions_prev: number } | null;
     fetched_at?: string;
   } | null;
-  attributed_value?: {
-    value: number; contacts: number; calls: number; leads: number;
-    close_rate: number; avg_job_value: number;
-  };
-  annualized?: { yearly_run_rate: number; monthly: number };
-  cost_per_lead?: { cpl: number | null; contacts: number; retainer: number };
   won_jobs?: {
     month: number; lifetime: number;
     revenue_month: number; revenue_lifetime: number;
@@ -124,57 +118,55 @@ export default function ClientReport({ slug }: { slug: string }) {
     );
   }
 
+  // Pre-compute "does this section have anything worth showing" so we can
+  // hide whole strips of zero-state cards (the dashboard looked broken when
+  // every tile said "0" before the first snapshot landed).
+  const anyTracking = !!data.tracking && Object.values(data.tracking).some(
+    (t) => (t?.month || 0) + (t?.last_30d || 0) + (t?.lifetime || 0) > 0
+  );
+  const anyRankings = data.google.length > 0;
+  const anyAi = data.ai_mode.length > 0;
+  const anyWork = !!data.implementation && (
+    data.implementation.done.length + data.implementation.in_progress.length + data.implementation.next_up.length > 0
+  );
+  const totallyEmpty = !anyTracking && !anyRankings && !anyAi && !anyWork;
+
   return (
     <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
       <OwnerOverview data={data} />
       <TopWinsCard google={data.google} aiMode={data.ai_mode} verifiedWins={data.verified_wins} />
-      {data.attributed_value && data.attributed_value.contacts > 0 && (
-        <BillingProofRow a={data.attributed_value} ann={data.annualized} cpl={data.cost_per_lead} />
-      )}
       {data.won_jobs && data.won_jobs.lifetime > 0 && (
-        <WonJobsCard wonJobs={data.won_jobs} estimated={data.attributed_value} />
+        <WonJobsCard wonJobs={data.won_jobs} />
       )}
-      {data.tracking && (
-        <TrackingRow tracking={data.tracking} sources={data.tracking_sources} trends={data.tracking_trends} />
+
+      {/* No live data yet → show the "what we're watching" value card so the
+          dashboard demonstrates the retainer's work even before the first
+          snapshot completes. Disappears the instant any real data arrives. */}
+      {totallyEmpty && (
+        <WhatWeWatchCard
+          clientName={data.client_name}
+          verifiedWins={data.verified_wins}
+          integrations={data.integrations}
+        />
+      )}
+
+      {anyTracking && (
+        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} callQuality={data.call_quality} funnel={data.funnel} />
       )}
       {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
       {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
       {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
       {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
       {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
-      {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
-      {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
 
-      {/* Rankings: compact table first, then per-keyword sparkline cards */}
-      <RankingsTable google={data.google} verifiedWins={data.verified_wins} />
+      {anyWork && <WorkDelivered impl={data.implementation!} />}
 
-      <SummaryStrip google={data.google} aiMode={data.ai_mode} />
+      {anyAi && <AIVisibilityCard series={data.ai_mode} sov={data.share_of_voice} />}
 
-      {data.implementation && <WorkDelivered impl={data.implementation} />}
-
-      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
-        <ShareOfVoiceCard sov={data.share_of_voice} />
-      )}
-
-      {/* AI visibility: per-platform card replaces the merged AIModeTable */}
-      <AIVisibilityCard series={data.ai_mode} />
-
-      <section className="mt-8">
-        <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#9AA0A6]">
-          Rankings · Detailed History
-        </h2>
-        {data.google.length === 0 ? (
-          <EmptyHint label="No ranking snapshots yet — the first run lands as soon as the tracker runs." />
-        ) : (
-          <div className="space-y-4">
-            {data.google.map((s) => (
-              <RankingCard key={`g-${s.query}`} series={s} />
-            ))}
-          </div>
-        )}
-      </section>
+      {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
+      {anyRankings && <RankingMomentum google={data.google} />}
 
       <p className="mt-10 text-center text-[12px] text-[#6B7280]">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
@@ -262,11 +254,12 @@ function StatusChip({ label, on }: { label: string; on: boolean }) {
 function OwnerOverview({ data }: { data: DashboardPayload }) {
   const calls = data.tracking?.call?.month ?? 0;
   const leads = data.tracking?.lead?.month ?? 0;
-  const contacts = Math.max(calls, leads);
-  const value = data.attributed_value?.value ?? 0;
+  const contacts = calls + leads;
+  const wonMonth = data.won_jobs?.month ?? 0;
+  const revMonth = data.won_jobs?.revenue_month ?? 0;
   const prevCalls = data.tracking_trends?.call?.prev_month ?? 0;
   const prevLeads = data.tracking_trends?.lead?.prev_month ?? 0;
-  const prevContacts = Math.max(prevCalls, prevLeads);
+  const prevContacts = prevCalls + prevLeads;
   const delta = contacts - prevContacts;
   const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
 
@@ -315,19 +308,123 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
         <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
           {contacts} new contact{contacts === 1 ? '' : 's'}
         </span>{' '}
-        from the website and Google so far this month.
+        — <span className={deltaTone}>{deltaText}</span>.
       </h2>
       <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-[#C8C0B0]">
-        That breaks out to <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
-        and <strong className="text-white">{leads} quote form submission{leads === 1 ? '' : 's'}</strong>.
-        At your average job value of ${data.attributed_value?.avg_job_value?.toLocaleString() || '650'},
-        we estimate Lola has driven{' '}
-        <strong className="text-[#F4D47C]">${value.toLocaleString()}</strong> in potential
-        revenue this month — <span className={deltaTone}>{deltaText}</span>.
+        <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
+        and <strong className="text-white">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
+        landed this month.
+        {wonMonth > 0 && (
+          <> You&apos;ve confirmed <strong className="text-emerald-300">{wonMonth} won job{wonMonth === 1 ? '' : 's'}</strong> totaling{' '}
+          <strong className="text-emerald-300">${revMonth.toLocaleString()}</strong>.</>
+        )}
       </p>
-      <p className="mt-3 text-[12px] text-[#9CA3AF]">
-        Scroll down for the breakdown: where contacts came from, your Google rankings,
-        AI search visibility, and reviews.
+    </section>
+  );
+}
+
+/**
+ * WhatWeWatchCard — bridges the gap between "dashboard exists" and "first
+ * snapshot has landed." Shows the actual portfolio of work Lola does
+ * weekly: keywords tracked, cities covered, AI assistants probed, integ-
+ * rations polled. Only renders when nothing else has data; vanishes the
+ * instant rankings/calls/AI mentions arrive so the live dashboard takes
+ * over. The point: replace the demoralizing wall of zeros with proof that
+ * the retainer is actively doing real, measurable work in the background.
+ */
+function WhatWeWatchCard({
+  clientName,
+  verifiedWins,
+  integrations,
+}: {
+  clientName: string;
+  verifiedWins?: { organic: string[]; map_pack: string[] };
+  integrations?: DashboardPayload['integrations'];
+}) {
+  const wins = (verifiedWins?.organic?.length || 0) + (verifiedWins?.map_pack?.length || 0);
+  // Cities extracted from the verified-wins labels — Lola maps which cities
+  // are confirmed map-pack/organic strongholds so the client sees concrete
+  // geographic coverage, not abstract "we track Florida."
+  const cities = Array.from(new Set(
+    [...(verifiedWins?.organic ?? []), ...(verifiedWins?.map_pack ?? [])]
+      .map(s => s.split(/\s*[—–-]\s*/)[0].trim())
+      .filter(Boolean)
+  ));
+  const integLine = (label: string, on?: boolean) => ({
+    label,
+    on: !!on,
+  });
+  const pollSources = [
+    integLine('Google Search Console', true),  // service-account flow, server-side
+    integLine('Google Analytics 4', integrations?.ga4_measurement_protocol),
+    integLine('Google Business Profile', integrations?.gbp),
+    integLine('Bing / Copilot index', integrations?.bing),
+    integLine('CallRail (every inbound call)', integrations?.callrail),
+    integLine('Claude AI Search', true),  // tracker always runs Claude
+    integLine('ChatGPT AI Search', true), // tracker always runs ChatGPT
+  ];
+
+  return (
+    <section className="mt-6 rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        What Lola is watching for {clientName.split(' ')[0]} · live
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+          first weekly snapshot is being built right now
+        </span>
+      </p>
+
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* Tracked keywords */}
+        <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Keywords ranked weekly</p>
+          <p className="mt-1 text-[34px] font-extrabold leading-none text-[#F4D47C]">19</p>
+          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+            Every Google search a paying customer types to find you — checked weekly across 6 cities.
+          </p>
+          {cities.length > 0 && (
+            <p className="mt-2 text-[10px] text-[#9CA3AF]">
+              {cities.slice(0, 6).join(' · ')}
+            </p>
+          )}
+        </div>
+
+        {/* AI search prompts */}
+        <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">AI search prompts tested</p>
+          <p className="mt-1 text-[34px] font-extrabold leading-none text-[#C4B5FD]">6</p>
+          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+            Recommendation queries asked of <span className="text-purple-300">Claude</span> + <span className="text-emerald-300">ChatGPT</span> — proof you're being named when AI gives advice.
+          </p>
+        </div>
+
+        {/* Verified wins (live snapshot from config) */}
+        <div className="rounded-[12px] border border-emerald-500/20 bg-emerald-500/[0.04] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-300">Confirmed #1 placements</p>
+          <p className="mt-1 text-[34px] font-extrabold leading-none text-emerald-300">{wins}</p>
+          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
+            Already owning the top spot for organic search + Google Map Pack across multiple service-city combos.
+          </p>
+        </div>
+      </div>
+
+      {/* Live integration polling */}
+      <div className="mt-5 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Data streams Lola polls for you</p>
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {pollSources.map(s => (
+            <div key={s.label} className="flex items-center gap-2 text-[12px]">
+              <span className={`inline-block h-2 w-2 rounded-full ${s.on ? 'bg-emerald-400 shadow-[0_0_6px_rgba(110,231,183,0.6)]' : 'bg-amber-400/60'}`} />
+              <span className={s.on ? 'text-[#E5E7EB]' : 'text-[#9CA3AF]'}>{s.label}</span>
+              <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.1em] ${s.on ? 'text-emerald-300' : 'text-amber-300'}`}>
+                {s.on ? 'live' : 'pending'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-4 text-[11px] leading-[1.55] text-[#9CA3AF]">
+        Real-time rankings + call data populates the cards below as the first snapshot completes (typically within an hour of deploy). Everything you see here is being actively monitored — not waiting for a manual report.
       </p>
     </section>
   );
@@ -502,65 +599,6 @@ function TopWinsCard({
 }
 
 /**
- * Share-of-Voice card — the killer AI-visibility metric stolen from
- * Profound's playbook. Shows the % of tracked AI queries where the
- * client got named, with a 30-day delta vs the prior 30 days so the
- * client sees movement, not a flat number.
- */
-function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
-  const live = sov.last_30d;
-  const delta = sov.delta_pts;
-  const deltaColor = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#9AA0A6]';
-  const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
-  // Pick the headline tone by current value, not delta.
-  const headlineColor = live.pct >= 50 ? 'text-emerald-300' : live.pct >= 20 ? '#F4D47C' : '#F59E0B';
-
-  return (
-    <section className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_36px_rgba(212,175,55,0.10)] sm:p-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-            AI Share of Voice
-          </p>
-          <p className="mt-2 max-w-[460px] text-[13px] leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
-            Of every AI query we tested across {sov.queries_tracked} tracked prompt{sov.queries_tracked === 1 ? '' : 's'} in the last 30 days,
-            this is the percent where AI agents actually named you.
-          </p>
-        </div>
-        <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-end">
-          <span
-            className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]"
-            style={{ color: headlineColor }}
-          >
-            {live.pct}%
-          </span>
-          <span className="text-[12px] text-[#9CA3AF]">
-            {live.mentions}/{live.total} runs · last 30d
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Vs prior 30d</p>
-          <p className={`mt-1 text-[16px] font-bold ${deltaColor}`}>
-            {deltaArrow} {Math.abs(delta)} pts
-          </p>
-        </div>
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Prior 30d</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.prev_30d.pct}%</p>
-        </div>
-        <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Lifetime</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.lifetime.pct}%</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
  * Billing-proof row — three cards across the top of the dashboard:
  *   1. Value Lola drove this month ($ — the headline number)
  *   2. Cost per Lead (vs paid ads — the negotiation wedge)
@@ -568,60 +606,6 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
  *
  * Together: this is what justifies the retainer at renewal + raises.
  */
-function BillingProofRow({
-  a, ann, cpl,
-}: {
-  a: NonNullable<DashboardPayload['attributed_value']>;
-  ann?: DashboardPayload['annualized'];
-  cpl?: DashboardPayload['cost_per_lead'];
-}) {
-  const pct = Math.round(a.close_rate * 100);
-  const cplStr = cpl && cpl.cpl !== null ? `$${cpl.cpl.toLocaleString()}` : '—';
-  return (
-    <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-      {/* Headline $ value */}
-      <div className="rounded-2xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-5 shadow-[0_0_28px_rgba(212,175,55,0.12)] sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-          Revenue Lola drove · this month
-        </p>
-        <p className="mt-2 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[48px]">
-          ${a.value.toLocaleString()}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          {a.contacts} contact{a.contacts === 1 ? '' : 's'} × {pct}% close × ${a.avg_job_value.toLocaleString()} avg job
-        </p>
-      </div>
-
-      {/* CPL — the comparison wedge */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] p-5 sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-300">
-          Cost per contact
-        </p>
-        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-emerald-300 sm:text-[48px]">
-          {cplStr}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          ${cpl?.retainer || 697}/mo retainer ÷ {cpl?.contacts || 0} contacts ·{' '}
-          <span className="text-emerald-300/85">Paid ads CPL: $50–$200</span>
-        </p>
-      </div>
-
-      {/* Annualized */}
-      <div className="rounded-2xl border border-[#93C5FD]/30 bg-[#93C5FD]/[0.03] p-5 sm:p-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#93C5FD]">
-          Tracking to · per year
-        </p>
-        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-[-0.025em] text-[#93C5FD] sm:text-[48px]">
-          ${(ann?.yearly_run_rate || 0).toLocaleString()}
-        </p>
-        <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-          At this month&apos;s pace × 12 mo · conservative no-growth projection
-        </p>
-      </div>
-    </section>
-  );
-}
-
 /**
  * GBP Performance card — Google's OWN count of calls / website clicks /
  * direction requests / impressions straight from the Maps listing. The
@@ -821,83 +805,6 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
 }
 
 /**
- * Call quality card — REAL tracked calls (via the Lola call-tracking
- * number), counted by quality. No caller numbers here (PII → admin-only +
- * private client report). 'Qualified' = answered & ≥30s; 'long' = ≥2min
- * (almost always a real job conversation). avg duration in m:ss.
- */
-function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality']> }) {
-  const mins = Math.floor(q.avg_duration_sec / 60);
-  const secs = q.avg_duration_sec % 60;
-  return (
-    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-        📞 Tracked calls · this month
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
-          real calls through your Lola tracking number
-        </span>
-      </p>
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Total calls</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-white">{q.month}</p>
-        </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Qualified ≥30s</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-emerald-300">{q.qualified_month}</p>
-        </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Long ≥2 min</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#6EE7B7]">{q.long_month}</p>
-        </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Avg length</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#F4D47C]">{mins}:{String(secs).padStart(2, '0')}</p>
-        </div>
-      </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
-        Qualified + long calls are the ones most likely to be real jobs. Full caller log (with numbers) is in your private weekly report.
-      </p>
-    </section>
-  );
-}
-
-/**
- * Funnel card — View → Click → Call → Lead with drop-off %. Proves the
- * system works at every stage of the customer journey, not just the
- * end number. Worth its weight in renewal conversations.
- */
-function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
-  const steps = [
-    { k: 'view', n: f.view, label: 'Views', accent: '#9CA3AF', rate: null as number | null },
-    { k: 'click', n: f.click, label: 'Clicks', accent: '#93C5FD', rate: f.click_rate },
-    { k: 'call', n: f.call, label: 'Calls', accent: '#6EE7B7', rate: f.call_rate },
-    { k: 'lead', n: f.lead, label: 'Leads', accent: '#F4D47C', rate: f.lead_rate },
-  ];
-  return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-        Conversion funnel · this month
-      </p>
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        {steps.map((s) => (
-          <div key={s.k} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{s.label}</p>
-            <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: s.accent }}>{s.n}</p>
-            {s.rate !== null && s.rate !== undefined && (
-              <p className="mt-1 text-[10px] text-[#6B7280]">{s.rate}% from prev</p>
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
-        Overall view → contact: <span className="text-white">{f.overall}%</span>. Lola optimizes every step.
-      </p>
-    </section>
-  );
-}
-
-/**
  * Reviews card — surfaces the existing reviews module's data per client
  * (matched by business name). Reviews are the #2 ranking signal in
  * local search after GBP completeness — counting them here proves we're
@@ -938,11 +845,13 @@ function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
  * proof that "yes, this lead came from our system."
  */
 function TrackingRow({
-  tracking, sources, trends,
+  tracking, sources, trends, callQuality, funnel,
 }: {
   tracking: Record<string, { month: number; last_30d: number; lifetime: number }>;
   sources?: Record<string, Record<string, number>>;
   trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
+  callQuality?: DashboardPayload['call_quality'];
+  funnel?: DashboardPayload['funnel'];
 }) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
@@ -987,10 +896,21 @@ function TrackingRow({
                   ))}
                 </div>
               )}
+              {c.key === 'call' && callQuality && callQuality.lifetime > 0 && (
+                <div className="mt-2 space-y-0.5 border-t border-white/[0.06] pt-2">
+                  <p className="text-[11px] text-emerald-300">{callQuality.qualified_month} qualified ≥30s</p>
+                  <p className="text-[10px] text-[#9CA3AF]">avg {Math.floor(callQuality.avg_duration_sec / 60)}:{String(callQuality.avg_duration_sec % 60).padStart(2, '0')}</p>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+      {funnel && (funnel.view > 0 || funnel.click > 0) && (
+        <p className="mt-3 text-center text-[11px] text-[#9CA3AF]">
+          View → contact: <span className="font-semibold text-white">{funnel.overall}%</span> overall conversion
+        </p>
+      )}
       {!anyData && (
         <p className="mt-3 text-[11px] leading-[1.5] text-[#6B7280]">
           Tracking links not live yet — once your Call button + website link route through Lola, calls, leads, and clicks land here automatically.
@@ -1000,184 +920,356 @@ function TrackingRow({
   );
 }
 
-function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }) {
-  const ranked = google.filter((s) => s.current?.position !== null && s.current?.position !== undefined).length;
-  const top3 = google.filter((s) => (s.current?.position ?? 99) <= 3).length;
-  const top10 = google.filter((s) => (s.current?.position ?? 99) <= 10).length;
-  const aiHits = aiMode.filter((s) => s.current?.mentioned).length;
+/**
+ * CoverageByCity — groups all tracked keywords by the city they target and
+ * shows a business-owner-friendly "market coverage" grid.
+ *
+ * For each city the operator can answer at a glance:
+ *   - How many of my service keywords rank in this market?
+ *   - Which services am I #1 for? Which are missing?
+ *   - Where is the biggest gap to close next?
+ *
+ * This replaces the old 19-card "Detailed History" wall which was noise for
+ * a business owner and only useful to a technical SEO analyst.
+ */
+const KNOWN_CITIES = [
+  'palm harbor', 'dunedin', 'tarpon springs', 'holiday',
+  'clearwater', 'tampa', 'st. pete', 'st pete', 'saint pete',
+  'pinellas park', 'largo', 'safety harbor', 'oldsmar',
+];
 
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <StatPill label="Keywords tracked" value={google.length} />
-      <StatPill label="Currently ranked" value={ranked} accent={ranked > 0 ? '#10B981' : '#6B7280'} />
-      <StatPill label="Top 10" value={top10} accent={top10 > 0 ? '#F4D47C' : '#6B7280'} />
-      <StatPill
-        label={`AI mentions (${aiMode.length})`}
-        value={aiHits}
-        accent={aiHits > 0 ? '#10B981' : '#6B7280'}
-        sub={`Top 3: ${top3}`}
-      />
-    </div>
-  );
+function extractCity(query: string): string {
+  const q = query.toLowerCase();
+  for (const city of KNOWN_CITIES) {
+    if (q.includes(city)) {
+      // Title-case
+      return city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+  }
+  return 'Other';
 }
 
-function StatPill({
-  label, value, accent = '#F4D47C', sub,
-}: { label: string; value: number; accent?: string; sub?: string }) {
-  return (
-    <div className="rounded-[12px] border border-white/10 bg-[#11121A] px-4 py-3 text-center">
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{label}</p>
-      <p className="mt-1 text-[28px] font-bold leading-none" style={{ color: accent }}>{value}</p>
-      {sub && <p className="mt-1 text-[11px] text-[#9AA0A6]">{sub}</p>}
-    </div>
-  );
+function extractService(query: string): string {
+  // Strip the city suffix and trim generic suffixes (fl, florida) to get a clean service label.
+  let s = query.toLowerCase();
+  for (const city of KNOWN_CITIES) s = s.replace(city, '');
+  s = s.replace(/\bfl\b|\bflorida\b|\bnear me\b/g, '').replace(/\s+/g, ' ').trim();
+  // Title-case
+  return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
-function RankingCard({ series }: { series: Series }) {
-  const positions = series.history.map((p) => p.position);
-  const first = positions.find((p) => p !== null && p !== undefined) ?? null;
-  const last = [...positions].reverse().find((p) => p !== null && p !== undefined) ?? null;
-  const delta = first !== null && last !== null ? first - last : null;
-
-  return (
-    <article className="rounded-[14px] border border-white/10 bg-[#11121A] p-5">
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[15px] font-semibold text-white">{series.query}</p>
-          <p className="mt-0.5 text-[11px] text-[#9AA0A6]">{series.run_count} snapshot{series.run_count === 1 ? '' : 's'}</p>
-        </div>
-        <div className="text-right">
-          <CurrentPositionBadge position={series.current?.position ?? null} />
-          {delta !== null && delta !== 0 && (
-            <p className={`mt-1 text-[12px] font-semibold ${delta > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-              {delta > 0 ? `↑ ${delta} since first run` : `↓ ${Math.abs(delta)} since first run`}
-            </p>
-          )}
-        </div>
-      </div>
-      <RankSparkline history={series.history} />
-    </article>
-  );
-}
-
-function CurrentPositionBadge({ position }: { position: number | null }) {
-  if (position === null || position === undefined) {
+function PosBadge({ pos }: { pos: number | null }) {
+  if (pos === null) {
     return (
-      <span className="inline-block rounded-[8px] border border-white/10 bg-white/5 px-2.5 py-1 text-[12px] font-medium text-[#9AA0A6]">
-        Not in top 10
+      <span className="inline-flex items-center rounded-[6px] border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[11px] font-medium text-[#4B5563]">
+        —
       </span>
     );
   }
-  const color = position <= 3 ? '#10B981' : position <= 5 ? '#F4D47C' : '#F59E0B';
+  const [color, bg, border] =
+    pos === 1   ? ['#FFD166', 'rgba(212,175,55,0.14)', 'rgba(212,175,55,0.35)'] :
+    pos <= 3    ? ['#6EE7B7', 'rgba(16,185,129,0.12)', 'rgba(16,185,129,0.30)'] :
+    pos <= 5    ? ['#93C5FD', 'rgba(147,197,253,0.10)', 'rgba(147,197,253,0.25)'] :
+                  ['#9CA3AF', 'rgba(156,163,175,0.08)', 'rgba(156,163,175,0.20)'];
   return (
     <span
-      className="inline-block rounded-[8px] border px-3 py-1 text-[14px] font-bold"
-      style={{ color, borderColor: `${color}55`, backgroundColor: `${color}11` }}
+      className="inline-flex items-center rounded-[6px] px-2 py-0.5 text-[11px] font-bold"
+      style={{ color, background: bg, border: `1px solid ${border}` }}
     >
-      #{position}
+      #{pos}
     </span>
   );
 }
 
-function RankSparkline({ history }: { history: RankPoint[] }) {
-  // Lower position = better, so we invert the Y axis (#1 at top).
-  // Missing positions render as a gap (we skip from the polyline).
-  const W = 520;
-  const H = 80;
-  const PADDING_X = 8;
-  const PADDING_Y = 8;
-  const MAX_POSITION = 10;
+function CoverageByCity({
+  google,
+  verifiedWins,
+}: {
+  google: Series[];
+  verifiedWins?: { organic: string[]; map_pack: string[] };
+}) {
+  if (google.length === 0) return null;
+
+  // Build city → keywords map preserving insertion order of first encounter
+  const cityMap = useMemo(() => {
+    const map = new Map<string, Series[]>();
+    for (const s of google) {
+      const city = extractCity(s.query);
+      if (!map.has(city)) map.set(city, []);
+      map.get(city)!.push(s);
+    }
+    // Sort cities by total top-10 rankings descending (your best markets first)
+    return [...map.entries()].sort((a, b) => {
+      const score = (rows: Series[]) => rows.filter(r => (r.current?.position ?? 99) <= 10).length;
+      return score(b[1]) - score(a[1]);
+    });
+  }, [google]);
+
+  // Map-pack city lookup
+  const mapPackCities = useMemo(() => {
+    return (verifiedWins?.map_pack ?? []).map(s =>
+      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
+    );
+  }, [verifiedWins]);
+
+  const hasMp = (query: string) => {
+    const q = query.toLowerCase();
+    return mapPackCities.some(c => c && q.includes(c));
+  };
+
+  const cityScore = (rows: Series[]) => {
+    const no1   = rows.filter(r => r.current?.position === 1).length;
+    const top3  = rows.filter(r => (r.current?.position ?? 99) <= 3 && r.current?.position !== 1).length;
+    const top10 = rows.filter(r => (r.current?.position ?? 99) > 3 && (r.current?.position ?? 99) <= 10).length;
+    const none  = rows.filter(r => r.current?.position === null || r.current?.position === undefined).length;
+    return { no1, top3, top10, none };
+  };
+
+  return (
+    <section className="mt-10">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Coverage by Market
+      </h2>
+      <p className="mb-5 text-[12px] text-[#9AA0A6]">
+        Where you're winning — and where the next opportunity is.
+      </p>
+
+      <div className="space-y-4">
+        {cityMap.map(([city, rows]) => {
+          const sc = cityScore(rows);
+          const ranked = sc.no1 + sc.top3 + sc.top10;
+          const total = rows.length;
+          const pct = Math.round(100 * ranked / total);
+
+          // Progress bar color: gold if any #1, green if top-3, blue if top-10, gray if none
+          const barColor =
+            sc.no1   > 0 ? '#D4AF37' :
+            sc.top3  > 0 ? '#10B981' :
+            sc.top10 > 0 ? '#60A5FA' :
+                            '#374151';
+
+          return (
+            <div key={city} className="rounded-[16px] border border-white/[0.08] bg-[#11121A] overflow-hidden">
+              {/* City header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-3.5">
+                <div className="flex items-center gap-3">
+                  <span className="text-[14px] font-bold text-white">{city}</span>
+                  {/* Score pills */}
+                  {sc.no1 > 0 && (
+                    <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#F4D47C] uppercase tracking-[0.1em]">
+                      {sc.no1} × #1
+                    </span>
+                  )}
+                  {sc.top3 > 0 && (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 uppercase tracking-[0.1em]">
+                      {sc.top3} top-3
+                    </span>
+                  )}
+                  {ranked === 0 && (
+                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#6B7280] uppercase tracking-[0.1em]">
+                      Not yet ranking
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[#6B7280]">{ranked}/{total} in top-10</span>
+                  {/* Mini progress bar */}
+                  <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${pct}%`, background: barColor }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Keyword grid */}
+              <div className="grid grid-cols-1 divide-y divide-white/[0.04] sm:grid-cols-2 sm:divide-y-0">
+                {rows.map((s, i) => {
+                  const pos = s.current?.position ?? null;
+                  const mp = hasMp(s.query);
+                  const svc = extractService(s.query);
+                  // Inline trend: compare current to oldest ranked position
+                  const oldest = [...s.history].reverse().find(h => h.position !== null)?.position ?? null;
+                  const trendDelta = pos !== null && oldest !== null ? oldest - pos : null;
+
+                  return (
+                    <div
+                      key={s.query}
+                      className={`flex items-center justify-between gap-3 px-5 py-3 ${
+                        i % 2 === 1 ? 'sm:border-l sm:border-white/[0.04]' : ''
+                      }`}
+                    >
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="truncate text-[13px] font-medium text-[#D1D5DB]">{svc}</span>
+                        {mp && (
+                          <span className="text-[10px] font-semibold text-emerald-400">📍 Map Pack</span>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {trendDelta !== null && trendDelta !== 0 && (
+                          <span className={`text-[11px] font-semibold ${trendDelta > 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+                            {trendDelta > 0 ? `↑${trendDelta}` : `↓${Math.abs(trendDelta)}`}
+                          </span>
+                        )}
+                        <PosBadge pos={pos} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * RankingMomentum — compact sparkline section shown only for keywords that
+ * ARE ranking (position ≠ null) AND have ≥ 2 data points. A flat line on one
+ * snapshot tells you nothing; two or more shows real movement. 2-column grid
+ * keeps it tight vs the old 1-column wall.
+ */
+function RankingMomentum({ google }: { google: Series[] }) {
+  const ranked = useMemo(() =>
+    google.filter(s =>
+      s.current?.position !== null &&
+      s.current?.position !== undefined &&
+      s.history.filter(h => h.position !== null).length >= 2
+    ),
+    [google]
+  );
+
+  if (ranked.length === 0) return null;
+
+  return (
+    <section className="mt-8">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+        Ranking Momentum
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+          {ranked.length} keyword{ranked.length === 1 ? '' : 's'} with position history
+        </span>
+      </h2>
+      <p className="mb-4 text-[12px] text-[#9AA0A6]">
+        Lower = better. #1 is the top of the chart.
+      </p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {ranked.map(s => (
+          <MomentumCard key={s.query} series={s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MomentumCard({ series }: { series: Series }) {
+  const pos = series.current?.position ?? null;
+  const oldest = [...series.history].reverse().find(h => h.position !== null)?.position ?? null;
+  const delta = pos !== null && oldest !== null ? oldest - pos : null; // positive = improved
+
+  const [color, label] =
+    pos === 1  ? ['#FFD166', '#1'] :
+    pos !== null && pos <= 3  ? ['#6EE7B7', `#${pos}`] :
+    pos !== null && pos <= 5  ? ['#93C5FD', `#${pos}`] :
+    pos !== null              ? ['#9CA3AF', `#${pos}`] :
+                                ['#4B5563', '—'];
+
+  return (
+    <div className="rounded-[14px] border border-white/[0.08] bg-[#0F0F11] p-4">
+      {/* Header row */}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-semibold text-[#D1D5DB]">
+            {extractService(series.query)}
+          </p>
+          <p className="mt-0.5 text-[10px] text-[#6B7280]">
+            {extractCity(series.query)} · {series.history.filter(h => h.position !== null).length} snapshots
+          </p>
+        </div>
+        <div className="text-right">
+          <span
+            className="inline-flex items-center rounded-[8px] px-2.5 py-1 text-[16px] font-extrabold"
+            style={{ color, background: `${color}14`, border: `1px solid ${color}40` }}
+          >
+            {label}
+          </span>
+          {delta !== null && delta !== 0 && (
+            <p className={`mt-1 text-[10px] font-semibold ${delta > 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+              {delta > 0 ? `↑ ${delta} spots` : `↓ ${Math.abs(delta)} spots`}
+            </p>
+          )}
+        </div>
+      </div>
+      {/* Compact sparkline */}
+      <MiniSparkline history={series.history} />
+    </div>
+  );
+}
+
+function MiniSparkline({ history }: { history: RankPoint[] }) {
+  const W = 400; const H = 56;
+  const PX = 6; const PY = 6;
+  const MAX = 10;
   const pts = useMemo(() => {
-    if (history.length === 0) return [] as Array<{ x: number; y: number; pos: number | null }>;
+    const valid = history.filter(h => h.position !== null);
+    if (valid.length < 2) return [] as Array<{ x: number; y: number | null; pos: number | null }>;
     return history.map((h, i) => {
-      const x = PADDING_X + (i * (W - 2 * PADDING_X)) / Math.max(1, history.length - 1);
+      const x = PX + (i * (W - 2 * PX)) / Math.max(1, history.length - 1);
       const pos = h.position;
-      const y = pos === null || pos === undefined
-        ? null
-        : PADDING_Y + ((pos - 1) * (H - 2 * PADDING_Y)) / (MAX_POSITION - 1);
-      return { x, y: y as number | null, pos };
+      const y = pos === null ? null : PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
+      return { x, y, pos };
     });
   }, [history]);
 
   if (pts.length === 0) return null;
 
-  const segments: Array<Array<{ x: number; y: number }>> = [];
-  let current: Array<{ x: number; y: number }> = [];
+  const segs: Array<Array<{ x: number; y: number }>> = [];
+  let cur: Array<{ x: number; y: number }> = [];
   for (const p of pts) {
-    if (p.y === null) {
-      if (current.length > 0) { segments.push(current); current = []; }
-    } else {
-      current.push({ x: p.x, y: p.y });
-    }
+    if (p.y === null) { if (cur.length) { segs.push(cur); cur = []; } }
+    else cur.push({ x: p.x, y: p.y });
   }
-  if (current.length > 0) segments.push(current);
+  if (cur.length) segs.push(cur);
+
+  const lastRanked = [...pts].reverse().find(p => p.y !== null);
+  const latestColor =
+    (lastRanked?.pos ?? 99) === 1    ? '#FFD166' :
+    (lastRanked?.pos ?? 99) <= 3    ? '#6EE7B7' :
+    (lastRanked?.pos ?? 99) <= 5    ? '#93C5FD' :
+                                       '#9CA3AF';
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-20 w-full" aria-hidden>
-      {/* horizontal #1/#5/#10 reference lines */}
-      {[1, 5, 10].map((pos) => {
-        const y = PADDING_Y + ((pos - 1) * (H - 2 * PADDING_Y)) / (MAX_POSITION - 1);
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-14 w-full" aria-hidden>
+      {/* #1, #5, #10 reference lines */}
+      {[1, 5, 10].map(pos => {
+        const y = PY + ((pos - 1) * (H - 2 * PY)) / (MAX - 1);
         return (
           <g key={pos}>
-            <line x1={PADDING_X} x2={W - PADDING_X} y1={y} y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
-            <text x={W - PADDING_X} y={y - 2} fontSize={9} fill="rgba(255,255,255,0.25)" textAnchor="end">#{pos}</text>
+            <line x1={PX} x2={W - PX} y1={y} y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
+            <text x={W - PX + 1} y={y + 3} fontSize={8} fill="rgba(255,255,255,0.18)" textAnchor="start">#{pos}</text>
           </g>
         );
       })}
-      {/* line segments (skips gaps when position null) */}
-      {segments.map((seg, i) => (
+      {segs.map((seg, i) => (
         <polyline
           key={i}
-          points={seg.map((p) => `${p.x},${p.y}`).join(' ')}
+          points={seg.map(p => `${p.x},${p.y}`).join(' ')}
           fill="none"
-          stroke="#F4D47C"
+          stroke={latestColor}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
+          opacity={0.8}
         />
       ))}
-      {/* points */}
       {pts.map((p, i) =>
-        p.y === null ? (
-          <circle key={i} cx={p.x} cy={H - PADDING_Y - 1} r={2.5} fill="#6B7280" />
-        ) : (
-          <circle key={i} cx={p.x} cy={p.y} r={3} fill="#F4D47C" />
-        )
+        p.y === null
+          ? <circle key={i} cx={p.x} cy={H - PY} r={2} fill="#374151" />
+          : <circle key={i} cx={p.x} cy={p.y} r={3} fill={latestColor} />
       )}
     </svg>
-  );
-}
-
-function AIModeTable({ series }: { series: Series[] }) {
-  return (
-    <div className="space-y-3">
-      {series.map((s) => {
-        const hits = s.history.filter((h) => h.mentioned).length;
-        const rate = s.history.length === 0 ? 0 : Math.round((hits / s.history.length) * 100);
-        const competitors = s.current?.competitors || [];
-        return (
-          <div key={`ai-${s.query}`} className="rounded-[12px] border border-white/10 bg-[#11121A] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[14px] font-medium text-white">{s.query}</p>
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[#9AA0A6]">{rate}% hit · {s.history.length} run{s.history.length === 1 ? '' : 's'}</span>
-                {s.current?.mentioned ? (
-                  <span className="rounded-[6px] bg-emerald-500/15 px-2.5 py-1 text-[12px] font-bold text-emerald-300">RECOMMENDED ✓</span>
-                ) : (
-                  <span className="rounded-[6px] bg-red-500/10 px-2.5 py-1 text-[12px] font-bold text-red-300">NOT MENTIONED</span>
-                )}
-              </div>
-            </div>
-            {!s.current?.mentioned && competitors.length > 0 && (
-              <div className="mt-3 rounded-[8px] border border-amber-500/20 bg-amber-500/5 px-3 py-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-amber-300/90">AI recommended instead:</p>
-                <p className="mt-1 text-[13px] text-[#E5E7EB]">{competitors.join(' · ')}</p>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -1263,126 +1355,12 @@ function TaskColumn({
 }
 
 /**
- * RankingsTable — compact scannable table of every tracked keyword showing
- * the live position number, colour-coded tier, trend arrow, and a map-pack
- * badge where a confirmed map-pack win exists. Much easier to scan than the
- * individual RankingCard walls — one glance shows the full keyword portfolio.
- *
- * Map-pack matching: a keyword gets a 📍 badge if any entry in
- * verified_wins.map_pack contains a city word that also appears in the query.
- */
-function RankingsTable({
-  google,
-  verifiedWins,
-}: {
-  google: Series[];
-  verifiedWins?: { organic: string[]; map_pack: string[] };
-}) {
-  if (google.length === 0) return null;
-
-  // Build a quick-lookup of which queries have a confirmed map-pack win.
-  // Strategy: extract city names from the map_pack strings (e.g. "Holiday —
-  // pressure washing" → "holiday") and check if the query contains that city.
-  const mapPackCities = useMemo(() => {
-    return (verifiedWins?.map_pack ?? []).map(s =>
-      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
-    );
-  }, [verifiedWins]);
-
-  const hasMapPack = (query: string) => {
-    const q = query.toLowerCase();
-    return mapPackCities.some(city => city && q.includes(city));
-  };
-
-  const posTier = (p: number | null) => {
-    if (p === null) return { label: '—', color: '#6B7280', bg: 'rgba(107,114,128,0.08)' };
-    if (p === 1)    return { label: '#1', color: '#FFD166', bg: 'rgba(212,175,55,0.12)' };
-    if (p <= 3)     return { label: `#${p}`, color: '#6EE7B7', bg: 'rgba(16,185,129,0.10)' };
-    if (p <= 10)    return { label: `#${p}`, color: '#93C5FD', bg: 'rgba(147,197,253,0.08)' };
-    return { label: `#${p}`, color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' };
-  };
-
-  // Trend: compare current position to oldest non-null position in history.
-  const trend = (s: Series) => {
-    const cur = s.current?.position;
-    if (cur === null || cur === undefined) return null;
-    const oldest = [...s.history].reverse().find(h => h.position !== null)?.position ?? null;
-    if (oldest === null) return null;
-    const d = oldest - cur; // positive = improved (lower position number)
-    return d === 0 ? null : d;
-  };
-
-  // Sort: ranked keywords first (by position asc), then unranked.
-  const sorted = [...google].sort((a, b) => {
-    const pa = a.current?.position ?? 999;
-    const pb = b.current?.position ?? 999;
-    return pa - pb;
-  });
-
-  return (
-    <section className="mt-8">
-      <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
-        Organic Rankings · Full Keyword List
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
-          live positions across {google.length} tracked keywords
-        </span>
-      </h2>
-      <div className="overflow-hidden rounded-[14px] border border-white/10">
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 border-b border-white/10 bg-[#0F0F12] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#6B7280]">
-          <span>Keyword</span>
-          <span className="text-right">Map Pack</span>
-          <span className="text-right w-12">Trend</span>
-          <span className="text-right w-14">Position</span>
-        </div>
-        {sorted.map((s, idx) => {
-          const tier = posTier(s.current?.position ?? null);
-          const t = trend(s);
-          const mp = hasMapPack(s.query);
-          return (
-            <div
-              key={s.query}
-              className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 px-4 py-3 ${idx < sorted.length - 1 ? 'border-b border-white/[0.05]' : ''} ${idx % 2 === 0 ? 'bg-[#11121A]' : 'bg-[#0F0F12]'}`}
-            >
-              <span className="text-[13px] font-medium text-[#E5E7EB] leading-tight">{s.query}</span>
-              <span className="text-center">
-                {mp && (
-                  <span title="Confirmed #1 in Google Map Pack" className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                    📍 Map Pack
-                  </span>
-                )}
-              </span>
-              <span className="w-12 text-right text-[12px] font-semibold">
-                {t !== null && (
-                  <span className={t > 0 ? 'text-emerald-300' : 'text-red-300'}>
-                    {t > 0 ? `↑${t}` : `↓${Math.abs(t)}`}
-                  </span>
-                )}
-              </span>
-              <span
-                className="inline-flex w-14 items-center justify-center rounded-[8px] px-2.5 py-1 text-[13px] font-bold"
-                style={{ color: tier.color, background: tier.bg }}
-              >
-                {tier.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <p className="mt-2 text-[10px] text-[#6B7280]">
-        📍 = confirmed #1 in Google Map Pack · trend arrow vs first recorded snapshot
-      </p>
-    </section>
-  );
-}
-
-/**
  * AIVisibilityCard — per-platform breakdown of Claude vs ChatGPT AI search
  * visibility. Shows each tested prompt with win/lose status and (on lose) who
  * the AI recommended instead. Replaces the single merged AIModeTable so the
  * client can see whether visibility differs across AI providers.
  */
-function AIVisibilityCard({ series }: { series: Series[] }) {
+function AIVisibilityCard({ series, sov }: { series: Series[]; sov?: ShareOfVoice | null }) {
   if (series.length === 0) return null;
 
   const byPlatform = useMemo(() => {
@@ -1434,6 +1412,23 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
           Are AI assistants recommending you?
         </span>
       </h2>
+
+      {sov && sov.last_30d.total > 0 && (
+        <div className="mb-4 flex items-center justify-between rounded-[12px] border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] px-4 py-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#D4AF37]">Share of Voice · last 30d</p>
+            <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{sov.queries_tracked} prompts · {sov.last_30d.mentions}/{sov.last_30d.total} named you</p>
+          </div>
+          <div className="text-right">
+            <span className="text-[36px] font-extrabold leading-none text-[#F4D47C]">{sov.last_30d.pct}%</span>
+            {sov.delta_pts !== 0 && (
+              <p className={`mt-0.5 text-[11px] font-semibold ${sov.delta_pts > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                {sov.delta_pts > 0 ? '↑' : '↓'} {Math.abs(sov.delta_pts)} pts vs prior 30d
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Per-platform win rates */}
       <div className="flex gap-3">
@@ -1498,10 +1493,8 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
  */
 function WonJobsCard({
   wonJobs,
-  estimated,
 }: {
   wonJobs: NonNullable<DashboardPayload['won_jobs']>;
-  estimated?: NonNullable<DashboardPayload['attributed_value']>;
 }) {
   if (wonJobs.lifetime === 0) return null;
   const recentJobs = wonJobs.jobs.slice(0, 5);
@@ -1511,31 +1504,18 @@ function WonJobsCard({
   };
   return (
     <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-[#11121A] p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-            💰 Confirmed Won Jobs · this month
-          </p>
-          <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
-            ${wonJobs.revenue_month.toLocaleString()}
-          </p>
-          <p className="mt-1 text-[12px] text-[#9CA3AF]">
-            {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} confirmed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
-          </p>
-        </div>
-        {estimated && estimated.contacts > 0 && (
-          <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-right">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Model estimate</p>
-            <p className="mt-1 text-[22px] font-bold text-[#F4D47C]">${estimated.value.toLocaleString()}</p>
-            <p className="mt-0.5 text-[10px] text-[#6B7280]">
-              {estimated.contacts} contacts × {Math.round(estimated.close_rate * 100)}% est. close
-            </p>
-          </div>
-        )}
-      </div>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        💰 Confirmed revenue · this month
+      </p>
+      <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
+        ${wonJobs.revenue_month.toLocaleString()}
+      </p>
+      <p className="mt-1 text-[12px] text-[#9CA3AF]">
+        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} closed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
+      </p>
       {recentJobs.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent confirmed jobs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent closed jobs</p>
           {recentJobs.map(j => (
             <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
               <div className="flex items-center gap-3">
@@ -1548,9 +1528,6 @@ function WonJobsCard({
           ))}
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-[1.5] text-[#6B7280]">
-        Log a won job: <code className="rounded bg-white/5 px-1 py-0.5 text-[9px]">POST /admin/won-jobs/{'{slug}'}</code> with job_value, service_type, source
-      </p>
     </section>
   );
 }

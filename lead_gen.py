@@ -17,7 +17,7 @@ import uuid
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/lead-gen", tags=["lead-gen"])
@@ -261,36 +261,67 @@ GA4_API_SECRET = (os.getenv("GA4_API_SECRET") or "").strip() or None
 
 
 async def _ga4_event(
-    name: str, params: dict, client_id: Optional[str] = None
-) -> None:
+    name: str, params: dict, client_id: Optional[str] = None,
+    debug_mode: bool = False,
+) -> dict:
     """Fire a single GA4 event via the Measurement Protocol. Best-effort:
-    swallows all errors so a tracking hiccup never affects the lead flow."""
-    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
-        return
+    catches all errors so a tracking hiccup never affects the lead flow.
+
+    Returns a small status dict (also logged) so the caller can see what
+    happened — used by /lead-gen/ga4-fire-test to surface live failures
+    instead of swallowing them silently.
+
+    Env vars are re-read on every call so a post-startup Railway env-var
+    change takes effect on the next event without requiring a redeploy.
+    """
+    mid = (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+    secret = (os.getenv("GA4_API_SECRET") or "").strip()
+    if not mid or not secret:
+        return {"ok": False, "reason": "env_vars_not_set",
+                "have_mid": bool(mid), "have_secret": bool(secret)}
+    # debug_mode=1 makes the event show up in GA4 DebugView. Pass through
+    # for ad-hoc tests; leave off for production events so they don't
+    # pollute DebugView for the actual analyst.
+    event_params = dict(params or {})
+    if debug_mode:
+        event_params["debug_mode"] = 1
     payload = {
         "client_id": client_id or uuid.uuid4().hex,
-        "events": [{"name": name, "params": params}],
+        "events": [{"name": name, "params": event_params}],
     }
     url = (
         "https://www.google-analytics.com/mp/collect"
-        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+        f"?measurement_id={mid}&api_secret={secret}"
     )
     try:
         async with httpx.AsyncClient(timeout=8.0) as client:
-            await client.post(url, json=payload)
-    except Exception:
-        pass
+            resp = await client.post(url, json=payload)
+        # MP /collect returns 204 on success with no body. Anything else
+        # means GA4 rejected the request — log it so a real failure isn't
+        # silent.
+        if resp.status_code not in (200, 204):
+            print(f"[ga4] event={name} rejected: HTTP {resp.status_code} body={resp.text[:200]}")
+            return {"ok": False, "reason": "http_error",
+                    "status": resp.status_code, "body": resp.text[:200]}
+        return {"ok": True, "status": resp.status_code, "event": name}
+    except Exception as e:
+        print(f"[ga4] event={name} exception: {type(e).__name__}: {e}")
+        return {"ok": False, "reason": "exception",
+                "error": f"{type(e).__name__}: {e}"}
 
 
 async def _ga4_mp_validate() -> dict:
     """Validate the Measurement Protocol creds via GA4's /debug/mp/collect.
     Returns {ok, detail} without exposing the secret. Empty validationMessages
-    from GA4 means the event/credentials are accepted."""
-    if not GA4_MEASUREMENT_ID or not GA4_API_SECRET:
+    from GA4 means the event/credentials are accepted. Env vars re-read on
+    every call so a post-deploy change takes effect immediately."""
+    mid = (os.getenv("GA4_MEASUREMENT_ID") or "").strip()
+    secret = (os.getenv("GA4_API_SECRET") or "").strip()
+    if not mid or not secret:
         return {"ok": False, "detail": "GA4_MEASUREMENT_ID / GA4_API_SECRET not set"}
     url = (
         "https://www.google-analytics.com/debug/mp/collect"
-        f"?measurement_id={GA4_MEASUREMENT_ID}&api_secret={GA4_API_SECRET}"
+        f"?measurement_id={mid}&api_secret={secret}"
     )
     payload = {
         "client_id": "setup.status.check",
@@ -826,57 +857,105 @@ async def webhook_callrail(request: Request):
 # (forward_number is configured in CallRail, not stored here — it is not
 # a column on reporting_clients, so it must NOT be passed to upsert_client.)
 
-_SANDBAR_SEED = {
+_SANDBAR_SEED_DEFAULTS = {
     "slug": "sandbar",
     "client_name": "Sandbar Soft Wash",
     "client_email": "ty@tyalexandermedia.com",
     "site_url": "https://www.sandbarsoftwash.com",
-    "money_keywords": [
-        "roof cleaning Tampa Bay",
-        "house soft wash Holiday FL",
-        "pool cage cleaning Pinellas County",
-        "pressure washing Palm Harbor FL",
-        "soft wash Holiday FL",
-    ],
     "conversion_rate": 0.35,
     "avg_job_value": 650,
     "gsc_property": "sc-domain:sandbarsoftwash.com",
 }
 
 
-@router.on_event("startup")
 async def _seed_sandbar_client() -> None:
+    """
+    Reseeds the Sandbar reporting_clients row on every deploy.
+
+    Keywords + AI Mode prompts are the single source of truth in
+    case_studies/configs.py — they get force-synced here on every boot so
+    a code change to the keyword list takes effect on the next deploy
+    without a manual /admin/reporting/onboard call. Operator-customized
+    values (conversion_rate, avg_job_value, gsc_property, ga_property_id,
+    forward_number) are preserved when present.
+    """
+    print("[seed] _seed_sandbar_client starting…")
     try:
+        # Pull the canonical 19 keywords + 6 AI prompts from the config so
+        # we never drift between the tracker config and the dashboard seed.
+        from case_studies.configs import CASE_STUDIES as _CONFIG
+        sandbar_cfg = _CONFIG.get("sandbar")
+        if not sandbar_cfg:
+            print("[seed] WARNING: CASE_STUDIES['sandbar'] missing — aborting seed (would have wiped keywords)")
+            return
+        canonical_keywords = list(sandbar_cfg.google_queries)
+        canonical_prompts = list(sandbar_cfg.ai_mode_prompts)
+
         ga_property_id = (
             os.getenv("SANDBAR_GA_PROPERTY_ID") or os.getenv("GA4_PROPERTY_ID") or ""
         ).strip() or None
-        existing = await get_client_by_slug(_SANDBAR_SEED["slug"])
-        # Stop once the row exists AND both analytics props are wired up.
-        if existing and existing.get("gsc_property") and existing.get("ga_property_id"):
-            return
-        # Preserve any already-tuned values; fall back to seed defaults.
+        existing = await get_client_by_slug(_SANDBAR_SEED_DEFAULTS["slug"])
         src = existing or {}
+
         await upsert_client(
-            slug=_SANDBAR_SEED["slug"],
-            client_name=src.get("client_name") or _SANDBAR_SEED["client_name"],
-            client_email=src.get("client_email") or _SANDBAR_SEED["client_email"],
-            site_url=src.get("site_url") or _SANDBAR_SEED["site_url"],
-            money_keywords=src.get("money_keywords") or _SANDBAR_SEED["money_keywords"],
-            conversion_rate=src.get("conversion_rate") or _SANDBAR_SEED["conversion_rate"],
-            avg_job_value=src.get("avg_job_value") or _SANDBAR_SEED["avg_job_value"],
+            slug=_SANDBAR_SEED_DEFAULTS["slug"],
+            client_name=src.get("client_name") or _SANDBAR_SEED_DEFAULTS["client_name"],
+            client_email=src.get("client_email") or _SANDBAR_SEED_DEFAULTS["client_email"],
+            site_url=src.get("site_url") or _SANDBAR_SEED_DEFAULTS["site_url"],
+            # FORCE-SYNC: always use the config — DB list is overwritten.
+            money_keywords=canonical_keywords,
+            conversion_rate=src.get("conversion_rate") or _SANDBAR_SEED_DEFAULTS["conversion_rate"],
+            avg_job_value=src.get("avg_job_value") or _SANDBAR_SEED_DEFAULTS["avg_job_value"],
             active=True,
-            target_url=src.get("target_url") or _SANDBAR_SEED["site_url"],
-            gsc_property=src.get("gsc_property") or _SANDBAR_SEED["gsc_property"],
+            target_url=src.get("target_url") or _SANDBAR_SEED_DEFAULTS["site_url"],
+            gsc_property=src.get("gsc_property") or _SANDBAR_SEED_DEFAULTS["gsc_property"],
             ga_property_id=ga_property_id or src.get("ga_property_id"),
+            # FORCE-SYNC AI prompts too.
+            ai_mode_prompts=canonical_prompts,
         )
         print(
-            "[seed] Onboarded/updated Sandbar reporting client "
-            f"(gsc={_SANDBAR_SEED['gsc_property']}, ga={ga_property_id or 'unset'})"
+            f"[seed] Sandbar reporting client synced — "
+            f"{len(canonical_keywords)} keywords, {len(canonical_prompts)} AI prompts "
+            f"(gsc={_SANDBAR_SEED_DEFAULTS['gsc_property']}, ga={ga_property_id or 'unset'})"
         )
     except Exception as e:  # never block app startup on a seed failure
         import traceback
         print(f"[seed] ERROR: Sandbar seed failed — {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+@router.on_event("startup")
+async def _kick_seed_in_background() -> None:
+    """Fire the Sandbar seed as a background task so a slow or hung DB
+    call can never block FastAPI from accepting requests. Combined with
+    the defensive /reporting/public/{slug} fallback to CASE_STUDIES, this
+    means the dashboard renders even if the seed never finishes."""
+    asyncio.create_task(_seed_sandbar_client())
+
+
+@router.post("/reseed/sandbar")
+async def manual_reseed_sandbar(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """
+    Manually re-runs the Sandbar seed without waiting for a Railway redeploy.
+    Useful after editing keywords/prompts in case_studies/configs.py and
+    needing the dashboard to reflect the change immediately. Returns the
+    resolved CaseStudy + the freshly-saved row so the operator can confirm.
+    """
+    _check_admin_key(x_admin_key)
+    await _seed_sandbar_client()
+    from case_studies.tracker import _load_case_study
+    cs = await _load_case_study("sandbar")
+    row = await get_client_by_slug("sandbar")
+    return {
+        "ok": True,
+        "case_study_loaded": cs is not None,
+        "google_queries_count": len(cs.google_queries) if cs else 0,
+        "ai_mode_prompts_count": len(cs.ai_mode_prompts) if cs else 0,
+        "first_3_queries": cs.google_queries[:3] if cs else [],
+        "db_row_present": row is not None,
+        "db_money_keywords_count": len(row.get("money_keywords", [])) if row else 0,
+        "db_ai_prompts_count": len(row.get("ai_mode_prompts", [])) if row else 0,
+    }
 
 
 # ============================================================
@@ -920,7 +999,9 @@ async def import_callrail_history(
     """
     _check_admin_key(x_admin_key)
     api_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
-    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    # Strip dashes: CallRail displays the account ID as "512-138-905" in the UI
+    # but the REST API path requires the plain digits "512138905".
+    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip().replace("-", "")
     if not api_key or not account_id:
         raise HTTPException(
             status_code=503,
@@ -1008,6 +1089,19 @@ async def import_callrail_history(
                                 (created_at, eid),
                             )
                             await db.commit()
+                    # Mirror to GA4 so backfilled calls show up alongside
+                    # live webhook events. No-op when GA4 env vars unset.
+                    await _ga4_event(
+                        "phone_call",
+                        {
+                            "duration_sec": duration_sec,
+                            "caller_city": caller_city or "",
+                            "source": source,
+                            "imported": 1,
+                            "engagement_time_msec": 1,
+                        },
+                        client_id=call_sid,
+                    )
                     imported += 1
                 except Exception as e:
                     print(f"[import/callrail] ERROR call {call_sid}: {type(e).__name__}: {e}")
@@ -1149,35 +1243,132 @@ async def import_all_in_one(
 _AUTO_REFRESH_STALE_HOURS = 12
 
 
-async def _do_sandbar_refresh() -> None:
+async def _has_recent_ranking_snapshot(slug: str, hours: int) -> bool:
+    """Per-subsystem freshness probe — checks the most recent
+    case_study_rankings row for the slug. Independent of GSC's freshness
+    so a recent GSC snapshot can't accidentally suppress the ranking
+    refresh."""
+    try:
+        import aiosqlite
+        async with aiosqlite.connect(os.getenv("DB_PATH", "lola.db")) as db:
+            async with db.execute(
+                "SELECT MAX(run_at) FROM case_study_rankings WHERE slug = ?",
+                (slug,),
+            ) as cur:
+                row = await cur.fetchone()
+                if not row or not row[0]:
+                    return False
+                latest = row[0]
+        dt = datetime.fromisoformat(latest.replace("Z", "").replace(" ", "T")[:19])
+        return (datetime.utcnow() - dt).total_seconds() / 3600.0 < hours
+    except Exception:
+        return False
+
+
+async def _do_sandbar_refresh(force: bool = False) -> None:
+    """Background refresh entry point.
+
+    Each subsystem has its OWN freshness check now so a recent GSC pull
+    can't suppress the ranking snapshot or the CallRail import. force=True
+    overrides every freshness check and runs everything.
+    """
     try:
         rc = await get_client_by_slug("sandbar")
         if not rc:
-            return  # seed handler runs first and would create it
-        # Cheap freshness probe — read a single GSC snapshot timestamp.
-        try:
-            from db.tracking import get_gsc_snapshot
-            snap = await get_gsc_snapshot("sandbar")
-            fetched_at = (snap or {}).get("fetched_at")
-            if fetched_at:
-                hrs = (datetime.utcnow() - datetime.fromisoformat(fetched_at.replace("Z", "").replace(" ", "T")[:19])).total_seconds() / 3600.0
-                if hrs < _AUTO_REFRESH_STALE_HOURS:
-                    return  # still fresh
-        except Exception:
-            pass  # if probe fails, just refresh
+            print("[auto-refresh] no sandbar client row — seeding now before refresh…")
+            await _seed_sandbar_client()
+            rc = await get_client_by_slug("sandbar")
+            if not rc:
+                print("[auto-refresh] seed completed but still no row — aborting")
+                return
+            print("[auto-refresh] seed complete — continuing refresh")
+
+        # ── Metrics: GSC / GA4 / GBP / Bing / CWV ──
+        # Freshness probe via GSC snapshot. Skipped only when fresh AND not
+        # forced. Other subsystems below are NOT gated by this check.
+        skip_metrics = False
+        if not force:
+            try:
+                from db.tracking import get_gsc_snapshot
+                snap = await get_gsc_snapshot("sandbar")
+                fetched_at = (snap or {}).get("fetched_at")
+                if fetched_at:
+                    hrs = (datetime.utcnow() - datetime.fromisoformat(fetched_at.replace("Z", "").replace(" ", "T")[:19])).total_seconds() / 3600.0
+                    if hrs < _AUTO_REFRESH_STALE_HOURS:
+                        skip_metrics = True
+                        print(f"[auto-refresh] metrics fresh ({hrs:.1f}h old) — skipping GSC/GA4/GBP/Bing/CWV")
+            except Exception:
+                pass
+
         import importlib
         main_mod = importlib.import_module("main")
-        await main_mod._refresh_client_metrics("sandbar", rc)
-        try:
-            await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
-        except Exception as e:
-            print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
-        print("[auto-refresh] Sandbar metrics refreshed on startup.")
+        if not skip_metrics:
+            try:
+                await main_mod._refresh_client_metrics("sandbar", rc)
+                print("[auto-refresh] metrics refresh OK")
+            except Exception as e:
+                print(f"[auto-refresh] metrics refresh failed: {type(e).__name__}: {e}")
+
+        # ── Rankings snapshot ── independent freshness probe.
+        # The 19 keywords + Claude + ChatGPT calls take 30-60s; skip if a
+        # recent snapshot already exists (or always run on force).
+        if force or not await _has_recent_ranking_snapshot("sandbar", _AUTO_REFRESH_STALE_HOURS):
+            try:
+                summary = await main_mod.run_case_study_snapshot("sandbar", notes="auto-refresh on deploy")
+                g_count = len(summary.get("google", []) or [])
+                ai_count = len(summary.get("ai_mode", []) or [])
+                print(f"[auto-refresh] rankings snapshot OK — {g_count} google, {ai_count} AI mode rows")
+            except Exception as e:
+                print(f"[auto-refresh] rankings snapshot failed: {type(e).__name__}: {e}")
+        else:
+            print("[auto-refresh] rankings fresh — skipping snapshot")
+
+        # ── CallRail webhook + backfill ── ALWAYS run if env vars are
+        # present. Webhook setup is idempotent; backfill is idempotent
+        # via the UNIQUE call_sid constraint. No freshness gate here —
+        # this is what brings the 3 historical calls into the dashboard
+        # right after env vars get set on Railway.
+        if (os.getenv("CALLRAIL_API_KEY") or "").strip() and (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip():
+            admin_key = (os.getenv("LOLA_SECRET_ADMIN_KEY") or "").strip()
+            if admin_key:
+                try:
+                    res = await callrail_setup_webhook(slug="sandbar", x_admin_key=admin_key)
+                    print(f"[auto-refresh] CallRail webhook setup: {res}")
+                except Exception as e:
+                    print(f"[auto-refresh] CallRail webhook setup failed: {type(e).__name__}: {e}")
+                try:
+                    res = await import_callrail_history(slug="sandbar", days=30, x_admin_key=admin_key)
+                    print(f"[auto-refresh] CallRail backfill: imported={res.get('imported', '?')} skipped={res.get('skipped', '?')}")
+                except Exception as e:
+                    print(f"[auto-refresh] CallRail backfill failed: {type(e).__name__}: {e}")
+            else:
+                print("[auto-refresh] CallRail keys set but LOLA_SECRET_ADMIN_KEY missing — skipping backfill")
+        else:
+            print("[auto-refresh] CallRail env vars not set — skipping webhook + backfill")
+
+        print("[auto-refresh] Sandbar refresh complete.")
     except Exception as e:
         # Never block app boot on a refresh failure.
         import traceback
         print(f"[auto-refresh] ERROR: {type(e).__name__}: {e}")
         traceback.print_exc()
+
+
+@router.post("/refresh/sandbar")
+async def force_refresh_sandbar(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Force-run the full Sandbar refresh pipeline (metrics + rankings +
+    CallRail backfill). Bypasses every freshness probe so it runs even
+    if a recent snapshot exists. Use this when env vars just changed on
+    Railway and you want the dashboard populated immediately."""
+    _check_admin_key(x_admin_key)
+    # Fire-and-forget so the HTTP response returns instantly; tail Railway
+    # logs to see progress (`[auto-refresh] …`).
+    asyncio.create_task(_do_sandbar_refresh(force=True))
+    return {
+        "ok": True,
+        "message": "Refresh kicked off in background — check dashboard in ~60s.",
+        "next_step": "Tail Railway logs and grep '[auto-refresh]' for per-subsystem status.",
+    }
 
 
 @router.on_event("startup")
@@ -1212,7 +1403,8 @@ async def callrail_setup_webhook(
     """
     _check_admin_key(x_admin_key)
     api_key = (os.getenv("CALLRAIL_API_KEY") or "").strip()
-    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip()
+    # Strip dashes — CallRail UI shows "512-138-905" but the API needs "512138905".
+    account_id = (os.getenv("CALLRAIL_ACCOUNT_ID") or "").strip().replace("-", "")
     if not api_key or not account_id:
         raise HTTPException(
             status_code=503,
@@ -1413,12 +1605,79 @@ async def inject_test_call(
             "note": "synthetic test call",
         },
     )
+    # Fire GA4 too — labelled with test=1 + debug_mode so it lands in
+    # DebugView and won't be confused with real traffic in production reports.
+    ga4_res = await _ga4_event(
+        "phone_call",
+        {
+            "duration_sec": 90,
+            "caller_city": "Palm Harbor",
+            "source": "test_inject",
+            "test": 1,
+            "engagement_time_msec": 1,
+        },
+        client_id=test_sid,
+        debug_mode=True,
+    )
     return {
         "ok": True,
         "note": "Synthetic test call injected — refresh the dashboard to see it.",
         "call_sid": test_sid,
         "event_id": eid,
+        "ga4": ga4_res,
         "dashboard": f"https://lola.tyalexandermedia.com/r/client/sandbar",
+    }
+
+
+@router.post("/ga4-fire-test")
+async def ga4_fire_test(
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+    event_name: str = "phone_call",
+):
+    """
+    Fires a REAL GA4 Measurement Protocol event (not the /debug/mp/collect
+    validator) with debug_mode=1 so it shows up in GA4 DebugView within ~30
+    seconds. Use this to confirm end-to-end that:
+      1. The server can read GA4_MEASUREMENT_ID + GA4_API_SECRET
+      2. GA4 accepts the credentials (HTTP 204)
+      3. The event lands in DebugView
+
+    Open GA4 → Reports → Realtime / Configure → DebugView BEFORE firing,
+    then refresh after ~10-30s and look for `phone_call` from client_id
+    `ga4-fire-test`.
+
+    Returns:
+      ok=true  → GA4 accepted the request (204 No Content)
+      ok=false → either env vars missing or GA4 rejected (full body returned)
+
+    Note: GA4 returns 204 even for invalid measurement IDs that *look*
+    well-formed, so a 204 doesn't fully prove your stream is wired —
+    pair this with the /lead-gen/setup-status validate check (which uses
+    /debug/mp/collect and DOES return validation errors).
+    """
+    _check_admin_key(x_admin_key)
+    live_result = await _ga4_event(
+        event_name,
+        {
+            "test": 1,
+            "source": "ga4_fire_test",
+            "engagement_time_msec": 1,
+        },
+        client_id="ga4-fire-test",
+        debug_mode=True,
+    )
+    # Also hit /debug/mp/collect so we get GA4's validation feedback — this
+    # is the only path that returns actionable error messages (the real
+    # /mp/collect just returns 204 silently for almost everything).
+    validate_result = await _ga4_mp_validate()
+    return {
+        "live_fire": live_result,
+        "validate": validate_result,
+        "instructions": (
+            "Open GA4 → Admin → Data Streams → your stream → DebugView. "
+            "Refresh after 10-30 seconds. Look for client_id=ga4-fire-test "
+            "and event=" + event_name + " with test=1, debug_mode=1."
+        ),
     }
 
 

@@ -1747,17 +1747,46 @@ async def public_client_dashboard(slug: str):
     with their team — they see ranking history per tracked keyword and
     AI-mode mention rate, no login. Safe fields only.
     """
+    # Hardened: any individual DB or downstream call that fails returns its
+    # empty default rather than 500ing the entire dashboard. As long as the
+    # case study config exists in code, the dashboard renders.
+    async def _safe(coro, default):
+        try:
+            return await coro
+        except Exception as e:
+            print(f"[public_dashboard:{slug}] sub-call failed → using default: {type(e).__name__}: {e}")
+            return default
+
     cs = await _load_case_study(slug)
     if not cs:
         raise HTTPException(status_code=404, detail="No such client dashboard")
-    series = await get_all_history_for_slug(slug)
-    google_series = [s for s in series if s["source"] == "google_organic"]
+    series = await _safe(get_all_history_for_slug(slug), [])
+    # Filter to ONLY queries/prompts currently in the case study config so
+    # stale rows from a prior keyword set don't pollute the dashboard.
+    # Comparison is case-insensitive + trimmed since CallRail / config /
+    # operator-entered queries occasionally drift on casing.
+    _current_queries = {(q or "").strip().lower() for q in (cs.google_queries or [])}
+    _current_prompts = {(p or "").strip().lower() for p in (cs.ai_mode_prompts or [])}
+    def _query_matches(s: dict, allowed: set) -> bool:
+        if not allowed:
+            return True  # no config = no filter
+        return (s.get("query") or "").strip().lower() in allowed
+    google_series = [
+        s for s in series
+        if s["source"] == "google_organic" and _query_matches(s, _current_queries)
+    ]
     # Aggregate every AI Mode provider (Claude, ChatGPT, future Gemini, etc.)
     # so Share of Voice represents AI search visibility as a whole, not just one.
-    ai_series = [s for s in series if str(s.get("source", "")).endswith("_ai_mode")]
+    ai_series = [
+        s for s in series
+        if str(s.get("source", "")).endswith("_ai_mode") and _query_matches(s, _current_prompts)
+    ]
     # Work-delivered feed — proves the retainer is doing the work between
     # ranking snapshots. Empty/absent until tasks are logged for this slug.
-    implementation = await reporting_tasks_grouped(slug)
+    implementation = await _safe(
+        reporting_tasks_grouped(slug),
+        {"done": [], "in_progress": [], "next_up": [], "counts": {}},
+    )
 
     # ── Share of Voice (the killer Profound-style metric) ──────
     # SoV = % of (query, run) pairs in claude_ai_mode where the client
@@ -1769,10 +1798,15 @@ async def public_client_dashboard(slug: str):
     from datetime import timezone
 
     def _to_dt(iso: str):
+        # SQLite's datetime('now') returns "YYYY-MM-DD HH:MM:SS" (naive). The
+        # CallRail backfill writes ISO 8601 with "Z" (aware). Normalize both to
+        # timezone-aware UTC so window comparisons don't TypeError when a slug
+        # has a mix of webhook and backfilled rows.
         try:
-            return datetime.fromisoformat(iso.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
         except (ValueError, AttributeError):
             return None
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
 
     now = datetime.now(timezone.utc)
     cutoff_30 = now - timedelta(days=30)
@@ -1817,23 +1851,25 @@ async def public_client_dashboard(slug: str):
     }
 
     # Call / lead / click attribution — the billing-proof row.
-    tracking = await counts_for_slug(slug)
-    tracking_sources = await counts_by_source(slug)
-    funnel = await funnel_for_slug(slug)
-    trends = await trend_deltas(slug)
-    reviews = await review_counts_for_slug(slug)
+    # Every downstream call wrapped in _safe so one broken table or missing
+    # snapshot can't cascade into a 500. Empty defaults gracefully degrade.
+    tracking = await _safe(counts_for_slug(slug), {})
+    tracking_sources = await _safe(counts_by_source(slug), {})
+    funnel = await _safe(funnel_for_slug(slug), {"view": 0, "click": 0, "call": 0, "lead": 0, "click_rate": 0, "call_rate": 0, "lead_rate": 0, "overall": 0})
+    trends = await _safe(trend_deltas(slug), {})
+    reviews = await _safe(review_counts_for_slug(slug), {"month": 0, "lifetime": 0, "google_routed_month": 0})
     # Pull per-client avg_job_value from reporting_clients (operator-set).
     # Falls back to 400 (matches the leak-calc default) when the slug isn't
     # in the reporting table yet.
     from db.tracking import won_jobs_stats as _won_jobs_stats
-    won_jobs = await _won_jobs_stats(slug)
+    won_jobs = await _safe(_won_jobs_stats(slug), {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []})
     from db.reporting import get_client_by_slug as _get_client
-    rc = await _get_client(slug)
+    rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
     # Map any active Lock tier → retainer $ for CPL math. Falls back to
     # the Growth tier ($697) when no lock — the modal client price.
-    held = await locks_for_slug(slug, active_only=True)
+    held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
     retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
@@ -1843,11 +1879,11 @@ async def public_client_dashboard(slug: str):
     # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
     call_tracking_on = tier in ("growth", "pro")
     premium = tier in ("growth", "pro")
-    call_quality = await call_quality_stats(slug) if call_tracking_on else None
-    gsc = await get_gsc_snapshot(slug) if premium else None
-    gbp = await get_provider_snapshot(slug, "gbp") if premium else None
-    bing = await get_provider_snapshot(slug, "bing") if premium else None
-    cwv = await cwv_history(slug)  # CWV trend is fine for all tiers
+    call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
+    gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
+    gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
+    bing = await _safe(get_provider_snapshot(slug, "bing"), None) if premium else None
+    cwv = await _safe(cwv_history(slug), [])
     # Lead-source rollup: collapse this-month source counts across call+lead
     # into a single 'where contacts came from' map for the pie.
     lead_sources: dict = {}
@@ -1942,7 +1978,7 @@ async def admin_upsert_reporting_client(
         client_name=body.client_name,
         client_email=body.client_email,
         site_url=body.site_url,
-        money_keywords=body.money_keywords[:5],
+        money_keywords=body.money_keywords,
         conversion_rate=body.conversion_rate,
         avg_job_value=body.avg_job_value,
         brevo_template_id=body.brevo_template_id,
@@ -2172,7 +2208,7 @@ async def admin_onboard_client(
         client_name=body.client_name,
         client_email=body.client_email,
         site_url=body.site_url,
-        money_keywords=keywords[:5],
+        money_keywords=keywords,
         conversion_rate=body.conversion_rate,
         avg_job_value=body.avg_job_value,
         gsc_property=body.gsc_property,
@@ -2918,6 +2954,144 @@ async def admin_list_won_jobs(
     return await won_jobs_stats(slug)
 
 
+@app.get("/admin/calls/{slug}")
+async def admin_list_calls(
+    slug: str,
+    days: int = 30,
+    limit: int = 100,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Operator-only call log — returns every tracked call for the slug with
+    full caller info (number, name, city/state, duration, recording, first-
+    call flag, source) so the operator can identify who called and decide
+    whether it became a paying job.
+
+    Pair with POST /admin/won-jobs/{slug} — pass the call_sid from this
+    response so the won-job revenue ties back to the specific call that
+    earned it. Then the dashboard's WonJobsCard shows actual vs estimated
+    revenue with attribution down to the originating call.
+
+    Caller info is PII so this is admin-keyed and NEVER surfaced on the
+    public dashboard.
+
+    Example:
+        curl https://lola-backend-production.up.railway.app/admin/calls/sandbar?days=30 \
+          -H "X-Admin-Key: <key>"
+
+    Returns:
+        {
+          "total": <count of calls in window>,
+          "window_days": 30,
+          "calls": [
+            {
+              "call_sid": "CR-1234567890",
+              "created_at": "2026-06-19T14:32:11",
+              "caller_number": "+17275550142",
+              "customer_name": "John Smith",
+              "caller_city": "Palm Harbor",
+              "caller_state": "FL",
+              "duration_sec": 240,
+              "answered": true,
+              "first_call": true,
+              "recording_url": "https://...",
+              "source": "gbp",
+              "tracking_number": "+17275559999",
+              "won_job_logged": false  # whether a won_jobs row links to this call_sid
+            },
+            ...
+          ]
+        }
+    """
+    _check_admin(x_admin_key)
+    import aiosqlite, json as _json
+    db_path = os.getenv("DB_PATH", "lola.db")
+    slug_l = slug.strip().lower()
+    days_clamped = max(1, min(days, 365))
+    limit_clamped = max(1, min(limit, 500))
+
+    out: dict = {"slug": slug_l, "window_days": days_clamped, "total": 0, "calls": []}
+
+    async with aiosqlite.connect(db_path) as db:
+        db.row_factory = aiosqlite.Row
+        # 1. Pull call rows from tracked_calls (basic call metadata).
+        async with db.execute(
+            f"""SELECT call_sid, caller_number, caller_city, caller_state,
+                       tracking_number, forwarded_to, source, status,
+                       duration_sec, recording_url, created_at
+                FROM tracked_calls
+                WHERE slug = ? AND created_at >= datetime('now', '-{days_clamped} days')
+                ORDER BY created_at DESC
+                LIMIT ?""",
+            (slug_l, limit_clamped),
+        ) as cur:
+            call_rows = [dict(r) for r in await cur.fetchall()]
+
+        if not call_rows:
+            return out
+
+        # 2. Pull matching tracked_events 'call' rows to extract customer_name +
+        #    answered + first_call from meta_json (the webhook stores these in
+        #    the event meta, not on the call row itself).
+        sids = [c["call_sid"] for c in call_rows]
+        placeholders = ",".join("?" * len(sids))
+        meta_by_sid: dict = {}
+        try:
+            async with db.execute(
+                f"""SELECT meta_json FROM tracked_events
+                    WHERE slug = ? AND event_type = 'call'
+                      AND meta_json LIKE '%call_sid%'""",
+                (slug_l,),
+            ) as cur:
+                for r in await cur.fetchall():
+                    try:
+                        m = _json.loads(r["meta_json"] or "{}")
+                        sid = m.get("call_sid")
+                        if sid in sids:
+                            meta_by_sid[sid] = m
+                    except Exception:
+                        continue
+        except Exception:
+            pass  # event meta is enrichment — never block the response
+
+        # 3. Pull won_jobs.call_sid set so we can flag which calls have
+        #    already been logged as paying jobs (avoid double-attribution).
+        won_call_sids: set = set()
+        try:
+            async with db.execute(
+                f"""SELECT DISTINCT call_sid FROM won_jobs
+                    WHERE slug = ? AND call_sid IS NOT NULL
+                      AND call_sid IN ({placeholders})""",
+                (slug_l, *sids),
+            ) as cur:
+                won_call_sids = {r["call_sid"] for r in await cur.fetchall()}
+        except Exception:
+            pass
+
+    # Merge everything into one operator-friendly row per call.
+    for c in call_rows:
+        sid = c["call_sid"]
+        meta = meta_by_sid.get(sid, {})
+        out["calls"].append({
+            "call_sid": sid,
+            "created_at": c.get("created_at"),
+            "caller_number": c.get("caller_number"),
+            "customer_name": meta.get("customer_name"),
+            "caller_city": c.get("caller_city"),
+            "caller_state": c.get("caller_state"),
+            "duration_sec": c.get("duration_sec") or 0,
+            "answered": meta.get("answered"),
+            "first_call": meta.get("first_call"),
+            "recording_url": c.get("recording_url") or meta.get("recording_url"),
+            "source": c.get("source") or meta.get("source"),
+            "tracking_number": c.get("tracking_number"),
+            "forwarded_to": c.get("forwarded_to"),
+            "won_job_logged": sid in won_call_sids,
+        })
+    out["total"] = len(out["calls"])
+    return out
+
+
 @app.post("/admin/metrics/{slug}/run")
 async def admin_metrics_run(
     slug: str,
@@ -3005,22 +3179,6 @@ async def admin_metrics_run_all(
             metrics["rankings"] = f"error: {str(e)[:60]}"
         results[slug] = metrics
     return {"ok": True, "clients": len(clients), "results": results}
-
-
-@app.get("/admin/calls/{slug}")
-async def admin_calls(
-    slug: str,
-    limit: int = 50,
-    x_admin_key: str = Header(..., alias="X-Admin-Key"),
-):
-    """ADMIN-only full call log with real caller numbers + durations. Share
-    privately with the client; never exposed on the public dashboard."""
-    _check_admin(x_admin_key)
-    return {
-        "slug": slug,
-        "quality": await call_quality_stats(slug),
-        "calls": await recent_calls_admin(slug, limit=max(1, min(limit, 200))),
-    }
 
 
 @app.get("/admin/tracking/{slug}")

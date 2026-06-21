@@ -237,24 +237,51 @@ def _domain_from_url(url: str) -> str:
 
 async def _load_case_study(slug: str) -> CaseStudy | None:
     """
-    Resolve a case-study config by slug. Priority:
-      1. reporting_clients DB row (new retainer clients live here — no redeploy
-         needed to start tracking a new one).
-      2. CASE_STUDIES in-memory dict (legacy Sandbar entry stays as a safety
-         net so the existing tracker keeps working even if nothing is in DB).
+    Resolve a case-study config by slug — MERGE the DB row (if any) with the
+    in-memory CASE_STUDIES config (if any). Either source alone is enough to
+    yield a working case study; merging means a partial DB row or a missing
+    DB row never causes a 404 on the dashboard.
+
+    Merge rules (DB beats config when both have a value; config fills gaps):
+      - client_name / target_url / target_domain → DB → config → slug fallback
+      - google_queries / ai_mode_prompts → DB if non-empty, else config
+      - verified_organic_wins / verified_map_pack_wins → config only (DB has
+        no column for them yet)
     """
-    row = await get_client_by_slug(slug)
+    fallback = CASE_STUDIES.get(slug)
+    row = None
+    try:
+        row = await get_client_by_slug(slug)
+    except Exception as e:
+        print(f"[_load_case_study] DB lookup failed for {slug}: {type(e).__name__}: {e}")
+
+    # Neither source has anything → genuinely unknown slug.
+    if not row and not fallback:
+        return None
+
     if row:
-        target_url = (row.get("target_url") or row.get("site_url") or "").strip()
+        target_url = (
+            (row.get("target_url") or row.get("site_url") or "").strip()
+            or (fallback.target_url if fallback else "")
+        )
+        google_queries = list(row.get("money_keywords") or []) \
+            or (list(fallback.google_queries) if fallback else [])
+        ai_mode_prompts = list(row.get("ai_mode_prompts") or []) \
+            or (list(fallback.ai_mode_prompts) if fallback else [])
         return CaseStudy(
             slug=row["slug"],
-            client_name=row.get("client_name") or row["slug"],
+            client_name=row.get("client_name") or (fallback.client_name if fallback else row["slug"]),
             target_url=target_url,
-            target_domain=_domain_from_url(target_url or row.get("site_url", "")),
-            google_queries=list(row.get("money_keywords") or []),
-            ai_mode_prompts=list(row.get("ai_mode_prompts") or []),
+            target_domain=_domain_from_url(target_url) if target_url else (fallback.target_domain if fallback else ""),
+            google_queries=google_queries,
+            ai_mode_prompts=ai_mode_prompts,
+            verified_organic_wins=list(fallback.verified_organic_wins) if fallback else [],
+            verified_map_pack_wins=list(fallback.verified_map_pack_wins) if fallback else [],
         )
-    return CASE_STUDIES.get(slug)
+
+    # No DB row but config exists → return the config directly. Hardens
+    # against a wiped/missing reporting_clients table.
+    return fallback
 
 
 async def case_study_exists(slug: str) -> bool:
