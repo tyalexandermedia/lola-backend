@@ -112,7 +112,8 @@ Primary service areas:
 
 Call and quote CTAs temporarily use Sandbar/LOLA intake:
 
-- Phone intake: `727-712-6281`
+- Temporary shared CallRail/intake phone: `727-712-6281`
+- Tel link format: `tel:+17277126281`
 - Intake destination: `https://www.sandbarsoftwash.com/#contact`
 - Campaign source: `lola`
 - Campaign name: `tampa_bay_power_clean`
@@ -121,10 +122,20 @@ Call and quote CTAs temporarily use Sandbar/LOLA intake:
 
 The public page discloses this as active LOLA intake routing so Tampa Bay Power
 Clean remains presented as its own brand. Internally, that routing uses
-Sandbar's current public phone number and the existing Sandbar/LOLA form until
-a dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint are
-ready. The landing page does not publish or fabricate a Tampa Bay Power Clean
-phone number.
+Sandbar's existing CallRail/intake number and the existing Sandbar/LOLA form
+until a dedicated Tampa Bay Power Clean CallRail number and tracked form
+endpoint are ready. The phone source is the Sandbar public schema/NAP entry in
+`docs/case-studies/sandbar-roof-cleaning-optimization.md`, which lists
+`+1-727-712-6281`. The landing page does not publish or fabricate a Tampa Bay
+Power Clean-owned phone number.
+
+## Pending Infrastructure
+
+- Domain transfer pending for Tampa Bay Power Clean.
+- Dedicated Tampa Bay Power Clean CallRail number pending.
+- GBP access pending.
+- Analytics and Google Search Console access pending.
+- Dedicated tracked form endpoint pending.
 
 ## Data Sources Still Needed
 
@@ -135,16 +146,16 @@ To make the dashboard live in production, configure or collect:
 - Current production admin key for admin endpoints.
 - Reporting client row via `POST /admin/reporting/onboard` or `/admin/reporting/clients`.
 - Call tracking provider/webhook data for `tampa-bay-power-clean`.
-- Dedicated Tampa Bay Power Clean tracking number or form endpoint, if this
-  test asset needs LOLA OS call/lead attribution.
+- Dedicated Tampa Bay Power Clean CallRail tracking number or form endpoint,
+  if this test asset needs separated LOLA OS call/lead attribution.
 - Quote form or lead capture events into `tracked_events`.
 - Google Search Console property, if available.
 - GA4 property ID, if available.
 - Google Business Profile integration, if available. GBP is not required for
   the current landing-page test and no GBP data is fabricated.
 - Dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint.
-  The current page temporarily uses Sandbar's phone number and sends quote
-  requests through the established Sandbar/LOLA intake form.
+  The current page temporarily uses Sandbar's existing CallRail/intake number
+  and sends quote requests through the established Sandbar/LOLA intake form.
 - Verified testimonials/reviews and before/after photos for the landing page.
 - Brevo/weekly reporting recipient email and template, if weekly reports should send.
 
