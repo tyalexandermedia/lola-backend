@@ -13,9 +13,12 @@ Services configured for tracking and landing-page copy:
 
 - Pressure Washing
 - Power Washing
+- Paver Sealing
 - House Washing
 - Driveway Cleaning
 - Roof Cleaning
+- Residential Roof Cleaning
+- Commercial Roof Cleaning
 - Soft Washing
 - Commercial Pressure Washing
 - Paver Cleaning
@@ -44,9 +47,13 @@ Services configured for tracking and landing-page copy:
   - `CASE_STUDIES["sandbar"]` is also built from its registry file without
     changing the Sandbar slug, target URL, query list, or dashboard behavior.
 - `frontend/public/lp/tampa-bay-power-clean.html`
-  - Client-specific static landing page.
-  - Includes LocalBusiness and FAQ schema.
+  - Client-specific static landing page and SEO test asset.
+  - Focus: paver sealing, roof cleaning, house washing, commercial pressure
+    washing, and commercial roof cleaning in Dunedin and Tampa Bay.
+  - Includes LocalBusiness, FAQ, and breadcrumb schema.
   - Any unverified proof/review content is explicitly marked as placeholder.
+  - Does not depend on GBP access and does not claim rankings, review counts,
+    GBP metrics, or fabricated performance data.
 - `frontend/vercel.json`
   - Added rewrite for `/lp/tampa-bay-power-clean`.
 - `frontend/public/sitemap.xml`
@@ -72,6 +79,39 @@ The client uses the same slug-based LOLA OS backend surfaces as Sandbar:
 - AI visibility snapshots from `ai_mode_prompts`.
 - Reporting tasks and weekly reporting support once a `reporting_clients` row is created.
 
+## SEO Test Focus
+
+Tampa Bay Power Clean complements Sandbar instead of competing with the same
+proof story. Sandbar remains focused on its established soft washing, roof
+washing, house washing, and local proof. Tampa Bay Power Clean targets a
+separate lead-gen angle:
+
+- `paver sealing Dunedin`
+- `paver sealing Tampa Bay`
+- `commercial pressure washing Dunedin`
+- `commercial pressure washing Tampa Bay`
+- `commercial roof cleaning Dunedin`
+- `commercial roof cleaning Tampa Bay`
+- `residential roof cleaning Dunedin`
+- `residential roof cleaning Tampa Bay`
+- `roof cleaning Dunedin`
+- `roof cleaning Tampa Bay`
+- `house washing Dunedin`
+- `house washing Tampa Bay`
+
+Primary service areas:
+
+- Dunedin
+- Clearwater
+- Palm Harbor
+- Safety Harbor
+- Tarpon Springs
+- Tampa Bay
+
+Call and quote CTAs currently route through the existing Sandbar/LOLA intake
+workflow because no dedicated Tampa Bay Power Clean tracking number is
+configured in repo config yet.
+
 ## Data Sources Still Needed
 
 No fabricated performance data was added.
@@ -81,10 +121,13 @@ To make the dashboard live in production, configure or collect:
 - Current production admin key for admin endpoints.
 - Reporting client row via `POST /admin/reporting/onboard` or `/admin/reporting/clients`.
 - Call tracking provider/webhook data for `tampa-bay-power-clean`.
+- Dedicated Tampa Bay Power Clean tracking number or form endpoint, if this
+  test asset should stop routing through the existing intake workflow.
 - Quote form or lead capture events into `tracked_events`.
 - Google Search Console property, if available.
 - GA4 property ID, if available.
-- Google Business Profile integration, if available.
+- Google Business Profile integration, if available. GBP is not required for
+  the current landing-page test and no GBP data is fabricated.
 - Verified phone number for the landing-page call CTA.
 - Verified testimonials/reviews and before/after photos for the landing page.
 - Brevo/weekly reporting recipient email and template, if weekly reports should send.
@@ -102,26 +145,33 @@ Suggested onboarding payload:
   "service": "pressure washing",
   "city": "Tampa Bay, FL",
   "money_keywords": [
-    "pressure washing tampa bay",
-    "power washing tampa bay",
-    "house washing tampa bay",
-    "driveway cleaning tampa bay",
+    "paver sealing dunedin",
+    "paver sealing tampa bay",
+    "commercial pressure washing dunedin",
+    "commercial pressure washing tampa bay",
+    "commercial roof cleaning dunedin",
+    "commercial roof cleaning tampa bay",
+    "residential roof cleaning dunedin",
+    "residential roof cleaning tampa bay",
+    "roof cleaning dunedin",
     "roof cleaning tampa bay",
-    "soft washing tampa bay",
-    "commercial pressure washing tampa",
-    "paver cleaning tampa bay",
-    "concrete cleaning tampa bay"
+    "house washing dunedin",
+    "house washing tampa bay",
+    "paver sealing clearwater",
+    "commercial pressure washing clearwater",
+    "roof cleaning clearwater",
+    "house washing clearwater"
   ],
   "ai_mode_prompts": [
-    "Best pressure washing company in Tampa Bay? List 3 options.",
-    "Recommend a power washing company near Tampa, Florida.",
-    "Who should I call for soft washing and house washing in Tampa Bay?",
-    "Best driveway cleaning company in Tampa Bay?",
-    "Recommend a commercial pressure washing company in Tampa, FL.",
-    "Who offers roof cleaning and exterior cleaning around Tampa Bay?"
+    "Who should I call for paver sealing in Dunedin, Florida?",
+    "Recommend a paver sealing company in Tampa Bay.",
+    "Best commercial pressure washing company in Dunedin, FL?",
+    "Who offers commercial pressure washing across Tampa Bay?",
+    "Recommend a residential roof cleaning company in Dunedin.",
+    "Who handles commercial roof cleaning in Tampa Bay?",
+    "Best house washing company in Dunedin or Clearwater?",
+    "Who should I call for roof cleaning and house washing in Tampa Bay?"
   ],
-  "conversion_rate": 0.03,
-  "avg_job_value": 400,
   "seed_tasks": true
 }
 ```
