@@ -1,0 +1,157 @@
+# Tampa Bay Power Clean Client Setup
+
+## Overview
+
+- Client name: Tampa Bay Power Clean
+- Slug: `tampa-bay-power-clean`
+- Website: https://www.tampabaypowerclean.com
+- Industry: Pressure washing / exterior cleaning / power washing
+- Market: Tampa Bay, Florida
+- Primary service area: Tampa Bay
+
+Services configured for tracking and landing-page copy:
+
+- Pressure Washing
+- Power Washing
+- House Washing
+- Driveway Cleaning
+- Roof Cleaning
+- Soft Washing
+- Commercial Pressure Washing
+- Paver Cleaning
+- Concrete Cleaning
+
+## Routes Created
+
+- Public client dashboard: `/r/client/tampa-bay-power-clean`
+- Client landing page: `/lp/tampa-bay-power-clean`
+- Revenue admin UI: `/admin/revenue/tampa-bay-power-clean`
+- Revenue agent run endpoint: `POST /admin/revenue/tampa-bay-power-clean/run`
+- Case-study snapshot endpoint: `POST /admin/case-study/tampa-bay-power-clean/run`
+- Admin calls endpoint: `/admin/calls/tampa-bay-power-clean`
+- Admin tracking endpoint: `/admin/tracking/tampa-bay-power-clean`
+
+## Config Files Added or Updated
+
+- `case_studies/configs.py`
+  - Added `CASE_STUDIES["tampa-bay-power-clean"]`.
+  - Sandbar entries are unchanged.
+- `frontend/public/lp/tampa-bay-power-clean.html`
+  - Client-specific static landing page.
+  - Includes LocalBusiness and FAQ schema.
+  - Any unverified proof/review content is explicitly marked as placeholder.
+- `frontend/vercel.json`
+  - Added rewrite for `/lp/tampa-bay-power-clean`.
+- `frontend/public/sitemap.xml`
+  - Added sitemap entry for the client landing page.
+
+## Backend Capabilities
+
+The client uses the same slug-based LOLA OS backend surfaces as Sandbar:
+
+- Revenue Agent tables and summary by slug.
+- Calls from `tracked_calls`.
+- Leads from `tracked_events`.
+- Estimates from `revenue_estimates`.
+- Opportunities from `revenue_opportunities`.
+- Won jobs from `won_jobs`.
+- Revenue influenced from the Revenue Agent summary.
+- SEO/ranking snapshots from the case-study tracker.
+- AI visibility snapshots from `ai_mode_prompts`.
+- Reporting tasks and weekly reporting support once a `reporting_clients` row is created.
+
+## Data Sources Still Needed
+
+No fabricated performance data was added.
+
+To make the dashboard live in production, configure or collect:
+
+- Current production admin key for admin endpoints.
+- Reporting client row via `POST /admin/reporting/onboard` or `/admin/reporting/clients`.
+- Call tracking provider/webhook data for `tampa-bay-power-clean`.
+- Quote form or lead capture events into `tracked_events`.
+- Google Search Console property, if available.
+- GA4 property ID, if available.
+- Google Business Profile integration, if available.
+- Verified phone number for the landing-page call CTA.
+- Verified testimonials/reviews and before/after photos for the landing page.
+- Brevo/weekly reporting recipient email and template, if weekly reports should send.
+
+Suggested onboarding payload:
+
+```json
+{
+  "slug": "tampa-bay-power-clean",
+  "client_name": "Tampa Bay Power Clean",
+  "client_email": "replace-with-client-email@example.com",
+  "site_url": "https://www.tampabaypowerclean.com",
+  "target_url": "https://www.tampabaypowerclean.com",
+  "tier": "growth",
+  "service": "pressure washing",
+  "city": "Tampa Bay, FL",
+  "money_keywords": [
+    "pressure washing tampa bay",
+    "power washing tampa bay",
+    "house washing tampa bay",
+    "driveway cleaning tampa bay",
+    "roof cleaning tampa bay",
+    "soft washing tampa bay",
+    "commercial pressure washing tampa",
+    "paver cleaning tampa bay",
+    "concrete cleaning tampa bay"
+  ],
+  "ai_mode_prompts": [
+    "Best pressure washing company in Tampa Bay? List 3 options.",
+    "Recommend a power washing company near Tampa, Florida.",
+    "Who should I call for soft washing and house washing in Tampa Bay?",
+    "Best driveway cleaning company in Tampa Bay?",
+    "Recommend a commercial pressure washing company in Tampa, FL.",
+    "Who offers roof cleaning and exterior cleaning around Tampa Bay?"
+  ],
+  "conversion_rate": 0.03,
+  "avg_job_value": 400,
+  "seed_tasks": true
+}
+```
+
+## Local Verification
+
+Run:
+
+```bash
+.venv/bin/python -m py_compile main.py db/revenue.py db/tracking.py agents/revenue_agent/main.py
+npm --prefix frontend run build
+git diff --check
+```
+
+Optional backend route smoke check once the FastAPI app is running:
+
+```bash
+curl http://localhost:8000/reporting/public/tampa-bay-power-clean
+curl http://localhost:8000/reporting/public/sandbar
+```
+
+Optional frontend route check once Vite is running:
+
+```bash
+curl http://localhost:5173/r/client/tampa-bay-power-clean
+curl http://localhost:5173/lp/tampa-bay-power-clean
+curl http://localhost:5173/r/client/sandbar
+```
+
+## Deploy
+
+1. Push the branch to GitHub.
+2. Open a draft PR.
+3. Let Railway deploy the backend from the merged branch.
+4. Let Vercel deploy the frontend from `frontend/`.
+5. Verify:
+   - `/r/client/tampa-bay-power-clean`
+   - `/lp/tampa-bay-power-clean`
+   - `/r/client/sandbar`
+
+## Safety Notes
+
+- Sandbar slugs, configs, dashboards, routes, docs, and data were not renamed or removed.
+- Tampa Bay Power Clean is added as a separate slug and separate landing page.
+- Placeholder sections are marked as placeholder/demo until verified proof is available.

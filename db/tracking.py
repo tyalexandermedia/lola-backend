@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS won_jobs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT NOT NULL,
     call_sid TEXT,           -- optional link to tracked_calls row
+    opportunity_id INTEGER,  -- optional link to revenue_opportunities row
     job_value INTEGER NOT NULL,
     service_type TEXT,       -- e.g. "roof cleaning", "soft wash"
     source TEXT,             -- gbp / callrail / website / ai_search
@@ -93,6 +94,10 @@ async def init_tracking_tables() -> None:
             if stmt.strip():
                 await db.execute(stmt)
         await db.execute(CREATE_WON_JOBS)
+        async with db.execute("PRAGMA table_info(won_jobs)") as cur:
+            cols = {row[1] for row in await cur.fetchall()}
+        if "opportunity_id" not in cols:
+            await db.execute("ALTER TABLE won_jobs ADD COLUMN opportunity_id INTEGER")
         await db.execute(CREATE_WON_JOBS_IDX)
         await db.commit()
     print(f"✅ Tracking tables ready at {DB_PATH}")
@@ -227,7 +232,7 @@ async def won_jobs_stats(slug: str) -> dict:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            """SELECT id, call_sid, job_value, service_type, source, notes, created_at
+            """SELECT id, call_sid, opportunity_id, job_value, service_type, source, notes, created_at
                FROM won_jobs WHERE slug = ? ORDER BY created_at DESC""",
             (slug_l,),
         ) as cur:
@@ -247,6 +252,7 @@ async def won_jobs_stats(slug: str) -> dict:
             pass
         out["jobs"].append({
             "id": r["id"],
+            "opportunity_id": r["opportunity_id"],
             "job_value": val,
             "service_type": r["service_type"],
             "source": r["source"],

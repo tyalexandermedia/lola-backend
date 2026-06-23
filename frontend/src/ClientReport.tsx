@@ -64,6 +64,14 @@ interface DashboardPayload {
     revenue_month: number; revenue_lifetime: number;
     jobs: Array<{ id: number; job_value: number; service_type?: string; source?: string; notes?: string; created_at: string }>;
   };
+  revenue_agent?: {
+    contacts: number;
+    pipeline_value: number;
+    won_revenue: number;
+    open_actions: number;
+    opportunities: Record<string, number>;
+    estimates: Record<string, number>;
+  };
   generated_at: string;
 }
 
@@ -138,6 +146,9 @@ export default function ClientReport({ slug }: { slug: string }) {
       <TopWinsCard google={data.google} aiMode={data.ai_mode} verifiedWins={data.verified_wins} />
       {data.won_jobs && data.won_jobs.lifetime > 0 && (
         <WonJobsCard wonJobs={data.won_jobs} />
+      )}
+      {data.revenue_agent && (
+        <RevenueAgentCard revenue={data.revenue_agent} />
       )}
 
       {/* No live data yet → show the "what we're watching" value card so the
@@ -330,6 +341,39 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
         )}
       </p>
     </section>
+  );
+}
+
+function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['revenue_agent']> }) {
+  const hasData = revenue.contacts > 0 || revenue.pipeline_value > 0 || revenue.won_revenue > 0 || revenue.open_actions > 0;
+  if (!hasData) return null;
+  const money = (n: number) => `$${Math.round(n || 0).toLocaleString()}`;
+  const openOpps = (revenue.opportunities.new || 0) + (revenue.opportunities.qualified || 0) + (revenue.opportunities.estimate_sent || 0);
+  const sentEstimates = revenue.estimates.sent || 0;
+  return (
+    <section className="mb-6 rounded-2xl border border-emerald-500/20 bg-[#0E1512] p-6 shadow-[0_0_28px_rgba(16,185,129,0.06)]">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        Revenue Agent
+      </p>
+      <h2 className="mt-2 text-[22px] font-bold text-white">
+        {money(revenue.pipeline_value)} open pipeline · {money(revenue.won_revenue)} confirmed won
+      </h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        <MiniMetric label="Contacts matched" value={revenue.contacts} />
+        <MiniMetric label="Open opportunities" value={openOpps} />
+        <MiniMetric label="Sent estimates" value={sentEstimates} />
+        <MiniMetric label="Follow-ups queued" value={revenue.open_actions} />
+      </div>
+    </section>
+  );
+}
+
+function MiniMetric({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+      <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
+      <p className="mt-1 text-xl font-bold text-white">{value}</p>
+    </div>
   );
 }
 
