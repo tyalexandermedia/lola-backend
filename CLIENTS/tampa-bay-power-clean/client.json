@@ -1,0 +1,49 @@
+{
+  "slug": "tampa-bay-power-clean",
+  "client_name": "Tampa Bay Power Clean",
+  "website": "https://www.tampabaypowerclean.com",
+  "target_domain": "tampabaypowerclean.com",
+  "industry": "Pressure washing / exterior cleaning / power washing",
+  "market": "Tampa Bay, Florida",
+  "primary_service_area": "Tampa Bay",
+  "services": [
+    "Pressure Washing",
+    "Power Washing",
+    "House Washing",
+    "Driveway Cleaning",
+    "Roof Cleaning",
+    "Soft Washing",
+    "Commercial Pressure Washing",
+    "Paver Cleaning",
+    "Concrete Cleaning"
+  ],
+  "tracking": {
+    "google_queries": [
+      "pressure washing tampa bay",
+      "power washing tampa bay",
+      "house washing tampa bay",
+      "driveway cleaning tampa bay",
+      "roof cleaning tampa bay",
+      "soft washing tampa bay",
+      "commercial pressure washing tampa",
+      "paver cleaning tampa bay",
+      "concrete cleaning tampa bay",
+      "pressure washing tampa fl",
+      "power washing tampa fl",
+      "soft wash tampa fl",
+      "driveway pressure washing tampa",
+      "commercial pressure washing near tampa",
+      "roof cleaning tampa fl"
+    ],
+    "ai_mode_prompts": [
+      "Best pressure washing company in Tampa Bay? List 3 options.",
+      "Recommend a power washing company near Tampa, Florida.",
+      "Who should I call for soft washing and house washing in Tampa Bay?",
+      "Best driveway cleaning company in Tampa Bay?",
+      "Recommend a commercial pressure washing company in Tampa, FL.",
+      "Who offers roof cleaning and exterior cleaning around Tampa Bay?"
+    ],
+    "verified_organic_wins": [],
+    "verified_map_pack_wins": []
+  }
+}

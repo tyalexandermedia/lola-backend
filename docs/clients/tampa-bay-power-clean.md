@@ -33,9 +33,16 @@ Services configured for tracking and landing-page copy:
 
 ## Config Files Added or Updated
 
+- `CLIENTS/tampa-bay-power-clean/client.json`
+  - Canonical non-secret client metadata, services, and tracking prompts.
+- `CLIENTS/tampa-bay-power-clean/README.md`
+  - Client-specific scaffold documentation.
+- `client_configs.py`
+  - File-backed client registry loader shared by backend config.
 - `case_studies/configs.py`
-  - Added `CASE_STUDIES["tampa-bay-power-clean"]`.
-  - Sandbar entries are unchanged.
+  - `CASE_STUDIES["tampa-bay-power-clean"]` is built from the client registry.
+  - `CASE_STUDIES["sandbar"]` is also built from its registry file without
+    changing the Sandbar slug, target URL, query list, or dashboard behavior.
 - `frontend/public/lp/tampa-bay-power-clean.html`
   - Client-specific static landing page.
   - Includes LocalBusiness and FAQ schema.
@@ -44,6 +51,11 @@ Services configured for tracking and landing-page copy:
   - Added rewrite for `/lp/tampa-bay-power-clean`.
 - `frontend/public/sitemap.xml`
   - Added sitemap entry for the client landing page.
+- `scripts/create_client.py`
+  - Safe new-client scaffold generator for future clients.
+- `scripts/verify_client_registry.py`
+  - Smoke check that Sandbar and Tampa registry configs resolve through the
+    existing case-study layer.
 
 ## Backend Capabilities
 
@@ -119,7 +131,8 @@ Suggested onboarding payload:
 Run:
 
 ```bash
-.venv/bin/python -m py_compile main.py db/revenue.py db/tracking.py agents/revenue_agent/main.py
+.venv/bin/python -m py_compile main.py db/revenue.py db/tracking.py agents/revenue_agent/main.py client_configs.py case_studies/configs.py scripts/create_client.py scripts/verify_client_registry.py
+.venv/bin/python scripts/verify_client_registry.py
 npm --prefix frontend run build
 git diff --check
 ```
