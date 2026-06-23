@@ -111,6 +111,20 @@ from db.tracking import (
     cwv_history,
     EVENT_TYPES,
 )
+from db.revenue import (
+    init_revenue_tables,
+    create_estimate,
+    complete_action as revenue_complete_action,
+    link_won_job_to_opportunity,
+    list_actions as revenue_list_actions,
+    list_estimates,
+    list_opportunities,
+    revenue_summary,
+    update_estimate_status,
+    update_opportunity_status,
+    upsert_opportunity,
+)
+from agents.revenue_agent.main import run_revenue_agent
 from db.reviews import review_counts_for_slug
 from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
@@ -202,6 +216,7 @@ async def startup_event():
     await init_outreach_tables()
     await init_prospect_tables()
     await init_tracking_tables()
+    await init_revenue_tables()
     await init_applications_table()
     await init_reviews_tables()
     await init_case_studies_table()
@@ -1863,6 +1878,17 @@ async def public_client_dashboard(slug: str):
     # in the reporting table yet.
     from db.tracking import won_jobs_stats as _won_jobs_stats
     won_jobs = await _safe(_won_jobs_stats(slug), {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []})
+    revenue_agent_summary = await _safe(
+        revenue_summary(slug),
+        {
+            "contacts": 0,
+            "pipeline_value": 0,
+            "won_revenue": 0,
+            "open_actions": 0,
+            "opportunities": {},
+            "estimates": {},
+        },
+    )
     from db.reporting import get_client_by_slug as _get_client
     rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
@@ -1941,6 +1967,20 @@ async def public_client_dashboard(slug: str):
         "cost_per_lead": cpl,
         "integrations": integrations,
         "won_jobs": won_jobs,
+        "revenue_agent": {
+            "contacts": int(revenue_agent_summary.get("contacts") or 0),
+            "pipeline_value": int(revenue_agent_summary.get("pipeline_value") or 0),
+            "won_revenue": int(revenue_agent_summary.get("won_revenue") or 0),
+            "open_actions": int(revenue_agent_summary.get("open_actions") or 0),
+            "opportunities": {
+                status: int((data or {}).get("count") or 0)
+                for status, data in (revenue_agent_summary.get("opportunities") or {}).items()
+            },
+            "estimates": {
+                status: int((data or {}).get("count") or 0)
+                for status, data in (revenue_agent_summary.get("estimates") or {}).items()
+            },
+        },
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -2893,6 +2933,7 @@ class WonJobRequest(BaseModel):
     service_type: Optional[str] = None   # "roof cleaning", "soft wash", etc.
     source: Optional[str] = None         # gbp / callrail / website / ai_search
     call_sid: Optional[str] = None       # link to specific tracked_calls row
+    opportunity_id: Optional[int] = None # link to Revenue Agent opportunity
     notes: Optional[str] = None
 
 
@@ -2919,12 +2960,20 @@ async def admin_log_won_job(
     import aiosqlite
     db_path = os.getenv("DB_PATH", "lola.db")
     async with aiosqlite.connect(db_path) as db:
+        if body.opportunity_id:
+            async with db.execute(
+                "SELECT id FROM revenue_opportunities WHERE id = ? AND slug = ?",
+                (body.opportunity_id, slug.strip().lower()),
+            ) as cur:
+                if not await cur.fetchone():
+                    raise HTTPException(status_code=404, detail="opportunity_id not found")
         await db.execute(
-            """INSERT INTO won_jobs (slug, call_sid, job_value, service_type, source, notes)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO won_jobs (slug, call_sid, opportunity_id, job_value, service_type, source, notes)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
                 slug.strip().lower(),
                 (body.call_sid or "").strip() or None,
+                body.opportunity_id,
                 body.job_value,
                 (body.service_type or "").strip() or None,
                 (body.source or "").strip() or None,
@@ -2932,6 +2981,8 @@ async def admin_log_won_job(
             ),
         )
         await db.commit()
+    if body.opportunity_id:
+        await link_won_job_to_opportunity(body.opportunity_id, body.job_value)
     stats = await won_jobs_stats(slug)
     return {
         "ok": True,
@@ -2952,6 +3003,192 @@ async def admin_list_won_jobs(
     _check_admin(x_admin_key)
     from db.tracking import won_jobs_stats
     return await won_jobs_stats(slug)
+
+
+# ── REVENUE AGENT ADMIN API ───────────────────────────────────
+
+class OpportunityRequest(BaseModel):
+    title: str
+    contact_id: Optional[int] = None
+    source: Optional[str] = None
+    source_id: Optional[str] = None
+    status: str = "new"
+    estimated_value: int = 0
+    notes: Optional[str] = None
+
+
+class OpportunityStatusRequest(BaseModel):
+    status: str
+    won_value: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class EstimateRequest(BaseModel):
+    opportunity_id: Optional[int] = None
+    contact_id: Optional[int] = None
+    amount: int
+    status: str = "sent"
+    description: Optional[str] = None
+
+
+class EstimateStatusRequest(BaseModel):
+    status: str
+
+
+class RevenueActionRequest(BaseModel):
+    status: str = "completed"
+
+
+@app.post("/admin/revenue/{slug}/run")
+async def admin_run_revenue_agent(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return await run_revenue_agent(slug)
+
+
+@app.get("/admin/revenue/{slug}/summary")
+async def admin_revenue_summary(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return await revenue_summary(slug)
+
+
+@app.post("/admin/opportunities/{slug}")
+async def admin_create_opportunity(
+    slug: str,
+    body: OpportunityRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    title = body.title.strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+    if body.estimated_value < 0:
+        raise HTTPException(status_code=400, detail="estimated_value must be >= 0")
+    try:
+        oid = await upsert_opportunity(
+            slug=slug,
+            title=title,
+            contact_id=body.contact_id,
+            source=(body.source or "").strip() or None,
+            source_id=(body.source_id or "").strip() or None,
+            status=body.status,
+            estimated_value=body.estimated_value,
+            notes=(body.notes or "").strip() or None,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"ok": True, "id": oid}
+
+
+@app.get("/admin/opportunities/{slug}")
+async def admin_list_opportunities(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"opportunities": await list_opportunities(slug)}
+
+
+@app.post("/admin/opportunities/{opportunity_id}/status")
+async def admin_update_opportunity_status(
+    opportunity_id: int,
+    body: OpportunityStatusRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await update_opportunity_status(
+            opportunity_id,
+            body.status,
+            won_value=body.won_value,
+            notes=body.notes,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="opportunity not found")
+    return {"ok": True, "opportunity": updated}
+
+
+@app.post("/admin/estimates/{slug}")
+async def admin_create_estimate(
+    slug: str,
+    body: EstimateRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    if body.amount < 0:
+        raise HTTPException(status_code=400, detail="amount must be >= 0")
+    try:
+        eid = await create_estimate(
+            slug=slug,
+            opportunity_id=body.opportunity_id,
+            contact_id=body.contact_id,
+            amount=body.amount,
+            status=body.status,
+            description=(body.description or "").strip() or None,
+        )
+    except ValueError as e:
+        message = str(e)
+        status = 404 if "not found" in message else 400
+        raise HTTPException(status_code=status, detail=message)
+    return {"ok": True, "id": eid}
+
+
+@app.get("/admin/estimates/{slug}")
+async def admin_list_estimates(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"estimates": await list_estimates(slug)}
+
+
+@app.post("/admin/estimates/{estimate_id}/status")
+async def admin_update_estimate_status(
+    estimate_id: int,
+    body: EstimateStatusRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await update_estimate_status(estimate_id, body.status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="estimate not found")
+    return {"ok": True, "estimate": updated}
+
+
+@app.get("/admin/revenue/{slug}/actions")
+async def admin_list_revenue_actions(
+    slug: str,
+    include_done: bool = False,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"actions": await revenue_list_actions(slug, include_done=include_done)}
+
+
+@app.post("/admin/revenue/actions/{action_id}/complete")
+async def admin_complete_revenue_action(
+    action_id: int,
+    body: RevenueActionRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await revenue_complete_action(action_id, body.status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="action not found")
+    return {"ok": True, "action": updated}
 
 
 @app.get("/admin/calls/{slug}")

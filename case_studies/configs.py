@@ -90,6 +90,41 @@ CASE_STUDIES: dict[str, CaseStudy] = {
             "Tarpon Springs — soft wash",
         ],
     ),
+    # Separate client-facing dashboard for Tampa Bay Power Clean.
+    # Share: https://lola.tyalexandermedia.com/r/client/tampa-bay-power-clean
+    # Admin snapshot:
+    #   POST /admin/case-study/tampa-bay-power-clean/run   (X-Admin-Key header)
+    "tampa-bay-power-clean": CaseStudy(
+        slug="tampa-bay-power-clean",
+        client_name="Tampa Bay Power Clean",
+        target_url="https://www.tampabaypowerclean.com",
+        target_domain="tampabaypowerclean.com",
+        google_queries=[
+            "pressure washing tampa bay",
+            "power washing tampa bay",
+            "house washing tampa bay",
+            "driveway cleaning tampa bay",
+            "roof cleaning tampa bay",
+            "soft washing tampa bay",
+            "commercial pressure washing tampa",
+            "paver cleaning tampa bay",
+            "concrete cleaning tampa bay",
+            "pressure washing tampa fl",
+            "power washing tampa fl",
+            "soft wash tampa fl",
+            "driveway pressure washing tampa",
+            "commercial pressure washing near tampa",
+            "roof cleaning tampa fl",
+        ],
+        ai_mode_prompts=[
+            "Best pressure washing company in Tampa Bay? List 3 options.",
+            "Recommend a power washing company near Tampa, Florida.",
+            "Who should I call for soft washing and house washing in Tampa Bay?",
+            "Best driveway cleaning company in Tampa Bay?",
+            "Recommend a commercial pressure washing company in Tampa, FL.",
+            "Who offers roof cleaning and exterior cleaning around Tampa Bay?",
+        ],
+    ),
     # The original page-level case study — Coach Ty's father's operation.
     # Day 0: 2026-05-25. Day 30 target: 2026-06-23. Kept for granular
     # roof-cleaning-page tracking (internal); 'sandbar' above is the
