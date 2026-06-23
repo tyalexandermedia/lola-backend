@@ -16,6 +16,10 @@ from typing import Any
 CLIENTS_DIR = Path(__file__).resolve().parent / "CLIENTS"
 
 
+class ClientConfigError(ValueError):
+    """Raised when one client config is malformed or incomplete."""
+
+
 @dataclass(frozen=True)
 class ClientTrackingConfig:
     google_queries: list[str] = field(default_factory=list)
@@ -37,18 +41,37 @@ class LolaClientConfig:
     tracking: ClientTrackingConfig = field(default_factory=ClientTrackingConfig)
 
 
+@dataclass(frozen=True)
+class ClientConfigLoadResult:
+    slug: str
+    path: Path
+    config: LolaClientConfig | None = None
+    error: str | None = None
+
+
+def _format_error(slug: str, field_name: str, message: str) -> ClientConfigError:
+    return ClientConfigError(f"{slug}: {field_name}: {message}")
+
+
 def _string_list(value: Any, field_name: str, slug: str) -> list[str]:
     if value is None:
         return []
     if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-        raise ValueError(f"{slug}: {field_name} must be a list of strings")
+        raise _format_error(slug, field_name, "must be a list of strings")
     return [item.strip() for item in value if item.strip()]
+
+
+def _required_string_list(value: Any, field_name: str, slug: str) -> list[str]:
+    items = _string_list(value, field_name, slug)
+    if not items:
+        raise _format_error(slug, field_name, "must contain at least one value")
+    return items
 
 
 def _required_string(data: dict[str, Any], field_name: str, slug: str) -> str:
     value = data.get(field_name)
     if not isinstance(value, str) or not value.strip():
-        raise ValueError(f"{slug}: missing required string field {field_name}")
+        raise _format_error(slug, field_name, "missing required non-empty string")
     return value.strip()
 
 
@@ -57,16 +80,36 @@ def load_client_config(slug: str) -> LolaClientConfig | None:
     if not path.exists():
         return None
 
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise ClientConfigError(
+            f"{slug}: client.json: invalid JSON at line {exc.lineno}: {exc.msg}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise ClientConfigError(f"{slug}: client.json: must contain a JSON object")
 
     declared_slug = _required_string(data, "slug", slug)
     if declared_slug != slug:
-        raise ValueError(f"{slug}: client.json slug must match folder name")
+        raise _format_error(slug, "slug", "must match the client folder name")
 
     tracking_data = data.get("tracking") or {}
     if not isinstance(tracking_data, dict):
-        raise ValueError(f"{slug}: tracking must be an object")
+        raise _format_error(slug, "tracking", "must be an object")
+
+    google_queries = _string_list(
+        tracking_data.get("google_queries"), "tracking.google_queries", slug
+    )
+    ai_mode_prompts = _string_list(
+        tracking_data.get("ai_mode_prompts"), "tracking.ai_mode_prompts", slug
+    )
+    if not google_queries and not ai_mode_prompts:
+        raise _format_error(
+            slug,
+            "tracking",
+            "must include at least one google query or AI mode prompt",
+        )
 
     return LolaClientConfig(
         slug=slug,
@@ -76,14 +119,10 @@ def load_client_config(slug: str) -> LolaClientConfig | None:
         industry=_required_string(data, "industry", slug),
         market=_required_string(data, "market", slug),
         primary_service_area=_required_string(data, "primary_service_area", slug),
-        services=_string_list(data.get("services"), "services", slug),
+        services=_required_string_list(data.get("services"), "services", slug),
         tracking=ClientTrackingConfig(
-            google_queries=_string_list(
-                tracking_data.get("google_queries"), "tracking.google_queries", slug
-            ),
-            ai_mode_prompts=_string_list(
-                tracking_data.get("ai_mode_prompts"), "tracking.ai_mode_prompts", slug
-            ),
+            google_queries=google_queries,
+            ai_mode_prompts=ai_mode_prompts,
             verified_organic_wins=_string_list(
                 tracking_data.get("verified_organic_wins"),
                 "tracking.verified_organic_wins",
@@ -98,18 +137,63 @@ def load_client_config(slug: str) -> LolaClientConfig | None:
     )
 
 
-def iter_client_configs() -> dict[str, LolaClientConfig]:
+def load_client_config_result(
+    slug: str, *, require_file: bool = False
+) -> ClientConfigLoadResult:
+    path = CLIENTS_DIR / slug / "client.json"
+    if require_file and not path.exists():
+        return ClientConfigLoadResult(
+            slug=slug,
+            path=path,
+            error=f"{slug}: missing CLIENTS/{slug}/client.json",
+        )
+    try:
+        return ClientConfigLoadResult(
+            slug=slug, path=path, config=load_client_config(slug)
+        )
+    except ClientConfigError as exc:
+        return ClientConfigLoadResult(slug=slug, path=path, error=str(exc))
+
+
+def iter_client_configs(*, strict: bool = False) -> dict[str, LolaClientConfig]:
     clients: dict[str, LolaClientConfig] = {}
     if not CLIENTS_DIR.exists():
         return clients
 
+    errors: list[str] = []
     for child in sorted(CLIENTS_DIR.iterdir()):
         if not child.is_dir() or child.name.startswith("_"):
             continue
-        config = load_client_config(child.name)
-        if config:
-            clients[config.slug] = config
+        result = load_client_config_result(child.name, require_file=True)
+        if result.config:
+            clients[result.config.slug] = result.config
+        elif result.error:
+            errors.append(result.error)
+    if strict and errors:
+        raise ClientConfigError("; ".join(errors))
     return clients
+
+
+def validate_client_configs(required_slugs: tuple[str, ...] = ()) -> list[str]:
+    errors: list[str] = []
+    seen: set[str] = set()
+    if not CLIENTS_DIR.exists():
+        return [f"registry: missing CLIENTS directory at {CLIENTS_DIR}"]
+
+    for child in sorted(CLIENTS_DIR.iterdir()):
+        if not child.is_dir() or child.name.startswith("_"):
+            continue
+        seen.add(child.name)
+        result = load_client_config_result(child.name, require_file=True)
+        if result.error:
+            errors.append(result.error)
+
+    for slug in required_slugs:
+        if slug not in seen:
+            errors.append(f"{slug}: missing CLIENTS/{slug}/ folder")
+        elif not (CLIENTS_DIR / slug / "client.json").exists():
+            errors.append(f"{slug}: missing CLIENTS/{slug}/client.json")
+    return errors
 
 
 def get_client_config(slug: str) -> LolaClientConfig | None:

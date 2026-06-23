@@ -55,7 +55,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from case_studies.configs import CASE_STUDIES  # noqa: E402
-from client_configs import get_client_config, iter_client_configs  # noqa: E402
+from client_configs import (  # noqa: E402
+    get_client_config,
+    iter_client_configs,
+    validate_client_configs,
+)
 
 
 def add_error(errors: list[str], slug: str, message: str) -> None:
@@ -188,6 +192,9 @@ def validate_loader_isolation(slug: str, errors: list[str]) -> None:
 
 
 def validate_registry_paths(errors: list[str]) -> None:
+    for error in validate_client_configs(required_slugs=REQUIRED_CLIENTS):
+        add_error(errors, "registry", error)
+
     try:
         registry = iter_client_configs()
     except Exception as exc:

@@ -11,13 +11,20 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from case_studies.configs import CASE_STUDIES
-from client_configs import iter_client_configs
+from client_configs import iter_client_configs, validate_client_configs
 
 
 REQUIRED_SLUGS = ("sandbar", "tampa-bay-power-clean")
 
 
 def main() -> int:
+    validation_errors = validate_client_configs(required_slugs=REQUIRED_SLUGS)
+    if validation_errors:
+        print("Client registry validation failed:")
+        for error in validation_errors:
+            print(f"- {error}")
+        return 1
+
     clients = iter_client_configs()
     for slug in REQUIRED_SLUGS:
         if slug not in clients:
