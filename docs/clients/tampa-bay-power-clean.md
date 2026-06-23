@@ -27,7 +27,8 @@ Services configured for tracking and landing-page copy:
 ## Routes Created
 
 - Public client dashboard: `/r/client/tampa-bay-power-clean`
-- Client landing page: `/lp/tampa-bay-power-clean`
+- Temporary public landing page: `https://www.sandbarsoftwash.com/tampa-bay-power-clean`
+- Preserved client landing page: `/lp/tampa-bay-power-clean`
 - Revenue admin UI: `/admin/revenue/tampa-bay-power-clean`
 - Revenue agent run endpoint: `POST /admin/revenue/tampa-bay-power-clean/run`
 - Case-study snapshot endpoint: `POST /admin/case-study/tampa-bay-power-clean/run`
@@ -50,12 +51,13 @@ Services configured for tracking and landing-page copy:
   - Client-specific static landing page and SEO test asset.
   - Focus: paver sealing, roof cleaning, house washing, commercial pressure
     washing, and commercial roof cleaning in Dunedin and Tampa Bay.
-  - Includes LocalBusiness, FAQ, and breadcrumb schema.
+  - Includes Service and FAQ schema without publishing an unverified phone
+    number or street address.
   - Any unverified proof/review content is explicitly marked as placeholder.
   - Does not depend on GBP access and does not claim rankings, review counts,
     GBP metrics, or fabricated performance data.
 - `frontend/vercel.json`
-  - Added rewrite for `/lp/tampa-bay-power-clean`.
+  - Added rewrites for `/tampa-bay-power-clean` and `/lp/tampa-bay-power-clean`.
 - `frontend/public/sitemap.xml`
   - Added sitemap entry for the client landing page.
 - `scripts/create_client.py`
@@ -108,15 +110,21 @@ Primary service areas:
 - Tarpon Springs
 - Tampa Bay
 
-Call and quote CTAs currently use Tampa Bay Power Clean's public website and
-phone details from the live site:
+Call and quote CTAs temporarily use Sandbar/LOLA intake:
 
-- Phone: `727-210-5668`
-- Contact path: `https://www.tampabaypowerclean.com/contact-us`
-- Public address shown on source site: `73 Patricia Avenue, Dunedin, FL 34698`
+- Phone intake: `727-712-6281`
+- Intake destination: `https://www.sandbarsoftwash.com/#contact`
+- Campaign source: `lola`
+- Campaign name: `tampa_bay_power_clean`
+- Temporary public URL: `https://www.sandbarsoftwash.com/tampa-bay-power-clean`
+- Preserved URL: `https://www.sandbarsoftwash.com/lp/tampa-bay-power-clean`
 
-A dedicated campaign tracking number or form endpoint should replace these
-public links if this test needs call/lead attribution inside LOLA OS.
+The public page discloses this as active LOLA intake routing so Tampa Bay Power
+Clean remains presented as its own brand. Internally, that routing uses
+Sandbar's current public phone number and the existing Sandbar/LOLA form until
+a dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint are
+ready. The landing page does not publish or fabricate a Tampa Bay Power Clean
+phone number.
 
 ## Data Sources Still Needed
 
@@ -134,9 +142,9 @@ To make the dashboard live in production, configure or collect:
 - GA4 property ID, if available.
 - Google Business Profile integration, if available. GBP is not required for
   the current landing-page test and no GBP data is fabricated.
-- Dedicated tracked phone number for the landing-page call CTA, if campaign
-  attribution is required. The current page uses the public phone number shown
-  on Tampa Bay Power Clean's site.
+- Dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint.
+  The current page temporarily uses Sandbar's phone number and sends quote
+  requests through the established Sandbar/LOLA intake form.
 - Verified testimonials/reviews and before/after photos for the landing page.
 - Brevo/weekly reporting recipient email and template, if weekly reports should send.
 
@@ -155,6 +163,7 @@ Suggested onboarding payload:
   "money_keywords": [
     "paver sealing dunedin",
     "paver sealing tampa bay",
+    "paver cleaning and sealing dunedin",
     "commercial pressure washing dunedin",
     "commercial pressure washing tampa bay",
     "commercial roof cleaning dunedin",
@@ -165,10 +174,16 @@ Suggested onboarding payload:
     "roof cleaning tampa bay",
     "house washing dunedin",
     "house washing tampa bay",
+    "soft washing dunedin",
+    "driveway cleaning dunedin",
+    "concrete cleaning dunedin",
     "paver sealing clearwater",
     "commercial pressure washing clearwater",
     "roof cleaning clearwater",
-    "house washing clearwater"
+    "house washing clearwater",
+    "roof cleaning palm harbor",
+    "pressure washing safety harbor",
+    "pressure washing tarpon springs"
   ],
   "ai_mode_prompts": [
     "Who should I call for paver sealing in Dunedin, Florida?",
@@ -178,7 +193,9 @@ Suggested onboarding payload:
     "Recommend a residential roof cleaning company in Dunedin.",
     "Who handles commercial roof cleaning in Tampa Bay?",
     "Best house washing company in Dunedin or Clearwater?",
-    "Who should I call for roof cleaning and house washing in Tampa Bay?"
+    "Who should I call for roof cleaning and house washing in Tampa Bay?",
+    "Who offers soft washing and driveway cleaning in Dunedin?",
+    "Recommend an exterior cleaning company serving Palm Harbor, Safety Harbor, and Tarpon Springs."
   ],
   "seed_tasks": true
 }
@@ -217,9 +234,10 @@ curl http://localhost:5173/r/client/sandbar
 3. Let Railway deploy the backend from the merged branch.
 4. Let Vercel deploy the frontend from `frontend/`.
 5. Verify:
-   - `/r/client/tampa-bay-power-clean`
-   - `/lp/tampa-bay-power-clean`
-   - `/r/client/sandbar`
+  - `/r/client/tampa-bay-power-clean`
+  - `/tampa-bay-power-clean`
+  - `/lp/tampa-bay-power-clean`
+  - `/r/client/sandbar`
 
 ## Safety Notes
 

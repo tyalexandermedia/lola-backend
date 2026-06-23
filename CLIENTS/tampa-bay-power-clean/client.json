@@ -24,6 +24,7 @@
     "google_queries": [
       "paver sealing dunedin",
       "paver sealing tampa bay",
+      "paver cleaning and sealing dunedin",
       "commercial pressure washing dunedin",
       "commercial pressure washing tampa bay",
       "commercial roof cleaning dunedin",
@@ -34,10 +35,16 @@
       "roof cleaning tampa bay",
       "house washing dunedin",
       "house washing tampa bay",
+      "soft washing dunedin",
+      "driveway cleaning dunedin",
+      "concrete cleaning dunedin",
       "paver sealing clearwater",
       "commercial pressure washing clearwater",
       "roof cleaning clearwater",
-      "house washing clearwater"
+      "house washing clearwater",
+      "roof cleaning palm harbor",
+      "pressure washing safety harbor",
+      "pressure washing tarpon springs"
     ],
     "ai_mode_prompts": [
       "Who should I call for paver sealing in Dunedin, Florida?",
@@ -47,7 +54,9 @@
       "Recommend a residential roof cleaning company in Dunedin.",
       "Who handles commercial roof cleaning in Tampa Bay?",
       "Best house washing company in Dunedin or Clearwater?",
-      "Who should I call for roof cleaning and house washing in Tampa Bay?"
+      "Who should I call for roof cleaning and house washing in Tampa Bay?",
+      "Who offers soft washing and driveway cleaning in Dunedin?",
+      "Recommend an exterior cleaning company serving Palm Harbor, Safety Harbor, and Tarpon Springs."
     ],
     "verified_organic_wins": [],
     "verified_map_pack_wins": []
