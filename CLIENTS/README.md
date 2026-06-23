@@ -23,3 +23,22 @@
 ## How It Supports LOLA OS
 
 `CLIENTS/` keeps each client isolated as a first-class entity while still letting LOLA OS reuse shared platform capabilities from the rest of the repo.
+
+## Verification
+
+Run the read-only onboarding verifier before moving shared code or promoting a
+new client:
+
+```bash
+python scripts/verify_client_onboarding.py
+```
+
+If your shell does not provide a `python` alias, use the project virtualenv:
+
+```bash
+.venv/bin/python scripts/verify_client_onboarding.py
+```
+
+The script checks required client config fields, secret-like keys and values,
+tracking targets, service lists, Sandbar's case-study/dashboard config path,
+and Tampa Bay Power Clean's client registry path.
