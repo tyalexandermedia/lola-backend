@@ -108,9 +108,15 @@ Primary service areas:
 - Tarpon Springs
 - Tampa Bay
 
-Call and quote CTAs currently route through the existing Sandbar/LOLA intake
-workflow because no dedicated Tampa Bay Power Clean tracking number is
-configured in repo config yet.
+Call and quote CTAs currently use Tampa Bay Power Clean's public website and
+phone details from the live site:
+
+- Phone: `727-210-5668`
+- Contact path: `https://www.tampabaypowerclean.com/contact-us`
+- Public address shown on source site: `73 Patricia Avenue, Dunedin, FL 34698`
+
+A dedicated campaign tracking number or form endpoint should replace these
+public links if this test needs call/lead attribution inside LOLA OS.
 
 ## Data Sources Still Needed
 
@@ -122,13 +128,15 @@ To make the dashboard live in production, configure or collect:
 - Reporting client row via `POST /admin/reporting/onboard` or `/admin/reporting/clients`.
 - Call tracking provider/webhook data for `tampa-bay-power-clean`.
 - Dedicated Tampa Bay Power Clean tracking number or form endpoint, if this
-  test asset should stop routing through the existing intake workflow.
+  test asset needs LOLA OS call/lead attribution.
 - Quote form or lead capture events into `tracked_events`.
 - Google Search Console property, if available.
 - GA4 property ID, if available.
 - Google Business Profile integration, if available. GBP is not required for
   the current landing-page test and no GBP data is fabricated.
-- Verified phone number for the landing-page call CTA.
+- Dedicated tracked phone number for the landing-page call CTA, if campaign
+  attribution is required. The current page uses the public phone number shown
+  on Tampa Bay Power Clean's site.
 - Verified testimonials/reviews and before/after photos for the landing page.
 - Brevo/weekly reporting recipient email and template, if weekly reports should send.
 
