@@ -1,0 +1,59 @@
+{
+  "id": "local-service",
+  "name": "Local Service",
+  "version": "1.0.0",
+  "status": "tested",
+  "claim_status": "tested",
+  "summary": "Reusable business model for service businesses that win demand in a defined local market and convert calls/leads into estimates, won jobs, and revenue.",
+  "business_model": "Lead generation and service fulfillment for local customers or commercial property buyers.",
+  "customer_journey": [
+    "Search or referral discovery",
+    "Service and area fit validation",
+    "Call or quote request",
+    "Scope qualification",
+    "Estimate",
+    "Won job",
+    "Review, referral, or repeat service"
+  ],
+  "offer_ladder": [
+    "Single service quote",
+    "Bundled service quote",
+    "Commercial maintenance request",
+    "Recurring maintenance or seasonal follow-up"
+  ],
+  "acquisition_strategy": [
+    "Local SEO",
+    "Google Business Profile",
+    "AI visibility",
+    "Reviews and referrals",
+    "Commercial relationship building"
+  ],
+  "retention_strategy": [
+    "Maintenance reminders",
+    "Review requests",
+    "Referral prompts",
+    "Seasonal reactivation"
+  ],
+  "key_metrics": [
+    "Calls",
+    "Leads",
+    "Qualified opportunities",
+    "Estimates sent",
+    "Won jobs",
+    "Revenue influenced",
+    "Ranking and visibility movement"
+  ],
+  "common_failure_modes": [
+    "No call tracking",
+    "Thin location content",
+    "Unverified trust claims",
+    "No estimate follow-up",
+    "Client proof mixed into global playbooks"
+  ],
+  "evidence_requirements": [
+    "At least one live client implementation",
+    "Tracking for calls or leads",
+    "Documented conversion path",
+    "Clear proof status for all claims"
+  ]
+}

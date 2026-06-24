@@ -1,5 +1,8 @@
 {
   "slug": "tampa-bay-power-clean",
+  "pattern_id": "local-service",
+  "blueprint_id": "pressure-washing",
+  "lifecycle": "launch",
   "client_name": "Tampa Bay Power Clean",
   "website": "https://www.tampabaypowerclean.com",
   "target_domain": "tampabaypowerclean.com",

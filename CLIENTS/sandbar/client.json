@@ -1,5 +1,8 @@
 {
   "slug": "sandbar",
+  "pattern_id": "local-service",
+  "blueprint_id": "pressure-washing",
+  "lifecycle": "live",
   "client_name": "Sandbar Soft Wash",
   "website": "https://www.sandbarsoftwash.com",
   "target_domain": "sandbarsoftwash.com",
