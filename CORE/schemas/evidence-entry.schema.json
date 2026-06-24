@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lola-os.local/schemas/evidence-entry.schema.json",
+  "title": "LOLA OS Evidence Entry",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "source",
+    "date",
+    "claim_status",
+    "context",
+    "evidence",
+    "confidence_score",
+    "reusability_score",
+    "review_date"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "claim_status": {
+      "type": "string",
+      "enum": [
+        "assumption",
+        "hypothesis",
+        "tested",
+        "proven",
+        "deprecated"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "client_slug",
+        "pattern_id",
+        "blueprint_id"
+      ],
+      "properties": {
+        "client_slug": {
+          "type": "string"
+        },
+        "pattern_id": {
+          "type": "string"
+        },
+        "blueprint_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "experiment_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "summary"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metric_impacted": {
+          "type": "string"
+        },
+        "before": {},
+        "after": {},
+        "source_url": {
+          "type": "string"
+        },
+        "private_data_removed": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "confidence_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "reusability_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "recommended_use": {
+      "type": "string"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "additionalProperties": false
+}

@@ -22,3 +22,12 @@
 ## How It Supports LOLA OS
 
 Blueprints turn proven knowledge into repeatable systems. Clients inherit from blueprints; blueprints inherit from patterns.
+
+## Verification
+
+Run:
+
+```bash
+python3 scripts/verify_blueprints.py
+python3 scripts/blueprint_scorecard.py pressure-washing
+```

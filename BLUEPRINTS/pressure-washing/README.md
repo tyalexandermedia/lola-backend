@@ -21,3 +21,13 @@ The pressure washing blueprint defines the reusable LOLA OS system for exterior 
 ## How It Supports LOLA OS
 
 This blueprint is the first reusable local-service blueprint. It converts Sandbar proof and Tampa Bay Power Clean validation into a repeatable model for future exterior-cleaning clients.
+
+## Scorecard
+
+Run the read-only scorecard from the repo root:
+
+```bash
+python3 scripts/blueprint_scorecard.py pressure-washing
+```
+
+Unknown values such as revenue influenced, experiments run, and proven systems remain empty until evidence exists.
