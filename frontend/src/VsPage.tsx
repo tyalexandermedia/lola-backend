@@ -62,7 +62,7 @@ interface Competitor {
 // Source of truth. Add new competitors by appending here.
 
 const LOLA_PRICE = '$697 – $997/mo';
-const LOLA_MODEL = 'Done-for-you, transparent monthly';
+const LOLA_MODEL = 'Done-for-you · transparent · no feature gates';
 
 const LOCALIQ: Competitor = {
   slug: 'localiq',

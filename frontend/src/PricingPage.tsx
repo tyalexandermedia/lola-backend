@@ -171,8 +171,8 @@ export default function PricingPage() {
         </h1>
         <p className="mx-auto mt-5 max-w-[700px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
           One business per niche per city. When you lock a market, we don&apos;t run
-          the Lola playbook for your direct competitor there. Three tiers sized by
-          your service-area scope — 1 city, your full delivery radius, or a multi-market
+          the Lola playbook for your direct competitor there. Two tiers sized by
+          your service-area scope — your full delivery radius, or a multi-market
           region.
         </p>
         <p className="mx-auto mt-3 max-w-[680px] text-[13px] italic leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
