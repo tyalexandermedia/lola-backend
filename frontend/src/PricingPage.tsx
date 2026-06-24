@@ -3,16 +3,15 @@
  *
  * Sections:
  *   1. Transparency block (above tiers)
- *   2. 3-tier grid: Starter · Growth (featured, Most Popular) · Pro
+ *   2. 2-tier grid: Growth (featured, Most Popular) · Pro
  *   3. 30-Day Half-Back + First Win guarantees
  *   4. Trust strip
  *   5. 3-column comparison: SEO Tools vs Premium Agencies vs Lola
  *   6. Testimonial card
  *
- * Pricing matrix (locked 2026-06-15 — call-first rebuild):
- *   - Starter   $297/mo   done-for-you, monthly, cancel anytime
- *   - Growth    $697/mo   Most Popular
- *   - Pro       $997/mo   premium, founder access
+ * Pricing matrix (locked 2026-06-24 — two-tier collapse, no feature gates):
+ *   - Growth    $697/mo   Most Popular · the floor · every signal, no gates
+ *   - Pro       $997/mo   premium, multi-market, monthly founder call
  *
  * Every CTA books a free strategy call. No Stripe self-serve checkout — at
  * these price points a 15-minute call closes far better than a cold cart.
@@ -35,7 +34,7 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'Which plan should I pick?',
-    a: "Starter ($297) if you operate in one city. Growth ($697) if your vans cover 3–5 cities — that's most home-service businesses. Pro ($997) if you have multiple locations or you serve a whole region/state. Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+    a: "Growth ($697) if your vans cover up to 5 cities — that's most home-service businesses, and it's the floor: every signal Lola tracks, no feature gates. Pro ($997) if you have multiple locations or serve a whole region/state and want a monthly strategy call with Coach Ty. Not sure? Book the free call and Coach Ty will tell you straight.",
   },
   {
     q: 'Do you handle social media posting too?',
@@ -47,7 +46,7 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'Can I switch tiers later?',
-    a: 'Anytime. Move up or down between Starter, Growth, and Pro with one Slack message. We pro-rate the difference. No friction, no penalty.',
+    a: 'Anytime. Move up or down between Growth and Pro with one Slack message. We pro-rate the difference. No friction, no penalty.',
   },
   {
     q: "What's NOT included?",
@@ -150,7 +149,6 @@ export default function PricingPage() {
     };
   }, []);
 
-  const starterHref = withUtm(CALENDAR_URL, 'starter', 'starter');
   const growthHref = withUtm(CALENDAR_URL, 'growth', 'growth');
   const proHref = withUtm(CALENDAR_URL, 'pro', 'pro');
 
@@ -206,55 +204,31 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── 2. 3-TIER GRID ─────────────────────────────────────────── */}
+      {/* ── 2. 2-TIER GRID ─────────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
-        {/* DOM order: Starter, Growth, Pro (desktop left→right value ladder).
-            Mobile order: Growth (1) → Pro (2) → Starter (3) — anchor on popular. */}
-        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-5">
-          {/* STARTER — 1 city Local Lock */}
-          <div className="order-3 lg:order-1">
-            <TierCard
-              variant="starter"
-              eyebrow="1-City Local Lock · Monthly"
-              name="Starter"
-              price="$297"
-              pricePeriod="/month · cancel anytime"
-              positioning="Get found in 1 city. Lock = your direct competitor can't hire Lola for the same city + niche. We deliver visibility, clicks, calls, form fills — you close them."
-              features={[
-                '🔒 Local Lock — 1 city, your niche, exclusive',
-                'Full Lola audit + priority fix list',
-                'Google Business Profile optimization (1 location)',
-                'Citation + directory cleanup',
-                'On-page SEO fixes (titles, schema, speed)',
-                'Review-generation system set up',
-                'AI search visibility baseline (ChatGPT, Perplexity, Gemini)',
-                'Monthly progress report',
-                'Email support',
-              ]}
-              ctaLabel="Claim your city →"
-              ctaHref={starterHref}
-              ctaSubtext="Free 15-min call · No contract · 48hr onboarding"
-              onCtaClick={() => track('starter_cta_clicked')}
-            />
-          </div>
-
+        {/* Two tiers, sized by service-area scope. Growth is the floor and
+            unlocks every signal Lola tracks — no feature gates. Pro adds a
+            bigger Lock radius + a monthly strategy call with Coach Ty. */}
+        <div className="mx-auto flex max-w-[760px] flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-5">
           {/* GROWTH (featured — Most Popular) — Service area lock */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1">
             <TierCard
               variant="growth"
               eyebrow="Service-Area Lock · Monthly"
               name="Growth"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Lock = no direct competitor can hire Lola in any of those cities + your niche."
+              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
               features={[
                 '🔒 Local Lock — up to 5 cities, your niche, exclusive',
-                'Everything in Starter, ongoing',
-                'AI Search Visibility tracking (20 prompts/mo)',
+                'Full Lola audit + priority fix list',
+                'Google Business Profile optimization + weekly posts',
+                'On-page SEO, citations, schema, speed fixes',
+                'Review-generation system',
+                'Call tracking + lead attribution (CallRail)',
+                'AI Search Visibility tracking (ChatGPT, Perplexity, Gemini)',
                 'Public client dashboard (rankings + AI Share of Voice)',
                 'Monthly content + link building',
-                'GMB management + weekly posts',
-                'Ongoing citation building + new directories',
                 'Bi-weekly performance reports',
                 'Priority Slack + text support',
               ]}
@@ -266,18 +240,17 @@ export default function PricingPage() {
           </div>
 
           {/* PRO — Regional/Multi-Market Lock. `id="pro"` is the deep-link target from /pricing#pro. */}
-          <div id="pro" className="order-2 scroll-mt-24 lg:order-3">
+          <div id="pro" className="order-2 scroll-mt-24">
             <TierCard
               variant="pro"
               eyebrow="Multi-Market Lock · Monthly"
               name="Pro"
               price="$997"
               pricePeriod="/month · cancel anytime"
-              positioning="Get found across a region — up to 10 cities OR multi-location operations. Lock = no direct competitor can hire Lola in any of those markets + your niche. Coach Ty on Slack."
+              positioning="Get found across a region — up to 10 cities OR multi-location operations. Everything in Growth, plus a monthly strategy call with Coach Ty. Lock = no direct competitor can hire Lola in any of those markets + your niche."
               features={[
                 '🔒 Local Lock — up to 10 cities OR multi-location, your niche, exclusive',
                 'Everything in Growth',
-                'Live AI search citation tracking (ChatGPT, Perplexity, Gemini, Google AI)',
                 'Multi-location / service-area expansion pages (programmatic)',
                 'Per-location dashboards + roll-up metrics',
                 'Monthly 1-on-1 strategy call with Coach Ty',
@@ -296,9 +269,9 @@ export default function PricingPage() {
 
         <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
           Not sure which plan? Book the free call and Coach Ty will tell you
-          straight — even if the honest answer is &quot;start with Starter.&quot; Upgrade to
+          straight — even if the honest answer is &quot;start with Growth.&quot; Upgrade to
           a bigger Lock anytime; if your market gets claimed first, you can grandfather
-          the smaller Lock you already hold.
+          the Lock you already hold.
         </p>
       </section>
 
@@ -416,7 +389,7 @@ export default function PricingPage() {
                 </th>
                 <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] px-3 py-4 sm:px-5">
                   Lola
-                  <span className="block text-[10px] font-normal text-[#D4AF37]">$297–$997/mo</span>
+                  <span className="block text-[10px] font-normal text-[#D4AF37]">$697–$997/mo</span>
                 </th>
               </tr>
             </thead>

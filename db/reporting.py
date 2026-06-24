@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS local_locks (
     niche TEXT NOT NULL,                  -- normalized niche (lowercase)
     city_key TEXT NOT NULL,               -- normalized city slug (e.g. 'tampa-fl')
     city_display TEXT NOT NULL,           -- the human-readable city ('Tampa, FL')
-    tier TEXT NOT NULL DEFAULT 'starter', -- starter | growth | pro
+    tier TEXT NOT NULL DEFAULT 'growth',  -- growth | pro (starter retired 2026-06-24)
     claimed_at TEXT DEFAULT (datetime('now')),
     released_at TEXT,                     -- NULL = active hold
     notes TEXT
@@ -446,7 +446,7 @@ async def claim_lock(
     slug: str,
     niche: str,
     city: str,
-    tier: str = "starter",
+    tier: str = "growth",
     notes: Optional[str] = None,
 ) -> dict:
     """Claim a lock atomically. Returns {ok, conflict?, holder?, lock_id?}.

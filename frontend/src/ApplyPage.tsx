@@ -35,7 +35,7 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
 ];
 
 // Values kept stable for the backend/type contract; labels updated to the
-// call-first 3-tier model (Starter $297 / Growth $697 / Pro $997).
+// call-first two-tier model — Growth $697 / Pro $997 (Starter retired 2026-06-24).
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
   { value: 'retainer', label: 'Growth — $697/mo' },
   { value: 'pro', label: 'Pro — $997/mo' },

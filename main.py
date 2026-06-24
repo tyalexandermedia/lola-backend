@@ -1874,17 +1874,19 @@ async def public_client_dashboard(slug: str):
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
     # Map any active Lock tier → retainer $ for CPL math. Falls back to
-    # the Growth tier ($697) when no lock — the modal client price.
+    # the Growth tier ($697) when no lock — the floor client price.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
-    retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
+    retainer = {"growth": 697, "pro": 997}.get(tier, 697)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 
-    # Tier gating: call tracking + GSC are premium (Growth + Pro). Starter
-    # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
-    call_tracking_on = tier in ("growth", "pro")
-    premium = tier in ("growth", "pro")
+    # No feature gates: every active client sees every signal we track.
+    # Growth ($697) is the floor and unlocks everything; Pro ($997) adds a
+    # monthly strategy call + multi-market coverage (service scope, not
+    # dashboard flags), so the gating below is intentionally always-on.
+    call_tracking_on = True
+    premium = True
     call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
     gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
     gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
@@ -1922,7 +1924,7 @@ async def public_client_dashboard(slug: str):
         "client_name": cs.client_name,
         "target_url": cs.target_url,
         "tier": tier,
-        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
+        "features": {"call_tracking": call_tracking_on, "search_console": premium},
         "google": google_series,
         "ai_mode": ai_series,
         "verified_wins": {
