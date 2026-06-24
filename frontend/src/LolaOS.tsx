@@ -51,6 +51,7 @@ const clients: Client[] = [
       { label: 'Landing Page', state: 'done' },
       { label: 'Call Tracking', state: 'done' },
       { label: 'SEO Targets', state: 'done' },
+      { label: 'Public GBP Signal', state: 'done' },
       { label: 'Domain Transfer', state: 'pending' },
       { label: 'GBP Access', state: 'pending' },
       { label: 'Search Console', state: 'pending' },
@@ -192,8 +193,8 @@ export default function LolaOS() {
           </h2>
           <p className="mt-3 text-[15px] leading-[1.65] text-[#C5C5C8]">
             Tampa Bay Power Clean already has a live page, temporary shared call routing,
-            and SEO targets. The next compounding work is dedicated tracking: domain,
-            CallRail, Search Console, GA4, and GBP access.
+            SEO targets, and a public Google Business Profile signal. The next compounding
+            work is dedicated tracking: domain, CallRail, Search Console, GA4, and GBP access.
           </p>
         </div>
 

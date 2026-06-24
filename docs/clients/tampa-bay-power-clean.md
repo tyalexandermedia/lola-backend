@@ -133,7 +133,9 @@ Power Clean-owned phone number.
 
 - Domain transfer pending for Tampa Bay Power Clean.
 - Dedicated Tampa Bay Power Clean CallRail number pending.
-- GBP access pending.
+- Public Google Business Profile signal found via Google search for the brand/site.
+- GBP admin access pending; do not publish star rating, review count, ranking
+  claims, GBP metrics, or owner-only data until access is verified.
 - Analytics and Google Search Console access pending.
 - Dedicated tracked form endpoint pending.
 
@@ -151,7 +153,8 @@ To make the dashboard live in production, configure or collect:
 - Quote form or lead capture events into `tracked_events`.
 - Google Search Console property, if available.
 - GA4 property ID, if available.
-- Google Business Profile integration, if available. GBP is not required for
+- Google Business Profile integration, if available. A public GBP/search signal
+  has been identified, but admin access is still pending. GBP is not required for
   the current landing-page test and no GBP data is fabricated.
 - Dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint.
   The current page temporarily uses Sandbar's existing CallRail/intake number
