@@ -28,6 +28,14 @@
   ],
   "rewrites": [
     {
+      "source": "/os",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/client-status",
+      "destination": "/index.html"
+    },
+    {
       "source": "/lp/pressure-washing-seo-tampa",
       "destination": "/lp/pressure-washing-seo-tampa.html"
     },

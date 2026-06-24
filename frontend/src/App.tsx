@@ -23,6 +23,7 @@ const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
+const LolaOS = lazy(() => import('./LolaOS'));
 
 type Route =
   | { name: 'home' }
@@ -30,6 +31,7 @@ type Route =
   | { name: 'grader' }
   | { name: 'start' }
   | { name: 'methodology' }
+  | { name: 'lola-os' }
   | { name: 'case-studies-index' }
   | { name: 'case-study'; slug: string }
   | { name: 'vs-hub' }
@@ -52,6 +54,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
+  if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
   if (pathname === '/case-studies' || pathname === '/case-studies/') return { name: 'case-studies-index' };
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
@@ -101,6 +104,8 @@ function App() {
       ? 'max-w-[820px] pt-2 sm:pt-6'
       : route.name === 'methodology'
       ? 'max-w-[920px] pt-6 sm:pt-10'
+      : route.name === 'lola-os'
+      ? 'max-w-[1120px] pt-6 sm:pt-10'
       : route.name === 'case-study' || route.name === 'case-studies-index'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
@@ -129,6 +134,7 @@ function App() {
           {route.name === 'grader' && <Grader />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
+          {route.name === 'lola-os' && <LolaOS />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
           {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
           {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
@@ -206,6 +212,7 @@ function SiteFooter({ route }: { route: Route }) {
         <FooterCol title="Get found">
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
+          <FooterLink href="/os">LOLA OS status</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
