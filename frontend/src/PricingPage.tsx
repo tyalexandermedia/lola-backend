@@ -209,6 +209,14 @@ export default function PricingPage() {
         {/* One price. Growth $697 is the whole product — every signal Lola
             tracks, no feature gates. Region-wide coverage + a monthly strategy
             call are the Multi-Market add-on below. */}
+        {/* Agency-price anchor — frame the one price as a steal */}
+        <div className="mx-auto mb-6 max-w-[600px] rounded-[14px] border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/[0.08] to-transparent px-5 py-4 text-center">
+          <p className="text-[14px] leading-[1.55] text-[#E8E4D8]">
+            Most agencies charge <span className="font-bold text-white">$2,000–$5,000/mo</span> — for just
+            <span className="italic"> pieces</span> of this. Lola does <span className="font-semibold text-[#D4AF37]">all of it</span>,
+            done-for-you, for <span className="font-bold text-white">$697/mo</span>. No setup fee. Cancel anytime.
+          </p>
+        </div>
         <div className="mx-auto max-w-[460px]">
           {/* GROWTH (featured — Most Popular) — Service area lock */}
           <div className="order-1">
@@ -220,6 +228,7 @@ export default function PricingPage() {
               pricePeriod="/month · cancel anytime"
               positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
               features={[
+                '🌐 Done-for-you AI website — built + hosted, $0 setup ($3,000 value)',
                 '🔒 Local Lock — up to 5 cities, your niche, exclusive',
                 'Full Lola audit + priority fix list',
                 'Google Business Profile optimization + weekly posts',
@@ -241,6 +250,38 @@ export default function PricingPage() {
 
         </div>
 
+        {/* Value stack — itemized à-la-carte cost vs the one price */}
+        <div className="mx-auto mt-8 max-w-[600px] rounded-[16px] border border-white/[0.10] bg-white/[0.02] p-6 sm:p-7">
+          <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+            What you&apos;d pay for this separately
+          </p>
+          <ul className="mt-5 space-y-2 text-[13px] sm:text-[14px]">
+            {[
+              ['Done-for-you AI website (built + hosted)', '$3,000 build'],
+              ['Local SEO management', '$1,500/mo'],
+              ['Google Business Profile + weekly posts', '$400/mo'],
+              ['Content + link building', '$600/mo'],
+              ['Review-generation system', '$150/mo'],
+              ['Call tracking + lead attribution', '$100/mo'],
+              ['AI Search Visibility tracking', '$250/mo'],
+              ['Live dashboard + reporting', '$150/mo'],
+            ].map(([label, val]) => (
+              <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2">
+                <span className="text-[#C5C5C8]">{label}</span>
+                <span className="whitespace-nowrap font-medium text-[#9CA3AF] line-through">{val}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">
+              Over <span className="font-bold text-white">$3,150/mo</span> of marketing + a <span className="font-bold text-white">$3,000</span> website
+            </p>
+            <p className="text-[16px] font-bold text-white">
+              You pay <span className="text-[#D4AF37]">$697/mo</span> · $0 setup
+            </p>
+          </div>
+        </div>
+
         <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
           One price, everything included — no feature gates. Need region-wide
           coverage or a monthly strategy call with Coach Ty? Add Multi-Market
@@ -252,22 +293,25 @@ export default function PricingPage() {
       {/* ── 2b. ADD-ONS — expansion revenue, plain English ──────────── */}
       <section className="mt-14 sm:mt-16">
         <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Add-ons — bolt onto any plan
+          Add-ons — bolt on only what you need
         </p>
         <div className="mx-auto mt-6 grid max-w-[820px] grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* Social posting — the flagship add-on */}
+          {/* Social Media Management — flagship add-on, base + video upsell */}
           <div className="flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-white/[0.02] p-6">
             <div className="flex items-baseline justify-between gap-3">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                📣 Social Posting
+                📣 Social Media Management
               </p>
               <p className="text-[20px] font-extrabold text-white">+$197<span className="text-[12px] font-medium text-[#9CA3AF]">/mo</span></p>
             </div>
             <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
-              We post for you — Google Business, Facebook, and Instagram. You (or we) supply the
-              photos/clips; Lola schedules + publishes. Set it and forget it. Posting only, no editing.
+              We run your <span className="text-white">Google Business, Facebook &amp; Instagram</span> — content
+              created, scheduled, and posted for you. You approve; we publish. Your channels stay active
+              without you lifting a finger.
             </p>
-            <p className="mt-3 text-[12px] text-[#8A8F98]">YouTube + TikTok available on request.</p>
+            <p className="mt-3 rounded-[8px] border border-white/[0.08] bg-white/[0.02] px-3 py-2 text-[12px] text-[#C5C5C8]">
+              <span className="font-semibold text-[#D4AF37]">+ YouTube &amp; TikTok</span> short-form video posting — <span className="font-semibold text-white">+$200/mo</span>
+            </p>
           </div>
 
           {/* Multi-Market — the old "Pro," now an add-on. id="pro" keeps /pricing#pro deep-links working. */}
