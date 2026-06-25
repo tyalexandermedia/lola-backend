@@ -140,6 +140,75 @@ function MarketMomentum() {
   );
 }
 
+// ROI calculator — makes the $697 math undeniable for cold traffic. Honest:
+// the visitor sets the numbers; Lola only claims to get them found + called.
+function RoiCalculator({ ctaHref }: { ctaHref: string }) {
+  const [jobValue, setJobValue] = useState(500);
+  const [jobsPerMo, setJobsPerMo] = useState(3);
+  const monthly = jobValue * jobsPerMo;
+  const annual = monthly * 12;
+  const roiX = monthly / 697;
+  const breakeven = Math.max(1, Math.ceil(697 / jobValue));
+  const money = (n: number) => '$' + Math.round(n).toLocaleString();
+  return (
+    <section className="mt-16 sm:mt-20">
+      <div className="mx-auto max-w-[620px] rounded-[18px] border border-[#D4AF37]/25 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-6 shadow-[0_0_50px_rgba(212,175,55,0.07)] sm:p-8">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Do the math</p>
+        <h2 className="mt-2 text-center text-[22px] font-bold tracking-[-0.01em] text-white sm:text-[26px]">
+          What is getting found actually worth?
+        </h2>
+        <p className="mx-auto mt-2 max-w-[440px] text-center text-[13px] leading-[1.5] text-[#9CA3AF]">
+          You set the numbers. Lola gets your phone ringing — you close the jobs.
+        </p>
+
+        <div className="mt-7 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="roi-job" className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Your average job</label>
+              <span className="text-[18px] font-extrabold text-white">{money(jobValue)}</span>
+            </div>
+            <input id="roi-job" type="range" min={150} max={5000} step={50} value={jobValue} onChange={(e) => setJobValue(+e.target.value)} className="mt-3 w-full accent-[#D4AF37]" />
+          </div>
+          <div>
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="roi-jobs" className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Extra jobs / month</label>
+              <span className="text-[18px] font-extrabold text-white">{jobsPerMo}</span>
+            </div>
+            <input id="roi-jobs" type="range" min={1} max={20} step={1} value={jobsPerMo} onChange={(e) => setJobsPerMo(+e.target.value)} className="mt-3 w-full accent-[#D4AF37]" />
+          </div>
+        </div>
+
+        <div className="mt-7 rounded-[14px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] p-5 text-center">
+          <p className="text-[13px] text-[#C5C5C8]">
+            {jobsPerMo} extra job{jobsPerMo > 1 ? 's' : ''}/mo at {money(jobValue)} each =
+          </p>
+          <p className="mt-1 text-[40px] font-black leading-none text-[#D4AF37] sm:text-[48px]">
+            {money(monthly)}<span className="text-[16px] font-bold text-[#9CA3AF]">/mo</span>
+          </p>
+          <p className="mt-1 text-[13px] text-[#9CA3AF]">{money(annual)}/year in new work</p>
+          <div className="mt-4 flex flex-col gap-1 border-t border-white/[0.08] pt-4 text-[13px] text-[#C5C5C8]">
+            <p>Lola pays for itself with <span className="font-bold text-white">{breakeven} job{breakeven > 1 ? 's' : ''}</span> — the rest is profit.</p>
+            <p><span className="font-bold text-[#D4AF37]">{roiX.toFixed(1)}× return</span> on your $697/mo.</p>
+          </div>
+        </div>
+
+        <a
+          href={ctaHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track('growth_cta_clicked', { from: 'roi_calc' })}
+          className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left text-[15px] font-black uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_24px_rgba(212,175,55,0.4)] transition-all hover:bg-right active:scale-[0.99] sm:h-16 sm:text-[16px]"
+        >
+          🔒 Lock my market — book a free call →
+        </a>
+        <p className="mt-3 text-center text-[11px] text-[#7A7F8A]">
+          We don&apos;t promise jobs — we get you found, clicked, and called. Closing is your craft.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function PricingPage() {
   const promiseRef = useRef<HTMLDivElement>(null);
   const promiseSeen = useRef(false);
@@ -464,6 +533,9 @@ export default function PricingPage() {
           <a href={proHref} target="_blank" rel="noopener noreferrer" onClick={() => track('pro_cta_clicked')} className="font-semibold text-[#D4AF37] hover:text-[#F4D47C]">Book a call to add one →</a>
         </p>
       </section>
+
+      {/* ── 2c. ROI CALCULATOR — make the $697 math undeniable ──────── */}
+      <RoiCalculator ctaHref={growthHref} />
 
       {/* ── 3. GUARANTEES ─────────────────────────────────────────── */}
       <section ref={promiseRef} className="mt-16 sm:mt-20">
