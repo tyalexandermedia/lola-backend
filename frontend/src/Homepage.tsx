@@ -391,8 +391,8 @@ export default function Homepage() {
       {/* ── 3. EXECUTION-FIRST FRAMING LINE ─────────────────────────── */}
       <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
-        Premium agencies charge $2,500/mo to fix it.{' '}
-        <span className="font-bold text-[#D4AF37]">Lola does the work for $697/mo</span> — with a
+        Premium agencies charge <span className="font-semibold text-white">$2,000–$5,000/mo</span> to fix it.{' '}
+        <span className="font-bold text-[#D4AF37]">Lola does it all for $697/mo</span> — one price, with a
         guarantee.{' '}
         <span className="font-bold text-white">Real work or you walk.</span>
       </p>
@@ -751,6 +751,23 @@ export default function Homepage() {
           Book a free 15-minute strategy call with Coach Ty. No pressure, no pitch deck —
           just a straight answer on what's leaking and what to fix first.
         </p>
+
+        {/* Offer snapshot — the Lola Leads package, one price (mirrors /pricing) */}
+        <div className="mx-auto mt-7 max-w-[560px] rounded-[16px] border border-[#D4AF37]/30 bg-[#0A0A0B]/50 p-5 sm:p-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The Lola Leads package</p>
+          <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-[1.55] text-[#E8E4D8]">
+            A <span className="font-semibold text-white">free $3,000 website</span> + local SEO, Google Business,
+            AI-search visibility, call tracking &amp; a live dashboard — <span className="font-semibold text-white">everything, done for you</span>.
+          </p>
+          <p className="mt-4 text-[34px] font-black leading-none text-[#D4AF37] sm:text-[40px]">
+            $697<span className="text-[15px] font-bold text-[#9CA3AF]">/mo · one price</span>
+          </p>
+          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime · 30-day half-back · one business per market</p>
+          <a href="/pricing" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]">
+            See everything you get →
+          </a>
+        </div>
+
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
             href={CALENDAR_URL}
