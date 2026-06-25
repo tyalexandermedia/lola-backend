@@ -304,6 +304,11 @@ export default function Homepage() {
           </a>
         </div>
 
+        {/* Free-website hook — lead with the biggest bonus (Hormozi: value up front) */}
+        <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-1.5 text-[12px] font-semibold text-[#E8E4D8] sm:text-[13px]">
+          🎁 Includes a <span className="font-bold text-white">free $3,000 website</span> — built + hosted, $0 setup
+        </p>
+
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
@@ -414,6 +419,52 @@ export default function Homepage() {
           your bills. <span className="text-[#D4AF37]">ROI you can see, not take on faith.</span>
         </p>
       </div>
+
+      {/* ── 3b. VALUE STACK — make $697 an obvious steal (mirrors /pricing) ─ */}
+      <section className="mt-14 sm:mt-20">
+        <h2
+          className="mx-auto max-w-[760px] text-center font-bold leading-[1.15] tracking-[-0.01em] text-white"
+          style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.4rem)' }}
+        >
+          Everything you&apos;d pay an agency{' '}
+          <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$2,000–$5,000/mo</span> for —
+          for <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$697</span>.
+        </h2>
+        <div className="mx-auto mt-7 max-w-[600px] rounded-[18px] border border-[#D4AF37]/25 bg-white/[0.02] p-6 shadow-[0_0_44px_rgba(212,175,55,0.06)] sm:p-7">
+          <ul className="space-y-2.5 text-[14px] sm:text-[15px]">
+            {[
+              ['🌐 Done-for-you AI website', 'FREE ($3,000)'],
+              ['🔎 Local SEO — Google + Map Pack', '$1,500/mo'],
+              ['📍 Google Business + weekly posts', '$400/mo'],
+              ['✍️ Content + link building', '$600/mo'],
+              ['🤖 AI-search visibility + call tracking', '$350/mo'],
+              ['📊 Live dashboard + reporting', '$150/mo'],
+            ].map(([label, val]) => (
+              <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2.5">
+                <span className="text-[#E8E4D8]">{label}</span>
+                <span className="whitespace-nowrap text-[13px] font-semibold text-[#9CA3AF]">{val}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4 text-center">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Over $3,000/mo of marketing + a free website</p>
+            <p className="text-[15px] font-bold text-white">You pay <span className="text-[#D4AF37]">$697/mo</span> · $0 setup</p>
+          </div>
+          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a
+              href={CALENDAR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right"
+            >
+              Book a free strategy call →
+            </a>
+            <a href="/pricing" className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:text-[#F4D47C]">
+              See full pricing →
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* ── 4. SCROLLING STATS MARQUEE ──────────────────────────────── */}
       <div className="relative left-1/2 right-1/2 mt-12 -mx-[50vw] w-screen sm:mt-16">
