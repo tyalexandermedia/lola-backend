@@ -35,11 +35,11 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
 ];
 
 // Values kept stable for the backend/type contract; labels updated to the
-// call-first 3-tier model (Starter $297 / Growth $697 / Pro $997).
+// one-price + add-ons model — $697/mo base, Multi-Market +$300 (Starter/Pro tiers retired).
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'retainer', label: 'Growth — $697/mo' },
-  { value: 'pro', label: 'Pro — $997/mo' },
-  { value: 'both', label: 'Tell me which fits better' },
+  { value: 'retainer', label: 'Lola — $697/mo (everything done-for-you)' },
+  { value: 'pro', label: 'Lola + Multi-Market (+$300/mo)' },
+  { value: 'both', label: 'Not sure — tell me what fits' },
 ];
 
 export default function ApplyPage() {

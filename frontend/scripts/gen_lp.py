@@ -20,7 +20,7 @@ Design notes
   (local-seo-plumbers-tampa.html) so every page shares the dark-gold aesthetic.
 * Copy is varied per SERVICE (H1, intent framing, "what we do" bullets, FAQ)
   and per CITY (neighborhoods, nearby cities) so pages are not thin duplicates.
-* Pricing is the NEW 3-tier monthly model only: $297 / $697 / $997.
+* Pricing is one price + add-ons: $697/mo base, Multi-Market +$300, Social +$197.
 * Every primary CTA books a call at the Google Calendar link.
 """
 
@@ -37,17 +37,15 @@ CALENDAR_URL = "https://calendar.app.google/J7idjUDitd2Hziuc7"
 PHONE = "+1-727-300-6573"
 EMAIL = "ty@tyalexandermedia.com"
 
-# New monthly pricing tiers (the ONLY tiers — old $47/$397/$6,970 are dead).
+# One price + add-ons (Starter/Pro tiers retired 2026-06-25; old $47/$397/$6,970 dead).
 TIERS = [
-    {"name": "Starter", "price": "$297/mo", "featured": False,
-     "blurb": "Core GBP + Map Pack optimization, citations cleaned, monthly reporting."},
-    {"name": "Growth", "price": "$697/mo", "featured": True,
-     "blurb": "Everything in Starter + content, review velocity, AI-search tracking. Most popular."},
-    {"name": "Pro", "price": "$997/mo", "featured": False,
-     "blurb": "Everything in Growth + multi-location / service-area pages and priority support."},
+    {"name": "Lola", "price": "$697/mo", "featured": True,
+     "blurb": "Everything done-for-you — GBP + Map Pack, citations, content, reviews, call tracking, AI-search visibility. No feature gates. One price, cancel anytime."},
+    {"name": "Multi-Market add-on", "price": "+$300/mo", "featured": False,
+     "blurb": "Optional: region-wide or multi-location coverage + a monthly strategy call with Coach Ty."},
 ]
-PRICE_RANGE = "$297-$997"
-LOW_PRICE = "297"
+PRICE_RANGE = "$697-$997"
+LOW_PRICE = "697"
 HIGH_PRICE = "997"
 
 # Repo-root-relative output locations. Resolved against the repo root, which we
@@ -173,7 +171,7 @@ SERVICES = {
     "pressure-washing": _svc(
         "Pressure Washing", "pressure washing pros", "Pressure Washing", "Pressure Washing",
         h1=lambda c: f'{c["name"]} pressure washing: own the "{c["name"].lower()} house washing near me" search.',
-        sub=lambda c: f'Homeowners in {c["name"]} search the second they see the green creeping up the driveway. Lola gets your soft-wash business ranking on Google + ChatGPT for those exact searches. Done for you. From $297/mo.',
+        sub=lambda c: f'Homeowners in {c["name"]} search the second they see the green creeping up the driveway. Lola gets your soft-wash business ranking on Google + ChatGPT for those exact searches. Done for you. From $697/mo.',
         not_this=[
             'Buying shared leads you split with 3 other washers',
             'Boosting Facebook posts that never reach buyers ready to book',
@@ -182,7 +180,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you keep for good',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Soft-wash + house-wash keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -203,7 +201,7 @@ SERVICES = {
             ("Do you understand soft wash vs pressure wash?",
              "Yes. Coach Ty's dad runs Sandbar Soft Wash in Palm Harbor — 15+ years, master certified. We know the difference and we optimize for both."),
             ("Is there a contract?",
-             "No. It's month-to-month from $297/mo. Cancel anytime. The 30-day half-refund promise is on top of that."),
+             "No. It's month-to-month from $697/mo. Cancel anytime. The 30-day half-refund promise is on top of that."),
             ("Can you handle a seasonal schedule?",
              f"Yes — we build GBP post cadence around {c['name']}'s busy washing season and keep ranking signals warm in the off months."),
         ],
@@ -212,7 +210,7 @@ SERVICES = {
     "plumber": _svc(
         "Plumbing", "plumbers", "Plumber", "Plumbing",
         h1=lambda c: f'{c["name"]} plumbers: be the first result when someone searches "plumber near me" at 11pm.',
-        sub=lambda c: f'Emergency plumbing searches in {c["name"]} happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $297/mo.',
+        sub=lambda c: f'Emergency plumbing searches in {c["name"]} happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $697/mo.',
         not_this=[
             '"Pay $50/lead" services that share your leads with 3 competitors',
             '$2,500/mo plumbing agencies with 12-month contracts',
@@ -221,7 +219,7 @@ SERVICES = {
         ],
         this_=[
             'Organic Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Emergency-keyword targeting baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -240,7 +238,7 @@ SERVICES = {
             ("How fast will I see new calls?",
              "30-day promise: measurable ranking improvement in the first month, or I refund half. Most clients see new GMB call volume within 6-8 weeks."),
             ("What if my GMB profile is a mess?",
-             "That's part of week 1. We audit, fix categories, add proper services, photo cadence, and post strategy. Included from $297/mo."),
+             "That's part of week 1. We audit, fix categories, add proper services, photo cadence, and post strategy. Included from $697/mo."),
             ("Do you do Google LSA (Local Service Ads)?",
              "LSA is a separate paid channel. Lola handles organic + Map Pack. Many clients pause LSA after 60 days because organic catches up."),
             ("We have 10 service vans — will the system scale?",
@@ -251,7 +249,7 @@ SERVICES = {
     "hvac": _svc(
         "HVAC", "HVAC contractors", "HVAC", "HVAC",
         h1=lambda c: f'{c["name"]} HVAC: be the "AC not cooling near me" call before your competitor is.',
-        sub=lambda c: f'When the AC dies in a {c["name"]} summer, people grab a phone and search — fast. Lola gets your HVAC business ranking on Google + ChatGPT for those emergency moments. Done for you. From $297/mo.',
+        sub=lambda c: f'When the AC dies in a {c["name"]} summer, people grab a phone and search — fast. Lola gets your HVAC business ranking on Google + ChatGPT for those emergency moments. Done for you. From $697/mo.',
         not_this=[
             'Lead resellers who sell the same homeowner to 4 HVAC shops',
             '$3,000/mo agencies locking you into a year',
@@ -260,7 +258,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Emergency AC-repair keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -283,14 +281,14 @@ SERVICES = {
             ("Do you optimize for replace-vs-repair searches?",
              "Yes. Those buyers are high-ticket and high-intent. We build content and GBP services to capture them."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
     # ---------------------------------------------------------------- #
     "roofing": _svc(
         "Roofing", "roofers", "Roofing", "Roofing",
         h1=lambda c: f'{c["name"]} roofers: own the search the morning after the storm.',
-        sub=lambda c: f'After a {c["name"]} storm, homeowners search "roof repair near me" and call whoever shows up first on Google. Lola gets you ranking on Google + ChatGPT before the storm-chasers do. Done for you. From $297/mo.',
+        sub=lambda c: f'After a {c["name"]} storm, homeowners search "roof repair near me" and call whoever shows up first on Google. Lola gets you ranking on Google + ChatGPT before the storm-chasers do. Done for you. From $697/mo.',
         not_this=[
             'Out-of-state storm-chasers buying your local keywords',
             '$4,000/mo agencies on 12-month contracts',
@@ -299,7 +297,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Storm + insurance-claim keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -322,14 +320,14 @@ SERVICES = {
             ("Do you build insurance-claim content?",
              "Yes — insurance-claim and storm-inspection pages are high-intent and we make them part of the playbook."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
     # ---------------------------------------------------------------- #
     "pool-service": _svc(
         "Pool Service", "pool service pros", "Pool Service", "Pool Service",
         h1=lambda c: f'{c["name"]} pool service: lock in recurring weekly accounts from "pool cleaning near me."',
-        sub=lambda c: f'In {c["name"]}, a pool that turns green sends the owner straight to Google. Lola gets your pool business ranking on Google + ChatGPT so you win the recurring weekly contract, not just the one-off. Done for you. From $297/mo.',
+        sub=lambda c: f'In {c["name"]}, a pool that turns green sends the owner straight to Google. Lola gets your pool business ranking on Google + ChatGPT so you win the recurring weekly contract, not just the one-off. Done for you. From $697/mo.',
         not_this=[
             'Shared-lead apps that pit you against every other route',
             '$2,000/mo agencies that never sold a weekly service plan',
@@ -338,7 +336,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Weekly-service + green-pool keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -361,14 +359,14 @@ SERVICES = {
             ("Do you handle seasonal demand?",
              f"Yes — we keep {c['name']} ranking signals warm year-round so you're first in line when pool season ramps."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
     # ---------------------------------------------------------------- #
     "lawn-care": _svc(
         "Lawn Care", "lawn care pros", "Lawn Care", "Lawn Care",
         h1=lambda c: f'{c["name"]} lawn care: win the route, not just the one-time mow.',
-        sub=lambda c: f'In {c["name"]}, "lawn care near me" searches turn into recurring weekly routes — if you show up first. Lola gets your lawn business ranking on Google + ChatGPT for that local demand. Done for you. From $297/mo.',
+        sub=lambda c: f'In {c["name"]}, "lawn care near me" searches turn into recurring weekly routes — if you show up first. Lola gets your lawn business ranking on Google + ChatGPT for that local demand. Done for you. From $697/mo.',
         not_this=[
             'Lead apps that auction you against every mower in town',
             '$1,500/mo agencies that never built a route business',
@@ -377,7 +375,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Weekly-service + lawn-treatment keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -400,14 +398,14 @@ SERVICES = {
             ("Do you optimize for fertilization and treatment too?",
              "Yes — treatment and fertilization searches are higher-margin and high-intent. We target them alongside mowing."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
     # ---------------------------------------------------------------- #
     "electrician": _svc(
         "Electrical", "electricians", "Electrician", "Electrical",
         h1=lambda c: f'{c["name"]} electricians: be the "electrician near me" call when the power\'s out.',
-        sub=lambda c: f'When a panel trips or the power\'s out in {c["name"]}, people search and call the first trusted result. Lola gets your electrical business ranking on Google + ChatGPT for those urgent moments. Done for you. From $297/mo.',
+        sub=lambda c: f'When a panel trips or the power\'s out in {c["name"]}, people search and call the first trusted result. Lola gets your electrical business ranking on Google + ChatGPT for those urgent moments. Done for you. From $697/mo.',
         not_this=[
             'Lead resellers selling the same homeowner to 4 shops',
             '$2,500/mo agencies on 12-month contracts',
@@ -416,7 +414,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Emergency + panel-upgrade keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -439,14 +437,14 @@ SERVICES = {
             ("What if my licensing info is inconsistent online?",
              "That's part of week 1. We fix NAP and licensing citations so Google trusts your listing."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
     # ---------------------------------------------------------------- #
     "cleaning": _svc(
         "Cleaning Services", "cleaning companies", "Cleaning", "Cleaning",
         h1=lambda c: f'{c["name"]} cleaning services: win recurring clients from "house cleaning near me."',
-        sub=lambda c: f'In {c["name"]}, "house cleaning near me" and "move-out cleaning" searches turn into recurring clients — if you rank. Lola gets your cleaning business ranking on Google + ChatGPT for that local demand. Done for you. From $297/mo.',
+        sub=lambda c: f'In {c["name"]}, "house cleaning near me" and "move-out cleaning" searches turn into recurring clients — if you rank. Lola gets your cleaning business ranking on Google + ChatGPT for that local demand. Done for you. From $697/mo.',
         not_this=[
             'Lead apps that auction you against every cleaner in town',
             '$1,800/mo agencies that never sold a recurring plan',
@@ -455,7 +453,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'From $297/mo, cancel anytime, no setup fee',
+            'From $697/mo, cancel anytime, no setup fee',
             'Recurring + deep-clean keywords baked in',
             '30-day move-the-ranking promise (half back if not)',
         ],
@@ -478,7 +476,7 @@ SERVICES = {
             ("Do you target commercial cleaning too?",
              "Yes — we can add commercial and office-cleaning keywords and pages on the Pro tier as you grow."),
             ("Is there a contract?",
-             "No — month-to-month from $297/mo, cancel anytime, plus the 30-day half-refund promise."),
+             "No — month-to-month from $697/mo, cancel anytime, plus the 30-day half-refund promise."),
         ],
     ),
 }
@@ -533,7 +531,7 @@ def render_page(svc_slug, svc, city_slug, city):
     cname = city["name"]
     title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Lola'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
-            f'ChatGPT for high-intent searches. 3 monthly plans from $297/mo. '
+            f'ChatGPT for high-intent searches. One price from $697/mo. '
             f'Book a free strategy call with Coach Ty.')
 
     faqs = svc["faqs"](city)
@@ -567,7 +565,7 @@ def render_page(svc_slug, svc, city_slug, city):
             "lowPrice": LOW_PRICE,
             "highPrice": HIGH_PRICE,
             "priceCurrency": "USD",
-            "offerCount": "3",
+            "offerCount": "2",
         },
         "sameAs": ["https://www.instagram.com/tyalexandermedia"],
     }
@@ -758,7 +756,7 @@ def render_hub():
     title = "Local SEO by Industry & City — Tampa Bay & Florida | Lola"
     desc = ("Done-for-you local SEO for service businesses across Tampa Bay & "
             "Florida. Pick your trade and city. Rank on Google + ChatGPT. "
-            "Plans from $297/mo. Book a free strategy call with Coach Ty.")
+            "Plans from $697/mo. Book a free strategy call with Coach Ty.")
 
     # ItemList of every generated page for the CollectionPage schema.
     item_list = []
@@ -796,7 +794,7 @@ def render_hub():
         "areaServed": [{"@type": "State", "name": "Florida"}]
         + [{"@type": "City", "name": c["name"]} for c in CITIES.values()],
         "offers": {"@type": "AggregateOffer", "lowPrice": LOW_PRICE,
-                   "highPrice": HIGH_PRICE, "priceCurrency": "USD", "offerCount": "3"},
+                   "highPrice": HIGH_PRICE, "priceCurrency": "USD", "offerCount": "2"},
         "sameAs": ["https://www.instagram.com/tyalexandermedia"],
     }
     breadcrumb = {
@@ -889,7 +887,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 <main class="wrap">
 <p class="eyebrow">Industries &amp; Cities · Lola SEO</p>
 <h1>Local SEO by industry &amp; city. Tampa Bay &amp; Florida.</h1>
-<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). Plans from $297/mo.</p>
+<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). Plans from $697/mo.</p>
 <a class="cta" href="{esc(cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
 
 {sections}

@@ -25,7 +25,7 @@ export default function Start() {
     const desc = document.querySelector('meta[name="description"]');
     const prevDesc = desc?.getAttribute('content') || '';
     document.title = 'Get Found Online — Done For You | Lola';
-    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + a live dashboard, done for you. $297/mo, no setup fee, cancel anytime. You do nothing but answer the phone.');
+    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + a live dashboard, done for you. $697/mo, one price, no setup fee, cancel anytime. You do nothing but answer the phone.');
     track('start_page_viewed');
     return () => { document.title = prevTitle; if (desc) desc.setAttribute('content', prevDesc); };
   }, []);
@@ -66,7 +66,7 @@ export default function Start() {
           Book a free 15-min call →
         </a>
         <p className="mt-4 text-[13px] text-[#9CA3AF]">
-          <span className="font-semibold text-white">$297/mo</span> · no setup fee · cancel anytime
+          <span className="font-semibold text-white">$697/mo</span> · one price · no setup fee · cancel anytime
         </p>
       </section>
 

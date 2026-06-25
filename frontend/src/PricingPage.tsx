@@ -3,16 +3,15 @@
  *
  * Sections:
  *   1. Transparency block (above tiers)
- *   2. 3-tier grid: Starter · Growth (featured, Most Popular) · Pro
+ *   2. 2-tier grid: Growth (featured, Most Popular) · Pro
  *   3. 30-Day Half-Back + First Win guarantees
  *   4. Trust strip
  *   5. 3-column comparison: SEO Tools vs Premium Agencies vs Lola
  *   6. Testimonial card
  *
- * Pricing matrix (locked 2026-06-15 — call-first rebuild):
- *   - Starter   $297/mo   done-for-you, monthly, cancel anytime
- *   - Growth    $697/mo   Most Popular
- *   - Pro       $997/mo   premium, founder access
+ * Pricing matrix (locked 2026-06-24 — two-tier collapse, no feature gates):
+ *   - Growth    $697/mo   Most Popular · the floor · every signal, no gates
+ *   - Pro       $997/mo   premium, multi-market, monthly founder call
  *
  * Every CTA books a free strategy call. No Stripe self-serve checkout — at
  * these price points a 15-minute call closes far better than a cold cart.
@@ -31,11 +30,11 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'What do I actually get? Is the website included?',
-    a: "Every plan includes a done-for-you AI website (built + hosted, no setup fee), local SEO across Google + AI search, weekly Google Business Profile management, and a live dashboard showing your calls, leads, and clicks. You don't manage anything — it's set-it-and-forget-it. Higher tiers add more cities + deeper AI tracking.",
+    a: "Every plan includes a done-for-you AI website (built + hosted, no setup fee), local SEO across Google + AI search, weekly Google Business Profile management, and a live dashboard showing your calls, leads, and clicks. You don't manage anything — it's set-it-and-forget-it. One price covers all of it; add-ons (social posting, multi-market) bolt on only if you need them.",
   },
   {
-    q: 'Which plan should I pick?',
-    a: "Starter ($297) if you operate in one city. Growth ($697) if your vans cover 3–5 cities — that's most home-service businesses. Pro ($997) if you have multiple locations or you serve a whole region/state. Not sure? Book the free call and Coach Ty will tell you straight, even if the answer is 'start with Starter.'",
+    q: 'How much is it — and are there hidden tiers?',
+    a: "One price: $697/mo, everything done-for-you with no feature gates — that's the whole product for most home-service businesses (up to 5 cities, your full van radius). Two optional add-ons if you need them: Social Posting (+$197/mo) and Multi-Market (+$300/mo — region-wide or multi-location coverage plus a monthly strategy call with Coach Ty). Not sure? Book the free call and Coach Ty will tell you straight.",
   },
   {
     q: 'Do you handle social media posting too?',
@@ -46,8 +45,8 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
     a: "We tell you straight on the call. If your direct competitor is already locked in your city, we'll either point you to an adjacent market we can serve, or place you on a notice list in case the lock opens. We don't play both sides.",
   },
   {
-    q: 'Can I switch tiers later?',
-    a: 'Anytime. Move up or down between Starter, Growth, and Pro with one Slack message. We pro-rate the difference. No friction, no penalty.',
+    q: 'Can I add or drop add-ons later?',
+    a: 'Anytime. Add Social or Multi-Market — or drop them — with one Slack message. We pro-rate the difference. No friction, no penalty.',
   },
   {
     q: "What's NOT included?",
@@ -150,7 +149,6 @@ export default function PricingPage() {
     };
   }, []);
 
-  const starterHref = withUtm(CALENDAR_URL, 'starter', 'starter');
   const growthHref = withUtm(CALENDAR_URL, 'growth', 'growth');
   const proHref = withUtm(CALENDAR_URL, 'pro', 'pro');
 
@@ -173,9 +171,9 @@ export default function PricingPage() {
         </h1>
         <p className="mx-auto mt-5 max-w-[700px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
           One business per niche per city. When you lock a market, we don&apos;t run
-          the Lola playbook for your direct competitor there. Three tiers sized by
-          your service-area scope — 1 city, your full delivery radius, or a multi-market
-          region.
+          the Lola playbook for your direct competitor there. One price covers your
+          full delivery radius — up to 5 cities. Serve a whole region? The
+          Multi-Market add-on extends the Lock.
         </p>
         <p className="mx-auto mt-3 max-w-[680px] text-[13px] italic leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
           Plain English: we get you <span className="text-white">found, clicked, called, and form-filled</span>.
@@ -206,55 +204,31 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── 2. 3-TIER GRID ─────────────────────────────────────────── */}
+      {/* ── 2. ONE PRICE ───────────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
-        {/* DOM order: Starter, Growth, Pro (desktop left→right value ladder).
-            Mobile order: Growth (1) → Pro (2) → Starter (3) — anchor on popular. */}
-        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-5">
-          {/* STARTER — 1 city Local Lock */}
-          <div className="order-3 lg:order-1">
-            <TierCard
-              variant="starter"
-              eyebrow="1-City Local Lock · Monthly"
-              name="Starter"
-              price="$297"
-              pricePeriod="/month · cancel anytime"
-              positioning="Get found in 1 city. Lock = your direct competitor can't hire Lola for the same city + niche. We deliver visibility, clicks, calls, form fills — you close them."
-              features={[
-                '🔒 Local Lock — 1 city, your niche, exclusive',
-                'Full Lola audit + priority fix list',
-                'Google Business Profile optimization (1 location)',
-                'Citation + directory cleanup',
-                'On-page SEO fixes (titles, schema, speed)',
-                'Review-generation system set up',
-                'AI search visibility baseline (ChatGPT, Perplexity, Gemini)',
-                'Monthly progress report',
-                'Email support',
-              ]}
-              ctaLabel="Claim your city →"
-              ctaHref={starterHref}
-              ctaSubtext="Free 15-min call · No contract · 48hr onboarding"
-              onCtaClick={() => track('starter_cta_clicked')}
-            />
-          </div>
-
+        {/* One price. Growth $697 is the whole product — every signal Lola
+            tracks, no feature gates. Region-wide coverage + a monthly strategy
+            call are the Multi-Market add-on below. */}
+        <div className="mx-auto max-w-[460px]">
           {/* GROWTH (featured — Most Popular) — Service area lock */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1">
             <TierCard
               variant="growth"
               eyebrow="Service-Area Lock · Monthly"
               name="Growth"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Lock = no direct competitor can hire Lola in any of those cities + your niche."
+              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
               features={[
                 '🔒 Local Lock — up to 5 cities, your niche, exclusive',
-                'Everything in Starter, ongoing',
-                'AI Search Visibility tracking (20 prompts/mo)',
+                'Full Lola audit + priority fix list',
+                'Google Business Profile optimization + weekly posts',
+                'On-page SEO, citations, schema, speed fixes',
+                'Review-generation system',
+                'Call tracking + lead attribution (CallRail)',
+                'AI Search Visibility tracking (ChatGPT, Perplexity, Gemini)',
                 'Public client dashboard (rankings + AI Share of Voice)',
                 'Monthly content + link building',
-                'GMB management + weekly posts',
-                'Ongoing citation building + new directories',
                 'Bi-weekly performance reports',
                 'Priority Slack + text support',
               ]}
@@ -265,40 +239,13 @@ export default function PricingPage() {
             />
           </div>
 
-          {/* PRO — Regional/Multi-Market Lock. `id="pro"` is the deep-link target from /pricing#pro. */}
-          <div id="pro" className="order-2 scroll-mt-24 lg:order-3">
-            <TierCard
-              variant="pro"
-              eyebrow="Multi-Market Lock · Monthly"
-              name="Pro"
-              price="$997"
-              pricePeriod="/month · cancel anytime"
-              positioning="Get found across a region — up to 10 cities OR multi-location operations. Lock = no direct competitor can hire Lola in any of those markets + your niche. Coach Ty on Slack."
-              features={[
-                '🔒 Local Lock — up to 10 cities OR multi-location, your niche, exclusive',
-                'Everything in Growth',
-                'Live AI search citation tracking (ChatGPT, Perplexity, Gemini, Google AI)',
-                'Multi-location / service-area expansion pages (programmatic)',
-                'Per-location dashboards + roll-up metrics',
-                'Monthly 1-on-1 strategy call with Coach Ty',
-                'Priority fix queue (Pro clients first)',
-                'Competitor + lead-list CSV exports (Pro-only)',
-                'Lola Pro badge for your site footer',
-                'Direct line to Coach Ty — Slack + text',
-              ]}
-              ctaLabel="Claim your region →"
-              ctaHref={proHref}
-              ctaSubtext="Free 15-min call · Cancel anytime · Founder access"
-              onCtaClick={() => track('pro_cta_clicked')}
-            />
-          </div>
         </div>
 
         <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] leading-[1.55] text-[#8A8F98]">
-          Not sure which plan? Book the free call and Coach Ty will tell you
-          straight — even if the honest answer is &quot;start with Starter.&quot; Upgrade to
-          a bigger Lock anytime; if your market gets claimed first, you can grandfather
-          the smaller Lock you already hold.
+          One price, everything included — no feature gates. Need region-wide
+          coverage or a monthly strategy call with Coach Ty? Add Multi-Market
+          below. Book the free call and Coach Ty will tell you straight — even
+          if the honest answer is &quot;you don&apos;t need the add-on yet.&quot;
         </p>
       </section>
 
@@ -323,19 +270,28 @@ export default function PricingPage() {
             <p className="mt-3 text-[12px] text-[#8A8F98]">YouTube + TikTok available on request.</p>
           </div>
 
-          {/* Extra market / location */}
-          <div className="flex flex-col rounded-[14px] border border-white/[0.10] bg-white/[0.02] p-6">
+          {/* Multi-Market — the old "Pro," now an add-on. id="pro" keeps /pricing#pro deep-links working. */}
+          <div id="pro" className="flex scroll-mt-24 flex-col rounded-[14px] border border-[#D4AF37]/30 bg-white/[0.02] p-6">
             <div className="flex items-baseline justify-between gap-3">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                📍 Extra location / market
+                📍 Multi-Market
               </p>
-              <p className="text-[20px] font-extrabold text-white">Custom</p>
+              <p className="text-[20px] font-extrabold text-white">+$300<span className="text-[12px] font-medium text-[#9CA3AF]">/mo</span></p>
             </div>
             <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
-              Second storefront or a new city beyond your plan&apos;s Lock radius? We add the
-              location pages, GBP, and tracking. Priced on the call.
+              Region-wide coverage — up to 10 cities or multi-location operations — plus a
+              monthly 1-on-1 strategy call with Coach Ty, per-location dashboards, and a
+              priority fix queue. For businesses that serve a whole region, not just a few cities.
             </p>
-            <p className="mt-3 text-[12px] text-[#8A8F98]">Pro plans include up to 10 cities already.</p>
+            <a
+              href={proHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track('pro_cta_clicked')}
+              className="mt-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]"
+            >
+              Claim your region →
+            </a>
           </div>
         </div>
         <p className="mx-auto mt-4 max-w-[680px] text-center text-[12px] text-[#8A8F98]">
@@ -416,7 +372,7 @@ export default function PricingPage() {
                 </th>
                 <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] px-3 py-4 sm:px-5">
                   Lola
-                  <span className="block text-[10px] font-normal text-[#D4AF37]">$297–$997/mo</span>
+                  <span className="block text-[10px] font-normal text-[#D4AF37]">$697–$997/mo</span>
                 </th>
               </tr>
             </thead>
@@ -430,7 +386,7 @@ export default function PricingPage() {
                 ['❌ Generic audience', '❌ "Serve everyone"', '✓ Local service business specialist'],
                 ['❌ No execution', '✓ Full service (manual)', '✓ Done-for-you execution every week'],
                 ['⚠️ Steep learning curve', '⚠️ Long sales call', '✓ Free 15-min call, real answers'],
-                ['❌ No founder access', '⚠️ Account manager only', '✓ Pro tier: monthly calls with Coach Ty'],
+                ['❌ No founder access', '⚠️ Account manager only', '✓ Founder access; monthly calls via Multi-Market'],
               ].map((row, i) => (
                 <tr key={i}>
                   {row.map((cell, j) => (

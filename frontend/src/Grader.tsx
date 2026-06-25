@@ -448,8 +448,8 @@ export default function Grader() {
           Want Lola to do the work for you?
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Done-for-you plans start at <span className="font-semibold text-white">$297/mo</span>.
-          Three monthly tiers, no contracts, 30-day half-back guarantee.
+          Done-for-you plans start at <span className="font-semibold text-white">$697/mo</span>.
+          Two monthly tiers, no contracts, 30-day half-back guarantee.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a

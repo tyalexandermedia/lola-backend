@@ -11,7 +11,7 @@ const STATS = [
   '🔒 One business per niche per city — Local Lock',
   '30-Day Half-Back Guarantee',
   '60-second AI Visibility Score, no signup',
-  'Transparent pricing — $297 to $997/mo, done-for-you',
+  'Transparent pricing — $697 to $997/mo, done-for-you',
   'Built for local service businesses',
   'Faith-driven, legacy-focused, founder-led',
 ];

@@ -308,7 +308,7 @@ export default function Homepage() {
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
         <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          <span><span className="font-semibold text-white">From $297/mo</span> · 3 plans, all done-for-you</span>
+          <span><span className="font-semibold text-white">$697/mo</span> · one price, all done-for-you</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>🛡️ 30-day half-back guarantee</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
@@ -695,7 +695,7 @@ export default function Homepage() {
             },
             {
               q: 'How much does Lola cost?',
-              a: 'Three simple monthly plans, no long-term contracts: Starter $297/mo, Growth $697/mo (most popular), Pro $997/mo. Every plan is done-for-you. No setup fee.',
+              a: 'One simple price, no long-term contracts: $697/mo, done-for-you with no feature gates — that\'s the whole product. Two optional add-ons if you need them: Social Posting (+$197/mo) and Multi-Market (+$300/mo) for region-wide coverage plus a monthly strategy call. No setup fee.',
             },
             {
               q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',

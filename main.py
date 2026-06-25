@@ -1541,12 +1541,12 @@ async def pricing():
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
         "tiers": {
-            "diy":      {"one_time": 197},
-            "standard": {
-                "monthly": standard_price,
-                "monthly_original": 697,
+            # One price + add-ons. standard_price is flat $697 (see db/pricing.py).
+            "standard": {"monthly": standard_price},
+            "addons": {
+                "social":       {"monthly": 197},
+                "multi_market": {"monthly": 300},
             },
-            "pro":      {"monthly": 997, "monthly_original": 1297},
         },
     }
 
@@ -1571,8 +1571,8 @@ REVENUE_LABELS = {
 }
 
 TIER_LABELS = {
-    "retainer": "Retainer ($697/mo)",
-    "pro": "Pro ($6,970/yr)",
+    "retainer": "Lola ($697/mo)",
+    "pro": "Lola + Multi-Market ($997/mo)",
     "both": "Tell me which fits better",
 }
 
@@ -1897,7 +1897,7 @@ async def public_client_dashboard(slug: str):
     # the Growth tier ($697) when no lock — the modal client price.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
-    retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
+    retainer = {"growth": 697, "pro": 997}.get(tier, 697)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 

@@ -242,12 +242,11 @@ export default function RetainerPage() {
               🦴 Founding Member Pricing
             </p>
             <h2 className="relative mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
-              First 10 retainer clients get $697/mo — locked for life.
+              First 10 retainer clients lock $697/mo — for life.
             </h2>
             <p className="relative mt-4 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-              After {foundingCap} founding spots are taken, the public rate moves to{' '}
-              <span className="font-semibold text-white">$897/mo</span>. Founders keep $697/mo
-              forever, even when public pricing goes up.
+              One price, everything done-for-you — no tiers, no feature gates. Founding
+              members lock today&apos;s $697/mo for life, even as our public rate rises.
             </p>
             {/* Only show numeric counter when we have a real reading. Hiding
                 the chip on fetch-fail beats showing "10 of 10" which reads as

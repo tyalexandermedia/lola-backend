@@ -28,14 +28,6 @@
   ],
   "rewrites": [
     {
-      "source": "/os",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/client-status",
-      "destination": "/index.html"
-    },
-    {
       "source": "/lp/pressure-washing-seo-tampa",
       "destination": "/lp/pressure-washing-seo-tampa.html"
     },
@@ -228,14 +220,6 @@
       "destination": "/lp/cleaning-seo-sarasota.html"
     },
     {
-      "source": "/lp/tampa-bay-power-clean",
-      "destination": "/lp/tampa-bay-power-clean.html"
-    },
-    {
-      "source": "/tampa-bay-power-clean",
-      "destination": "/lp/tampa-bay-power-clean.html"
-    },
-    {
       "source": "/lp/industries",
       "destination": "/lp/industries.html"
     },
@@ -262,18 +246,6 @@
     {
       "source": "/t/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/t/$1"
-    },
-    {
-      "source": "/reporting/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/reporting/$1"
-    },
-    {
-      "source": "/lead-gen/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/admin/$1"
     },
     {
       "source": "/(.*)",
