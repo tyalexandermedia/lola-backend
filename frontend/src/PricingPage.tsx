@@ -17,8 +17,9 @@
  * these price points a 15-minute call closes far better than a cold cart.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LockChecker from './LockChecker';
+import { API_URL } from './api';
 
 // Page-scoped FAQs — each entry powers the visible accordion AND the
 // FAQPage JSON-LD we inject into <head> at mount (route-specific schema
@@ -101,6 +102,42 @@ function track(label: string, props?: Record<string, string | number>) {
     else if (w.gtag) w.gtag('event', label, { event_category: 'pricing', ...(props || {}) });
     else console.log(`[track] ${label}`, props || {});
   } catch {}
+}
+
+// Live "markets claimed" momentum — real /locks/recent data. Self-hides when
+// empty so a new business never shows fabricated scarcity: social proof + the
+// one-per-market scarcity in one honest strip, auto-activating as locks land.
+function MarketMomentum() {
+  const [locks, setLocks] = useState<Array<{ niche: string; city: string }>>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/locks/recent?limit=8`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && Array.isArray(d?.locks)) setLocks(d.locks); })
+      .catch(() => { /* silent — strip stays hidden */ });
+    return () => { cancelled = true; };
+  }, []);
+  if (locks.length === 0) return null;
+  return (
+    <div className="mx-auto mt-16 max-w-[640px] rounded-[14px] border border-[#D4AF37]/25 bg-white/[0.02] px-5 py-4 sm:mt-20">
+      <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+        🔒 Recently locked markets
+      </p>
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
+        {locks.map((l, i) => (
+          <span key={`${l.niche}-${l.city}-${i}`} className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-[#0F0F12] px-3 py-1 text-[11px] text-[#C5C5C8]">
+            <span className="capitalize text-white">{l.niche}</span>
+            <span aria-hidden className="text-[#5A5F68]">·</span>
+            {l.city}
+            <span aria-hidden className="text-[#F59E0B]">🔒</span>
+          </span>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-[12px] text-[#7A7F8A]">
+        One business per niche per city. Yours is still open — for now.
+      </p>
+    </div>
+  );
 }
 
 export default function PricingPage() {
@@ -561,6 +598,8 @@ export default function PricingPage() {
           Turns the structural Lock backend (local_locks table + DB-level
           uniqueness) into a visible conversion lever. Real data, real
           urgency, no fabricated scarcity. */}
+      <MarketMomentum />
+
       <LockChecker />
 
       {/* ── 6b. FAQ — visible accordion + matching FAQPage JSON-LD ────
@@ -694,7 +733,8 @@ function TierCard({
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
           {eyebrow}
         </p>
-        <h3 className="mt-2.5 text-[28px] font-extrabold leading-tight tracking-[-0.01em] text-white sm:text-[34px]">
+        <h3 className="mt-2.5 flex items-center justify-center gap-2 text-[28px] font-extrabold leading-tight tracking-[-0.01em] text-white sm:text-[34px]">
+          <span aria-hidden className="text-[#D4AF37]">🐾</span>
           {name}
         </h3>
         <div className="mt-3 flex items-baseline justify-center gap-2">
