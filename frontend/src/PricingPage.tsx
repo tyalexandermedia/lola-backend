@@ -154,6 +154,16 @@ export default function PricingPage() {
 
   return (
     <main className="flex flex-1 flex-col">
+      {/* Desktop floating CTA — always-visible buy button on pricing (mobile uses the global sticky bar) */}
+      <a
+        href={growthHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => track('growth_cta_clicked', { from: 'desktop_float' })}
+        className="fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 py-3.5 text-[14px] font-black uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[0_8px_28px_rgba(212,175,55,0.45)] transition-all hover:scale-[1.03] sm:flex"
+      >
+        🔒 Lock my market — $697 →
+      </a>
       {/* ── 1. TRANSPARENCY BLOCK ─────────────────────────────────────── */}
       <section className="pt-2 text-center sm:pt-6">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
@@ -179,6 +189,25 @@ export default function PricingPage() {
           Plain English: we get you <span className="text-white">found, clicked, called, and form-filled</span>.
           Closing the lead is on you — that&apos;s your craft, not ours.
         </p>
+
+        {/* Above-the-fold price + CTA + honest Lock scarcity — first thing they see */}
+        <div className="mx-auto mt-7 flex max-w-[520px] flex-col items-center gap-3">
+          <p className="text-[15px] text-[#C5C5C8]">
+            Everything done-for-you — <span className="text-[22px] font-black text-[#D4AF37]">$697</span><span className="text-[13px] font-bold text-[#9CA3AF]">/mo</span>. No setup fee. Cancel anytime.
+          </p>
+          <a
+            href={growthHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => track('growth_cta_clicked', { from: 'hero' })}
+            className="flex h-14 w-full max-w-[420px] items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left text-[15px] font-black uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_24px_rgba(212,175,55,0.4)] transition-all hover:bg-right active:scale-[0.99] sm:h-16 sm:text-[16px]"
+          >
+            🔒 Lock my market — book a free call →
+          </a>
+          <p className="text-[12px] text-[#9CA3AF]">
+            One business per niche per city — when yours is locked, your competitor can&apos;t hire us.
+          </p>
+        </div>
       </section>
 
       {/* ── 1b. EVERY PLAN INCLUDES — instant bundle clarity ──────────
@@ -661,26 +690,27 @@ function TierCard({
         </span>
       )}
 
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
-        {eyebrow}
-      </p>
-      <h3 className="mt-3 text-[22px] font-bold tracking-[-0.01em] text-white sm:text-[26px]">
-        {name}
-      </h3>
-
-      <div className="mt-4 flex items-baseline gap-2">
-        <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[46px]">
-          {price}
-        </span>
-        {priceStrikethrough && (
-          <span className="text-[14px] font-medium text-[#7A7F8A] line-through">
-            {priceStrikethrough}
+      <div className="text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+          {eyebrow}
+        </p>
+        <h3 className="mt-2.5 text-[28px] font-extrabold leading-tight tracking-[-0.01em] text-white sm:text-[34px]">
+          {name}
+        </h3>
+        <div className="mt-3 flex items-baseline justify-center gap-2">
+          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[46px] font-extrabold leading-none tracking-[-0.025em] text-transparent sm:text-[54px]">
+            {price}
           </span>
-        )}
+          {priceStrikethrough && (
+            <span className="text-[14px] font-medium text-[#7A7F8A] line-through">
+              {priceStrikethrough}
+            </span>
+          )}
+        </div>
+        <p className="mt-2 text-[13px] font-normal text-[#A0A5AE] sm:text-[14px]">
+          {pricePeriod}
+        </p>
       </div>
-      <p className="mt-1.5 text-[13px] font-normal text-[#A0A5AE] sm:text-[14px]">
-        {pricePeriod}
-      </p>
 
       {priceMeta && <div className="mt-2">{priceMeta}</div>}
 

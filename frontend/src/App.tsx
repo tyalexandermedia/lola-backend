@@ -284,6 +284,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
     'https://calendar.app.google/J7idjUDitd2Hziuc7';
   const utm = `utm_source=sticky&utm_medium=mobile_bar&utm_campaign=${route.name}`;
   const callHref = `${calendar}${calendar.includes('?') ? '&' : '?'}${utm}`;
+  const primaryLabel = route.name === 'pricing' ? 'Lock my market →' : 'Book Free Call →';
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
@@ -300,7 +301,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
           rel="noreferrer"
           className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
         >
-          Book Free Call →
+          {primaryLabel}
         </a>
       </div>
     </div>
