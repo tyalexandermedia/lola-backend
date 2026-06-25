@@ -715,7 +715,7 @@ export default function Homepage() {
             },
             {
               q: "What's actually included each month?",
-              a: "Google Business Profile management, citation cleanup + new submissions, on-page SEO fixes, schema markup, AI search visibility tracking, review-generation system, monthly content (Growth+), and Coach Ty oversight. The exact playbook depends on tier — see /pricing for the full breakdown.",
+              a: "Google Business Profile management, citation cleanup + new submissions, on-page SEO fixes, schema markup, AI search visibility tracking, review-generation system, monthly content, and Coach Ty oversight — all of it included in the one $697/mo plan. See /pricing for the full breakdown.",
             },
             {
               q: 'Who is behind Lola?',

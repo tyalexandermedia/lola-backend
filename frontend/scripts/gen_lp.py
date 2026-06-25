@@ -40,11 +40,13 @@ EMAIL = "ty@tyalexandermedia.com"
 # One price + add-ons (Starter/Pro tiers retired 2026-06-25; old $47/$397/$6,970 dead).
 TIERS = [
     {"name": "Lola", "price": "$697/mo", "featured": True,
-     "blurb": "Everything done-for-you — done-for-you website, GBP + Map Pack, citations, content, reviews, call tracking, AI-search visibility. No feature gates, no setup fee. Agencies charge $2,000-$5,000/mo for less."},
-    {"name": "Social Media Mgmt add-on", "price": "+$197/mo", "featured": False,
-     "blurb": "We run your Google Business, Facebook + Instagram. Add YouTube/TikTok video for +$200/mo."},
+     "blurb": "Everything done-for-you — website, GBP + Map Pack, citations, content, reviews, call tracking, AI-search visibility. No feature gates, no setup fee. Agencies charge $2,000-$5,000/mo for less."},
+    {"name": "Social Media Mgmt add-on", "price": "from +$197/mo", "featured": False,
+     "blurb": "Essentials ($197): Google Business + Facebook + Instagram. Complete ($397): adds YouTube + TikTok."},
     {"name": "Multi-Market add-on", "price": "+$300/mo", "featured": False,
-     "blurb": "Optional: region-wide or multi-location coverage + a monthly strategy call with Coach Ty."},
+     "blurb": "Region-wide coverage (up to 10 cities) + a monthly strategy call with Coach Ty."},
+    {"name": "Extra location add-on", "price": "+$200/mo", "featured": False,
+     "blurb": "A 2nd or 3rd storefront — its own Google Business Profile, location page, and call tracking."},
 ]
 PRICE_RANGE = "$697-$997"
 LOW_PRICE = "697"

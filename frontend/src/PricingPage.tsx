@@ -3,15 +3,15 @@
  *
  * Sections:
  *   1. Transparency block (above tiers)
- *   2. 2-tier grid: Growth (featured, Most Popular) · Pro
+ *   2. One price ($697) + add-ons (Social, Multi-Market)
  *   3. 30-Day Half-Back + First Win guarantees
  *   4. Trust strip
  *   5. 3-column comparison: SEO Tools vs Premium Agencies vs Lola
  *   6. Testimonial card
  *
  * Pricing matrix (locked 2026-06-24 — two-tier collapse, no feature gates):
- *   - Growth    $697/mo   Most Popular · the floor · every signal, no gates
- *   - Pro       $997/mo   premium, multi-market, monthly founder call
+ *   - Lola      $697/mo   one price · everything · no feature gates
+ *   - Add-ons   Social +$197/$397 · Multi-Market +$300 · Extra location +$200
  *
  * Every CTA books a free strategy call. No Stripe self-serve checkout — at
  * these price points a 15-minute call closes far better than a cold cart.
@@ -34,11 +34,11 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'How much is it — and are there hidden tiers?',
-    a: "One price: $697/mo, everything done-for-you with no feature gates — that's the whole product for most home-service businesses (up to 5 cities, your full van radius). Two optional add-ons if you need them: Social Posting (+$197/mo) and Multi-Market (+$300/mo — region-wide or multi-location coverage plus a monthly strategy call with Coach Ty). Not sure? Book the free call and Coach Ty will tell you straight.",
+    a: "One price: $697/mo, everything done-for-you with no feature gates — that's the whole product for most home-service businesses (up to 5 cities, your full van radius). Two optional add-ons if you need them: Social Media Management (from +$197/mo) and Multi-Market (+$300/mo — region-wide or multi-location coverage plus a monthly strategy call with Coach Ty). Not sure? Book the free call and Coach Ty will tell you straight.",
   },
   {
     q: 'Do you handle social media posting too?',
-    a: "Yes — as a $197/mo add-on. We post to your Google Business, Facebook, and Instagram for you (YouTube + TikTok on request). You or we supply the photos/clips; Lola schedules and publishes. It's posting only — we're not editing video — so your channels stay active without you lifting a finger. Bolt it onto any plan.",
+    a: "Yes — Social Media Management is an add-on with two levels: Essentials ($197/mo) covers Google Business, Facebook, and Instagram; Complete ($397/mo) adds YouTube Shorts + TikTok short-form video. We create, schedule, and publish — you just approve. It's posting, not video editing, so your channels stay active without you lifting a finger. Add or drop it anytime.",
   },
   {
     q: 'What if a competitor locks my market before I do?',
@@ -206,9 +206,9 @@ export default function PricingPage() {
 
       {/* ── 2. ONE PRICE ───────────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
-        {/* One price. Growth $697 is the whole product — every signal Lola
-            tracks, no feature gates. Region-wide coverage + a monthly strategy
-            call are the Multi-Market add-on below. */}
+        {/* One price. $697 is the whole product — every signal Lola tracks,
+            no feature gates. Region-wide coverage + a monthly strategy call
+            are the Multi-Market add-on below. */}
         {/* Agency-price anchor — frame the one price as a steal */}
         <div className="mx-auto mb-6 max-w-[600px] rounded-[14px] border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/[0.08] to-transparent px-5 py-4 text-center">
           <p className="text-[14px] leading-[1.55] text-[#E8E4D8]">
@@ -223,7 +223,7 @@ export default function PricingPage() {
             <TierCard
               variant="growth"
               eyebrow="Service-Area Lock · Monthly"
-              name="Growth"
+              name="Lola"
               price="$697"
               pricePeriod="/month · cancel anytime"
               positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
@@ -290,56 +290,70 @@ export default function PricingPage() {
         </p>
       </section>
 
-      {/* ── 2b. ADD-ONS — expansion revenue, plain English ──────────── */}
+      {/* ── 2b. ADD-ONS — clear good/better pricing, expansion revenue ──── */}
       <section className="mt-14 sm:mt-16">
         <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Add-ons — bolt on only what you need
+          Optional add-ons — bolt on only what you need
         </p>
-        <div className="mx-auto mt-6 grid max-w-[820px] grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* Social Media Management — flagship add-on, base + video upsell */}
+        <p className="mx-auto mt-2 max-w-[560px] text-center text-[13px] leading-[1.5] text-[#9CA3AF]">
+          The $697 plan is the whole growth system. These just extend your reach — add or drop anytime, no contract.
+        </p>
+        <div className="mx-auto mt-6 grid max-w-[860px] grid-cols-1 gap-4 sm:grid-cols-2">
+
+          {/* Social Media Management — Essentials / Complete */}
           <div className="flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-white/[0.02] p-6">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                📣 Social Media Management
-              </p>
-              <p className="text-[20px] font-extrabold text-white">+$197<span className="text-[12px] font-medium text-[#9CA3AF]">/mo</span></p>
+            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">📣 Social Media Management</p>
+            <p className="mt-2 text-[13px] leading-[1.55] text-[#9CA3AF]">
+              Done-for-you content — we create it, schedule it, and post it. You approve; we publish. Your feeds stay
+              alive without you lifting a finger.
+            </p>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.02] p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[14px] font-bold text-white">Essentials</p>
+                  <p className="text-[18px] font-extrabold text-white">+$197<span className="text-[11px] font-medium text-[#9CA3AF]">/mo</span></p>
+                </div>
+                <p className="mt-1 text-[12px] text-[#C5C5C8]">Google Business · Facebook · Instagram</p>
+              </div>
+              <div className="relative rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] p-4">
+                <span className="absolute -top-2 right-3 rounded-full bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0A0A0B]">Best value</span>
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[14px] font-bold text-white">Complete</p>
+                  <p className="text-[18px] font-extrabold text-white">+$397<span className="text-[11px] font-medium text-[#9CA3AF]">/mo</span></p>
+                </div>
+                <p className="mt-1 text-[12px] text-[#C5C5C8]">Everything in Essentials <span className="text-[#D4AF37]">+ YouTube Shorts &amp; TikTok</span></p>
+              </div>
             </div>
-            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
-              We run your <span className="text-white">Google Business, Facebook &amp; Instagram</span> — content
-              created, scheduled, and posted for you. You approve; we publish. Your channels stay active
-              without you lifting a finger.
-            </p>
-            <p className="mt-3 rounded-[8px] border border-white/[0.08] bg-white/[0.02] px-3 py-2 text-[12px] text-[#C5C5C8]">
-              <span className="font-semibold text-[#D4AF37]">+ YouTube &amp; TikTok</span> short-form video posting — <span className="font-semibold text-white">+$200/mo</span>
-            </p>
           </div>
 
-          {/* Multi-Market — the old "Pro," now an add-on. id="pro" keeps /pricing#pro deep-links working. */}
+          {/* Multi-Market & Locations — id="pro" keeps /pricing#pro deep-links working */}
           <div id="pro" className="flex scroll-mt-24 flex-col rounded-[14px] border border-[#D4AF37]/30 bg-white/[0.02] p-6">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                📍 Multi-Market
-              </p>
-              <p className="text-[20px] font-extrabold text-white">+$300<span className="text-[12px] font-medium text-[#9CA3AF]">/mo</span></p>
-            </div>
-            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8]">
-              Region-wide coverage — up to 10 cities or multi-location operations — plus a
-              monthly 1-on-1 strategy call with Coach Ty, per-location dashboards, and a
-              priority fix queue. For businesses that serve a whole region, not just a few cities.
+            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">📍 Multi-Market &amp; Locations</p>
+            <p className="mt-2 text-[13px] leading-[1.55] text-[#9CA3AF]">
+              Serve more than your home turf — stretch the Lock across a region, or run more than one storefront.
             </p>
-            <a
-              href={proHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => track('pro_cta_clicked')}
-              className="mt-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]"
-            >
-              Claim your region →
-            </a>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.02] p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[14px] font-bold text-white">Multi-Market</p>
+                  <p className="text-[18px] font-extrabold text-white">+$300<span className="text-[11px] font-medium text-[#9CA3AF]">/mo</span></p>
+                </div>
+                <p className="mt-1 text-[12px] leading-[1.45] text-[#C5C5C8]">Region-wide — up to 10 cities · monthly strategy call with Coach Ty · per-location dashboards · priority queue</p>
+              </div>
+              <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.02] p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[14px] font-bold text-white">Each extra location</p>
+                  <p className="text-[18px] font-extrabold text-white">+$200<span className="text-[11px] font-medium text-[#9CA3AF]">/mo</span></p>
+                </div>
+                <p className="mt-1 text-[12px] leading-[1.45] text-[#C5C5C8]">A 2nd or 3rd storefront — its own Google Business Profile, location page &amp; call tracking</p>
+              </div>
+            </div>
           </div>
+
         </div>
-        <p className="mx-auto mt-4 max-w-[680px] text-center text-[12px] text-[#8A8F98]">
-          Add any of these when you book — or anytime after. No contracts on add-ons either.
+        <p className="mx-auto mt-5 max-w-[680px] text-center text-[12px] text-[#8A8F98]">
+          Add any of these when you book — or anytime after. No contracts on add-ons either.{' '}
+          <a href={proHref} target="_blank" rel="noopener noreferrer" onClick={() => track('pro_cta_clicked')} className="font-semibold text-[#D4AF37] hover:text-[#F4D47C]">Book a call to add one →</a>
         </p>
       </section>
 
@@ -416,7 +430,7 @@ export default function PricingPage() {
                 </th>
                 <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] px-3 py-4 sm:px-5">
                   Lola
-                  <span className="block text-[10px] font-normal text-[#D4AF37]">$697–$997/mo</span>
+                  <span className="block text-[10px] font-normal text-[#D4AF37]">$697/mo</span>
                 </th>
               </tr>
             </thead>

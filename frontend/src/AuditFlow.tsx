@@ -816,7 +816,7 @@ export function ResultsStage({
 
       {/* AI Search Visibility — v1 placeholder section. Frames the upcoming
           metric (where you actually show up across ChatGPT/Perplexity/Gemini)
-          and tells the reader honestly that live tracking is a Pro feature. */}
+          and tells the reader honestly that live tracking is a client feature. */}
       <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
         <div className="flex items-center gap-2">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
@@ -833,7 +833,7 @@ export function ResultsStage({
           Your Agent Readiness Score above predicts <em>how well</em> AI agents can
           understand your business. The next layer — live tracking of <strong className="text-white">where you actually appear</strong> in
           ChatGPT, Perplexity, Gemini, and Google AI Overviews for the queries
-          buyers run in {audit.city} — is rolling out to Pro retainers next month.
+          buyers run in {audit.city} — is rolling out to retainer clients next month.
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -859,12 +859,12 @@ export function ResultsStage({
           AI-readability signals (entities, reviews, schema, site speed). Live citation
           tracking goes live with the{' '}
           <a
-            href="/pricing#pro"
-            onClick={() => trackClick('pro_cta_clicked', { from: 'ai_search_visibility_note' })}
+            href="/pricing"
+            onClick={() => trackClick('pricing_cta_clicked', { from: 'ai_search_visibility_note' })}
             className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
           >
-            Pro tier
-          </a>.
+            Lola retainer
+          </a> — included, no upcharge.
         </p>
 
         <a
@@ -874,7 +874,7 @@ export function ResultsStage({
           onClick={() => trackClick('book_call_clicked', { from: 'ai_search_visibility_button' })}
           className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
         >
-          Skip the wait — book a call for Pro live tracking →
+          Skip the wait — book a call for live tracking →
         </a>
       </section>
 
