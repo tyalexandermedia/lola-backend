@@ -228,18 +228,11 @@ export default function PricingPage() {
               pricePeriod="/month · cancel anytime"
               positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
               features={[
-                '🌐 Done-for-you AI website — built + hosted, $0 setup ($3,000 value)',
-                '🔒 Local Lock — up to 5 cities, your niche, exclusive',
-                'Full Lola audit + priority fix list',
-                'Google Business Profile optimization + weekly posts',
-                'On-page SEO, citations, schema, speed fixes',
-                'Review-generation system',
-                'Call tracking + lead attribution (CallRail)',
-                'AI Search Visibility tracking (ChatGPT, Perplexity, Gemini)',
-                'Public client dashboard (rankings + AI Share of Voice)',
-                'Monthly content + link building',
-                'Bi-weekly performance reports',
-                'Priority Slack + text support',
+                '🌐 Done-for-you AI website — built + hosted ($3,000 value, free)',
+                '🔒 Local Lock — your niche + up to 5 cities, exclusive',
+                '🔎 Everything Lola tracks — SEO, GBP, content, reviews, calls, AI search',
+                '📊 Live client dashboard + bi-weekly reports',
+                '💬 Direct Slack + text with Coach Ty',
               ]}
               ctaLabel="Claim your service area →"
               ctaHref={growthHref}
@@ -250,34 +243,71 @@ export default function PricingPage() {
 
         </div>
 
-        {/* Value stack — itemized à-la-carte cost vs the one price */}
-        <div className="mx-auto mt-8 max-w-[600px] rounded-[16px] border border-white/[0.10] bg-white/[0.02] p-6 sm:p-7">
-          <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-            What you&apos;d pay for this separately
-          </p>
-          <ul className="mt-5 space-y-2 text-[13px] sm:text-[14px]">
-            {[
-              ['Done-for-you AI website (built + hosted)', '$3,000 build'],
-              ['Local SEO management', '$1,500/mo'],
-              ['Google Business Profile + weekly posts', '$400/mo'],
-              ['Content + link building', '$600/mo'],
-              ['Review-generation system', '$150/mo'],
-              ['Call tracking + lead attribution', '$100/mo'],
-              ['AI Search Visibility tracking', '$250/mo'],
-              ['Live dashboard + reporting', '$150/mo'],
-            ].map(([label, val]) => (
-              <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2">
-                <span className="text-[#C5C5C8]">{label}</span>
-                <span className="whitespace-nowrap font-medium text-[#9CA3AF] line-through">{val}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4">
-            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">
-              Over <span className="font-bold text-white">$3,150/mo</span> of marketing + a <span className="font-bold text-white">$3,000</span> website
-            </p>
-            <p className="text-[16px] font-bold text-white">
-              You pay <span className="text-[#D4AF37]">$697/mo</span> · $0 setup
+        {/* Grand-slam value + bonus stack — deliverables → free bonuses → total → price → CTA */}
+        <div className="mx-auto mt-8 max-w-[620px] overflow-hidden rounded-[18px] border border-[#D4AF37]/25 bg-gradient-to-b from-white/[0.05] to-white/[0.01] shadow-[0_0_50px_rgba(212,175,55,0.08)]">
+          <div className="border-b border-white/[0.08] bg-white/[0.02] py-4 text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Here&apos;s everything you get</p>
+          </div>
+          <div className="p-6 sm:p-8">
+            <ul className="space-y-3 text-[14px] sm:text-[15px]">
+              {[
+                ['Local SEO — Google + Map Pack rankings', '$1,500/mo'],
+                ['Google Business Profile + weekly posts', '$400/mo'],
+                ['Content + link building', '$600/mo'],
+                ['Review-generation system', '$150/mo'],
+                ['Call tracking + lead attribution', '$100/mo'],
+                ['AI Search Visibility tracking', '$250/mo'],
+                ['Live dashboard + reporting', '$150/mo'],
+              ].map(([label, val]) => (
+                <li key={label} className="flex items-baseline justify-between gap-4">
+                  <span className="flex items-baseline gap-2 text-[#E8E4D8]"><span className="text-[#D4AF37]">✓</span>{label}</span>
+                  <span className="whitespace-nowrap text-[13px] font-medium text-[#7A7F8A] line-through">{val}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Free bonuses — the Hormozi stack */}
+            <div className="mt-6 rounded-[14px] border border-[#D4AF37]/35 bg-[#D4AF37]/[0.06] p-5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🎁 Plus free bonuses when you lock your market</p>
+              <ul className="mt-4 space-y-3 text-[14px] sm:text-[15px]">
+                {[
+                  ['Done-for-you AI website — built + hosted', '$3,000', 'FREE'],
+                  ['Your Market Lock — we turn away your competitor, in writing', 'Exclusive', 'FREE'],
+                  ['Competitor Teardown on your call — who beats you + how to pass them', '$500', 'FREE'],
+                  ['48-hour onboarding — work starts in 2 days, no setup fee', '$500', 'FREE'],
+                ].map(([label, val, tag]) => (
+                  <li key={label} className="flex items-start justify-between gap-3">
+                    <span className="text-[#F0EAD6]">{label} <span className="whitespace-nowrap text-[12px] text-[#9CA3AF]">({val} value)</span></span>
+                    <span className="mt-0.5 whitespace-nowrap rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[10px] font-black tracking-wide text-[#0A0A0B]">{tag}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Total → price reveal */}
+            <div className="mt-7 text-center">
+              <p className="text-[12px] uppercase tracking-[0.2em] text-[#9CA3AF]">
+                Real value: <span className="font-bold text-white">$3,150/mo</span> + <span className="font-bold text-white">$4,000</span> in bonuses
+              </p>
+              <p className="mt-3 text-[14px] text-[#C5C5C8]">Your price</p>
+              <p className="text-[52px] font-black leading-none text-[#D4AF37] sm:text-[60px]">
+                $697<span className="text-[20px] font-bold text-[#9CA3AF]">/mo</span>
+              </p>
+              <p className="mt-3 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime · 30-day half-back guarantee</p>
+            </div>
+
+            {/* BIG CTA — easy to click & buy */}
+            <a
+              href={growthHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track('growth_cta_clicked', { from: 'value_stack' })}
+              className="mt-6 flex h-16 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left text-center text-[15px] font-black uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_10px_30px_rgba(212,175,55,0.4)] transition-all hover:bg-right active:scale-[0.99] sm:text-[16px]"
+            >
+              🔒 Lock my market — book a free call →
+            </a>
+            <p className="mt-3 text-center text-[12px] text-[#9CA3AF]">
+              No credit card · 15-minute call · We&apos;ll tell you straight if it&apos;s not a fit
             </p>
           </div>
         </div>
