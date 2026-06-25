@@ -37,7 +37,7 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
 // Values kept stable for the backend/type contract; labels updated to the
 // one-price + add-ons model — $697/mo base, Multi-Market +$300 (Starter/Pro tiers retired).
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'retainer', label: 'Lola — $697/mo (everything done-for-you)' },
+  { value: 'retainer', label: 'Lola Leads — $697/mo (everything done-for-you)' },
   { value: 'pro', label: 'Lola + Multi-Market (+$300/mo)' },
   { value: 'both', label: 'Not sure — tell me what fits' },
 ];

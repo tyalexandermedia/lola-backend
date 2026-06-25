@@ -39,7 +39,7 @@ EMAIL = "ty@tyalexandermedia.com"
 
 # One price + add-ons (Starter/Pro tiers retired 2026-06-25; old $47/$397/$6,970 dead).
 TIERS = [
-    {"name": "Lola", "price": "$697/mo", "featured": True,
+    {"name": "Lola Leads", "price": "$697/mo", "featured": True,
      "blurb": "Everything done-for-you — website, GBP + Map Pack, citations, content, reviews, call tracking, AI-search visibility. No feature gates, no setup fee. Agencies charge $2,000-$5,000/mo for less."},
     {"name": "Social Media Mgmt add-on", "price": "from +$197/mo", "featured": False,
      "blurb": "Essentials ($197): Google Business + Facebook + Instagram. Complete ($397): adds YouTube + TikTok."},

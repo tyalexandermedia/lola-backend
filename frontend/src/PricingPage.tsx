@@ -222,11 +222,11 @@ export default function PricingPage() {
           <div className="order-1">
             <TierCard
               variant="growth"
-              eyebrow="Service-Area Lock · Monthly"
-              name="Lola"
+              eyebrow="Done-for-you local visibility · Monthly"
+              name="Lola Leads"
               price="$697"
               pricePeriod="/month · cancel anytime"
-              positioning="Get found across your full service area — up to 5 cities, your van's whole delivery radius. Everything Lola tracks, no feature gates. Lock = no direct competitor can hire Lola in any of those cities + your niche."
+              positioning="Get found everywhere your next customer looks — Google, Maps, and AI search — so your phone rings. We do all of it. One business per market: lock yours and we say no to your direct competitor."
               features={[
                 '🌐 Done-for-you AI website — built + hosted ($3,000 value, free)',
                 '🔒 Local Lock — your niche + up to 5 cities, exclusive',
@@ -309,6 +309,18 @@ export default function PricingPage() {
             <p className="mt-3 text-center text-[12px] text-[#9CA3AF]">
               No credit card · 15-minute call · We&apos;ll tell you straight if it&apos;s not a fit
             </p>
+
+            {/* Easy in / easy out — kill the commitment objection (the #1 conversion lever) */}
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.02] p-3 text-center">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">✅ Easy in</p>
+                <p className="mt-1 text-[12px] text-[#C5C5C8]">No setup fee · no card to book · live in 48 hours</p>
+              </div>
+              <div className="rounded-[10px] border border-white/[0.08] bg-white/[0.02] p-3 text-center">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">🚪 Easy out</p>
+                <p className="mt-1 text-[12px] text-[#C5C5C8]">No contract · cancel anytime in one text</p>
+              </div>
+            </div>
           </div>
         </div>
 
