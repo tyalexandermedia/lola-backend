@@ -211,8 +211,7 @@ function SiteFooter({ route }: { route: Route }) {
 
         <FooterCol title="Get found">
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
-          <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
-          <FooterLink href="/os">LOLA OS status</FooterLink>
+          <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
@@ -237,7 +236,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          We work with one business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Claim your Local Lock</a>.
+          A phased growth roadmap for local service businesses — Foundation, Growth, Scale. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See your roadmap</a>.
         </p>
       </div>
     </footer>

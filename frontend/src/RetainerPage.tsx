@@ -1,29 +1,47 @@
 /// <reference types="vite/client" />
 /**
- * Lola SEO — /retainer close page.
+ * Lola SEO — /retainer close page (the done-for-you Growth Roadmap).
  *
  * Single-CTA scrollable funnel optimized for hot leads from cold outreach
  * and audit completers ready to buy. Andrea Palacio-style — value stack,
  * ROI math, founding-member urgency, dual guarantee, FAQ, founder story.
  *
+ * Repositioned onto the phased roadmap model (Foundation → Growth → Scale).
+ * Growth Roadmap ($497/mo, default $597 regular) is the recurring done-for-you
+ * default this page sells; Scale System ($697/mo, $997+ competitive) is the
+ * next stage. Foundation Sprint ($297 one-time) is the start line. Prices come
+ * from ./lib/pricing (canonical mirror of docs/PRICING.md).
+ *
  * Sticky mobile CTA bar at bottom. Desktop hides the sticky bar.
  *
  * Sections:
  *   1. Hero — single primary CTA
- *   2. Value stack (6 agents → $6,000/mo value → $697 price)
- *   3. ROI math (Time / Leads / Compound)
- *   4. Founding-member urgency (live count from /pricing endpoint)
- *   5. Dual guarantee stack
- *   6. What's included (agent breakdown)
- *   7. Who this is for
- *   8. FAQ accordion (7 questions)
- *   9. Founder story (Coach Ty)
- *  10. Final CTA + trust row
+ *   2. The roadmap (Foundation → Growth → Scale)
+ *   3. Value stack (6 agents → $6,000/mo value → Growth price)
+ *   4. ROI math (Time / Leads / Compound)
+ *   5. Founding-member urgency (live count from /pricing endpoint)
+ *   6. Dual guarantee stack
+ *   7. What's included (agent breakdown)
+ *   8. Who this is for
+ *   9. FAQ accordion (7 questions)
+ *  10. Founder story (Coach Ty)
+ *  11. Final CTA + trust row
  */
 
 import { useEffect, useState } from 'react';
 import { API_URL } from './api';
 import { track } from './analytics';
+import { ROADMAP } from './lib/pricing';
+
+// Roadmap stage prices, pulled from the canonical pricing source.
+const FOUNDATION = ROADMAP.find((s) => s.id === 'foundation')!;
+const GROWTH = ROADMAP.find((s) => s.id === 'growth')!;
+const SCALE = ROADMAP.find((s) => s.id === 'scale')!;
+
+// Founding rate = the current Growth price ($497). Regular rate is the price
+// the first 10 founders lock against ($597). Both are display strings.
+const GROWTH_FOUNDING = GROWTH.price; // "$497"
+const GROWTH_REGULAR = '$597';
 
 // Call-first rebuild: every retainer CTA now books a free strategy call
 // instead of Stripe self-serve checkout. Name kept for the env-var contract;
@@ -83,7 +101,7 @@ export default function RetainerPage() {
             className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.12)_0%,transparent_60%)] blur-2xl"
           />
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-            The Lola Retainer
+            The Growth Roadmap
           </p>
           <h1
             className="mx-auto mt-4 max-w-[820px] font-bold leading-[1.05] tracking-[-0.02em] text-white"
@@ -95,8 +113,12 @@ export default function RetainerPage() {
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
-            The Lola Retainer puts six specialist AI agents + Coach Ty on your account weekly.
-            Done-for-you. <span className="font-semibold text-white">$697/mo. Cancel anytime.</span>
+            This isn't a random SEO package — it's a phased growth roadmap. Six specialist AI
+            agents + Coach Ty build your foundation, then advance you through Growth and Scale.
+            Done-for-you.{' '}
+            <span className="font-semibold text-white">
+              Growth Roadmap from {GROWTH_FOUNDING}/mo. Cancel anytime.
+            </span>
           </p>
 
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -107,7 +129,7 @@ export default function RetainerPage() {
               onClick={() => track('retainer_cta_clicked', { from: 'hero' })}
               className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
             >
-              🦴 Activate the Retainer — $697/mo →
+              🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
             </a>
             {/* Desktop: full button. Mobile: small text link (sticky bar
                 already provides primary CTA; this avoids occlusion). */}
@@ -128,7 +150,67 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 2. VALUE STACK ──────────────────────────────────────────── */}
+        {/* ── 2. THE ROADMAP ──────────────────────────────────────────── */}
+        <section className="mt-16 sm:mt-20">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+            The roadmap, not a random package
+          </p>
+          <h2 className="mt-3 text-[26px] font-bold tracking-[-0.01em] text-white sm:text-[32px]">
+            Foundation → Growth → Scale.
+          </h2>
+          <p className="mt-3 max-w-[640px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+            You don't buy random SEO tasks — you enter a phased roadmap and advance through
+            stages of maturity. The first 30 days create the base. Days 31–90 build signals.
+            After 90 days, the data compounds. You're not paying more for no reason — you're
+            paying for maturity as the work expands.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+            {[FOUNDATION, GROWTH, SCALE].map((stage) => (
+              <div
+                key={stage.id}
+                className={`relative flex flex-col rounded-2xl border p-6 sm:p-7 ${
+                  stage.featured
+                    ? 'border-[#D4AF37]/60 bg-[#D4AF37]/[0.05] shadow-[0_0_28px_rgba(212,175,55,0.12)]'
+                    : 'border-white/[0.08] bg-white/[0.02]'
+                }`}
+              >
+                {stage.badge && (
+                  <span className="absolute right-4 top-4 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#D4AF37]">
+                    {stage.badge}
+                  </span>
+                )}
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">
+                  {stage.phase}
+                </p>
+                <p className="mt-2 text-[18px] font-bold text-white sm:text-[20px]">{stage.name}</p>
+                <p className="mt-3">
+                  <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[30px] font-extrabold leading-none text-transparent sm:text-[34px]">
+                    {stage.price}
+                  </span>
+                  <span className="ml-1 text-[13px] font-semibold text-[#8A8F98]">
+                    {stage.period}
+                  </span>
+                </p>
+                {stage.priceNote && (
+                  <p className="mt-1.5 text-[12px] leading-[1.5] text-[#8A8F98]">
+                    {stage.priceNote}
+                  </p>
+                )}
+                <p className="mt-4 text-[13px] leading-[1.6] text-[#C5C5C8]">{stage.outcome}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 max-w-[640px] text-[13px] leading-[1.6] text-[#8A8F98]">
+            Most clients start with the <span className="font-semibold text-white">Foundation
+            Sprint</span> ({FOUNDATION.price} one-time), then continue into the{' '}
+            <span className="font-semibold text-[#D4AF37]">Growth Roadmap</span> — the recurring
+            done-for-you default this page is built around.
+          </p>
+        </section>
+
+        {/* ── 3. VALUE STACK ──────────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             What you're actually getting
@@ -168,23 +250,26 @@ export default function RetainerPage() {
           </div>
 
           <div className="mt-6 rounded-2xl border-[1.5px] border-[#D4AF37]/40 bg-[#D4AF37]/[0.04] p-6 text-center sm:p-8">
-            <p className="text-[14px] uppercase tracking-[0.22em] text-[#8A8F98]">Your investment</p>
+            <p className="text-[14px] uppercase tracking-[0.22em] text-[#8A8F98]">
+              Your Growth Roadmap investment
+            </p>
             <p className="mt-3">
               <span className="text-[24px] font-medium text-[#7A7F8A] line-through sm:text-[28px]">
                 $6,000/mo
               </span>{' '}
               <span className="inline-block bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[44px] font-extrabold leading-none text-transparent sm:text-[56px]">
-                $697/mo
+                {GROWTH_FOUNDING}/mo
               </span>
             </p>
             <p className="mx-auto mt-4 max-w-[520px] text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
-              88% off agency pricing — because Lola does the heavy lifting, not a 30-person team
-              you don't need.
+              A fraction of agency pricing — because Lola does the heavy lifting, not a 30-person
+              team you don't need. Need multi-location or competitive-market execution? That's the
+              Scale System at {SCALE.price}/mo ($997+ competitive).
             </p>
           </div>
         </section>
 
-        {/* ── 3. ROI MATH ─────────────────────────────────────────────── */}
+        {/* ── 4. ROI MATH ─────────────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">The math</p>
           <h2 className="mt-3 text-[26px] font-bold tracking-[-0.01em] text-white sm:text-[32px]">
@@ -205,8 +290,8 @@ export default function RetainerPage() {
               },
               {
                 eyebrow: 'THE COMPOUND',
-                h: 'Top 3 by month 6',
-                body: 'Rankings stack month over month. By month 6 you\'re capturing 73% of local clicks. By month 12 competitors can\'t catch up.',
+                h: 'Maturity compounds',
+                body: 'This is a roadmap, not a one-off. The first 30 days build the foundation, days 31–90 build signals, and after 90 days the data compounds — so each month\'s work builds on the last.',
               },
             ].map((c) => (
               <div
@@ -225,13 +310,13 @@ export default function RetainerPage() {
           </div>
 
           <p className="mx-auto mt-6 max-w-[640px] text-center text-[15px] font-semibold leading-[1.55] text-white sm:text-[17px]">
-            Total upside: <span className="text-[#D4AF37]">$18,000+/year</span>. Investment:{' '}
-            <span className="text-[#D4AF37]">$8,364/year</span>. ROI:{' '}
-            <span className="text-[#D4AF37]">215%</span>.
+            Illustrative upside: <span className="text-[#D4AF37]">$18,000+/year</span>. Growth
+            Roadmap investment: <span className="text-[#D4AF37]">$5,964/year</span> ({GROWTH_FOUNDING}/mo).
+            These are example scenarios, not guaranteed results.
           </p>
         </section>
 
-        {/* ── 4. FOUNDING-MEMBER URGENCY ──────────────────────────────── */}
+        {/* ── 5. FOUNDING-MEMBER URGENCY ──────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <div className="relative overflow-hidden rounded-2xl border-[1.5px] border-[#D4AF37]/60 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] p-7 sm:p-9">
             <div
@@ -242,11 +327,12 @@ export default function RetainerPage() {
               🦴 Founding Member Pricing
             </p>
             <h2 className="relative mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
-              First 10 retainer clients lock $697/mo — for life.
+              First 10 Growth clients lock the {GROWTH_FOUNDING}/mo founding rate.
             </h2>
             <p className="relative mt-4 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-              One price, everything done-for-you — no tiers, no feature gates. Founding
-              members lock today&apos;s $697/mo for life, even as our public rate rises.
+              After {foundingCap} founding spots are taken, the regular Growth Roadmap rate moves
+              to <span className="font-semibold text-white">{GROWTH_REGULAR}/mo</span>. Founders
+              keep {GROWTH_FOUNDING}/mo, even as the regular rate goes up.
             </p>
             {/* Only show numeric counter when we have a real reading. Hiding
                 the chip on fetch-fail beats showing "10 of 10" which reads as
@@ -259,7 +345,7 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 5. GUARANTEE STACK ──────────────────────────────────────── */}
+        {/* ── 6. GUARANTEE STACK ──────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             Our promise to you
@@ -295,7 +381,7 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 6. WHAT'S INCLUDED ──────────────────────────────────────── */}
+        {/* ── 7. WHAT'S INCLUDED ──────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             Your dedicated SEO agent team
@@ -329,7 +415,7 @@ export default function RetainerPage() {
           </ul>
         </section>
 
-        {/* ── 7. WHO THIS IS FOR ──────────────────────────────────────── */}
+        {/* ── 8. WHO THIS IS FOR ──────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             The fit check
@@ -357,7 +443,7 @@ export default function RetainerPage() {
           </ul>
         </section>
 
-        {/* ── 8. FAQ ──────────────────────────────────────────────────── */}
+        {/* ── 9. FAQ ──────────────────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             Common questions
@@ -378,11 +464,11 @@ export default function RetainerPage() {
               },
               {
                 q: "What if I'm already working with an SEO agency?",
-                a: 'Fire them. Most agencies charge $2K–$5K/mo and deliver less than Lola does at $697. Or run us in parallel for 60 days and compare.',
+                a: `Fire them. Most agencies charge $2K–$5K/mo and deliver less than Lola does on the Growth Roadmap from ${GROWTH_FOUNDING}/mo. Or run us in parallel for 60 days and compare.`,
               },
               {
-                q: 'How fast will I see results?',
-                a: '30-Day Half-Back: measurable ranking improvement in 30 days or 50% back. Full ROI typically hits month 3. By month 6 you\'re in the top 3.',
+                q: 'How does the roadmap work — and how fast do things move?',
+                a: 'You start with the Foundation Sprint, then continue into the Growth Roadmap. The 30-Day Half-Back and First Win Promise back the early stages. The first 30 days build the foundation, days 31–90 build signals, and after 90 days the data compounds — this is a roadmap, not an overnight switch.',
               },
               {
                 q: "What if I'm not in Florida — or not a contractor?",
@@ -393,8 +479,8 @@ export default function RetainerPage() {
                 a: 'Cancel anytime. No contracts. No minimum commitment. If we\'re not earning back your investment, you don\'t owe us another dollar.',
               },
               {
-                q: 'Why $697/mo when agencies charge $2K+?',
-                a: 'Lola\'s AI does the work that would require a 5-person agency team. Coach Ty oversees strategy. You pay for results, not bloat.',
+                q: `Why ${GROWTH_FOUNDING}/mo when agencies charge $2K+?`,
+                a: 'Lola\'s AI does the work that would require a 5-person agency team. Coach Ty oversees strategy. You pay for the work, not bloat. Multi-location or competitive markets move up to the Scale System.',
               },
             ].map((item, i) => (
               <details
@@ -423,7 +509,7 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 9. FOUNDER STORY ────────────────────────────────────────── */}
+        {/* ── 10. FOUNDER STORY ───────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             Why Lola exists
@@ -458,7 +544,7 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 10. FINAL CTA ───────────────────────────────────────────── */}
+        {/* ── 11. FINAL CTA ───────────────────────────────────────────── */}
         <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
             Last step
@@ -477,7 +563,7 @@ export default function RetainerPage() {
             onClick={() => track('retainer_cta_clicked', { from: 'final' })}
             className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[16px]"
           >
-            🦴 Activate the Retainer — $697/mo →
+            🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
           </a>
 
           <p className="mt-4 text-[13px] text-[#D4AF37]/85">
@@ -517,7 +603,7 @@ export default function RetainerPage() {
           onClick={() => track('retainer_cta_clicked', { from: 'sticky_mobile' })}
           className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-4 text-[13px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.4)]"
         >
-          🦴 Activate the Retainer — $697/mo →
+          🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
         </a>
       </div>
     </>

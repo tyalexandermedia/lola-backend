@@ -9,8 +9,9 @@
  *   1. Honest framing. "Pick them if X, pick Lola if Y" — never "they suck".
  *   2. Acknowledge what they do well — credibility beats shilling.
  *   3. Specifics over adjectives. Real prices, real models, real fit cases.
- *   4. Pricing transparency = the moat. Lola's $697/mo + add-ons visible vs
- *      every competitor's "request a demo" gate.
+ *   4. Pricing transparency = the moat. Lola's published roadmap — a one-time
+ *      $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ in
+ *      competitive markets) — visible vs every competitor's "request a demo" gate.
  *   5. Two CTAs: book a call (warm leads) + run the free Grader (cold).
  *
  * Each page emits a FAQPage JSON-LD with switching/comparison questions —
@@ -61,8 +62,8 @@ interface Competitor {
 // ── COMPETITOR CONFIGS ───────────────────────────────────────
 // Source of truth. Add new competitors by appending here.
 
-const LOLA_PRICE = 'From $697/mo';
-const LOLA_MODEL = 'Done-for-you · transparent · no feature gates';
+const LOLA_PRICE = '$297 once, then $497–$997/mo';
+const LOLA_MODEL = 'Done-for-you, transparent roadmap';
 
 const LOCALIQ: Competitor = {
   slug: 'localiq',
@@ -72,7 +73,7 @@ const LOCALIQ: Competitor = {
   oneLine: 'A large-scale digital marketing service used by 1,000s of multi-location franchises and ad-spend-heavy local businesses.',
   priceRange: 'Quote-only (hidden)',
   metaTitle: 'Lola SEO vs LocalIQ — Which Local SEO is Right for You? | Lola',
-  metaDescription: 'Honest comparison: LocalIQ\'s quote-only enterprise model vs Lola\'s transparent $697/mo done-for-you local SEO. AI search visibility, real pricing, 30-day guarantee.',
+  metaDescription: 'Honest comparison: LocalIQ\'s quote-only enterprise model vs Lola\'s published roadmap — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive) done-for-you local SEO. AI search visibility, real pricing, 30-day guarantee.',
   tldr: {
     pickThemIf: [
       'You manage 10+ locations and want a full ad-spend partner',
@@ -97,8 +98,8 @@ const LOCALIQ: Competitor = {
     '30-Day Half-Back guarantee in writing — most enterprise vendors won\'t put a refund clause on paper',
   ],
   table: [
-    { label: 'Pricing',                lola: '$697/mo + add-ons (public)', them: 'Request a quote',          lolaWin: true  },
-    { label: 'Done-for-you?',          lola: 'Yes — always',                them: 'Yes (enterprise tiers)',   lolaWin: false },
+    { label: 'Pricing',                lola: '$297 once + $497–$997/mo (public)', them: 'Request a quote',          lolaWin: true  },
+    { label: 'Done-for-you?',          lola: 'Yes — every stage',                them: 'Yes (enterprise tiers)',   lolaWin: false },
     { label: 'Contract',               lola: 'Month-to-month, cancel anytime',  them: 'Typical annual term',      lolaWin: true  },
     { label: 'AI search visibility',   lola: 'Core product (ChatGPT / Perplexity / Gemini / Google AI)', them: 'Not a primary offering', lolaWin: true },
     { label: 'Free tool',              lola: '60-second AI Visibility Grader',  them: 'Website Grader (email-gated, 2 layers)', lolaWin: true },
@@ -109,11 +110,11 @@ const LOCALIQ: Competitor = {
   faqs: [
     {
       q: 'Is Lola SEO a real alternative to LocalIQ for a single-location local business?',
-      a: 'Yes — and arguably the better fit. LocalIQ\'s strength is multi-location scale and ad-spend management. If you\'re one location running on word-of-mouth + Google Maps, Lola\'s $697/mo done-for-you local SEO is built for exactly that.',
+      a: 'Yes — and arguably the better fit. LocalIQ\'s strength is multi-location scale and ad-spend management. If you\'re one location running on word-of-mouth + Google Maps, Lola\'s published roadmap — a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ in competitive markets) — done-for-you local SEO is built for exactly that.',
     },
     {
       q: 'How does Lola\'s pricing compare to LocalIQ\'s?',
-      a: 'LocalIQ does not publish pricing — every plan is quote-only behind a sales call. Lola publishes $697/mo (everything included) plus optional add-ons, no contracts, no setup fees. You can see exactly what you\'ll pay before any conversation.',
+      a: 'LocalIQ does not publish pricing — every plan is quote-only behind a sales call. Lola publishes the full roadmap: a one-time $297 Foundation Sprint, then Growth Roadmap at $497/mo (most popular) and Scale System at $697/mo ($997+ in competitive markets), no contracts, no setup fees. You can see exactly what you\'ll pay before any conversation.',
     },
     {
       q: 'Can I switch from LocalIQ to Lola?',
@@ -138,7 +139,7 @@ const BRIGHTLOCAL: Competitor = {
   oneLine: 'A respected local-SEO toolset used by 15,000+ businesses and SEO agencies — you do the work yourself.',
   priceRange: '$39 – $59/mo (software only)',
   metaTitle: 'Lola SEO vs BrightLocal — DIY Tool or Done-for-You? | Lola',
-  metaDescription: 'BrightLocal is a great DIY tool ($39–$59/mo). Lola is done-for-you ($697/mo). Which is right for your local business? Honest comparison from Coach Ty.',
+  metaDescription: 'BrightLocal is a great DIY tool ($39–$59/mo). Lola is done-for-you on a published roadmap — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive). Which is right for your local business? Honest comparison from Coach Ty.',
   tldr: {
     pickThemIf: [
       'You have an in-house marketer or SEO agency doing the work',
@@ -163,7 +164,7 @@ const BRIGHTLOCAL: Competitor = {
     '30-Day Half-Back guarantee. BrightLocal\'s a tool — there\'s no result to guarantee.',
   ],
   table: [
-    { label: 'Pricing',           lola: '$697/mo + add-ons',         them: '$39 / $49 / $59 /mo (software)',  lolaWin: false },
+    { label: 'Pricing',           lola: '$297 once + $497–$997/mo',       them: '$39 / $49 / $59 /mo (software)',  lolaWin: false },
     { label: 'Work done for you?', lola: 'Yes — full execution',          them: 'No — you DIY',                    lolaWin: true  },
     { label: 'Setup time',        lola: '48-hour onboarding',             them: 'Hours of setup + ongoing weekly', lolaWin: true  },
     { label: 'AI search included?', lola: 'Yes — core product',            them: 'Not a primary feature',           lolaWin: true  },
@@ -174,7 +175,7 @@ const BRIGHTLOCAL: Competitor = {
   faqs: [
     {
       q: 'Should I use BrightLocal or Lola SEO?',
-      a: 'They serve different needs. BrightLocal ($39–$59/mo) is a software tool — you do the SEO work, it gives you the dashboard. Lola ($697/mo) is done-for-you — we run the playbook for you. If your time is worth more than the price gap, Lola pays back. If you have an in-house SEO already, BrightLocal is the better tool.',
+      a: 'They serve different needs. BrightLocal ($39–$59/mo) is a software tool — you do the SEO work, it gives you the dashboard. Lola is done-for-you on a published roadmap — a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ competitive) — we run the playbook for you. If your time is worth more than the price gap, Lola pays back. If you have an in-house SEO already, BrightLocal is the better tool.',
     },
     {
       q: 'Is BrightLocal worth it for a small business owner?',
@@ -203,7 +204,7 @@ const SCORPION: Competitor = {
   oneLine: 'A large local-services marketing agency serving home services, legal, and franchise brands at the higher end of the spend curve.',
   priceRange: 'Quote-only (hidden)',
   metaTitle: 'Lola SEO vs Scorpion — Local SEO for Service Businesses | Lola',
-  metaDescription: 'Scorpion is a full-stack agency for $3K+/mo accounts. Lola is transparent, founder-led local SEO + AI search at $697/mo. Which fits your business?',
+  metaDescription: 'Scorpion is a full-stack agency for $3K+/mo accounts. Lola is transparent, founder-led local SEO + AI search on a published roadmap — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive). Which fits your business?',
   tldr: {
     pickThemIf: [
       'Your monthly marketing budget is $3K+ and you want one vendor handling everything',
@@ -229,7 +230,7 @@ const SCORPION: Competitor = {
     'You text Coach Ty directly — no agency layer between you and the work',
   ],
   table: [
-    { label: 'Pricing',                 lola: '$697/mo + add-ons (public)', them: 'Quote-only, typically $3K+/mo',   lolaWin: true  },
+    { label: 'Pricing',                 lola: '$297 once + $497–$997/mo (public)', them: 'Quote-only, typically $3K+/mo',   lolaWin: true  },
     { label: 'Contract',                lola: 'Month-to-month',                   them: 'Typically annual',                lolaWin: true  },
     { label: 'Done-for-you?',           lola: 'Yes',                              them: 'Yes',                             lolaWin: false },
     { label: 'AI search visibility',    lola: 'Core product',                     them: 'Not a primary offering',          lolaWin: true  },
@@ -241,11 +242,11 @@ const SCORPION: Competitor = {
   faqs: [
     {
       q: 'Is Lola SEO a real alternative to Scorpion?',
-      a: 'For most independent local service businesses, yes. Scorpion is built for larger operators with $3K+/mo budgets who want a full-stack media buying + SEO + CRM partner. Lola is focused: done-for-you local SEO + AI search visibility at $697/mo, no contract, founder-led.',
+      a: 'For most independent local service businesses, yes. Scorpion is built for larger operators with $3K+/mo budgets who want a full-stack media buying + SEO + CRM partner. Lola is focused: done-for-you local SEO + AI search visibility on a published roadmap — a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ competitive) — no contract, founder-led.',
     },
     {
       q: 'Is Scorpion really $3K+ per month?',
-      a: 'Their pricing isn\'t published, but reported engagements consistently run in that range for full-service work. Lola publishes prices ($697/mo + add-ons) so you can decide before any call.',
+      a: 'Their pricing isn\'t published, but reported engagements consistently run in that range for full-service work. Lola publishes the full roadmap (a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo, $997+ in competitive markets) so you can decide before any call.',
     },
     {
       q: 'Can I move from Scorpion to Lola mid-contract?',
@@ -270,7 +271,7 @@ const PODIUM: Competitor = {
   oneLine: 'A leading messaging + reviews platform used by 100,000+ local businesses to capture leads from website chat, SMS, and Google reviews.',
   priceRange: '$399 – $799+/mo (software)',
   metaTitle: 'Lola vs Podium — Lead Capture or Lead Generation? | Lola',
-  metaDescription: 'Podium captures the leads you already get. Lola generates new leads through AI search + local SEO. Honest comparison from Coach Ty. Pricing $697/mo.',
+  metaDescription: 'Podium captures the leads you already get. Lola generates new leads through AI search + local SEO. Honest comparison from Coach Ty. Published roadmap pricing — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive).',
   tldr: {
     pickThemIf: [
       'You already get a lot of inbound web/SMS traffic and need to convert it faster',
@@ -292,10 +293,10 @@ const PODIUM: Competitor = {
     "Lola fills the top of the funnel — Podium converts what's already there",
     'AI search visibility (ChatGPT, Perplexity, Gemini) is the core product, not an add-on',
     'Done-for-you execution — Lola runs the playbook, not a tool you have to operate',
-    'Done-for-you lead generation — not another inbox to run. Podium is software you operate ($399+/mo plus setup); Lola runs the playbook for you.',
+    'Transparent pricing starts at a one-time $297 Foundation, then $497/mo — Podium starts at $399 software + setup costs',
   ],
   table: [
-    { label: 'Pricing',          lola: '$697/mo + add-ons (public)', them: '$399 – $799+/mo (software)',     lolaWin: false },
+    { label: 'Pricing',          lola: '$297 once + $497–$997/mo (public)', them: '$399 – $799+/mo (software)',     lolaWin: true  },
     { label: 'What it does',     lola: 'Generates leads (SEO + AI search)', them: 'Converts existing traffic',    lolaWin: false },
     { label: 'Done-for-you?',    lola: 'Yes — full execution',             them: 'No — you operate the platform', lolaWin: true  },
     { label: 'AI search included?', lola: 'Yes — core product',             them: 'No — focused on messaging',      lolaWin: true  },
@@ -323,7 +324,7 @@ const PODIUM: Competitor = {
     },
     {
       q: "How does Lola's pricing compare to Podium's?",
-      a: "Podium starts around $399/mo for the base tier and goes up with seats/features. Lola starts at $697/mo with done-for-you SEO + AI search visibility — different product (lead generation vs lead capture), transparent pricing on both ends.",
+      a: "Podium starts around $399/mo for the base tier and goes up with seats/features. Lola starts with a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ competitive) — done-for-you SEO + AI search visibility, different product, different value, transparent pricing on both ends.",
     },
   ],
 };
@@ -336,7 +337,7 @@ const YEXT: Competitor = {
   oneLine: 'A publicly-traded enterprise platform managing business listings across 200+ directories and AI Answers — used by Fortune 500 brands and multi-location operators.',
   priceRange: 'Enterprise — quote-only',
   metaTitle: 'Lola vs Yext — Local Listings + AI Search Compared | Lola',
-  metaDescription: 'Yext manages listings at enterprise scale. Lola does done-for-you local SEO + AI search visibility for service businesses at $697/mo. Honest comparison.',
+  metaDescription: 'Yext manages listings at enterprise scale. Lola does done-for-you local SEO + AI search visibility for service businesses on a published roadmap — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive). Honest comparison.',
   tldr: {
     pickThemIf: [
       'You have 50+ locations and need bulk listings management',
@@ -346,7 +347,7 @@ const YEXT: Competitor = {
     pickLolaIf: [
       'You\'re a single or small-multi local service business',
       'You want done-for-you execution, not another platform license',
-      'You want from $697/mo transparent pricing, not an enterprise contract',
+      'You want transparent roadmap pricing — a one-time $297 Foundation, then $497–$997/mo — not an enterprise contract',
     ],
   },
   whereTheyWin: [
@@ -361,7 +362,7 @@ const YEXT: Competitor = {
     'Founder-led — text Coach Ty, not file a ticket',
   ],
   table: [
-    { label: 'Pricing',            lola: '$697/mo + add-ons',         them: 'Enterprise quote-only',           lolaWin: true  },
+    { label: 'Pricing',            lola: '$297 once + $497–$997/mo',       them: 'Enterprise quote-only',           lolaWin: true  },
     { label: 'Done-for-you?',      lola: 'Yes',                             them: 'Platform — you operate it',       lolaWin: true  },
     { label: 'Listings coverage',  lola: 'Top 10-20 (Lola playbook)',       them: '200+ directories',                lolaWin: false },
     { label: 'AI search visibility', lola: 'Core product',                  them: 'Yext Answers (different focus)',   lolaWin: true  },
@@ -372,7 +373,7 @@ const YEXT: Competitor = {
   faqs: [
     {
       q: 'Is Yext overkill for my single-location business?',
-      a: "Honest answer: usually yes. Yext is engineered for 50+ locations with central IT. For a single service business, Lola's done-for-you local SEO + AI visibility at $697/mo gets the same ranking outcome without the platform overhead.",
+      a: "Honest answer: usually yes. Yext is engineered for 50+ locations with central IT. For a single service business, Lola's done-for-you local SEO + AI visibility on a published roadmap — a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ competitive) — fits without the platform overhead.",
     },
     {
       q: 'Does Lola sync listings to as many directories as Yext?',
@@ -388,7 +389,7 @@ const YEXT: Competitor = {
     },
     {
       q: 'Is Yext expensive?',
-      a: "Yext is quote-only but commonly reported in the $400/mo (base) to $2,000+/mo (enterprise) range per location. Lola is $697/mo flat with no per-location fees for single-location businesses.",
+      a: "Yext is quote-only but commonly reported in the $400/mo (base) to $2,000+/mo (enterprise) range per location. Lola publishes its roadmap — a one-time $297 Foundation, then $497–$997/mo — with no per-location fees for single-location businesses.",
     },
   ],
 };
@@ -401,7 +402,7 @@ const HIBU: Competitor = {
   oneLine: 'A full-service local digital marketing agency offering websites, SEO, paid ads, social, and listings management for small businesses.',
   priceRange: 'Quote-only (typically $300 – $2,500+/mo)',
   metaTitle: 'Lola vs Hibu — Local SEO + AI Visibility Compared | Lola',
-  metaDescription: 'Hibu is a full-stack local agency. Lola is focused AI Leads + local SEO at $697/mo. Which fits your business? Honest comparison from Coach Ty.',
+  metaDescription: 'Hibu is a full-stack local agency. Lola is focused AI Leads + local SEO on a published roadmap — a one-time $297 Foundation, then Growth $497/mo and Scale $697/mo ($997+ competitive). Which fits your business? Honest comparison from Coach Ty.',
   tldr: {
     pickThemIf: [
       'You want one vendor handling website + ads + SEO + social + listings',
@@ -427,7 +428,7 @@ const HIBU: Competitor = {
     'Coach Ty answers his own phone — no account manager layer',
   ],
   table: [
-    { label: 'Pricing',                 lola: '$697/mo + add-ons (public)', them: 'Quote-only',                     lolaWin: true  },
+    { label: 'Pricing',                 lola: '$297 once + $497–$997/mo (public)', them: 'Quote-only',                     lolaWin: true  },
     { label: 'Contract',                lola: 'Month-to-month',                    them: 'Typically annual',                lolaWin: true  },
     { label: 'Service scope',           lola: 'Local SEO + AI search (focused)',   them: 'Full stack (sites, ads, SEO, social)', lolaWin: false },
     { label: 'AI search visibility',    lola: 'Core product',                      them: 'Not a primary offering',          lolaWin: true  },
@@ -442,7 +443,7 @@ const HIBU: Competitor = {
     },
     {
       q: 'How does Lola compare to Hibu on price?',
-      a: "Hibu doesn't publish pricing — reported engagements range from ~$300/mo (basic listings) to $2,500+/mo (full stack). Lola publishes $697/mo flat. You see exactly what you'll pay before any call.",
+      a: "Hibu doesn't publish pricing — reported engagements range from ~$300/mo (basic listings) to $2,500+/mo (full stack). Lola publishes its full roadmap: a one-time $297 Foundation, then Growth at $497/mo and Scale at $697/mo ($997+ competitive). You see exactly what you'll pay before any call.",
     },
     {
       q: 'Can I move from Hibu to Lola mid-contract?',
