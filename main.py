@@ -881,12 +881,12 @@ async def send_audit_email(
 
     # Live founding-counter for the P.S. — falls back gracefully if DB hiccups.
     try:
-        founding_used = await get_founding_count("standard")
+        founding_used = await get_founding_count("growth")
         founding_remaining = max(0, FOUNDING_CAP - founding_used)
     except Exception:
         founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
     founding_line = (
-        f"P.P.S. — First {FOUNDING_CAP} retainer clients lock $697/mo for life. "
+        f"P.P.S. — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. "
         f"We're at {FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP} right now."
     )
 
@@ -923,12 +923,12 @@ OPTION 1 — Do It Yourself ($47)
 The DIY Playbook. Every checklist Lola uses, in plain English.
 {STRIPE_DIY_URL}
 
-OPTION 2 — Get a Real Plan ($397)
-The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
+OPTION 2 — Get Your Roadmap ($397)
+The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
 {STRIPE_SPRINT_URL}
 
-OPTION 3 — Hand It Off ($697/mo)
-The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. Cancel anytime.
+OPTION 3 — Scale System ($697/mo)
+Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. $997+/mo for competitive or multi-location markets. Cancel anytime.
 {STRIPE_RETAINER_URL}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
@@ -937,7 +937,7 @@ Or just hit reply. Tell me what you want fixed first, and I'll walk you through 
 
 🦴 Want Lola's 6 AI agents working YOUR account weekly?
 
-→ See the Retainer: {retainer_url}
+→ See the Growth Roadmap: {retainer_url}
 → Apply (Coach Ty reviews every application): {apply_url}
 
 Coach Ty
@@ -1023,10 +1023,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get a Real Plan</strong> <span style="color:#C9A84C;">($397)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get Your Roadmap</strong> <span style="color:#C9A84C;">($397)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Start the Sprint — $397 →</a>
+<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get your roadmap — $397 →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1034,10 +1034,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Hand It Off</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. Cancel anytime.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Scale System</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. $997+/mo for competitive or multi-location markets. Cancel anytime.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start the Retainer — $697/mo →</a>
+<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Scale with LOLA OS — $697/mo →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1054,7 +1054,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:24px 28px;">
 <p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's 6 AI agents working YOUR account weekly?</p>
 <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Retainer →</a>
+<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Growth Roadmap →</a>
 </td></tr></table>
 <p style="margin:0 0 18px;font-size:13px;line-height:1.55;color:#A89F94;"><a href="{apply_url}" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none;font-weight:600;">Or apply first — Coach Ty reviews every application →</a></p>
 <p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
@@ -1066,7 +1066,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} retainer clients lock $697/mo for life. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
 </td></tr>
 
 </table>
@@ -1518,20 +1518,21 @@ async def pricing():
     drive the Standard tier label/strikethrough; counter is real and stored
     in `founding_signups` (see db/pricing.py).
     """
-    count = await get_founding_count("standard")
-    standard_price, founding_active = standard_price_for_count(count)
+    count = await get_founding_count("growth")
+    growth_price, founding_active = standard_price_for_count(count)
     slots_remaining = max(0, FOUNDING_CAP - count)
     return {
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        "tiers": {
-            "diy":      {"one_time": 197},
-            "standard": {
-                "monthly": standard_price,
-                "monthly_original": 697,
+        # Roadmap model (source of truth: docs/PRICING.md).
+        "stages": {
+            "foundation": {"one_time": 297},
+            "growth": {
+                "monthly": growth_price,
+                "monthly_regular": 597,
             },
-            "pro":      {"monthly": 997, "monthly_original": 1297},
+            "scale": {"monthly": 697, "monthly_competitive": 997},
         },
     }
 
@@ -1556,9 +1557,13 @@ REVENUE_LABELS = {
 }
 
 TIER_LABELS = {
-    "retainer": "Retainer ($697/mo)",
-    "pro": "Pro ($6,970/yr)",
-    "both": "Tell me which fits better",
+    "foundation": "Foundation Sprint ($297 one-time)",
+    "growth": "Growth Roadmap ($497/mo)",
+    "scale": "Scale System ($697/mo · $997+ competitive)",
+    # Back-compat for older inbound payloads.
+    "retainer": "Growth Roadmap ($497/mo)",
+    "pro": "Scale System ($697/mo · $997+ competitive)",
+    "both": "Tell me which stage fits better",
 }
 
 
@@ -1867,18 +1872,22 @@ async def public_client_dashboard(slug: str):
     rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
-    # Map any active Lock tier → retainer $ for CPL math. Falls back to
-    # the Growth tier ($697) when no lock — the modal client price.
+    # Map any active stage → monthly $ for CPL math. Falls back to the Growth
+    # Roadmap ($497) when none — the modal recurring client price. Legacy tier
+    # names (starter/pro) still resolve for older records.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
-    retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
+    retainer = {
+        "foundation": 297, "growth": 497, "scale": 697,
+        "starter": 297, "pro": 997,  # back-compat
+    }.get(tier, 497)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 
-    # Tier gating: call tracking + GSC are premium (Growth + Pro). Starter
+    # Stage gating: call tracking + GSC are premium (Growth + Scale). Foundation
     # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
-    call_tracking_on = tier in ("growth", "pro")
-    premium = tier in ("growth", "pro")
+    call_tracking_on = tier in ("growth", "scale", "pro")
+    premium = tier in ("growth", "scale", "pro")
     call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
     gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
     gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
@@ -1916,7 +1925,7 @@ async def public_client_dashboard(slug: str):
         "client_name": cs.client_name,
         "target_url": cs.target_url,
         "tier": tier,
-        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
+        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "scale", "pro")},
         "google": google_series,
         "ai_mode": ai_series,
         "verified_wins": {
@@ -2287,7 +2296,7 @@ class LockClaimRequest(BaseModel):
     slug: str
     niche: str
     city: str
-    tier: str = "starter"
+    tier: str = "foundation"
     notes: Optional[str] = None
 
 
@@ -3224,7 +3233,7 @@ async def admin_health_keys(
 
 class FoundingSignupRequest(BaseModel):
     email: str
-    tier: str = "standard"
+    tier: str = "growth"  # founding rate tracks the Growth Roadmap stage
 
 
 @app.post("/admin/founding-signup")

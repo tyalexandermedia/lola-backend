@@ -18,52 +18,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
-import LockChecker from './LockChecker';
-import { API_URL } from './api';
-
-/**
- * Recent-locks social-proof strip. Fetches anonymized active locks from
- * GET /locks/recent and renders a "claimed markets" row. Self-hides when
- * there are no locks yet (new business) so it never shows an empty/sad
- * state. Real data only — no fabricated scarcity.
- */
-function RecentLocksStrip() {
-  const [locks, setLocks] = useState<Array<{ niche: string; city: string }>>([]);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`${API_URL}/locks/recent?limit=6`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled && Array.isArray(d?.locks)) setLocks(d.locks); })
-      .catch(() => { /* silent — strip just stays hidden */ });
-    return () => { cancelled = true; };
-  }, []);
-
-  if (locks.length === 0) return null;
-
-  return (
-    <div className="mt-8 rounded-[12px] border border-[#D4AF37]/15 bg-white/[0.02] px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">
-        🔒 Recently locked markets
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {locks.map((l, i) => (
-          <span
-            key={`${l.niche}-${l.city}-${i}`}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-[#0F0F12] px-3 py-1 text-[11px] text-[#C5C5C8]"
-          >
-            <span className="capitalize text-white">{l.niche}</span>
-            <span aria-hidden className="text-[#5A5F68]">·</span>
-            {l.city}
-            <span aria-hidden className="text-[#F59E0B]">🔒</span>
-          </span>
-        ))}
-      </div>
-      <p className="mt-2 text-[11px] text-[#7A7F8A]">
-        One business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Check if yours is open →</a>
-      </p>
-    </div>
-  );
-}
+import { ROADMAP } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
 // every primary CTA points here. Env-overridable so the calendar link can be
@@ -174,6 +129,12 @@ export default function Homepage() {
       /* ignore */
     }
   };
+
+  // Roadmap stages, pulled from the canonical pricing source so homepage copy
+  // never drifts from docs/PRICING.md.
+  const foundation = ROADMAP.find((s) => s.id === 'foundation')!;
+  const growth = ROADMAP.find((s) => s.id === 'growth')!;
+  const scale = ROADMAP.find((s) => s.id === 'scale')!;
 
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
@@ -308,14 +269,18 @@ export default function Homepage() {
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
         <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          <span><span className="font-semibold text-white">From $297/mo</span> · 3 plans, all done-for-you</span>
+          <span><span className="font-semibold text-white">Foundation from {foundation.price} {foundation.period}</span> · a phased growth roadmap, all done-for-you</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>🛡️ 30-day half-back guarantee</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>Cancel anytime</span>
+          <span>No contract · cancel anytime</span>
         </p>
 
-        <RecentLocksStrip />
+        {/* Foundation-first positioning — the core narrative wedge. */}
+        <p className="mt-6 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
+          <span className="font-semibold text-white">Most businesses don&apos;t have a marketing problem first — they have a foundation problem.</span>{' '}
+          Lola starts there. Month 1 builds the base, days 31–90 build the signals, and after 90 days the data compounds.
+        </p>
       </section>
 
       {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
@@ -347,7 +312,7 @@ export default function Homepage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] leading-[1.5] text-[#7A7F8A] sm:text-[12px]">
-          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four for every Lock client.
+          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four across your growth roadmap, as integrations are connected.
         </p>
       </section>
 
@@ -392,7 +357,7 @@ export default function Homepage() {
       <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
         Premium agencies charge $2,500/mo to fix it.{' '}
-        <span className="font-bold text-[#D4AF37]">Lola does the work for $697/mo</span> — with a
+        <span className="font-bold text-[#D4AF37]">Lola builds the foundation for {foundation.price}, then runs your growth roadmap from {growth.price}{growth.period}</span> — with a
         guarantee.{' '}
         <span className="font-bold text-white">Real work or you walk.</span>
       </p>
@@ -409,9 +374,10 @@ export default function Homepage() {
           ))}
         </div>
         <p className="text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          <span className="font-semibold text-white">You get a live dashboard</span> — every call,
-          lead, and click we drive, tracked and counted. Not vanity rankings: the calls that pay
-          your bills. <span className="text-[#D4AF37]">ROI you can see, not take on faith.</span>
+          <span className="font-semibold text-white">You get a live Growth Score dashboard</span> — calls,
+          leads, and clicks tracked where access exists and as integrations are connected. Not vanity rankings:
+          the signals that pay your bills, and exactly where you are on the roadmap.{' '}
+          <span className="text-[#D4AF37]">Evidence you can see, not take on faith.</span>
         </p>
       </div>
 
@@ -500,12 +466,6 @@ export default function Homepage() {
           </a>
         </p>
 
-        {/* Live Lock checker — leverages the structural backend (local_locks
-            table) to convert real availability into real urgency. Compact
-            variant for in-flow placement; full variant lives on /pricing. */}
-        <div className="mt-8">
-          <LockChecker variant="compact" />
-        </div>
       </section>
 
       {/* ── 6. COACH TY ABOUT ────────────────────────────────────────── */}
@@ -695,7 +655,7 @@ export default function Homepage() {
             },
             {
               q: 'How much does Lola cost?',
-              a: 'Three simple monthly plans, no long-term contracts: Starter $297/mo, Growth $697/mo (most popular), Pro $997/mo. Every plan is done-for-you. No setup fee.',
+              a: "It's a phased growth roadmap, not a one-size package. You start with the Foundation Sprint — $297 one-time — to build a searchable, trackable base. From there, Growth Roadmap is $497/mo (most popular) once the foundation's in place, and Scale System is $697/mo ($997+ in competitive or multi-location markets). No setup fee, no contract, month-to-month on the recurring stages. You're not paying more for no reason — you're paying for maturity as the work expands.",
             },
             {
               q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
@@ -703,7 +663,7 @@ export default function Homepage() {
             },
             {
               q: 'How fast will I see results?',
-              a: "30-Day Half-Back: measurable ranking improvement in your first 30 days, or Coach Ty refunds 50%. First Win Promise: at least one measurable win (ranking, lead, or Google Business improvement) in the first 60 days, or your next month is on us. Full ROI typically hits month 3.",
+              a: "Think in roadmap stages. Month 1 (the Foundation Sprint) builds the base. Days 31–90 build the signals — this is where rankings, impressions, calls, and lead signals start becoming visible. After 90 days the data compounds. Two real guarantees back it: the 30-Day Half-Back — if Lola doesn't move your ranking in your first 30 days, your next month is 50% off — and the First Win Promise — at least one measurable win (a new ranking, a new lead, or a Google Business improvement) in your first 60 days, or your next month is on us.",
             },
             {
               q: "Do you only work with Florida businesses?",
@@ -714,8 +674,8 @@ export default function Homepage() {
               a: "Cancel anytime. No contracts, no minimum commitment. If we're not earning back your investment, you don't owe another dollar.",
             },
             {
-              q: "What's actually included each month?",
-              a: "Google Business Profile management, citation cleanup + new submissions, on-page SEO fixes, schema markup, AI search visibility tracking, review-generation system, monthly content (Growth+), and Coach Ty oversight. The exact playbook depends on tier — see /pricing for the full breakdown.",
+              q: "What's actually included at each stage?",
+              a: "The Foundation Sprint ($297 one-time) creates the base: landing page / website foundation, core SEO setup, Google indexing basics, on-page SEO, local service-area targeting, call CTA + tracking setup, and your first roadmap snapshot + visibility score. Growth Roadmap ($497/mo) adds ongoing SEO, content expansion, Google Business posting (where access exists), call/form/message tracking review, monthly roadmap updates, and review strategy. Scale System ($697/mo, $997+ competitive) layers on multi-service and multi-city strategy, advanced dashboard reporting, attribution, conversion optimization, and the Evidence Engine. See /pricing for the full breakdown.",
             },
             {
               q: 'Who is behind Lola?',
