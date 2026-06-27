@@ -61,6 +61,19 @@
   .btn.primary:hover{filter:brightness(1.05);box-shadow:0 16px 40px -6px rgba(255,193,7,.5)}
   .btn.ghost{border:1px solid var(--line);color:var(--gold);background:rgba(255,255,255,.03);backdrop-filter:blur(8px)}
   .btn.block{width:100%}
+  /* premium CTA sheen — pulls the eye to the tap (subtle + slow), reduced-motion safe */
+  .btn.primary{position:relative;overflow:hidden}
+  .btn.primary::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);
+    animation:sheen 4.2s ease-in-out infinite}
+  @keyframes sheen{0%,14%{left:-70%}62%{left:150%}100%{left:150%}}
+  @media (prefers-reduced-motion: reduce){.btn.primary::after{display:none}}
+  /* value-offer chip — sits right above the hero CTA */
+  .offerbar{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:9px 16px;border-radius:999px;
+    border:1px solid var(--line);background:linear-gradient(180deg,rgba(212,175,55,.14),rgba(212,175,55,.03));
+    font-size:13.5px;color:var(--body);font-weight:600;box-shadow:0 0 0 4px rgba(212,175,55,.05)}
+  .offerbar b{color:var(--gold)}
+  @media(max-width:560px){.offerbar{font-size:12.5px;margin-top:16px;padding:8px 14px}}
 
   .glass{background:var(--card);border:1px solid var(--line2);border-radius:var(--r);backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);box-shadow:0 30px 70px -40px rgba(0,0,0,.9)}
 
@@ -203,10 +216,13 @@
   footer.site .fine{margin-top:8px;font-size:11px;color:var(--fine);max-width:700px;margin-left:auto;margin-right:auto}
 
   /* STICKY MOBILE CTA */
-  .sticky{position:fixed;inset-inline:0;bottom:0;z-index:55;display:none;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(8,8,10,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(212,175,55,.28);transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .sticky{position:fixed;inset-inline:0;bottom:0;z-index:55;display:none;flex-direction:column;gap:7px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:rgba(8,8,10,.94);backdrop-filter:blur(16px);border-top:1px solid rgba(212,175,55,.3);transform:translateY(112%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
   .sticky.show{transform:translateY(0)}
   @media(max-width:640px){.sticky{display:flex}}
-  .sticky .btn{flex:1;padding:13px 8px;font-size:13px;min-height:48px;box-shadow:none}
+  .sticky-lab{font-size:11px;font-weight:800;letter-spacing:.03em;color:var(--gold);text-align:center}
+  .sticky-row{display:flex;gap:8px;width:100%}
+  .sticky-row .btn{flex:1;padding:13px 8px;font-size:13px;min-height:48px;box-shadow:none}
+  .sticky-row .btn.primary{flex:1.8}
 
   /* ===== Mobile UX enhancement layer (phones) ===== */
   /* premium emphasis on the slider-matched phase card + softer dimension glow */
@@ -239,7 +255,7 @@
     .guard{padding:16px}
     h2{letter-spacing:-.015em}
     /* a hair more breathing room above the sticky bar */
-    body{padding-bottom:max(104px,env(safe-area-inset-bottom))}
+    body{padding-bottom:max(128px,env(safe-area-inset-bottom))}
   }
   /* nicer momentum + no accidental text-zoom on the carousel labels */
   .car{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -267,6 +283,7 @@
     <div class="kick">🐾 The Growth Roadmap</div>
     <h1>You don't have a marketing problem.<br>You have a <span class="gwm">foundation problem</span>.</h1>
     <p class="subhead">LOLA OS is a phased growth roadmap — <b style="color:#fff">Foundation → Growth → Scale</b>. Find your Growth Score, see where you stand, and follow the path to raise it.</p>
+    <div class="offerbar">🎁 <b>Free 60-second Growth Score</b> — then $297 to start · no contract</div>
     <div class="herocta">
       <a class="btn primary" href="/growth-score?utm_source=tam&utm_medium=lp&utm_campaign=roadmap">Get my free Growth Score →</a>
       <a class="btn ghost" href="https://calendar.app.google/J7idjUDitd2Hziuc7?utm_source=tam&utm_medium=lp&utm_campaign=roadmap">Book a roadmap call</a>
@@ -401,8 +418,11 @@
 
 <!-- STICKY MOBILE CTA -->
 <div class="sticky" id="sticky">
-  <a class="btn ghost" href="https://calendar.app.google/J7idjUDitd2Hziuc7?utm_source=sticky&utm_medium=roadmap">Book call</a>
-  <a class="btn primary" href="/growth-score?utm_source=sticky&utm_medium=roadmap">Free Growth Score →</a>
+  <div class="sticky-lab">🎁 Free Growth Score · 60-sec · no signup</div>
+  <div class="sticky-row">
+    <a class="btn ghost" href="https://calendar.app.google/J7idjUDitd2Hziuc7?utm_source=sticky&utm_medium=roadmap">Book call</a>
+    <a class="btn primary" href="/growth-score?utm_source=sticky&utm_medium=roadmap">Free score →</a>
+  </div>
 </div>
 
 <img src="/t/pixel/roadmap.gif?source=lp-roadmap" alt="" width="1" height="1" style="position:absolute;left:-9999px" aria-hidden="true">
