@@ -214,6 +214,7 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
+          <FooterLink href="/roadmap">The Growth Roadmap</FooterLink>
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>

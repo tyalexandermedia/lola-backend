@@ -240,6 +240,14 @@
       "destination": "/lp/outreach-admin.html"
     },
     {
+      "source": "/roadmap",
+      "destination": "/lp/roadmap.html"
+    },
+    {
+      "source": "/lp/roadmap",
+      "destination": "/lp/roadmap.html"
+    },
+    {
       "source": "/reviews/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
     },

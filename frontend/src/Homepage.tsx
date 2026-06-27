@@ -265,6 +265,18 @@ export default function Homepage() {
           </a>
         </div>
 
+        {/* Education-first wedge — the Growth Roadmap (/roadmap) lead-gen page.
+            Complements the Foundation-first narrative below by letting the
+            visitor SEE the phased journey. */}
+        <div className="mt-3">
+          <a
+            href="/roadmap"
+            className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
+          >
+            See the full Growth Roadmap →
+          </a>
+        </div>
+
         {/* Free-website hook — lead with the biggest bonus (Hormozi: value up front) */}
         <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-1.5 text-[12px] font-semibold text-[#E8E4D8] sm:text-[13px]">
           🎁 Includes a <span className="font-bold text-white">free $3,000 website</span> — built + hosted, $0 setup
