@@ -156,7 +156,18 @@ export default function PricingPage() {
   return (
     <main className="flex flex-1 flex-col">
       {/* ── 1. POSITIONING BLOCK ──────────────────────────────────────── */}
-      <section className="pt-2 text-center sm:pt-6">
+      <section className="animate-slide-up relative pt-2 text-center sm:pt-6">
+        {/* Ambient aurora — same premium multi-tone glow as the homepage hero,
+            so the whole funnel reads as one system. Decorative only. */}
+        <div
+          aria-hidden
+          className="animate-aurora pointer-events-none absolute left-1/2 top-[-12%] -z-10 h-[600px] w-[min(1040px,128vw)] -translate-x-1/2 blur-[64px]"
+          style={{
+            background:
+              'radial-gradient(38% 50% at 22% 12%, rgba(111,155,255,0.12), transparent 70%), radial-gradient(46% 56% at 82% 6%, rgba(212,175,55,0.20), transparent 70%), radial-gradient(42% 46% at 56% 36%, rgba(165,96,231,0.10), transparent 70%)',
+          }}
+        />
+
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
           The Growth Roadmap
         </p>
