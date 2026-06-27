@@ -8,10 +8,10 @@ const STATS = [
   'Sandbar Soft Wash — 5 keywords ranked in 3 weeks',
   '✓ Verified Google Business — Ty Alexander Media',
   'Tracks ChatGPT · Gemini · Perplexity · Claude',
-  '🔒 One business per niche per city — Local Lock',
+  '📈 Your Growth Score — see exactly where you stand',
   '30-Day Half-Back Guarantee',
   '60-second AI Visibility Score, no signup',
-  'Transparent pricing — from $697/mo, done-for-you',
+  'A phased roadmap — Foundation → Growth → Scale',
   'Built for local service businesses',
   'Faith-driven, legacy-focused, founder-led',
 ];

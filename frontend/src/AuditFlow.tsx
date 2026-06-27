@@ -7,7 +7,6 @@ import type {
   Recommendation,
 } from './types';
 import { track } from './analytics';
-import LockChecker from './LockChecker';
 
 import { API_URL } from './api';
 // Re-export retained for any external consumer; new code should import from
@@ -816,7 +815,7 @@ export function ResultsStage({
 
       {/* AI Search Visibility — v1 placeholder section. Frames the upcoming
           metric (where you actually show up across ChatGPT/Perplexity/Gemini)
-          and tells the reader honestly that live tracking is a client feature. */}
+          and tells the reader honestly that live tracking is a Scale-stage feature. */}
       <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
         <div className="flex items-center gap-2">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
@@ -833,7 +832,7 @@ export function ResultsStage({
           Your Agent Readiness Score above predicts <em>how well</em> AI agents can
           understand your business. The next layer — live tracking of <strong className="text-white">where you actually appear</strong> in
           ChatGPT, Perplexity, Gemini, and Google AI Overviews for the queries
-          buyers run in {audit.city} — is rolling out to retainer clients next month.
+          buyers run in {audit.city} — rolls out at the Scale stage of the roadmap.
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -857,24 +856,24 @@ export function ResultsStage({
         <p className="mt-5 text-[12px] leading-[1.5] text-[#7A7F8A]">
           Honest note: this section is a roadmap placeholder. Today's score reflects
           AI-readability signals (entities, reviews, schema, site speed). Live citation
-          tracking goes live with the{' '}
+          tracking goes live at the{' '}
           <a
-            href="/pricing"
-            onClick={() => trackClick('pricing_cta_clicked', { from: 'ai_search_visibility_note' })}
+            href="/pricing#scale"
+            onClick={() => trackClick('scale_cta_clicked', { from: 'ai_search_visibility_note' })}
             className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
           >
-            Lola retainer
-          </a> — included, no upcharge.
+            Scale stage
+          </a>.
         </p>
 
         <a
-          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'pro_upgrade' })}
+          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'scale_upgrade' })}
           target="_blank"
           rel="noreferrer"
           onClick={() => trackClick('book_call_clicked', { from: 'ai_search_visibility_button' })}
           className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
         >
-          Skip the wait — book a call for live tracking →
+          Skip the wait — book a call about Scale live tracking →
         </a>
       </section>
 
@@ -1008,16 +1007,6 @@ export function ResultsStage({
       </section>
 
       <ResultsFooter audit={audit} cta={cta} />
-
-      {/* Close the loop: the visitor just saw their score + fixes — now show
-          whether their exact market is still claimable. Pre-filled from the
-          audit's business_type + city so it's one glance, zero typing. */}
-      <div className="mt-12">
-        <LockChecker
-          defaultNiche={audit.business_type || ''}
-          defaultCity={audit.city || ''}
-        />
-      </div>
 
       {/* Data-freshness notice — moved from top-of-page banner to a quiet
           accordion at the bottom of results. Default collapsed; only shows
@@ -1609,15 +1598,15 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         </div>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
-            href="/retainer"
-            onClick={() => trackClick('retainer_cta_clicked', { from: 'lolas_take' })}
+            href="/pricing"
+            onClick={() => trackClick('roadmap_cta_clicked', { from: 'lolas_take' })}
             className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
           >
-            See the Retainer →
+            See the Growth Roadmap →
           </a>
           <a
             href="/apply"
-            onClick={() => trackClick('retainer_apply_clicked', { from: 'lolas_take' })}
+            onClick={() => trackClick('roadmap_apply_clicked', { from: 'lolas_take' })}
             className="inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37]"
           >
             Apply (Coach Ty reviews every one)
@@ -1947,7 +1936,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
               className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >
-              {payload.ctas.dfy_label || 'Activate the Retainer — $697/mo'}
+              {payload.ctas.dfy_label || 'Start the Growth Roadmap — $497/mo'}
             </a>
           )}
         </div>
