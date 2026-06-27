@@ -76,6 +76,17 @@
   .site-head .bar{max-width:1280px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
   .logo{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
   .logo .wm{font-weight:800;letter-spacing:.16em;font-size:13.5px}
+  /* responsive wordmark — short "LOLA LEADS" on phones (matches the React app Header) */
+  .wm-sm{display:inline} .wm-lg{display:none}
+  @media(min-width:640px){.wm-sm{display:none} .wm-lg{display:inline}}
+  /* swipe affordance for the phase carousel on touch */
+  .swipe-hint{display:none;text-align:center;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:10px 0 2px}
+  .swipe-hint span{display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:translateX(-4px)}50%{transform:translateX(4px)}}
+  @media(max-width:860px){.swipe-hint{display:block}}
+  @media (prefers-reduced-motion: reduce){.swipe-hint span{animation:none}}
+  /* full-width tap targets on small phones */
+  @media(max-width:560px){.herocta .btn,.ex-cta .btn,.btnrow .btn{width:100%}}
   .site-head nav{display:flex;align-items:center;gap:2px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
   .site-head nav a{color:var(--body);text-decoration:none;padding:12px 10px;min-height:44px;display:flex;align-items:center;transition:color .15s;-webkit-tap-highlight-color:transparent}
   .site-head nav a:hover,.site-head nav a.on{color:var(--gold)}
@@ -203,7 +214,7 @@
 
 <div class="site-head">
   <div class="bar">
-    <a class="logo" href="/"><span aria-hidden style="font-size:16px">🐾</span><span class="wm gwm">LOLA — AI LEADS EXPERT</span></a>
+    <a class="logo" href="/" aria-label="LOLA — AI Leads Expert — home"><span aria-hidden style="font-size:16px">🐾</span><span class="wm gwm"><span class="wm-sm">LOLA LEADS</span><span class="wm-lg">LOLA — AI LEADS EXPERT</span></span></a>
     <nav>
       <a href="/">Home</a>
       <a href="/roadmap" class="on">Roadmap</a>
@@ -269,6 +280,7 @@
       <h2>Three phases. One direction.</h2>
       <p class="sub">Swipe through the journey. Your score sets the starting line — most begin with the Foundation Sprint and advance as the data compounds.</p>
     </div>
+    <p class="swipe-hint"><span>← swipe the roadmap →</span></p>
     <div class="car" id="car"></div>
     <div class="dots" id="dots"></div>
   </section>
