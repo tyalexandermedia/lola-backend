@@ -126,7 +126,7 @@ export default function VsHub() {
       </section>
 
       {/* ── COMPARISON GRID ───────────────────────────────── */}
-      <section className="mt-12 sm:mt-16">
+      <section className="mt-16 sm:mt-20">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           {CARDS.map((c) => (
             <a
@@ -161,7 +161,7 @@ export default function VsHub() {
       </section>
 
       {/* ── WHY WE PUBLISH THESE ──────────────────────────── */}
-      <section className="mt-14 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
+      <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
           Why we publish these
         </p>
@@ -180,7 +180,7 @@ export default function VsHub() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="mt-12 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
+      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
           Faster than reading comparison pages
         </p>
@@ -212,7 +212,7 @@ export default function VsHub() {
         </div>
       </section>
 
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

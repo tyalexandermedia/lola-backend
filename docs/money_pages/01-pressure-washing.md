@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-pressure-washing-florida`
 - **Title tag** (under 60): `Local SEO for Pressure Washing in Florida | Ty Alexander Media`
-- **Meta description** (under 155): `Done-for-you local SEO for Florida pressure washing companies. Free 20-second audit. AI visibility tracked. From $697/mo. No long-term contracts.`
+- **Meta description** (under 155): `Done-for-you local SEO for Florida pressure washing companies. Free 20-second audit. AI visibility tracked. From $297. No long-term contracts.`
 - **OG title / Twitter**: same as title tag
 - **OG description**: same as meta description
 - **OG URL**: `https://tyalexandermedia.com/local-seo-pressure-washing-florida`
@@ -32,10 +32,10 @@
   "areaServed": "Florida",
   "offers": {
     "@type": "AggregateOffer",
-    "lowPrice": "47",
-    "highPrice": "6970",
+    "lowPrice": "297",
+    "highPrice": "997",
     "priceCurrency": "USD",
-    "offerCount": "4"
+    "offerCount": "3"
   }
 }
 ```
@@ -48,7 +48,7 @@
 **Florida Pressure Washing Companies: Stop Losing Jobs to Better-Ranked Competitors.**
 
 ### Subhead
-While you're answering the phone and quoting jobs, your competitors are ranking #1-3 on Google and ChatGPT — and taking the calls you should be getting. We fix that. Done for you. From $697/mo.
+While you're answering the phone and quoting jobs, your competitors are ranking #1-3 on Google and ChatGPT — and taking the calls you should be getting. We fix that. Done for you. From $297.
 
 ### Primary CTA (above the fold)
 **[Run my free 20-second audit →]** → `https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=pressure-washing-fl&trade=Soft%20Wash`
@@ -64,10 +64,10 @@ While you're answering the phone and quoting jobs, your competitors are ranking 
 - Tools that tell you what's broken but never fix it
 
 **THIS:**
-- Month-to-month $697/mo, cancel anytime
+- Foundation Sprint from $297, no contract, cancel anytime
 - Built by contractors, for contractors (we know your dad's business)
-- A real fix list every week, executed by AI agents + Coach Ty
-- Measurable ranking win in 30 days or 50% refund
+- A real fix list every week, done for you by Coach Ty + team
+- Measurable ranking win in 30 days or our 30-Day Half-Back Guarantee
 
 ---
 
@@ -85,26 +85,29 @@ While you're answering the phone and quoting jobs, your competitors are ranking 
 
 ### Case study
 
-**Sandbar Soft Wash (Palm Harbor, FL)** — Started at score 76. After 3 weeks on the Lola Retainer: 5 keywords ranked, 8 new GMB calls/week, ChatGPT now recommends them by name for "house wash Palm Harbor."
+**Sandbar Soft Wash (Palm Harbor, FL)** — Started at score 76. After 3 weeks on the Lola roadmap: 5 keywords ranked, and ChatGPT now recommends them by name for "house wash Palm Harbor." (Attributed case study — your results will vary.)
 
 ---
 
 ### Pricing (matches Lola)
 
+Start free: get your free Growth Score and free audit, then choose your phase.
+
 | Tier | Price | What you get |
 |---|---|---|
-| DIY Playbook | $47 one-time | Every checklist, plain English |
-| Local SEO Sprint | $397 one-time | Audit + 90-day plan + strategy call |
-| **Local SEO Retainer** | **$697/mo** | Six AI agents + Coach Ty, weekly fixes |
-| Local SEO Pro | $6,970/yr | Retainer + locked-in rate, save $1,394 |
+| Foundation Sprint | $297 one-time | Audit + 90-day plan + strategy call, done for you |
+| **Growth Roadmap** *(Most Popular)* | **$497/mo** | Coach Ty + team execute weekly fixes |
+| Scale System | $697/mo ($997+ competitive) | Full done-for-you growth engine at scale |
 
-**[See full pricing →](https://lola.tyalexandermedia.com/pricing?utm_source=tam&utm_medium=landing&utm_campaign=pressure-washing-fl)**
+No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+
+**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=pressure-washing-fl)**
 
 ---
 
 ### Coach Ty trust block
 
-Coach Ty runs Ty Alexander Media in Tampa. He built Lola because his dad owns a soft wash business and got tired of watching him lose jobs to bigger companies with worse work but better Google rankings. You don't get a 30-person agency. You get one founder who answers his own phone, six AI specialist agents, and a guarantee in writing.
+Coach Ty runs Ty Alexander Media in Tampa. He built Lola because his dad owns a soft wash business and got tired of watching him lose jobs to bigger companies with worse work but better Google rankings. You don't get a 30-person agency. You get one founder who answers his own phone, a team that does the work for you, and a guarantee in writing.
 
 ---
 
@@ -114,7 +117,7 @@ Coach Ty runs Ty Alexander Media in Tampa. He built Lola because his dad owns a 
 We're Florida-focused because that's our network and we know the local search landscape. We'll work with pressure washers anywhere with Google Maps — but Florida companies get the deepest local intel.
 
 **2. How long until I see rankings move?**
-First Win Promise: a measurable ranking improvement in 30 days or 50% refund. Full ROI typically hits month 3.
+First Win Promise: a measurable ranking improvement within 60 days. Plus a 30-Day Half-Back Guarantee. Full ROI typically hits month 3.
 
 **3. What if I'm already on a contract with another agency?**
 Run us in parallel for 60 days and compare results. Most clients fire the other agency by month 2.
@@ -122,8 +125,8 @@ Run us in parallel for 60 days and compare results. Most clients fire the other 
 **4. How much of my time does this take?**
 ~15 min/month on a check-in call. Everything else we handle.
 
-**5. Why $697/mo when other agencies charge $2,500+?**
-Lola's six AI agents do the work a 5-person team would do. Coach Ty oversees strategy. You're paying for execution, not bloat.
+**5. Why so much less than agencies charging $2,500+?**
+Lola is a done-for-you roadmap — Coach Ty and his team handle the execution a 5-person agency would do. You're paying for results, not bloat. Start with the Foundation Sprint at $297.
 
 ---
 
@@ -140,7 +143,7 @@ Lola's six AI agents do the work a 5-person team would do. Coach Ty oversees str
 - [Florida roofers →](/local-seo-roofers-florida)
 - [Tampa plumbers →](/local-seo-plumbers-tampa)
 - [Lola free audit →](https://lola.tyalexandermedia.com)
-- [Activate the Retainer →](https://lola.tyalexandermedia.com/retainer)
+- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
 
 ### External authority links (use 1)
 

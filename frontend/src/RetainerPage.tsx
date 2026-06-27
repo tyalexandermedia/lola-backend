@@ -17,11 +17,11 @@
  * Sections:
  *   1. Hero — single primary CTA
  *   2. The roadmap (Foundation → Growth → Scale)
- *   3. Value stack (6 agents → $6,000/mo value → Growth price)
+ *   3. Value stack (agency-cost anchor → done-for-you Growth price)
  *   4. ROI math (Time / Leads / Compound)
  *   5. Founding-member urgency (live count from /pricing endpoint)
  *   6. Dual guarantee stack
- *   7. What's included (agent breakdown)
+ *   7. What's included (what each roadmap stage delivers)
  *   8. Who this is for
  *   9. FAQ accordion (7 questions)
  *  10. Founder story (Coach Ty)
@@ -113,9 +113,9 @@ export default function RetainerPage() {
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
-            This isn't a random SEO package — it's a phased growth roadmap. Six specialist AI
-            agents + Coach Ty build your foundation, then advance you through Growth and Scale.
-            Done-for-you.{' '}
+            This isn't a random SEO package — it's a phased growth roadmap. Coach Ty and Lola
+            build your foundation, then advance you through Growth and Scale. Agency-grade
+            execution, done for you.{' '}
             <span className="font-semibold text-white">
               Growth Roadmap from {GROWTH_FOUNDING}/mo. Cancel anytime.
             </span>
@@ -127,7 +127,7 @@ export default function RetainerPage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => track('retainer_cta_clicked', { from: 'hero' })}
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
+              className="inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 py-3 text-center text-[14px] font-bold uppercase leading-tight tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:w-auto sm:text-[15px]"
             >
               🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
             </a>
@@ -216,35 +216,28 @@ export default function RetainerPage() {
             What you're actually getting
           </p>
           <h2 className="mt-3 text-[26px] font-bold tracking-[-0.01em] text-white sm:text-[32px]">
-            Six AI agents. One Coach Ty. $6,000/mo of value.
+            Agency-grade execution, done for you — across the whole roadmap.
           </h2>
 
           <div className="mt-8 overflow-hidden rounded-2xl border border-white/[0.08]">
             <table className="w-full text-left text-[13px] sm:text-[15px]">
               <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
                 <tr>
-                  <th className="px-4 py-3 sm:px-6 sm:py-4">Agent</th>
-                  <th className="px-4 py-3 text-right sm:px-6 sm:py-4">Equivalent value</th>
+                  <th className="px-4 py-3 sm:px-6 sm:py-4">Stage</th>
+                  <th className="px-4 py-3 text-right sm:px-6 sm:py-4">What it delivers</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.06]">
                 {[
-                  ['Technical Agent', '$1,500/mo'],
-                  ['Content Agent', '$1,200/mo'],
-                  ['Authority Agent', '$800/mo'],
-                  ['Local Agent', '$600/mo'],
-                  ['AI Visibility Agent', '$400/mo'],
-                  ['Strategy Agent (Ty)', '$1,500/mo'],
-                ].map(([agent, value]) => (
-                  <tr key={agent}>
-                    <td className="px-4 py-3 text-white sm:px-6 sm:py-4">{agent}</td>
-                    <td className="px-4 py-3 text-right text-[#D4AF37] sm:px-6 sm:py-4">{value}</td>
+                  [`${FOUNDATION.name} · ${FOUNDATION.price} ${FOUNDATION.period}`, 'A searchable, trackable, presentable base — your start line.'],
+                  [`${GROWTH.name} · ${GROWTH.price}${GROWTH.period}`, 'Ongoing SEO, content, Google Business posting, and tracking — momentum on the dashboard.'],
+                  [`${SCALE.name} · ${SCALE.price}${SCALE.period}`, 'Multi-service / multi-city strategy, attribution, and the Evidence Engine — a full growth system.'],
+                ].map(([stage, delivers]) => (
+                  <tr key={stage}>
+                    <td className="px-4 py-3 align-top font-semibold text-white sm:px-6 sm:py-4">{stage}</td>
+                    <td className="px-4 py-3 text-right text-[#C5C5C8] sm:px-6 sm:py-4">{delivers}</td>
                   </tr>
                 ))}
-                <tr className="bg-[#D4AF37]/[0.06] font-bold">
-                  <td className="px-4 py-4 text-white sm:px-6">Total value</td>
-                  <td className="px-4 py-4 text-right text-[#D4AF37] sm:px-6">$6,000/mo</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -255,16 +248,17 @@ export default function RetainerPage() {
             </p>
             <p className="mt-3">
               <span className="text-[24px] font-medium text-[#7A7F8A] line-through sm:text-[28px]">
-                $6,000/mo
+                $2,000–$5,000/mo
               </span>{' '}
               <span className="inline-block bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[44px] font-extrabold leading-none text-transparent sm:text-[56px]">
                 {GROWTH_FOUNDING}/mo
               </span>
             </p>
             <p className="mx-auto mt-4 max-w-[520px] text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
-              A fraction of agency pricing — because Lola does the heavy lifting, not a 30-person
-              team you don't need. Need multi-location or competitive-market execution? That's the
-              Scale System at {SCALE.price}/mo ($997+ competitive).
+              Agencies charge $2,000–$5,000/mo for this kind of execution. Lola does it for you on
+              the Growth Roadmap — because the AI does the heavy lifting, not a 30-person team you
+              don't need. Need multi-location or competitive-market execution? That's the Scale
+              System at {SCALE.price}/mo ($997+ competitive).
             </p>
           </div>
         </section>
@@ -280,8 +274,8 @@ export default function RetainerPage() {
             {[
               {
                 eyebrow: 'TIME',
-                h: '$6,000/year back',
-                body: 'If your time is worth $50/hr and Lola saves 10 hrs/month of SEO work, that\'s $6,000/year back to running the business.',
+                h: '$7,200/year back',
+                body: 'If your time is worth $60/hr and Lola saves 10 hrs/month of SEO work, that\'s $7,200/year back to running the business.',
               },
               {
                 eyebrow: 'LEADS',
@@ -310,7 +304,7 @@ export default function RetainerPage() {
           </div>
 
           <p className="mx-auto mt-6 max-w-[640px] text-center text-[15px] font-semibold leading-[1.55] text-white sm:text-[17px]">
-            Illustrative upside: <span className="text-[#D4AF37]">$18,000+/year</span>. Growth
+            Illustrative upside: <span className="text-[#D4AF37]">$19,000+/year</span>. Growth
             Roadmap investment: <span className="text-[#D4AF37]">$5,964/year</span> ({GROWTH_FOUNDING}/mo).
             These are example scenarios, not guaranteed results.
           </p>
@@ -384,30 +378,29 @@ export default function RetainerPage() {
         {/* ── 7. WHAT'S INCLUDED ──────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-            Your dedicated SEO agent team
+            What's included, done for you
           </p>
           <h2 className="mt-3 text-[26px] font-bold tracking-[-0.01em] text-white sm:text-[32px]">
-            Six agents. One mission.
+            What each stage delivers.
           </h2>
 
           <ul className="mt-8 flex flex-col gap-3">
-            {[
-              { name: 'Technical Agent', desc: 'Weekly site fixes (speed, schema, indexing).' },
-              { name: 'Content Agent', desc: 'Monthly blog + service page optimization.' },
-              { name: 'Authority Agent', desc: 'Citations, directory submissions, link building.' },
-              { name: 'Local Agent', desc: 'GMB management, weekly posts, review strategy.' },
-              { name: 'AI Visibility Agent', desc: 'Monitors ChatGPT, Perplexity, Google AI Overviews.' },
-              { name: 'Strategy Agent (Coach Ty)', desc: 'On-demand via priority Slack + text.' },
-            ].map((a) => (
+            {[FOUNDATION, GROWTH, SCALE].map((stage) => (
               <li
-                key={a.name}
+                key={stage.id}
                 className="flex items-start gap-4 rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
               >
                 <span aria-hidden className="mt-0.5 text-[20px] text-[#D4AF37]">→</span>
                 <div>
-                  <p className="text-[15px] font-bold text-white sm:text-[16px]">{a.name}</p>
+                  <p className="text-[15px] font-bold text-white sm:text-[16px]">
+                    {stage.name}{' '}
+                    <span className="text-[#D4AF37]">
+                      · {stage.price}
+                      {stage.period.startsWith('/') ? stage.period : ` ${stage.period}`}
+                    </span>
+                  </p>
                   <p className="mt-1 text-[13px] leading-[1.55] text-[#C5C5C8] sm:text-[14px]">
-                    {a.desc}
+                    {stage.outcome}
                   </p>
                 </div>
               </li>
@@ -460,7 +453,7 @@ export default function RetainerPage() {
               },
               {
                 q: "What does 'done-for-you' actually mean?",
-                a: 'Six specialist AI agents + Coach Ty execute weekly fixes in your GMB, on your site, and in your citations. You don\'t touch a dashboard unless you want to.',
+                a: 'Coach Ty and Lola execute the work for you — fixes in your GMB, on your site, and in your citations, advancing through the roadmap stages. You don\'t touch a dashboard unless you want to.',
               },
               {
                 q: "What if I'm already working with an SEO agency?",
@@ -561,7 +554,7 @@ export default function RetainerPage() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('retainer_cta_clicked', { from: 'final' })}
-            className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[16px]"
+            className="mt-7 inline-flex min-h-[56px] w-full max-w-[420px] items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-8 py-3 text-center text-[14px] font-bold uppercase leading-tight tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:w-auto sm:max-w-none sm:text-[16px]"
           >
             🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
           </a>
@@ -601,7 +594,7 @@ export default function RetainerPage() {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => track('retainer_cta_clicked', { from: 'sticky_mobile' })}
-          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-4 text-[13px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.4)]"
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-4 text-center text-[13px] font-bold uppercase leading-tight tracking-[0.04em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.4)]"
         >
           🦴 Start the Growth Roadmap — {GROWTH_FOUNDING}/mo →
         </a>

@@ -214,6 +214,7 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
+          <FooterLink href="/roadmap">The Growth Roadmap</FooterLink>
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
@@ -294,7 +295,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
     <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
       <div className="mx-auto flex max-w-[640px] gap-2">
         <a
-          href="/grader"
+          href="/growth-score"
           className="flex h-12 flex-1 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37]"
         >
           Free Score
@@ -333,22 +334,22 @@ function Header() {
         </a>
 
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
-        <nav className="flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.12em] sm:gap-3 sm:text-[13px]">
+        <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
           <a
-            href="/"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            href="/roadmap"
+            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
-            Home
+            Roadmap
           </a>
           <a
-            href="/grader"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            href="/growth-score"
+            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
-            Free Grader
+            Free Score
           </a>
           <a
             href="/pricing"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            className="flex min-h-[44px] items-center rounded-[8px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-3 py-3 font-bold text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
           >
             Pricing
           </a>

@@ -599,7 +599,16 @@ export function ResultsStage({
   const heroCtaHref = withUtm(STRATEGY_CALL_URL, 'hero_cta', { campaign: 'plug_leak' });
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className="lola-report flex flex-1 flex-col">
+      {/* Print-only branded header — only renders in the saved PDF, turning a
+          screenshot-y page into a clean forwardable scorecard. */}
+      <div className="print-only print-header">
+        <span className="print-brand">🐾 LOLA OS — Growth Score Report</span>
+        <span className="print-meta">
+          {businessTypeDisplay ? `${businessTypeDisplay} · ` : ''}lola.tyalexandermedia.com
+        </span>
+      </div>
+
       {/* ════════════════════════════════════════════════════════════════
           HERO — above the fold.
           Eyebrow → H1 → city/type → custom insight → 3-stat grid
@@ -709,19 +718,31 @@ export function ResultsStage({
         </p>
       </section>
 
-      {/* Share link — relocated below the hero, smaller, doesn't compete */}
-      {shareUrl && (
-        <div className="mt-10 flex flex-col gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="truncate text-[12px] text-[#8A8F98]">{shareUrl}</span>
+      {/* Share + download — relocated below the hero, smaller, doesn't compete.
+          no-print so neither button appears in the saved PDF. */}
+      <div className="no-print mt-10 flex flex-col gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 sm:flex-row sm:items-center sm:justify-between">
+        <span className="truncate text-[12px] text-[#8A8F98]">
+          {shareUrl ?? 'Your Growth Score scorecard'}
+        </span>
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={copyShareLink}
-            className="flex h-11 min-w-[140px] items-center justify-center rounded-xl bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+            onClick={() => { try { track('scorecard_download_clicked'); } catch { /* noop */ } window.print(); }}
+            className="flex h-11 min-w-[150px] items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-4 text-[12px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] transition hover:brightness-105"
           >
-            {copied ? 'Copied ✓' : 'Copy share link'}
+            ⬇ Save as PDF
           </button>
+          {shareUrl && (
+            <button
+              type="button"
+              onClick={copyShareLink}
+              className="flex h-11 min-w-[140px] items-center justify-center rounded-xl bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+            >
+              {copied ? 'Copied ✓' : 'Copy share link'}
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {audit.segment === 'incomplete' && (
         <section className="mt-5 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-sm text-amber-100">
@@ -1236,7 +1257,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             onClick={onCaseStudyClick}
             className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
           >
-            → Read how Soft Wash Pro ranked 5 keywords in 3 weeks
+            → Read how Sandbar Soft Wash ranked 5 keywords in 3 weeks
           </a>
           {cta.href ? (
             <a

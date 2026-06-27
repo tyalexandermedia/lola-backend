@@ -48,8 +48,8 @@ TIERS = [
     {"name": "Scale System", "price": "$697/mo", "featured": False,
      "blurb": "Compete + compound: multi-service/multi-city expansion, attribution, advanced reporting, and strategy. $997+/mo for competitive markets."},
 ]
-PRICE_RANGE = "$697-$997"
-LOW_PRICE = "697"
+PRICE_RANGE = "$297-$997"
+LOW_PRICE = "297"
 HIGH_PRICE = "997"
 
 # Repo-root-relative output locations. Resolved against the repo root, which we
@@ -671,7 +671,7 @@ def render_page(svc_slug, svc, city_slug, city):
         f'<p class="footer-links-h">Start here</p>'
         f'<div class="footer-links">'
         f'<a href="https://lola.tyalexandermedia.com/growth-score">&#128202; Free Growth Score</a>'
-        f'<a href="https://lola.tyalexandermedia.com/pricing">See the roadmap</a>'
+        f'<a href="https://lola.tyalexandermedia.com/roadmap">See the roadmap</a>'
         f'<a href="/lp/industries">All industries &amp; cities</a>'
         f'</div>'
         '</div>'
@@ -956,6 +956,7 @@ def render_sitemap(slugs):
         ("/grader", "weekly", "0.95"),    # primary lead magnet
         ("/audit", "monthly", "0.9"),
         ("/pricing", "monthly", "0.9"),
+        ("/roadmap", "monthly", "0.88"),   # interactive Growth Roadmap (static LP)
         ("/retainer", "monthly", "0.9"),
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
@@ -997,6 +998,9 @@ def render_vercel(slugs):
     rewrites.append({"source": "/lp/reviews-admin", "destination": "/lp/reviews-admin.html"})
     rewrites.append({"source": "/lp/clients-admin", "destination": "/lp/clients-admin.html"})
     rewrites.append({"source": "/lp/outreach-admin", "destination": "/lp/outreach-admin.html"})
+    # 2b. Interactive Growth Roadmap (hand-built static page; clean + /lp URLs).
+    rewrites.append({"source": "/roadmap", "destination": "/lp/roadmap.html"})
+    rewrites.append({"source": "/lp/roadmap", "destination": "/lp/roadmap.html"})
     # 3. Backend proxies — reviews + tracking (/t/*) live on Railway.
     rewrites.append({"source": "/reviews/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/reviews/$1"})

@@ -96,7 +96,7 @@ export default function Methodology() {
       </section>
 
       {/* ── HEADLINE FORMULA ──────────────────────────────── */}
-      <section className="mt-12 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/[0.06] via-transparent to-transparent p-6 sm:mt-16 sm:p-8">
+      <section className="mt-16 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/[0.06] via-transparent to-transparent p-6 sm:mt-20 sm:p-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
           The formula
         </p>
@@ -108,7 +108,7 @@ export default function Methodology() {
       </section>
 
       {/* ── 5 CATEGORIES IN DEPTH ─────────────────────────── */}
-      <section className="mt-12 sm:mt-16">
+      <section className="mt-16 sm:mt-20">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
           The five categories
         </p>
@@ -232,7 +232,7 @@ export default function Methodology() {
       </section>
 
       {/* ── DATA HONESTY ──────────────────────────────────── */}
-      <section className="mt-14 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
+      <section className="mt-16 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
           What we don&apos;t do
         </p>
@@ -281,7 +281,7 @@ export default function Methodology() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="mt-12 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
+      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Ready?</p>
         <h2
           className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
@@ -300,7 +300,7 @@ export default function Methodology() {
         </a>
       </section>
 
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>
