@@ -97,6 +97,11 @@ textarea::placeholder {
   animation-play-state: paused;
 }
 
+/* Print-only elements are hidden on screen; revealed when printing / saving PDF. */
+.print-only {
+  display: none;
+}
+
 @media print {
   @page {
     margin: 0.55in;
@@ -119,54 +124,91 @@ textarea::placeholder {
     display: none !important;
   }
 
-  .client-report {
+  /* Branded print header (logo + url) — clean forwardable scorecard. */
+  .print-only {
+    display: block !important;
+  }
+  .print-header {
+    display: flex !important;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #D4AF37 !important;
+  }
+  .print-brand {
+    font-weight: 800;
+    font-size: 14px;
+    color: #92400e !important;
+    letter-spacing: 0.04em;
+  }
+  .print-meta {
+    font-size: 11px;
+    color: #6b7280 !important;
+  }
+
+  /* Neutralize the dark theme for both the client dashboard and the score
+     report so the saved PDF is clean, light, and readable. */
+  .client-report,
+  .lola-report {
     max-width: none !important;
     padding: 0 !important;
   }
 
   .client-report,
-  .client-report * {
+  .client-report *,
+  .lola-report,
+  .lola-report * {
     box-shadow: none !important;
     text-shadow: none !important;
   }
 
   .client-report section,
-  .client-report header {
+  .client-report header,
+  .lola-report section,
+  .lola-report header {
     break-inside: avoid;
     page-break-inside: avoid;
     border-color: #d1d5db !important;
     background: #ffffff !important;
   }
 
-  .client-report h1,
-  .client-report h2,
-  .client-report h3,
-  .client-report p,
-  .client-report span,
-  .client-report div,
-  .client-report li {
+  .client-report h1, .client-report h2, .client-report h3,
+  .client-report p, .client-report span, .client-report div, .client-report li,
+  .lola-report h1, .lola-report h2, .lola-report h3,
+  .lola-report p, .lola-report span, .lola-report div, .lola-report li {
     color: #111827 !important;
   }
 
-  .client-report a {
+  /* Keep the gold print-header brand readable (not forced to dark). */
+  .print-header .print-brand { color: #92400e !important; }
+  .print-header .print-meta { color: #6b7280 !important; }
+
+  .client-report a,
+  .lola-report a {
     color: #92400e !important;
     text-decoration: none !important;
   }
 
-  .client-report [class*="text-transparent"] {
+  .client-report [class*="text-transparent"],
+  .lola-report [class*="text-transparent"] {
     color: #111827 !important;
     -webkit-text-fill-color: #111827 !important;
   }
 
-  .client-report [class*="bg-clip-text"] {
+  .client-report [class*="bg-clip-text"],
+  .lola-report [class*="bg-clip-text"] {
     background: none !important;
   }
 
-  .client-report [class*="border"] {
+  .client-report [class*="border"],
+  .lola-report [class*="border"] {
     border-color: #d1d5db !important;
   }
 
-  .client-report [class*="bg-"] {
+  .client-report [class*="bg-"],
+  .lola-report [class*="bg-"] {
     background-image: none !important;
   }
 }
