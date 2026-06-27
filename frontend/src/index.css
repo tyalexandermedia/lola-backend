@@ -85,6 +85,19 @@ textarea::placeholder {
   animation: pulse-slow 1.5s ease-in-out infinite;
 }
 
+/* Ambient aurora — premium multi-tone glow behind hero sections. Decorative
+   only (-z-10, pointer-events-none). Slow drift; disabled for reduced-motion. */
+@keyframes aurora {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(0, 16px, 0) scale(1.05); }
+}
+.animate-aurora {
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora { animation: none; }
+}
+
 /* Stats marquee — slow infinite horizontal scroll, pause on parent hover. */
 @keyframes marquee {
   0%   { transform: translateX(0); }
