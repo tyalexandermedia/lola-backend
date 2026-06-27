@@ -1,0 +1,96 @@
+{
+  "id": "pressure-washing",
+  "name": "Pressure Washing Blueprint",
+  "version": "1.1.0",
+  "status": "tested",
+  "claim_status": "tested",
+  "inherits_from_pattern": "local-service",
+  "summary": "Reusable LOLA OS blueprint for exterior cleaning businesses focused on roof cleaning, house washing, paver sealing, pressure washing, commercial pressure washing, and commercial roof cleaning.",
+  "proof_clients": [
+    "sandbar",
+    "tampa-bay-power-clean"
+  ],
+  "primary_services": [
+    "Roof Cleaning",
+    "House Washing",
+    "Paver Sealing",
+    "Commercial Pressure Washing",
+    "Commercial Roof Cleaning"
+  ],
+  "secondary_services": [
+    "Pressure Washing",
+    "Power Washing",
+    "Soft Washing",
+    "Driveway Cleaning",
+    "Concrete Cleaning",
+    "Paver Cleaning"
+  ],
+  "seo_architecture": {
+    "primary_intents": [
+      "roof cleaning + city",
+      "house washing + city",
+      "paver sealing + city",
+      "commercial pressure washing + city"
+    ],
+    "secondary_intents": [
+      "roof cleaning + nearby city",
+      "house washing + nearby city",
+      "commercial roof cleaning + region",
+      "pressure washing + service area"
+    ],
+    "service_area_strategy": "Use useful local relevance by market and city. Avoid doorway-page spam and unverified ranking claims."
+  },
+  "conversion_structure": [
+    "Hero with high-value service positioning",
+    "Primary service hierarchy",
+    "Dedicated roof cleaning section",
+    "Dedicated house washing section",
+    "Dedicated paver sealing section",
+    "Dedicated commercial pressure washing section",
+    "Service-area explanation",
+    "Process and safety explanation",
+    "Proof section with verified-only claims",
+    "FAQ",
+    "Click-to-call and quote CTA"
+  ],
+  "required_tracking": [
+    "Call tracking",
+    "Lead/form tracking",
+    "SEO target tracking",
+    "AI visibility prompts",
+    "Revenue/opportunity tracking when available"
+  ],
+  "required_client_fields": [
+    "slug",
+    "client_name",
+    "website",
+    "industry",
+    "market",
+    "primary_service_area",
+    "services",
+    "tracking.google_queries",
+    "tracking.ai_mode_prompts"
+  ],
+  "proof_standard": {
+    "allowed_claim_statuses": [
+      "assumption",
+      "hypothesis",
+      "tested",
+      "proven",
+      "deprecated"
+    ],
+    "current_evidence_level": "tested",
+    "notes": "Sandbar is the flagship proof client. Tampa Bay Power Clean validates separate-brand duplication, landing page deployment, SEO targeting, and shared temporary tracking."
+  },
+  "open_assumptions": [
+    "Dedicated Tampa Bay Power Clean CallRail number will improve attribution quality.",
+    "GBP admin access will improve local proof and tracking once available.",
+    "Blueprint should not be promoted to proven until validated across more clients or markets."
+  ],
+  "promotion_requirements": [
+    "Validated across at least five businesses or markets",
+    "Revenue tracking connected for at least two clients",
+    "Clear evidence for primary service ranking and conversion patterns",
+    "Documented failures and deprecated tactics"
+  ]
+}

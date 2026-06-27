@@ -9,6 +9,7 @@ const AuditFlow = lazy(() => import('./AuditFlow'));
 const SharedReport = lazy(() => import('./SharedReport'));
 const AdminLeads = lazy(() => import('./AdminLeads'));
 const AdminCalls = lazy(() => import('./AdminCalls'));
+const AdminRevenue = lazy(() => import('./AdminRevenue'));
 const PricingPage = lazy(() => import('./PricingPage'));
 const RetainerPage = lazy(() => import('./RetainerPage'));
 const ApplyPage = lazy(() => import('./ApplyPage'));
@@ -16,19 +17,23 @@ const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
+const GrowthScore = lazy(() => import('./GrowthScore'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
+const LolaOS = lazy(() => import('./LolaOS'));
 
 type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'growth-score' }
   | { name: 'start' }
   | { name: 'methodology' }
+  | { name: 'lola-os' }
   | { name: 'case-studies-index' }
   | { name: 'case-study'; slug: string }
   | { name: 'vs-hub' }
@@ -42,14 +47,17 @@ type Route =
   | { name: 'client-report'; slug: string }
   | { name: 'admin' }
   | { name: 'admin-calls'; slug: string }
+  | { name: 'admin-revenue'; slug: string }
   | { name: 'unknown' };
 
 function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
+  if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
   if (pathname === '/case-studies' || pathname === '/case-studies/') return { name: 'case-studies-index' };
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
@@ -61,6 +69,8 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/admin/leads') return { name: 'admin' };
   const adminCallsMatch = pathname.match(/^\/admin\/calls\/([^/]+)\/?$/);
   if (adminCallsMatch) return { name: 'admin-calls', slug: decodeURIComponent(adminCallsMatch[1]) };
+  const adminRevenueMatch = pathname.match(/^\/admin\/revenue\/([^/]+)\/?$/);
+  if (adminRevenueMatch) return { name: 'admin-revenue', slug: decodeURIComponent(adminRevenueMatch[1]) };
   if (pathname === '/vs' || pathname === '/vs/') return { name: 'vs-hub' };
   const vsMatch = pathname.match(/^\/vs\/([^/]+)\/?$/);
   if (vsMatch) return { name: 'vs', slug: decodeURIComponent(vsMatch[1]) };
@@ -85,18 +95,20 @@ function App() {
   // Tighter top padding on /audit — Step 5 CTA must be above the fold at 375x667.
   // Other routes keep generous breathing room.
   const containerCls =
-    route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls'
+    route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
       : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
-      : route.name === 'grader'
+      : route.name === 'grader' || route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
       : route.name === 'methodology'
       ? 'max-w-[920px] pt-6 sm:pt-10'
+      : route.name === 'lola-os'
+      ? 'max-w-[1120px] pt-6 sm:pt-10'
       : route.name === 'case-study' || route.name === 'case-studies-index'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
@@ -123,8 +135,10 @@ function App() {
           {route.name === 'home' && <Homepage />}
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
+          {route.name === 'growth-score' && <GrowthScore />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
+          {route.name === 'lola-os' && <LolaOS />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
           {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
           {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
@@ -139,6 +153,7 @@ function App() {
           {route.name === 'client-report' && <ClientReport slug={route.slug} />}
           {route.name === 'admin' && <AdminLeads />}
           {route.name === 'admin-calls' && <AdminCalls slug={route.slug} />}
+          {route.name === 'admin-revenue' && <AdminRevenue slug={route.slug} />}
           {route.name === 'unknown' && <NotFound />}
         </Suspense>
       </div>
@@ -176,11 +191,11 @@ function RouteFallback() {
 function SiteFooter({ route }: { route: Route }) {
   // Routes that own their own bottom-of-page footer or shouldn't have a
   // global one (admin / report dashboards / interactive tools).
-  const HIDE = new Set(['admin', 'admin-calls', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
+  const HIDE = new Set(['admin', 'admin-calls', 'admin-revenue', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
   if (HIDE.has(route.name)) return null;
 
   return (
-    <footer className="mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
+    <footer className="no-print mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
       <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
           <a href="/" className="inline-flex items-center gap-2">
@@ -200,8 +215,9 @@ function SiteFooter({ route }: { route: Route }) {
 
         <FooterCol title="Get found">
           <FooterLink href="/roadmap">The Growth Roadmap</FooterLink>
+          <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
-          <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
+          <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
@@ -226,7 +242,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          We work with one business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Claim your Local Lock</a>.
+          A phased growth roadmap for local service businesses — Foundation, Growth, Scale. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See your roadmap</a>.
         </p>
       </div>
     </footer>
@@ -273,9 +289,10 @@ function MobileStickyCTA({ route }: { route: Route }) {
     'https://calendar.app.google/J7idjUDitd2Hziuc7';
   const utm = `utm_source=sticky&utm_medium=mobile_bar&utm_campaign=${route.name}`;
   const callHref = `${calendar}${calendar.includes('?') ? '&' : '?'}${utm}`;
+  const primaryLabel = route.name === 'pricing' ? 'Lock my market →' : 'Book Free Call →';
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
+    <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
       <div className="mx-auto flex max-w-[640px] gap-2">
         <a
           href="/grader"
@@ -289,7 +306,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
           rel="noreferrer"
           className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
         >
-          Book Free Call →
+          {primaryLabel}
         </a>
       </div>
     </div>
@@ -298,7 +315,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
+    <header className="no-print sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
         {/* Logo — gold gradient wordmark + paw */}
         <a

@@ -1,0 +1,66 @@
+{
+  "slug": "sandbar",
+  "pattern_id": "local-service",
+  "blueprint_id": "pressure-washing",
+  "lifecycle": "live",
+  "client_name": "Sandbar Soft Wash",
+  "website": "https://www.sandbarsoftwash.com",
+  "target_domain": "sandbarsoftwash.com",
+  "industry": "Pressure washing / soft washing / exterior cleaning",
+  "market": "Pinellas County and Tampa Bay, Florida",
+  "primary_service_area": "Palm Harbor",
+  "services": [
+    "Pressure Washing",
+    "Soft Washing",
+    "House Washing",
+    "Roof Cleaning",
+    "Paver Sealing"
+  ],
+  "tracking": {
+    "google_queries": [
+      "pressure washing palm harbor fl",
+      "soft wash palm harbor",
+      "house washing palm harbor fl",
+      "roof cleaning palm harbor fl",
+      "paver sealing palm harbor",
+      "pressure washing dunedin fl",
+      "soft wash dunedin fl",
+      "roof cleaning dunedin fl",
+      "house washing dunedin fl",
+      "pressure washing tarpon springs fl",
+      "soft wash tarpon springs",
+      "roof cleaning tarpon springs fl",
+      "pressure washing holiday fl",
+      "soft wash holiday fl",
+      "roof cleaning holiday fl",
+      "pressure washing tampa fl",
+      "soft wash tampa fl",
+      "pressure washing clearwater fl",
+      "soft wash clearwater"
+    ],
+    "ai_mode_prompts": [
+      "Who's the best pressure washing company near Palm Harbor, Florida? List 3.",
+      "Recommend a soft wash / house washing company in Palm Harbor, FL.",
+      "Best roof cleaning company in Palm Harbor FL?",
+      "Best pressure washing company in Dunedin, FL?",
+      "Recommend a soft wash company in Tarpon Springs, FL.",
+      "Who does the best pressure washing in Tampa Bay?"
+    ],
+    "verified_organic_wins": [
+      "Palm Harbor — pressure washing",
+      "Palm Harbor — soft wash",
+      "Palm Harbor — roof cleaning",
+      "Tarpon Springs — pressure washing",
+      "Tarpon Springs — soft wash",
+      "Dunedin — pressure washing",
+      "Dunedin — soft wash",
+      "Tampa — soft wash"
+    ],
+    "verified_map_pack_wins": [
+      "Holiday — pressure washing",
+      "Holiday — soft wash",
+      "Palm Harbor — soft wash",
+      "Tarpon Springs — soft wash"
+    ]
+  }
+}

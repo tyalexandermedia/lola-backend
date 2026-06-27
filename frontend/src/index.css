@@ -96,3 +96,77 @@ textarea::placeholder {
 .group:hover .animate-marquee {
   animation-play-state: paused;
 }
+
+@media print {
+  @page {
+    margin: 0.55in;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: auto;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .no-print,
+  .report-actions {
+    display: none !important;
+  }
+
+  .client-report {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .client-report,
+  .client-report * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .client-report section,
+  .client-report header {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-color: #d1d5db !important;
+    background: #ffffff !important;
+  }
+
+  .client-report h1,
+  .client-report h2,
+  .client-report h3,
+  .client-report p,
+  .client-report span,
+  .client-report div,
+  .client-report li {
+    color: #111827 !important;
+  }
+
+  .client-report a {
+    color: #92400e !important;
+    text-decoration: none !important;
+  }
+
+  .client-report [class*="text-transparent"] {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+  }
+
+  .client-report [class*="bg-clip-text"] {
+    background: none !important;
+  }
+
+  .client-report [class*="border"] {
+    border-color: #d1d5db !important;
+  }
+
+  .client-report [class*="bg-"] {
+    background-image: none !important;
+  }
+}

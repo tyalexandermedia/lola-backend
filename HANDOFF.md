@@ -231,11 +231,13 @@ git add -A
 git status                                  # eyeball before committing
 
 git commit -m "$(cat <<'EOF'
-Phase 1 final: 3-tier pricing + Agent 4 cold outreach
+Phase 1 final: roadmap pricing + Agent 4 cold outreach
 
-- Pricing: 3-tier (Pro/Standard/DIY) with founding-member counter,
-  responsive sizing (clamp + minmax(0,1fr)), CTA hierarchy,
-  annual toggle, mobile sticky CTA, BulletItem tooltips
+- Pricing: roadmap model (Foundation Sprint $297 one-time / Growth
+  Roadmap $497/mo / Scale System $697/mo, $997+ competitive) with
+  founding-member counter, responsive sizing (clamp + minmax(0,1fr)),
+  CTA hierarchy, mobile sticky CTA, BulletItem tooltips.
+  Canonical source: docs/PRICING.md
 - Agent 4: db/outreach.py, outreach/* module, CLI
   (send/status/suppress/preview), Tier 2 Resend webhook,
   Tier 3 LLM variants (opt-in), Tier 4 reply webhook
@@ -335,9 +337,10 @@ cd frontend && npm run dev
 - ✅ One-question-at-a-time frontend with shake validation + gold focus
 - ✅ Polished questionnaire (sticky blurred header, continuous gold
   progress bar, 44px headline, 64px gold-focus input)
-- ✅ 3-tier pricing ($197 / $497 / $997) with founding-member counter
-  (DB-backed via `db/pricing.py`), strikethrough anchors, MOST POPULAR
-  badge, annual/monthly toggle (16% savings on annual)
+- ✅ Pricing surface (DB-backed via `db/pricing.py`) with founding-member
+  counter, anchors, and CTA badges — now follows the roadmap model
+  (Foundation Sprint $297 one-time · Growth Roadmap $497/mo · Scale System
+  $697/mo, $997+ competitive). Canonical: [`docs/PRICING.md`](docs/PRICING.md)
 - ✅ Mobile sticky CTA (appears past pricing, dismissible)
 - ✅ Lola playbook recommendations engine (signal-driven, ≤5 ranked)
 - ✅ Per-audit recommendations + upsell CTA
@@ -374,9 +377,10 @@ cd frontend && npm run dev
   "AI Search Visibility" section in the audit report below Agent Readiness
   with three placeholder rows (ChatGPT / Perplexity / Google AI Overviews,
   "Tracking — ships Q3").
-- ✅ **Email 3 reframe** — "$400/mo SEO retainer" → "$499/month SEO automation
-  — we don't just tell you what's broken, we fix it weekly." Subject updated
-  from "SEO" to "AI visibility."
+- ✅ **Email 3 reframe** — moved off the "SEO retainer" framing toward the
+  growth-roadmap positioning ("we don't just tell you what's broken, we fix
+  it weekly"). Pricing now follows the roadmap model in
+  [`docs/PRICING.md`](docs/PRICING.md). Subject updated from "SEO" to "AI visibility."
 - ✅ **PostHog wired** — `posthog-js` installed, `src/analytics.ts` wrapper,
   `initAnalytics()` called from `main.tsx`. `trackClick` fans out to PostHog +
   Plausible + GA. Falls back to `console.log` when `VITE_POSTHOG_KEY` is
@@ -406,50 +410,56 @@ cd frontend && npm run dev
 
 ---
 
-## Pricing matrix v2 — locked 2026-05-23
+## Pricing & positioning — roadmap model (current)
 
-| Tier | Price | Type | Env var | Live Stripe Payment Link |
-|---|---|---|---|---|
-| DIY Playbook | **$47** | one-time | `VITE_STRIPE_DIY_PDF_URL` | ✅ `…3oA09` |
-| Local SEO Sprint | **$397** | one-time | `VITE_STRIPE_SPRINT_URL` | ✅ `…3oA07` |
-| Local SEO Retainer | **$697/mo** | monthly | `VITE_STRIPE_RETAINER_MONTHLY_URL` | ✅ `…3oA08` |
-| Local SEO Pro | **$6,970/yr** | annual (Best Value) | `VITE_STRIPE_PRO_URL` | ✅ `…3oA06` |
+> **Canonical source of truth:** [`docs/PRICING.md`](docs/PRICING.md). Update that
+> file first, then sync the mirrors (`frontend/src/lib/pricing.ts`, `db/pricing.py`,
+> `frontend/scripts/gen_lp.py`). The matrix below is a convenience snapshot — if it
+> disagrees with `docs/PRICING.md`, `docs/PRICING.md` wins.
 
-All 4 live URLs baked into the source as fallbacks (and `.env.example`).
-Set the same 4 env vars in Vercel for clean separation per environment;
-without them, the source defaults take over.
+LOLA OS is positioned as a **phased growth roadmap / business growth operating
+system**, not an SEO package. The dashboard is the **Growth Score**. Core narrative:
+*"Most businesses don't have a marketing problem first — they have a foundation
+problem."* Month 1 builds the base, days 31–90 build signals, and after 90 days the
+data compounds. (The earlier "Local Lock" 3-tier model — Starter $297/mo · Growth
+$697/mo · Pro $997/mo — is retired and replaced by the roadmap below.)
 
-### Paste-ready Stripe Payment Link descriptions
+### Core roadmap (offer ladder)
 
-**DIY Playbook — $47, one-time**
-> Step-by-step local SEO playbook for contractors who want to DIY. The exact system we use for paying clients — broken into plain-English checklists. Covers GMB optimization, citation building, on-page fixes, review strategy, and AI search visibility basics. No fluff, no jargon. Built for contractors, not marketers. Instant PDF download.
+| Stage | Price | Type | Role |
+|---|---|---|---|
+| Foundation Sprint | **$297** | one-time | Low-risk front door — create/clean/rebuild the online foundation |
+| Growth Roadmap | **$497/mo** | monthly | Default recurring — build momentum and start surfacing signals |
+| Scale System | **$697/mo** (**$997+** competitive markets) | monthly | Repeatable lead-gen system across services/areas/channels |
 
-**Local SEO Sprint — $397, one-time**
-> One focused fix — fast. For contractors who need clarity and a real plan. Includes a full Lola audit with priority fix list, Agent Readiness Score, AI search visibility baseline (5 prompts), custom 90-day SEO action plan, 60-minute strategy call with Coach Ty, GMB optimization checklist, citation + directory audit, and 30 days of email + Slack support. 48-hour onboarding. First Win Promise backed.
+### Add-ons (bolt onto any stage)
 
-**Local SEO Retainer — $697/mo, recurring monthly**
-> For contractors ready to dominate their local market month after month. Includes everything in the Sprint, ongoing — plus AI search visibility tracking (20 prompts/mo), prompt tracking dashboard, monthly content + link building, GMB management with weekly posts, citation cleanup, new directory submissions, bi-weekly performance reports, and priority Slack + text support. 48-hour onboarding. First Win Promise backed. Cancel anytime.
+| Add-on | Price |
+|---|---|
+| Social Posting System | $200–$500/mo |
+| Video / Shorts System | from $200/mo |
+| Email / SMS Follow-Up | $99–$300/mo |
+| SEO Sprint | $197–$497 one-time |
+| AI Visibility Add-On | premium (paid-tier only) |
 
-**Local SEO Pro — $6,970/yr, recurring annual**
-> The premium tier for contractors serious about dominating their market. Everything in the Retainer PLUS quarterly strategy calls with Coach Ty, priority fix queue, locked-in pricing (no rate increases ever), and Lola Pro badge for your site. Save $1,394 vs monthly. Built for Florida contractors ready to commit — and win — long-term. First Win Promise backed.
+See [`docs/PRICING.md`](docs/PRICING.md) for full inclusions, guarantees, Growth
+Score dimensions, and onboarding entry points.
 
-### Vercel env vars to set (one paste session)
+### Stripe / Vercel env vars
 
-```
-VITE_STRIPE_DIY_PDF_URL=https://buy.stripe.com/<new-diy-link>
-VITE_STRIPE_SPRINT_URL=https://buy.stripe.com/<new-sprint-link>
-VITE_STRIPE_RETAINER_MONTHLY_URL=https://buy.stripe.com/<new-retainer-link>
-VITE_STRIPE_PRO_URL=https://buy.stripe.com/<new-pro-link>
-```
+Set the recurring + one-time Payment Link URLs per the current roadmap stages.
+Apply to **Production + Preview + Development**, then redeploy.
 
-Apply to **Production + Preview + Development**. Redeploy after.
+### Earlier rewrite (historical — superseded by the roadmap model above)
 
-### Files touched in this rewrite
+This section previously documented a retired front-end pricing layout (DIY / Sprint
+/ Retainer / Pro). The files below were touched in that pass; their pricing now
+follows the roadmap model and `docs/PRICING.md`:
 
-- `frontend/src/PricingPage.tsx` — 3-tier → 4-tier, dropped billing toggle, added DIY card, repositioned Pro as annual with strikethrough + "Save $1,394" + "Best Value" badge, expanded comparison table with Pro-tier perks (price lock, quarterly calls).
-- `frontend/src/AuditFlow.tsx` — Sprint $397, Retainer $697, dropped in-page billing toggle, added inline "Or commit annually as Pro — save $1,394" nudge under the Retainer card, updated AI Search Visibility CTA to "Go Pro ($6,970/yr, save $1,394)".
-- `frontend/src/Homepage.tsx` — execution-framing line `$499/mo` → `$697/mo`; "Saved vs premium agencies" stat `$2,500` → `$1,800`.
-- `frontend/src/Marquee.tsx` — pricing-range string updated to `$47 DIY to $697/mo full-service`.
-- `automation/emails/email3_day5.html` — `$499/month` → `$697/month`, added Pro/annual nudge.
-- `outreach/templates.py` — variants D + E `$499/mo` → `$697/mo`; variant E mentions $47 DIY playbook.
-- `.env.example` — added `VITE_STRIPE_DIY_PDF_URL`, dropped `VITE_STRIPE_RETAINER_ANNUAL_URL`, reset all 4 URLs to placeholders.
+- `frontend/src/PricingPage.tsx`
+- `frontend/src/AuditFlow.tsx`
+- `frontend/src/Homepage.tsx`
+- `frontend/src/Marquee.tsx`
+- `automation/emails/email3_day5.html`
+- `outreach/templates.py`
+- `.env.example`

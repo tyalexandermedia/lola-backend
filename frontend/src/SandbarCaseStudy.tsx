@@ -273,7 +273,7 @@ export default function SandbarCaseStudy() {
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
           Get your AI Visibility Score in 60 seconds — same five categories Sandbar
-          ran against — then book a call to claim your Lock.
+          ran against — then book a call to map your roadmap.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
@@ -288,7 +288,7 @@ export default function SandbarCaseStudy() {
             rel="noreferrer"
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            Claim your Lock
+            Book a roadmap call
           </a>
         </div>
       </section>

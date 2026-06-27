@@ -64,6 +64,14 @@ interface DashboardPayload {
     revenue_month: number; revenue_lifetime: number;
     jobs: Array<{ id: number; job_value: number; service_type?: string; source?: string; notes?: string; created_at: string }>;
   };
+  revenue_agent?: {
+    contacts: number;
+    pipeline_value: number;
+    won_revenue: number;
+    open_actions: number;
+    opportunities: Record<string, number>;
+    estimates: Record<string, number>;
+  };
   generated_at: string;
 }
 
@@ -132,12 +140,20 @@ export default function ClientReport({ slug }: { slug: string }) {
   const totallyEmpty = !anyTracking && !anyRankings && !anyAi && !anyWork;
 
   return (
-    <main className="mx-auto w-full max-w-4xl py-6 sm:py-10">
+    <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
       <OwnerOverview data={data} />
-      <TopWinsCard google={data.google} aiMode={data.ai_mode} verifiedWins={data.verified_wins} />
+      <TopWinsCard
+        google={data.google}
+        aiMode={data.ai_mode}
+        verifiedWins={data.verified_wins}
+        clientName={data.client_name}
+      />
       {data.won_jobs && data.won_jobs.lifetime > 0 && (
         <WonJobsCard wonJobs={data.won_jobs} />
+      )}
+      {data.revenue_agent && (
+        <RevenueAgentCard revenue={data.revenue_agent} />
       )}
 
       {/* No live data yet → show the "what we're watching" value card so the
@@ -164,6 +180,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
 
       {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
+      {anyRankings && <CompetitorWatchlist google={data.google} />}
 
       {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
 
@@ -215,7 +232,16 @@ function Header({ data }: { data: DashboardPayload }) {
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">
           Retainer Dashboard
         </p>
-        <FreshnessPill iso={data.generated_at} />
+        <div className="flex flex-wrap items-center gap-2">
+          <FreshnessPill iso={data.generated_at} />
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="report-actions inline-flex h-8 items-center rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#F4D47C] transition hover:bg-[#D4AF37]/18"
+          >
+            Save PDF
+          </button>
+        </div>
       </div>
       <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{data.client_name}</h1>
       {data.target_url && (
@@ -272,6 +298,13 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
   const prevContacts = prevCalls + prevLeads;
   const delta = contacts - prevContacts;
   const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
+  const siteHost = (() => {
+    try {
+      return data.target_url ? new URL(data.target_url).hostname.replace(/^www\./, '') : 'your website';
+    } catch {
+      return 'your website';
+    }
+  })();
 
   if (contacts === 0) {
     return (
@@ -283,7 +316,7 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
           Tracking goes live the moment your first call or quote request lands.
         </h2>
         <p className="mt-3 max-w-[640px] text-[14px] leading-[1.6] text-[#C8C0B0]">
-          Every call from your tracking number, every quote form on sandbarsoftwash.com,
+          Every call from your tracking number, every quote form on {siteHost},
           and every Google Business Profile interaction shows up here automatically.
           Rankings, AI search visibility, and Google Search Console data populate
           below as snapshots come in.
@@ -330,6 +363,39 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
         )}
       </p>
     </section>
+  );
+}
+
+function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['revenue_agent']> }) {
+  const hasData = revenue.contacts > 0 || revenue.pipeline_value > 0 || revenue.won_revenue > 0 || revenue.open_actions > 0;
+  if (!hasData) return null;
+  const money = (n: number) => `$${Math.round(n || 0).toLocaleString()}`;
+  const openOpps = (revenue.opportunities.new || 0) + (revenue.opportunities.qualified || 0) + (revenue.opportunities.estimate_sent || 0);
+  const sentEstimates = revenue.estimates.sent || 0;
+  return (
+    <section className="mb-6 rounded-2xl border border-emerald-500/20 bg-[#0E1512] p-6 shadow-[0_0_28px_rgba(16,185,129,0.06)]">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        Revenue Agent
+      </p>
+      <h2 className="mt-2 text-[22px] font-bold text-white">
+        {money(revenue.pipeline_value)} open pipeline · {money(revenue.won_revenue)} confirmed won
+      </h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        <MiniMetric label="Contacts matched" value={revenue.contacts} />
+        <MiniMetric label="Open opportunities" value={openOpps} />
+        <MiniMetric label="Sent estimates" value={sentEstimates} />
+        <MiniMetric label="Follow-ups queued" value={revenue.open_actions} />
+      </div>
+    </section>
+  );
+}
+
+function MiniMetric({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+      <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
+      <p className="mt-1 text-xl font-bold text-white">{value}</p>
+    </div>
   );
 }
 
@@ -450,10 +516,12 @@ function TopWinsCard({
   google,
   aiMode,
   verifiedWins,
+  clientName,
 }: {
   google: Series[];
   aiMode: Series[];
   verifiedWins?: { organic: string[]; map_pack: string[] };
+  clientName: string;
 }) {
   const num1 = google.filter(s => s.current.position === 1);
   const top3 = google.filter(s => {
@@ -496,8 +564,8 @@ function TopWinsCard({
             across Google organic + map packs.
           </h2>
           <p className="mt-2 max-w-[640px] text-[13px] leading-[1.6] text-[#C8C0B0] sm:text-[14px]">
-            When customers across Pinellas County search these terms, Sandbar is the first
-            result they see — the position competitors pay $5–$15 per click for.
+            When customers search these terms, {clientName} is the first result they see —
+            the position competitors pay $5–$15 per click for.
           </p>
 
           {verifiedOrganic.length > 0 && (
@@ -1634,22 +1702,90 @@ function RankingsTable({
   );
 }
 
+function CompetitorWatchlist({ google }: { google: Series[] }) {
+  const rows = useMemo(() => {
+    return google
+      .map((s) => ({
+        query: s.query,
+        position: s.current?.position ?? null,
+        competitors: (s.current?.competitors ?? []).filter(Boolean).slice(0, 3),
+      }))
+      .filter((row) => row.competitors.length > 0)
+      .sort((a, b) => {
+        const pa = a.position ?? 999;
+        const pb = b.position ?? 999;
+        return pa - pb;
+      });
+  }, [google]);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-[14px] border border-[#F59E0B]/20 bg-[#11121A] p-5">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+            Competitor Watchlist
+          </h2>
+          <p className="mt-1 text-[12px] leading-relaxed text-[#9CA3AF]">
+            Top organic pages showing up for each tracked money keyword.
+          </p>
+        </div>
+        <span className="rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#F59E0B]">
+          {rows.length} keyword{rows.length === 1 ? '' : 's'}
+        </span>
+      </div>
+
+      <div className="mt-4 divide-y divide-white/[0.06]">
+        {rows.slice(0, 6).map((row) => (
+          <div key={row.query} className="py-3 first:pt-0 last:pb-0">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[13px] font-semibold leading-tight text-[#E5E7EB]">{row.query}</p>
+              <span className="text-[11px] font-medium text-[#6B7280]">
+                {row.position ? `You: #${row.position}` : 'You: not top 10'}
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {row.competitors.map((name, i) => (
+                <span
+                  key={`${row.query}-${name}`}
+                  className="rounded-full border border-white/[0.08] bg-[#0F0F12] px-2.5 py-1 text-[11px] text-[#C8C0B0]"
+                >
+                  #{i + 1} {name}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function aiProviderMeta(source: string) {
+  const provider = source.replace(/_ai_mode$/, '');
+  const labels: Record<string, { label: string; icon: string; color: string }> = {
+    claude: { label: 'Claude', icon: '⚡', color: '#C4B5FD' },
+    chatgpt: { label: 'ChatGPT', icon: '✦', color: '#6EE7B7' },
+    perplexity: { label: 'Perplexity', icon: '⌕', color: '#67E8F9' },
+    gemini: { label: 'Gemini', icon: '◆', color: '#93C5FD' },
+  };
+  return labels[provider] || {
+    label: provider.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+    icon: 'AI',
+    color: '#F4D47C',
+  };
+}
+
 /**
- * AIVisibilityCard — per-platform breakdown of Claude vs ChatGPT AI search
- * visibility. Shows each tested prompt with win/lose status and (on lose) who
- * the AI recommended instead. Replaces the single merged AIModeTable so the
- * client can see whether visibility differs across AI providers.
+ * AIVisibilityCard — per-platform breakdown of AI search visibility. Shows
+ * each tested prompt with win/lose status and (on lose) who the provider
+ * recommended instead.
  */
 function AIVisibilityCard({ series }: { series: Series[] }) {
   if (series.length === 0) return null;
 
-  const byPlatform = useMemo(() => {
-    const claude = series.filter(s => s.source === 'claude_ai_mode');
-    const chatgpt = series.filter(s => s.source === 'chatgpt_ai_mode');
-    // Merge: for each unique query, try to pair claude + chatgpt rows
-    const queries = [...new Map(series.map(s => [s.query, s])).keys()];
-    return { claude, chatgpt, queries };
-  }, [series]);
+  const sources = useMemo(() => [...new Set(series.map(s => s.source))].sort(), [series]);
 
   const winRate = (rows: Series[]) => {
     if (!rows.length) return null;
@@ -1657,15 +1793,17 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
     return { wins, total: rows.length, pct: Math.round(100 * wins / rows.length) };
   };
 
-  const claudeRate = winRate(byPlatform.claude);
-  const chatgptRate = winRate(byPlatform.chatgpt);
-
-  const PlatformChip = ({ label, icon, rate, color }: { label: string; icon: string; rate: ReturnType<typeof winRate>; color: string }) => {
+  const PlatformChip = ({ source }: { source: string }) => {
+    const rows = series.filter(s => s.source === source);
+    const rate = winRate(rows);
     if (!rate) return null;
+    const meta = aiProviderMeta(source);
     return (
-      <div className="flex-1 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color }}>{icon} {label}</p>
-        <p className="mt-2 text-[36px] font-extrabold leading-none" style={{ color }}>{rate.pct}%</p>
+      <div className="min-w-[150px] flex-1 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: meta.color }}>
+          {meta.icon} {meta.label}
+        </p>
+        <p className="mt-2 text-[36px] font-extrabold leading-none" style={{ color: meta.color }}>{rate.pct}%</p>
         <p className="mt-1 text-[11px] text-[#9CA3AF]">{rate.wins}/{rate.total} prompts recommended you</p>
       </div>
     );
@@ -1673,11 +1811,10 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
 
   // Group all series rows by query so we can show one row per prompt
   const byQuery = useMemo(() => {
-    const map: Record<string, { claude?: Series; chatgpt?: Series }> = {};
+    const map: Record<string, Record<string, Series>> = {};
     for (const s of series) {
       if (!map[s.query]) map[s.query] = {};
-      if (s.source === 'claude_ai_mode') map[s.query].claude = s;
-      if (s.source === 'chatgpt_ai_mode') map[s.query].chatgpt = s;
+      map[s.query][s.source] = s;
     }
     return map;
   }, [series]);
@@ -1694,40 +1831,39 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
       </h2>
 
       {/* Per-platform win rates */}
-      <div className="flex gap-3">
-        <PlatformChip label="Claude" icon="⚡" rate={claudeRate} color="#C4B5FD" />
-        <PlatformChip label="ChatGPT" icon="✦" rate={chatgptRate} color="#6EE7B7" />
+      <div className="flex flex-wrap gap-3">
+        {sources.map(source => <PlatformChip key={source} source={source} />)}
       </div>
 
       {/* Per-prompt breakdown */}
       <div className="mt-4 space-y-3">
-        {prompts.map(([query, { claude, chatgpt }]) => {
-          const claudeWin = claude?.current?.mentioned ?? null;
-          const chatgptWin = chatgpt?.current?.mentioned ?? null;
+        {prompts.map(([query, bySource]) => {
+          const rows = sources.map(source => bySource[source]).filter(Boolean);
           // Aggregate competitors across both platforms
-          const allCompetitors = [
-            ...(claudeWin === false ? claude?.current?.competitors ?? [] : []),
-            ...(chatgptWin === false ? chatgpt?.current?.competitors ?? [] : []),
-          ].filter((v, i, a) => a.indexOf(v) === i); // dedupe
+          const allCompetitors = rows
+            .flatMap(row => row.current?.mentioned === false ? row.current?.competitors ?? [] : [])
+            .filter((v, i, a) => a.indexOf(v) === i); // dedupe
 
-          const anyWin = claudeWin || chatgptWin;
-          const anyLoss = claudeWin === false || chatgptWin === false;
+          const anyWin = rows.some(row => row.current?.mentioned);
+          const anyLoss = rows.some(row => row.current?.mentioned === false);
 
           return (
             <div key={query} className={`rounded-[12px] border p-4 ${anyWin ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : 'border-white/10 bg-[#11121A]'}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <p className="flex-1 text-[13px] font-medium leading-snug text-[#E5E7EB]">{query}</p>
                 <div className="flex shrink-0 items-center gap-2">
-                  {claude && (
-                    <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${claudeWin ? 'bg-purple-500/15 text-purple-300' : 'bg-red-500/10 text-red-300'}`}>
-                      ⚡ Claude {claudeWin ? '✓' : '✗'}
-                    </span>
-                  )}
-                  {chatgpt && (
-                    <span className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${chatgptWin ? 'bg-emerald-500/15 text-emerald-300' : 'bg-red-500/10 text-red-300'}`}>
-                      ✦ ChatGPT {chatgptWin ? '✓' : '✗'}
-                    </span>
-                  )}
+                  {rows.map(row => {
+                    const meta = aiProviderMeta(row.source);
+                    const win = row.current?.mentioned;
+                    return (
+                      <span
+                        key={`${query}-${row.source}`}
+                        className={`rounded-[6px] px-2.5 py-1 text-[11px] font-bold ${win ? 'bg-emerald-500/15 text-emerald-300' : 'bg-red-500/10 text-red-300'}`}
+                      >
+                        {meta.icon} {meta.label} {win ? '✓' : '✗'}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
               {anyLoss && allCompetitors.length > 0 && (

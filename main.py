@@ -111,6 +111,20 @@ from db.tracking import (
     cwv_history,
     EVENT_TYPES,
 )
+from db.revenue import (
+    init_revenue_tables,
+    create_estimate,
+    complete_action as revenue_complete_action,
+    link_won_job_to_opportunity,
+    list_actions as revenue_list_actions,
+    list_estimates,
+    list_opportunities,
+    revenue_summary,
+    update_estimate_status,
+    update_opportunity_status,
+    upsert_opportunity,
+)
+from agents.revenue_agent.main import run_revenue_agent
 from db.reviews import review_counts_for_slug
 from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
@@ -202,6 +216,7 @@ async def startup_event():
     await init_outreach_tables()
     await init_prospect_tables()
     await init_tracking_tables()
+    await init_revenue_tables()
     await init_applications_table()
     await init_reviews_tables()
     await init_case_studies_table()
@@ -333,6 +348,8 @@ class AuditResponse(BaseModel):
     categories: dict
     signals: dict
     recommendations: List[Recommendation]
+    page_seo: Optional[dict] = None
+    agent_readiness: Optional[dict] = None
 
 
 class LeadItem(BaseModel):
@@ -881,12 +898,12 @@ async def send_audit_email(
 
     # Live founding-counter for the P.S. — falls back gracefully if DB hiccups.
     try:
-        founding_used = await get_founding_count("standard")
+        founding_used = await get_founding_count("growth")
         founding_remaining = max(0, FOUNDING_CAP - founding_used)
     except Exception:
         founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
     founding_line = (
-        f"P.P.S. — First {FOUNDING_CAP} retainer clients lock $697/mo for life. "
+        f"P.P.S. — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. "
         f"We're at {FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP} right now."
     )
 
@@ -923,12 +940,12 @@ OPTION 1 — Do It Yourself ($47)
 The DIY Playbook. Every checklist Lola uses, in plain English.
 {STRIPE_DIY_URL}
 
-OPTION 2 — Get a Real Plan ($397)
-The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
+OPTION 2 — Get Your Roadmap ($397)
+The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
 {STRIPE_SPRINT_URL}
 
-OPTION 3 — Hand It Off ($697/mo)
-The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. Cancel anytime.
+OPTION 3 — Scale System ($697/mo)
+Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. $997+/mo for competitive or multi-location markets. Cancel anytime.
 {STRIPE_RETAINER_URL}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
@@ -937,7 +954,7 @@ Or just hit reply. Tell me what you want fixed first, and I'll walk you through 
 
 🦴 Want Lola's 6 AI agents working YOUR account weekly?
 
-→ See the Retainer: {retainer_url}
+→ See the Growth Roadmap: {retainer_url}
 → Apply (Coach Ty reviews every application): {apply_url}
 
 Coach Ty
@@ -1023,10 +1040,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get a Real Plan</strong> <span style="color:#C9A84C;">($397)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Local SEO Sprint. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get Your Roadmap</strong> <span style="color:#C9A84C;">($397)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Start the Sprint — $397 →</a>
+<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get your roadmap — $397 →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1034,10 +1051,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Hand It Off</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The Lola Retainer. Six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. Cancel anytime.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Scale System</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. $997+/mo for competitive or multi-location markets. Cancel anytime.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start the Retainer — $697/mo →</a>
+<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Scale with LOLA OS — $697/mo →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1054,7 +1071,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:24px 28px;">
 <p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's 6 AI agents working YOUR account weekly?</p>
 <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Retainer →</a>
+<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Growth Roadmap →</a>
 </td></tr></table>
 <p style="margin:0 0 18px;font-size:13px;line-height:1.55;color:#A89F94;"><a href="{apply_url}" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none;font-weight:600;">Or apply first — Coach Ty reviews every application →</a></p>
 <p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
@@ -1066,7 +1083,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} retainer clients lock $697/mo for life. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
 </td></tr>
 
 </table>
@@ -1492,6 +1509,10 @@ async def health():
             ),
             "brevo": bool(BREVO_API_KEY),
             "resend": bool(RESEND_API_KEY),
+            "ai_visibility_anthropic": bool((os.getenv("ANTHROPIC_API_KEY") or "").strip()),
+            "ai_visibility_openai": bool((os.getenv("OPENAI_API_KEY") or "").strip()),
+            "ai_visibility_perplexity": bool((os.getenv("PERPLEXITY_API_KEY") or "").strip()),
+            "ai_visibility_gemini": bool((os.getenv("GEMINI_API_KEY") or "").strip()),
         },
         "api_status": API_STATUS,
         "audit_api_budget": AUDIT_API_BUDGET,
@@ -1518,20 +1539,21 @@ async def pricing():
     drive the Standard tier label/strikethrough; counter is real and stored
     in `founding_signups` (see db/pricing.py).
     """
-    count = await get_founding_count("standard")
-    standard_price, founding_active = standard_price_for_count(count)
+    count = await get_founding_count("growth")
+    growth_price, founding_active = standard_price_for_count(count)
     slots_remaining = max(0, FOUNDING_CAP - count)
     return {
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        "tiers": {
-            "diy":      {"one_time": 197},
-            "standard": {
-                "monthly": standard_price,
-                "monthly_original": 697,
+        # Roadmap model (source of truth: docs/PRICING.md).
+        "stages": {
+            "foundation": {"one_time": 297},
+            "growth": {
+                "monthly": growth_price,
+                "monthly_regular": 597,
             },
-            "pro":      {"monthly": 997, "monthly_original": 1297},
+            "scale": {"monthly": 697, "monthly_competitive": 997},
         },
     }
 
@@ -1556,9 +1578,13 @@ REVENUE_LABELS = {
 }
 
 TIER_LABELS = {
-    "retainer": "Retainer ($697/mo)",
-    "pro": "Pro ($6,970/yr)",
-    "both": "Tell me which fits better",
+    "foundation": "Foundation Sprint ($297 one-time)",
+    "growth": "Growth Roadmap ($497/mo)",
+    "scale": "Scale System ($697/mo · $997+ competitive)",
+    # Back-compat for older inbound payloads.
+    "retainer": "Growth Roadmap ($497/mo)",
+    "pro": "Scale System ($697/mo · $997+ competitive)",
+    "both": "Tell me which stage fits better",
 }
 
 
@@ -1863,22 +1889,37 @@ async def public_client_dashboard(slug: str):
     # in the reporting table yet.
     from db.tracking import won_jobs_stats as _won_jobs_stats
     won_jobs = await _safe(_won_jobs_stats(slug), {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []})
+    revenue_agent_summary = await _safe(
+        revenue_summary(slug),
+        {
+            "contacts": 0,
+            "pipeline_value": 0,
+            "won_revenue": 0,
+            "open_actions": 0,
+            "opportunities": {},
+            "estimates": {},
+        },
+    )
     from db.reporting import get_client_by_slug as _get_client
     rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
-    # Map any active Lock tier → retainer $ for CPL math. Falls back to
-    # the Growth tier ($697) when no lock — the modal client price.
+    # Map any active stage → monthly $ for CPL math. Falls back to the Growth
+    # Roadmap ($497) when none — the modal recurring client price. Legacy tier
+    # names (starter/pro) still resolve for older records.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "growth").lower()
-    retainer = {"starter": 297, "growth": 697, "pro": 997}.get(tier, 697)
+    retainer = {
+        "foundation": 297, "growth": 497, "scale": 697,
+        "starter": 297, "pro": 997,  # back-compat
+    }.get(tier, 497)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 
-    # Tier gating: call tracking + GSC are premium (Growth + Pro). Starter
+    # Stage gating: call tracking + GSC are premium (Growth + Scale). Foundation
     # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
-    call_tracking_on = tier in ("growth", "pro")
-    premium = tier in ("growth", "pro")
+    call_tracking_on = tier in ("growth", "scale", "pro")
+    premium = tier in ("growth", "scale", "pro")
     call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
     gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
     gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
@@ -1916,7 +1957,7 @@ async def public_client_dashboard(slug: str):
         "client_name": cs.client_name,
         "target_url": cs.target_url,
         "tier": tier,
-        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "pro")},
+        "features": {"call_tracking": call_tracking_on, "search_console": tier in ("growth", "scale", "pro")},
         "google": google_series,
         "ai_mode": ai_series,
         "verified_wins": {
@@ -1941,6 +1982,20 @@ async def public_client_dashboard(slug: str):
         "cost_per_lead": cpl,
         "integrations": integrations,
         "won_jobs": won_jobs,
+        "revenue_agent": {
+            "contacts": int(revenue_agent_summary.get("contacts") or 0),
+            "pipeline_value": int(revenue_agent_summary.get("pipeline_value") or 0),
+            "won_revenue": int(revenue_agent_summary.get("won_revenue") or 0),
+            "open_actions": int(revenue_agent_summary.get("open_actions") or 0),
+            "opportunities": {
+                status: int((data or {}).get("count") or 0)
+                for status, data in (revenue_agent_summary.get("opportunities") or {}).items()
+            },
+            "estimates": {
+                status: int((data or {}).get("count") or 0)
+                for status, data in (revenue_agent_summary.get("estimates") or {}).items()
+            },
+        },
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
 
@@ -2287,7 +2342,7 @@ class LockClaimRequest(BaseModel):
     slug: str
     niche: str
     city: str
-    tier: str = "starter"
+    tier: str = "foundation"
     notes: Optional[str] = None
 
 
@@ -2893,6 +2948,7 @@ class WonJobRequest(BaseModel):
     service_type: Optional[str] = None   # "roof cleaning", "soft wash", etc.
     source: Optional[str] = None         # gbp / callrail / website / ai_search
     call_sid: Optional[str] = None       # link to specific tracked_calls row
+    opportunity_id: Optional[int] = None # link to Revenue Agent opportunity
     notes: Optional[str] = None
 
 
@@ -2919,12 +2975,20 @@ async def admin_log_won_job(
     import aiosqlite
     db_path = os.getenv("DB_PATH", "lola.db")
     async with aiosqlite.connect(db_path) as db:
+        if body.opportunity_id:
+            async with db.execute(
+                "SELECT id FROM revenue_opportunities WHERE id = ? AND slug = ?",
+                (body.opportunity_id, slug.strip().lower()),
+            ) as cur:
+                if not await cur.fetchone():
+                    raise HTTPException(status_code=404, detail="opportunity_id not found")
         await db.execute(
-            """INSERT INTO won_jobs (slug, call_sid, job_value, service_type, source, notes)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO won_jobs (slug, call_sid, opportunity_id, job_value, service_type, source, notes)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
                 slug.strip().lower(),
                 (body.call_sid or "").strip() or None,
+                body.opportunity_id,
                 body.job_value,
                 (body.service_type or "").strip() or None,
                 (body.source or "").strip() or None,
@@ -2932,6 +2996,8 @@ async def admin_log_won_job(
             ),
         )
         await db.commit()
+    if body.opportunity_id:
+        await link_won_job_to_opportunity(body.opportunity_id, body.job_value)
     stats = await won_jobs_stats(slug)
     return {
         "ok": True,
@@ -2952,6 +3018,192 @@ async def admin_list_won_jobs(
     _check_admin(x_admin_key)
     from db.tracking import won_jobs_stats
     return await won_jobs_stats(slug)
+
+
+# ── REVENUE AGENT ADMIN API ───────────────────────────────────
+
+class OpportunityRequest(BaseModel):
+    title: str
+    contact_id: Optional[int] = None
+    source: Optional[str] = None
+    source_id: Optional[str] = None
+    status: str = "new"
+    estimated_value: int = 0
+    notes: Optional[str] = None
+
+
+class OpportunityStatusRequest(BaseModel):
+    status: str
+    won_value: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class EstimateRequest(BaseModel):
+    opportunity_id: Optional[int] = None
+    contact_id: Optional[int] = None
+    amount: int
+    status: str = "sent"
+    description: Optional[str] = None
+
+
+class EstimateStatusRequest(BaseModel):
+    status: str
+
+
+class RevenueActionRequest(BaseModel):
+    status: str = "completed"
+
+
+@app.post("/admin/revenue/{slug}/run")
+async def admin_run_revenue_agent(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return await run_revenue_agent(slug)
+
+
+@app.get("/admin/revenue/{slug}/summary")
+async def admin_revenue_summary(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return await revenue_summary(slug)
+
+
+@app.post("/admin/opportunities/{slug}")
+async def admin_create_opportunity(
+    slug: str,
+    body: OpportunityRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    title = body.title.strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+    if body.estimated_value < 0:
+        raise HTTPException(status_code=400, detail="estimated_value must be >= 0")
+    try:
+        oid = await upsert_opportunity(
+            slug=slug,
+            title=title,
+            contact_id=body.contact_id,
+            source=(body.source or "").strip() or None,
+            source_id=(body.source_id or "").strip() or None,
+            status=body.status,
+            estimated_value=body.estimated_value,
+            notes=(body.notes or "").strip() or None,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"ok": True, "id": oid}
+
+
+@app.get("/admin/opportunities/{slug}")
+async def admin_list_opportunities(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"opportunities": await list_opportunities(slug)}
+
+
+@app.post("/admin/opportunities/{opportunity_id}/status")
+async def admin_update_opportunity_status(
+    opportunity_id: int,
+    body: OpportunityStatusRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await update_opportunity_status(
+            opportunity_id,
+            body.status,
+            won_value=body.won_value,
+            notes=body.notes,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="opportunity not found")
+    return {"ok": True, "opportunity": updated}
+
+
+@app.post("/admin/estimates/{slug}")
+async def admin_create_estimate(
+    slug: str,
+    body: EstimateRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    if body.amount < 0:
+        raise HTTPException(status_code=400, detail="amount must be >= 0")
+    try:
+        eid = await create_estimate(
+            slug=slug,
+            opportunity_id=body.opportunity_id,
+            contact_id=body.contact_id,
+            amount=body.amount,
+            status=body.status,
+            description=(body.description or "").strip() or None,
+        )
+    except ValueError as e:
+        message = str(e)
+        status = 404 if "not found" in message else 400
+        raise HTTPException(status_code=status, detail=message)
+    return {"ok": True, "id": eid}
+
+
+@app.get("/admin/estimates/{slug}")
+async def admin_list_estimates(
+    slug: str,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"estimates": await list_estimates(slug)}
+
+
+@app.post("/admin/estimates/{estimate_id}/status")
+async def admin_update_estimate_status(
+    estimate_id: int,
+    body: EstimateStatusRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await update_estimate_status(estimate_id, body.status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="estimate not found")
+    return {"ok": True, "estimate": updated}
+
+
+@app.get("/admin/revenue/{slug}/actions")
+async def admin_list_revenue_actions(
+    slug: str,
+    include_done: bool = False,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    return {"actions": await revenue_list_actions(slug, include_done=include_done)}
+
+
+@app.post("/admin/revenue/actions/{action_id}/complete")
+async def admin_complete_revenue_action(
+    action_id: int,
+    body: RevenueActionRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    _check_admin(x_admin_key)
+    try:
+        updated = await revenue_complete_action(action_id, body.status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not updated:
+        raise HTTPException(status_code=404, detail="action not found")
+    return {"ok": True, "action": updated}
 
 
 @app.get("/admin/calls/{slug}")
@@ -3224,7 +3476,7 @@ async def admin_health_keys(
 
 class FoundingSignupRequest(BaseModel):
     email: str
-    tier: str = "standard"
+    tier: str = "growth"  # founding rate tracks the Growth Roadmap stage
 
 
 @app.post("/admin/founding-signup")

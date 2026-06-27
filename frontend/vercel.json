@@ -256,18 +256,6 @@
       "destination": "https://lola-backend-production.up.railway.app/t/$1"
     },
     {
-      "source": "/reporting/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/reporting/$1"
-    },
-    {
-      "source": "/lead-gen/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/admin/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
