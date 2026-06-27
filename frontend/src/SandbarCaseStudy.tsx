@@ -245,8 +245,44 @@ export default function SandbarCaseStudy() {
         </p>
       </section>
 
+      {/* ── SEE IT LIVE ───────────────────────────────────── */}
+      {/* Turns the proof story into LIVE proof: the same dashboard every
+          client logs into, no login. The dashboard degrades gracefully
+          (shows "what we watch" + the work-delivered feed before the first
+          ranking snapshot), so this is honest whether sparse or full — and
+          it gets richer every weekly refresh. No fabricated numbers here. */}
+      <section className="mt-6 overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/[0.06] via-transparent to-transparent p-6 sm:p-8">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/[0.08] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-300">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Live system
+          </span>
+          <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
+            Not a screenshot
+          </p>
+        </div>
+        <h2
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}
+        >
+          See Sandbar&apos;s live dashboard.
+        </h2>
+        <p className="mt-3 max-w-[700px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+          Sandbar runs on the exact dashboard every Lola client logs into — keyword
+          ranking history, AI Share-of-Voice, and the week-by-week work-delivered feed,
+          refreshed on a weekly cadence. No login, no sales screenshot. Open the real thing.
+        </p>
+        <a
+          href="/r/client/sandbar"
+          onClick={() => track('sandbar_dashboard_clicked', { from: 'case_study' })}
+          className="mt-5 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-emerald-500/40 bg-emerald-500/[0.06] px-6 text-[14px] font-semibold uppercase tracking-[0.05em] text-emerald-300 transition hover:border-emerald-400/60 hover:bg-emerald-500/[0.12] sm:text-[15px]"
+        >
+          Open the live Sandbar dashboard ↗
+        </a>
+      </section>
+
       {/* ── HONESTY NOTE ──────────────────────────────────── */}
-      <section className="mt-12 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-7">
+      <section className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-7">
         <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
           Honest fine print
         </p>
@@ -255,8 +291,8 @@ export default function SandbarCaseStudy() {
           have a clear conflict of interest in writing about them, so we&apos;re flagging it
           out loud. The numbers above (5 keywords / 3 weeks / 20+ cities / 15+ years) are
           claims we already publish on the homepage and in our pricing — nothing fabricated for
-          this page. As the live tracker accumulates more history, we&apos;ll add the actual
-          time-series graphs from the Sandbar dashboard.
+          this page. The live dashboard linked above shows the real tracker as it stands today;
+          its time-series graphs fill in as the weekly snapshots accumulate.
         </p>
       </section>
 
