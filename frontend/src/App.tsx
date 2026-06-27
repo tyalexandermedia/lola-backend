@@ -18,7 +18,6 @@ const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
 const GrowthScore = lazy(() => import('./GrowthScore'));
-const RoadmapPage = lazy(() => import('./RoadmapPage'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
@@ -32,7 +31,6 @@ type Route =
   | { name: 'audit' }
   | { name: 'grader' }
   | { name: 'growth-score' }
-  | { name: 'roadmap' }
   | { name: 'start' }
   | { name: 'methodology' }
   | { name: 'lola-os' }
@@ -57,7 +55,6 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
   if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
-  if (pathname === '/roadmap' || pathname === '/roadmap/') return { name: 'roadmap' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
@@ -106,8 +103,6 @@ function App() {
       ? 'max-w-[640px] pt-3 sm:pt-6'
       : route.name === 'grader' || route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
-      : route.name === 'roadmap'
-      ? 'max-w-[1080px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
       : route.name === 'methodology'
@@ -141,7 +136,6 @@ function App() {
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
           {route.name === 'growth-score' && <GrowthScore />}
-          {route.name === 'roadmap' && <RoadmapPage />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
@@ -287,7 +281,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
  * vs a single hero-only CTA. Pattern from Podium / Birdeye marketing sites.
  */
 function MobileStickyCTA({ route }: { route: Route }) {
-  const STICKY_ROUTES = new Set(['home', 'pricing', 'roadmap', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
+  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   const calendar =
