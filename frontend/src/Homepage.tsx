@@ -18,6 +18,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
+import RoadmapJourney from './RoadmapJourney';
 import { ROADMAP } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
@@ -298,6 +299,31 @@ export default function Homepage() {
           <span className="font-semibold text-white">Most businesses don&apos;t have a marketing problem first — they have a foundation problem.</span>{' '}
           Lola starts there. Month 1 builds the base, days 31–90 build the signals, and after 90 days the data compounds.
         </p>
+      </section>
+
+      {/* ── 1a. VISUAL ROADMAP — the signature journey graphic ──────── */}
+      <section className="mt-16 sm:mt-20">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          The path
+        </p>
+        <h2
+          className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
+        >
+          Start free. Advance by maturity.
+        </h2>
+        <p className="mx-auto mt-4 mb-10 max-w-[600px] text-center text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+          One number, then a phased roadmap — not a generic monthly package. Here&apos;s the whole journey.
+        </p>
+        <RoadmapJourney />
+        <div className="mt-8 text-center">
+          <a
+            href="/roadmap"
+            className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C]"
+          >
+            See the full roadmap →
+          </a>
+        </div>
       </section>
 
       {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
