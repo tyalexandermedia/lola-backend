@@ -234,6 +234,70 @@ export default function PricingPage() {
         </p>
       </section>
 
+      {/* ── 2a. WHAT TO EXPECT — 30/60/90 maturity timeline ──────────────
+          Answers the #1 objection ("how long until it works?") and frames the
+          recurring stages as maturity, not a meter running. Expectations, not
+          dated guarantees. */}
+      <section className="mt-16 sm:mt-20">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          What to expect
+        </p>
+        <h2
+          className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
+        >
+          Visibility compounds. Here&apos;s the curve.
+        </h2>
+        <p className="mx-auto mt-4 max-w-[620px] text-center text-[14px] leading-[1.6] text-[#C5C5C8]">
+          You&apos;re not paying more each month for no reason — you&apos;re paying for a more
+          mature growth system. This is the honest timeline, not a dated promise.
+        </p>
+
+        <div className="mx-auto mt-8 grid max-w-[860px] grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            {
+              tag: 'Days 1–30',
+              stage: 'Foundation',
+              h: 'Build the base',
+              body: 'Website foundation, core SEO + tracking, GBP cleanup, baseline audit + your visibility score. The work starts shipping — you watch it on the dashboard.',
+            },
+            {
+              tag: 'Days 31–60',
+              stage: 'Growth',
+              h: 'Signals start moving',
+              body: 'Content + service-area pages, posting cadence, review velocity. Rankings, impressions, and the first calls/forms begin showing up where access exists.',
+            },
+            {
+              tag: 'Days 61–90+',
+              stage: 'Scale',
+              h: 'It compounds',
+              body: 'Authority and AI visibility stack month over month. Better data means better decisions — and your Growth Score climbs toward the next number.',
+            },
+          ].map((t, i) => (
+            <div
+              key={t.tag}
+              className="relative flex flex-col rounded-[14px] border border-white/[0.10] bg-white/[0.02] p-6"
+            >
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37]/[0.12] text-[12px] font-bold text-[#D4AF37]">
+                  {i + 1}
+                </span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{t.tag}</span>
+              </div>
+              <p className="mt-3 text-[17px] font-bold text-white">{t.h}</p>
+              <p className="mt-2 flex-1 text-[13px] leading-[1.55] text-[#C5C5C8]">{t.body}</p>
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8A8F98]">
+                {t.stage} stage
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-5 max-w-[600px] text-center text-[11px] text-[#5A5F68]">
+          Timelines vary by market and starting point. The 30-Day Half-Back and First Win
+          guarantees put real accountability on the early days.
+        </p>
+      </section>
+
       {/* ── 2b. ADD-ONS ───────────────────────────────────────────────── */}
       <section className="mt-14 sm:mt-16">
         <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
@@ -584,7 +648,7 @@ function StageCard({
           target="_blank"
           rel="noreferrer"
           onClick={onCtaClick}
-          className="flex min-h-[60px] w-full items-center justify-center gap-2 whitespace-nowrap rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_4px_16px_rgba(212,175,55,0.25)] transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_8px_28px_rgba(212,175,55,0.5)] active:scale-[0.99] sm:text-[14px]"
+          className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-3 text-center text-[12px] font-bold uppercase leading-tight tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_4px_16px_rgba(212,175,55,0.25)] transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_8px_28px_rgba(212,175,55,0.5)] active:scale-[0.99] sm:text-[13px]"
         >
           {stage.cta} →
         </a>
