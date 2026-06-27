@@ -17,6 +17,7 @@ const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
+const GrowthScore = lazy(() => import('./GrowthScore'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
@@ -29,6 +30,7 @@ type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'growth-score' }
   | { name: 'start' }
   | { name: 'methodology' }
   | { name: 'lola-os' }
@@ -52,6 +54,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
@@ -98,7 +101,7 @@ function App() {
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
-      : route.name === 'grader'
+      : route.name === 'grader' || route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
@@ -132,6 +135,7 @@ function App() {
           {route.name === 'home' && <Homepage />}
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
+          {route.name === 'growth-score' && <GrowthScore />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
@@ -210,9 +214,9 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
+          <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
-          <FooterLink href="/pricing">Pricing &amp; Local Lock</FooterLink>
-          <FooterLink href="/os">LOLA OS status</FooterLink>
+          <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
@@ -237,7 +241,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          We work with one business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Claim your Local Lock</a>.
+          A phased growth roadmap for local service businesses — Foundation, Growth, Scale. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See your roadmap</a>.
         </p>
       </div>
     </footer>
@@ -284,6 +288,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
     'https://calendar.app.google/J7idjUDitd2Hziuc7';
   const utm = `utm_source=sticky&utm_medium=mobile_bar&utm_campaign=${route.name}`;
   const callHref = `${calendar}${calendar.includes('?') ? '&' : '?'}${utm}`;
+  const primaryLabel = route.name === 'pricing' ? 'Lock my market →' : 'Book Free Call →';
 
   return (
     <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
@@ -300,7 +305,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
           rel="noreferrer"
           className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
         >
-          Book Free Call →
+          {primaryLabel}
         </a>
       </div>
     </div>

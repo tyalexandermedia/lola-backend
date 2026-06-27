@@ -3,13 +3,12 @@
  * /case-studies — index page listing all published Lola case studies.
  *
  * Currently 1 published (Sandbar), 2 placeholders honestly framed as "coming
- * soon" with the niche+city already locked. This page is the SEO + trust
- * anchor — internal-link target for /sandbar, gives the homepage somewhere
- * to send "see proof" traffic, and signals the case-study slot for future
- * publishes.
+ * soon." This page is the SEO + trust anchor — internal-link target for
+ * /sandbar, gives the homepage somewhere to send "see proof" traffic, and
+ * signals the case-study slot for future publishes.
  *
  * No fake "Coming soon — Brand X" placeholders. Either we have a real client
- * with a public-shareable story, or we list a real Lock as held without
+ * with a public-shareable story, or we frame the slot honestly without
  * naming a client that hasn't agreed to be public.
  */
 
@@ -156,7 +155,7 @@ export default function CaseStudiesIndex() {
               Your business?
             </h2>
             <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#9CA3AF] sm:text-[15px]">
-              When a Lock client agrees to go public, this is where their story lands.
+              When a roadmap client agrees to go public, this is where their story lands.
               Real numbers from the live tracker, week-by-week playbook breakdown, AI
               Share-of-Voice graphs. Want to be next?
             </p>

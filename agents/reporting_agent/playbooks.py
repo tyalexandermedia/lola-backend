@@ -34,7 +34,7 @@ class PlaybookTask(TypedDict):
     status: str
 
 
-STARTER_PLAYBOOK: List[PlaybookTask] = [
+FOUNDATION_PLAYBOOK: List[PlaybookTask] = [
     {"title": "Full Lola audit + priority fix list", "category": "fix", "status": "next_up"},
     {"title": "Google Business Profile optimization (categories, services, hours, photos)", "category": "gbp", "status": "next_up"},
     {"title": "Citation + directory cleanup (NAP consistency)", "category": "citation", "status": "next_up"},
@@ -44,7 +44,7 @@ STARTER_PLAYBOOK: List[PlaybookTask] = [
     {"title": "First monthly progress report scheduled", "category": "other", "status": "next_up"},
 ]
 
-GROWTH_PLAYBOOK: List[PlaybookTask] = STARTER_PLAYBOOK + [
+GROWTH_PLAYBOOK: List[PlaybookTask] = FOUNDATION_PLAYBOOK + [
     {"title": "Monthly content piece — service-area focus", "category": "content", "status": "next_up"},
     {"title": "Link building — local + industry citations", "category": "citation", "status": "next_up"},
     {"title": "Weekly GMB posts (4 / month)", "category": "gbp", "status": "next_up"},
@@ -53,17 +53,22 @@ GROWTH_PLAYBOOK: List[PlaybookTask] = STARTER_PLAYBOOK + [
     {"title": "Bi-weekly performance report", "category": "other", "status": "next_up"},
 ]
 
-PRO_PLAYBOOK: List[PlaybookTask] = GROWTH_PLAYBOOK + [
+SCALE_PLAYBOOK: List[PlaybookTask] = GROWTH_PLAYBOOK + [
     {"title": "Live AI citation tracking (ChatGPT, Perplexity, Gemini, Google AI)", "category": "other", "status": "next_up"},
     {"title": "Multi-location / service-area expansion pages", "category": "content", "status": "next_up"},
     {"title": "Monthly 1-on-1 strategy call with Coach Ty", "category": "other", "status": "next_up"},
     {"title": "Competitor + lead-list CSV export delivered", "category": "other", "status": "next_up"},
 ]
 
+# Roadmap stages (source of truth: docs/PRICING.md). Legacy tier names
+# (starter/pro) kept as aliases so older client records still seed correctly.
 PLAYBOOKS: dict[str, List[PlaybookTask]] = {
-    "starter": STARTER_PLAYBOOK,
+    "foundation": FOUNDATION_PLAYBOOK,
     "growth": GROWTH_PLAYBOOK,
-    "pro": PRO_PLAYBOOK,
+    "scale": SCALE_PLAYBOOK,
+    # Back-compat aliases
+    "starter": FOUNDATION_PLAYBOOK,
+    "pro": SCALE_PLAYBOOK,
 }
 
 

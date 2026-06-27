@@ -18,52 +18,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
-import LockChecker from './LockChecker';
-import { API_URL } from './api';
-
-/**
- * Recent-locks social-proof strip. Fetches anonymized active locks from
- * GET /locks/recent and renders a "claimed markets" row. Self-hides when
- * there are no locks yet (new business) so it never shows an empty/sad
- * state. Real data only — no fabricated scarcity.
- */
-function RecentLocksStrip() {
-  const [locks, setLocks] = useState<Array<{ niche: string; city: string }>>([]);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`${API_URL}/locks/recent?limit=6`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled && Array.isArray(d?.locks)) setLocks(d.locks); })
-      .catch(() => { /* silent — strip just stays hidden */ });
-    return () => { cancelled = true; };
-  }, []);
-
-  if (locks.length === 0) return null;
-
-  return (
-    <div className="mt-8 rounded-[12px] border border-[#D4AF37]/15 bg-white/[0.02] px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">
-        🔒 Recently locked markets
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {locks.map((l, i) => (
-          <span
-            key={`${l.niche}-${l.city}-${i}`}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-[#0F0F12] px-3 py-1 text-[11px] text-[#C5C5C8]"
-          >
-            <span className="capitalize text-white">{l.niche}</span>
-            <span aria-hidden className="text-[#5A5F68]">·</span>
-            {l.city}
-            <span aria-hidden className="text-[#F59E0B]">🔒</span>
-          </span>
-        ))}
-      </div>
-      <p className="mt-2 text-[11px] text-[#7A7F8A]">
-        One business per niche per city. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">Check if yours is open →</a>
-      </p>
-    </div>
-  );
-}
+import { ROADMAP } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
 // every primary CTA points here. Env-overridable so the calendar link can be
@@ -175,6 +130,12 @@ export default function Homepage() {
     }
   };
 
+  // Roadmap stages, pulled from the canonical pricing source so homepage copy
+  // never drifts from docs/PRICING.md.
+  const foundation = ROADMAP.find((s) => s.id === 'foundation')!;
+  const growth = ROADMAP.find((s) => s.id === 'growth')!;
+  const scale = ROADMAP.find((s) => s.id === 'scale')!;
+
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
   // Grader is the new lead-magnet (60-second single-page form). The trade
@@ -263,7 +224,7 @@ export default function Homepage() {
             const q = new URLSearchParams();
             if (biz) q.set('biz', biz);
             if (trade) q.set('trade', trade);
-            window.location.assign(`/grader${q.toString() ? '?' + q.toString() : ''}`);
+            window.location.assign(`/growth-score${q.toString() ? '?' + q.toString() : ''}`);
           }}
         >
           <label htmlFor="biz" className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
@@ -283,11 +244,11 @@ export default function Homepage() {
               type="submit"
               className="h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:text-[14px]"
             >
-              Get my AI Score →
+              Get my Growth Score →
             </button>
           </div>
           <p className="mt-3 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-            60 seconds · no signup · 5-category Visibility Score across Google + AI search
+            60 seconds · no signup · your 0–100 Growth Score across 6 dimensions + your next step
           </p>
         </form>
 
@@ -304,18 +265,27 @@ export default function Homepage() {
           </a>
         </div>
 
+        {/* Free-website hook — lead with the biggest bonus (Hormozi: value up front) */}
+        <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-1.5 text-[12px] font-semibold text-[#E8E4D8] sm:text-[13px]">
+          🎁 Includes a <span className="font-bold text-white">free $3,000 website</span> — built + hosted, $0 setup
+        </p>
+
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
         <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          <span><span className="font-semibold text-white">From $297/mo</span> · 3 plans, all done-for-you</span>
+          <span><span className="font-semibold text-white">Foundation from {foundation.price} {foundation.period}</span> · a phased growth roadmap, all done-for-you</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>🛡️ 30-day half-back guarantee</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>Cancel anytime</span>
+          <span>No contract · cancel anytime</span>
         </p>
 
-        <RecentLocksStrip />
+        {/* Foundation-first positioning — the core narrative wedge. */}
+        <p className="mt-6 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
+          <span className="font-semibold text-white">Most businesses don&apos;t have a marketing problem first — they have a foundation problem.</span>{' '}
+          Lola starts there. Month 1 builds the base, days 31–90 build the signals, and after 90 days the data compounds.
+        </p>
       </section>
 
       {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
@@ -347,7 +317,7 @@ export default function Homepage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] leading-[1.5] text-[#7A7F8A] sm:text-[12px]">
-          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four for every Lock client.
+          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four across your growth roadmap, as integrations are connected.
         </p>
       </section>
 
@@ -392,7 +362,7 @@ export default function Homepage() {
       <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
         Premium agencies charge $2,500/mo to fix it.{' '}
-        <span className="font-bold text-[#D4AF37]">Lola does the work for $697/mo</span> — with a
+        <span className="font-bold text-[#D4AF37]">Lola builds the foundation for {foundation.price}, then runs your growth roadmap from {growth.price}{growth.period}</span> — with a
         guarantee.{' '}
         <span className="font-bold text-white">Real work or you walk.</span>
       </p>
@@ -409,11 +379,58 @@ export default function Homepage() {
           ))}
         </div>
         <p className="text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          <span className="font-semibold text-white">You get a live dashboard</span> — every call,
-          lead, and click we drive, tracked and counted. Not vanity rankings: the calls that pay
-          your bills. <span className="text-[#D4AF37]">ROI you can see, not take on faith.</span>
+          <span className="font-semibold text-white">You get a live Growth Score dashboard</span> — calls,
+          leads, and clicks tracked where access exists and as integrations are connected. Not vanity rankings:
+          the signals that pay your bills, and exactly where you are on the roadmap.{' '}
+          <span className="text-[#D4AF37]">Evidence you can see, not take on faith.</span>
         </p>
       </div>
+
+      {/* ── 3b. VALUE STACK — make $697 an obvious steal (mirrors /pricing) ─ */}
+      <section className="mt-14 sm:mt-20">
+        <h2
+          className="mx-auto max-w-[760px] text-center font-bold leading-[1.15] tracking-[-0.01em] text-white"
+          style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.4rem)' }}
+        >
+          Everything you&apos;d pay an agency{' '}
+          <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$2,000–$5,000/mo</span> for —
+          for <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$697</span>.
+        </h2>
+        <div className="mx-auto mt-7 max-w-[600px] rounded-[18px] border border-[#D4AF37]/25 bg-white/[0.02] p-6 shadow-[0_0_44px_rgba(212,175,55,0.06)] sm:p-7">
+          <ul className="space-y-2.5 text-[14px] sm:text-[15px]">
+            {[
+              ['🌐 Done-for-you AI website', 'FREE ($3,000)'],
+              ['🔎 Local SEO — Google + Map Pack', '$1,500/mo'],
+              ['📍 Google Business + weekly posts', '$400/mo'],
+              ['✍️ Content + link building', '$600/mo'],
+              ['🤖 AI-search visibility + call tracking', '$350/mo'],
+              ['📊 Live dashboard + reporting', '$150/mo'],
+            ].map(([label, val]) => (
+              <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2.5">
+                <span className="text-[#E8E4D8]">{label}</span>
+                <span className="whitespace-nowrap text-[13px] font-semibold text-[#9CA3AF]">{val}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4 text-center">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Over $3,000/mo of marketing + a free website</p>
+            <p className="text-[15px] font-bold text-white">You pay <span className="text-[#D4AF37]">$697/mo</span> · $0 setup</p>
+          </div>
+          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a
+              href={CALENDAR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right"
+            >
+              Book a free strategy call →
+            </a>
+            <a href="/pricing" className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:text-[#F4D47C]">
+              See full pricing →
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* ── 4. SCROLLING STATS MARQUEE ──────────────────────────────── */}
       <div className="relative left-1/2 right-1/2 mt-12 -mx-[50vw] w-screen sm:mt-16">
@@ -500,12 +517,6 @@ export default function Homepage() {
           </a>
         </p>
 
-        {/* Live Lock checker — leverages the structural backend (local_locks
-            table) to convert real availability into real urgency. Compact
-            variant for in-flow placement; full variant lives on /pricing. */}
-        <div className="mt-8">
-          <LockChecker variant="compact" />
-        </div>
       </section>
 
       {/* ── 6. COACH TY ABOUT ────────────────────────────────────────── */}
@@ -695,7 +706,7 @@ export default function Homepage() {
             },
             {
               q: 'How much does Lola cost?',
-              a: 'Three simple monthly plans, no long-term contracts: Starter $297/mo, Growth $697/mo (most popular), Pro $997/mo. Every plan is done-for-you. No setup fee.',
+              a: "It's a phased growth roadmap, not a one-size package. You start with the Foundation Sprint — $297 one-time — to build a searchable, trackable base. From there, Growth Roadmap is $497/mo (most popular) once the foundation's in place, and Scale System is $697/mo ($997+ in competitive or multi-location markets). No setup fee, no contract, month-to-month on the recurring stages. You're not paying more for no reason — you're paying for maturity as the work expands.",
             },
             {
               q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
@@ -703,7 +714,7 @@ export default function Homepage() {
             },
             {
               q: 'How fast will I see results?',
-              a: "30-Day Half-Back: measurable ranking improvement in your first 30 days, or Coach Ty refunds 50%. First Win Promise: at least one measurable win (ranking, lead, or Google Business improvement) in the first 60 days, or your next month is on us. Full ROI typically hits month 3.",
+              a: "Think in roadmap stages. Month 1 (the Foundation Sprint) builds the base. Days 31–90 build the signals — this is where rankings, impressions, calls, and lead signals start becoming visible. After 90 days the data compounds. Two real guarantees back it: the 30-Day Half-Back — if Lola doesn't move your ranking in your first 30 days, your next month is 50% off — and the First Win Promise — at least one measurable win (a new ranking, a new lead, or a Google Business improvement) in your first 60 days, or your next month is on us.",
             },
             {
               q: "Do you only work with Florida businesses?",
@@ -714,8 +725,8 @@ export default function Homepage() {
               a: "Cancel anytime. No contracts, no minimum commitment. If we're not earning back your investment, you don't owe another dollar.",
             },
             {
-              q: "What's actually included each month?",
-              a: "Google Business Profile management, citation cleanup + new submissions, on-page SEO fixes, schema markup, AI search visibility tracking, review-generation system, monthly content (Growth+), and Coach Ty oversight. The exact playbook depends on tier — see /pricing for the full breakdown.",
+              q: "What's actually included at each stage?",
+              a: "The Foundation Sprint ($297 one-time) creates the base: landing page / website foundation, core SEO setup, Google indexing basics, on-page SEO, local service-area targeting, call CTA + tracking setup, and your first roadmap snapshot + visibility score. Growth Roadmap ($497/mo) adds ongoing SEO, content expansion, Google Business posting (where access exists), call/form/message tracking review, monthly roadmap updates, and review strategy. Scale System ($697/mo, $997+ competitive) layers on multi-service and multi-city strategy, advanced dashboard reporting, attribution, conversion optimization, and the Evidence Engine. See /pricing for the full breakdown.",
             },
             {
               q: 'Who is behind Lola?',
@@ -751,6 +762,23 @@ export default function Homepage() {
           Book a free 15-minute strategy call with Coach Ty. No pressure, no pitch deck —
           just a straight answer on what's leaking and what to fix first.
         </p>
+
+        {/* Offer snapshot — the growth roadmap entry point (mirrors /pricing) */}
+        <div className="mx-auto mt-7 max-w-[560px] rounded-[16px] border border-[#D4AF37]/30 bg-[#0A0A0B]/50 p-5 sm:p-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The LOLA OS growth roadmap</p>
+          <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-[1.55] text-[#E8E4D8]">
+            Start with a <span className="font-semibold text-white">$297 Foundation Sprint</span> — website foundation, local SEO,
+            tracking, a baseline audit &amp; your 90-day roadmap — <span className="font-semibold text-white">done for you</span>.
+          </p>
+          <p className="mt-4 text-[34px] font-black leading-none text-[#D4AF37] sm:text-[40px]">
+            $297<span className="text-[15px] font-bold text-[#9CA3AF]"> one-time, then $497–$997/mo</span>
+          </p>
+          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime on recurring stages · 30-day half-back</p>
+          <a href="/pricing" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]">
+            See your full roadmap →
+          </a>
+        </div>
+
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
             href={CALENDAR_URL}

@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 /**
- * Lola SEO — /apply — Retainer/Pro pre-qualification form.
+ * Lola SEO — /apply — roadmap pre-qualification form.
  *
  * Posts to backend POST /applications. Backend:
  *   - Saves to SQLite (applications table)
@@ -15,7 +15,7 @@ import { API_URL } from './api';
 import { track } from './analytics';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
-type TierInterest = 'retainer' | 'pro' | 'both';
+type TierInterest = 'foundation' | 'growth' | 'scale' | 'both';
 
 const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
@@ -34,12 +34,14 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
   { value: '100k_plus', label: '$100K+' },
 ];
 
-// Values kept stable for the backend/type contract; labels updated to the
-// call-first 3-tier model (Starter $297 / Growth $697 / Pro $997).
+// Roadmap stages (Foundation → Growth → Scale). Values map to the phased
+// growth-roadmap model in docs/PRICING.md; the applicant picks where they want
+// to start and Coach Ty confirms the fit on the roadmap call.
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'retainer', label: 'Growth — $697/mo' },
-  { value: 'pro', label: 'Pro — $997/mo' },
-  { value: 'both', label: 'Tell me which fits better' },
+  { value: 'foundation', label: 'Foundation Sprint — $297 one-time' },
+  { value: 'growth', label: 'Growth Roadmap — $497/mo' },
+  { value: 'scale', label: 'Scale System — $697/mo ($997+ competitive)' },
+  { value: 'both', label: 'Help me pick the right stage' },
 ];
 
 export default function ApplyPage() {
@@ -104,7 +106,7 @@ export default function ApplyPage() {
         const body = await resp.json().catch(() => null);
         throw new Error(body?.detail || 'Submission failed — please try again or email ty@tyalexandermedia.com directly.');
       }
-      track(tier === 'pro' ? 'pro_application_completed' : 'retainer_application_completed', { tier });
+      track(tier === 'scale' ? 'scale_application_completed' : 'roadmap_application_completed', { tier });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something broke.');
@@ -278,7 +280,7 @@ export default function ApplyPage() {
         {/* Tier */}
         <fieldset>
           <legend className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85">
-            Tier you're interested in
+            Where do you want to start?
           </legend>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-3">
             {TIER_OPTIONS.map((t) => (
