@@ -207,6 +207,42 @@
   .sticky.show{transform:translateY(0)}
   @media(max-width:640px){.sticky{display:flex}}
   .sticky .btn{flex:1;padding:13px 8px;font-size:13px;min-height:48px;box-shadow:none}
+
+  /* ===== Mobile UX enhancement layer (phones) ===== */
+  /* premium emphasis on the slider-matched phase card + softer dimension glow */
+  .pcard.on{transform:translateY(-2px) scale(1.015)}
+  .dfill{box-shadow:0 0 8px rgba(212,175,55,.32)}
+  .num,.dval{font-variant-numeric:tabular-nums}
+  @media(max-width:560px){
+    header.hero{padding:30px 0 2px}
+    h1{font-size:clamp(27px,7.8vw,40px);letter-spacing:-.03em}
+    .subhead{font-size:15px;margin-top:13px}
+    .kick{font-size:11px;letter-spacing:.16em;padding:6px 13px}
+    .reassure{font-size:12px;margin-top:13px}
+    /* bring the interactive tool up + make it the visual anchor */
+    .explorer{margin-top:24px;padding:20px 14px}
+    .ex-head h2{font-size:23px}
+    .ex-head .sub{font-size:13.5px}
+    .gauge{width:224px;height:140px}
+    .gauge svg{width:224px;height:140px}
+    .gauge .num{font-size:52px;top:54px}
+    .slidewrap label{font-size:11px}
+    .dimrow{grid-template-columns:88px 1fr 28px;gap:9px}
+    .dimrow .dn{font-size:12px}
+    .readout{font-size:14px}
+    /* roomier, snappier cards */
+    .pcard .in{padding:18px}
+    .pname{font-size:19px}
+    .pprice{font-size:26px}
+    .timeline,.panel,.cta{padding:22px 15px}
+    .panel .sub,.journey .ex-head .sub,.timeline .sub{font-size:13.5px}
+    .guard{padding:16px}
+    h2{letter-spacing:-.015em}
+    /* a hair more breathing room above the sticky bar */
+    body{padding-bottom:max(104px,env(safe-area-inset-bottom))}
+  }
+  /* nicer momentum + no accidental text-zoom on the carousel labels */
+  .car{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 </style>
 </head>
 <body>
