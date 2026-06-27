@@ -348,6 +348,8 @@ class AuditResponse(BaseModel):
     categories: dict
     signals: dict
     recommendations: List[Recommendation]
+    page_seo: Optional[dict] = None
+    agent_readiness: Optional[dict] = None
 
 
 class LeadItem(BaseModel):
@@ -1507,6 +1509,10 @@ async def health():
             ),
             "brevo": bool(BREVO_API_KEY),
             "resend": bool(RESEND_API_KEY),
+            "ai_visibility_anthropic": bool((os.getenv("ANTHROPIC_API_KEY") or "").strip()),
+            "ai_visibility_openai": bool((os.getenv("OPENAI_API_KEY") or "").strip()),
+            "ai_visibility_perplexity": bool((os.getenv("PERPLEXITY_API_KEY") or "").strip()),
+            "ai_visibility_gemini": bool((os.getenv("GEMINI_API_KEY") or "").strip()),
         },
         "api_status": API_STATUS,
         "audit_api_budget": AUDIT_API_BUDGET,

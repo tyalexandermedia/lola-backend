@@ -191,7 +191,7 @@ function SiteFooter({ route }: { route: Route }) {
   if (HIDE.has(route.name)) return null;
 
   return (
-    <footer className="mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
+    <footer className="no-print mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
       <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
           <a href="/" className="inline-flex items-center gap-2">
@@ -286,7 +286,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
   const callHref = `${calendar}${calendar.includes('?') ? '&' : '?'}${utm}`;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
+    <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
       <div className="mx-auto flex max-w-[640px] gap-2">
         <a
           href="/grader"
@@ -309,7 +309,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
+    <header className="no-print sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
         {/* Logo — gold gradient wordmark + paw */}
         <a

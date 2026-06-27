@@ -25,18 +25,24 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip() or None
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip() or None
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
+PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY", "").strip() or None
+PERPLEXITY_MODEL = os.getenv("PERPLEXITY_MODEL", "sonar-pro").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or None
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
 
 
 async def _google_rank(
     client: httpx.AsyncClient,
     query: str,
     target_domain: str,
-) -> tuple[Optional[int], str, str]:
+) -> tuple[Optional[int], str, str, list[str]]:
     """
-    Returns (position, found_url, snippet). Position is None if not in top 10.
+    Returns (position, found_url, snippet, competitors). Position is None if
+    the client is not in the top 10. Competitors are the first 3 non-client
+    organic results for the query.
     """
     if not GOOGLE_CUSTOM_SEARCH_KEY or not GOOGLE_CUSTOM_SEARCH_CX:
-        return None, "", "Custom Search not configured"
+        return None, "", "Custom Search not configured", []
     try:
         resp = await client.get(
             "https://www.googleapis.com/customsearch/v1",
@@ -50,16 +56,27 @@ async def _google_rank(
             timeout=15.0,
         )
         if resp.status_code != 200:
-            return None, "", f"HTTP {resp.status_code}: {resp.text[:120]}"
+            return None, "", f"HTTP {resp.status_code}: {resp.text[:120]}", []
         body = resp.json()
         items = body.get("items", []) or []
+        competitors: list[str] = []
+        position: Optional[int] = None
+        found_url = ""
+        snippet = "not in top 10"
         for i, item in enumerate(items, 1):
             link = (item.get("link") or "").lower()
             if target_domain.lower() in link:
-                return i, item.get("link", ""), (item.get("snippet") or "")[:300]
-        return None, "", "not in top 10"
+                position = i
+                found_url = item.get("link", "")
+                snippet = (item.get("snippet") or "")[:300]
+                continue
+            if len(competitors) < 3:
+                name = (item.get("title") or item.get("displayLink") or item.get("link") or "").strip()
+                if name and name not in competitors:
+                    competitors.append(name[:90])
+        return position, found_url, snippet, competitors
     except Exception as e:
-        return None, "", f"exception: {e}"
+        return None, "", f"exception: {e}", []
 
 
 def _extract_recommended(text: str) -> list[str]:
@@ -96,6 +113,37 @@ def _name_matches(client_name: str, target_domain: str, candidate: str) -> bool:
     return False
 
 
+def _structured_recommendation_prompt(prompt: str) -> str:
+    return (
+        f"{prompt}\n\n"
+        "After your answer, on a new final line, output ONLY a JSON array of the "
+        "specific business/company names you recommended (most relevant first), e.g.\n"
+        'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
+        "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
+    )
+
+
+def _score_recommendation_text(
+    text: str,
+    client_name: str,
+    target_domain: str,
+) -> tuple[bool, list[str]]:
+    recommended = _extract_recommended(text)
+    mentioned_in_list = any(
+        _name_matches(client_name, target_domain, r) for r in recommended
+    )
+    mentioned_in_text = (
+        client_name.lower() in text.lower()
+        or target_domain.lower() in text.lower()
+    )
+    mentioned = mentioned_in_list or mentioned_in_text
+    competitors = [
+        r for r in recommended
+        if not _name_matches(client_name, target_domain, r)
+    ]
+    return mentioned, competitors
+
+
 async def _claude_ai_mode(
     client: httpx.AsyncClient,
     prompt: str,
@@ -115,13 +163,7 @@ async def _claude_ai_mode(
     """
     if not ANTHROPIC_API_KEY:
         return False, "Anthropic key not configured", []
-    structured_prompt = (
-        f"{prompt}\n\n"
-        "After your answer, on a new final line, output ONLY a JSON array of the "
-        "specific business/company names you recommended (most relevant first), e.g.\n"
-        'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
-        "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
-    )
+    structured_prompt = _structured_recommendation_prompt(prompt)
     try:
         resp = await client.post(
             "https://api.anthropic.com/v1/messages",
@@ -145,21 +187,9 @@ async def _claude_ai_mode(
             if block.get("type") == "text":
                 text += block.get("text", "")
 
-        recommended = _extract_recommended(text)
-        # Fallback to substring detection if the model skipped the JSON line.
-        mentioned_in_list = any(
-            _name_matches(client_name, target_domain, r) for r in recommended
+        mentioned, competitors = _score_recommendation_text(
+            text, client_name, target_domain
         )
-        mentioned_in_text = (
-            client_name.lower() in text.lower()
-            or target_domain.lower() in text.lower()
-        )
-        mentioned = mentioned_in_list or mentioned_in_text
-
-        competitors = [
-            r for r in recommended
-            if not _name_matches(client_name, target_domain, r)
-        ]
         return mentioned, text[:500], competitors
     except Exception as e:
         return False, f"exception: {e}", []
@@ -178,13 +208,7 @@ async def _chatgpt_ai_mode(
     """
     if not OPENAI_API_KEY:
         return False, "OpenAI key not configured", []
-    structured_prompt = (
-        f"{prompt}\n\n"
-        "After your answer, on a new final line, output ONLY a JSON array of the "
-        "specific business/company names you recommended (most relevant first), e.g.\n"
-        'RECOMMENDED_JSON: ["Acme Co", "Best Pros LLC", "Smith Services"]\n'
-        "If you can't name specific local businesses, output RECOMMENDED_JSON: []"
-    )
+    structured_prompt = _structured_recommendation_prompt(prompt)
     try:
         resp = await client.post(
             "https://api.openai.com/v1/chat/completions",
@@ -206,19 +230,99 @@ async def _chatgpt_ai_mode(
             data.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
         )
 
-        recommended = _extract_recommended(text)
-        mentioned_in_list = any(
-            _name_matches(client_name, target_domain, r) for r in recommended
+        mentioned, competitors = _score_recommendation_text(
+            text, client_name, target_domain
         )
-        mentioned_in_text = (
-            client_name.lower() in text.lower()
-            or target_domain.lower() in text.lower()
+        return mentioned, text[:500], competitors
+    except Exception as e:
+        return False, f"exception: {e}", []
+
+
+async def _perplexity_ai_mode(
+    client: httpx.AsyncClient,
+    prompt: str,
+    client_name: str,
+    target_domain: str,
+) -> tuple[bool, str, list[str]]:
+    """
+    Ask Perplexity Sonar the same recommendation prompt. Optional: only runs
+    when PERPLEXITY_API_KEY is configured.
+    """
+    if not PERPLEXITY_API_KEY:
+        return False, "Perplexity key not configured", []
+    structured_prompt = _structured_recommendation_prompt(prompt)
+    try:
+        resp = await client.post(
+            "https://api.perplexity.ai/v1/sonar",
+            json={
+                "model": PERPLEXITY_MODEL,
+                "max_tokens": 640,
+                "messages": [{"role": "user", "content": structured_prompt}],
+            },
+            headers={
+                "Authorization": f"Bearer {PERPLEXITY_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            timeout=30.0,
         )
-        mentioned = mentioned_in_list or mentioned_in_text
-        competitors = [
-            r for r in recommended
-            if not _name_matches(client_name, target_domain, r)
-        ]
+        if resp.status_code != 200:
+            return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
+        data = resp.json()
+        text = (
+            data.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
+        )
+        mentioned, competitors = _score_recommendation_text(
+            text, client_name, target_domain
+        )
+        return mentioned, text[:500], competitors
+    except Exception as e:
+        return False, f"exception: {e}", []
+
+
+async def _gemini_ai_mode(
+    client: httpx.AsyncClient,
+    prompt: str,
+    client_name: str,
+    target_domain: str,
+) -> tuple[bool, str, list[str]]:
+    """
+    Ask Gemini the same recommendation prompt. Optional: only runs when
+    GEMINI_API_KEY is configured.
+    """
+    if not GEMINI_API_KEY:
+        return False, "Gemini key not configured", []
+    structured_prompt = _structured_recommendation_prompt(prompt)
+    try:
+        resp = await client.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent",
+            params={"key": GEMINI_API_KEY},
+            json={
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [{"text": structured_prompt}],
+                    }
+                ],
+                "generationConfig": {
+                    "maxOutputTokens": 640,
+                    "temperature": 0.2,
+                },
+            },
+            timeout=30.0,
+        )
+        if resp.status_code != 200:
+            return False, f"HTTP {resp.status_code}: {resp.text[:120]}", []
+        data = resp.json()
+        parts = (
+            data.get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [])
+            or []
+        )
+        text = "".join(p.get("text", "") for p in parts if isinstance(p, dict))
+        mentioned, competitors = _score_recommendation_text(
+            text, client_name, target_domain
+        )
         return mentioned, text[:500], competitors
     except Exception as e:
         return False, f"exception: {e}", []
@@ -309,7 +413,7 @@ async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
     async with httpx.AsyncClient() as http:
         # Google organic rank per query
         for q in cs.google_queries:
-            pos, url, snippet = await _google_rank(http, q, cs.target_domain)
+            pos, url, snippet, competitors = await _google_rank(http, q, cs.target_domain)
             await save_ranking(
                 slug=slug,
                 query=q,
@@ -319,61 +423,49 @@ async def run_case_study_snapshot(slug: str, notes: str = "") -> dict:
                 found_url=url,
                 raw_excerpt=snippet,
                 notes=notes,
+                competitors=competitors,
             )
             summary["google"].append({
                 "query": q,
                 "position": pos,
                 "url": url,
                 "snippet": snippet[:120],
+                "competitors": competitors,
             })
 
-        # AI Mode — ask BOTH Claude and ChatGPT the same prompt. Each becomes
+        # AI Mode — ask every configured provider the same prompt. Each becomes
         # its own snapshot row so the dashboard can show per-provider mentions
         # AND aggregate share of voice across all AI search assistants.
         for p in cs.ai_mode_prompts:
-            mentioned_c, excerpt_c, competitors_c = await _claude_ai_mode(
-                http, p, cs.client_name, cs.target_domain
-            )
-            await save_ranking(
-                slug=slug,
-                query=p,
-                source="claude_ai_mode",
-                position=None,
-                mentioned=mentioned_c,
-                found_url="",
-                raw_excerpt=excerpt_c,
-                notes=notes,
-                competitors=competitors_c,
-            )
-            summary["ai_mode"].append({
-                "prompt": p[:80],
-                "provider": "claude",
-                "mentioned": mentioned_c,
-                "competitors": competitors_c,
-                "excerpt": excerpt_c[:200],
-            })
-
-            if OPENAI_API_KEY:
-                mentioned_g, excerpt_g, competitors_g = await _chatgpt_ai_mode(
+            providers = [
+                ("claude", "claude_ai_mode", _claude_ai_mode, bool(ANTHROPIC_API_KEY)),
+                ("chatgpt", "chatgpt_ai_mode", _chatgpt_ai_mode, bool(OPENAI_API_KEY)),
+                ("perplexity", "perplexity_ai_mode", _perplexity_ai_mode, bool(PERPLEXITY_API_KEY)),
+                ("gemini", "gemini_ai_mode", _gemini_ai_mode, bool(GEMINI_API_KEY)),
+            ]
+            for provider, source, fn, enabled in providers:
+                if not enabled:
+                    continue
+                mentioned, excerpt, competitors = await fn(
                     http, p, cs.client_name, cs.target_domain
                 )
                 await save_ranking(
                     slug=slug,
                     query=p,
-                    source="chatgpt_ai_mode",
+                    source=source,
                     position=None,
-                    mentioned=mentioned_g,
+                    mentioned=mentioned,
                     found_url="",
-                    raw_excerpt=excerpt_g,
+                    raw_excerpt=excerpt,
                     notes=notes,
-                    competitors=competitors_g,
+                    competitors=competitors,
                 )
                 summary["ai_mode"].append({
                     "prompt": p[:80],
-                    "provider": "chatgpt",
-                    "mentioned": mentioned_g,
-                    "competitors": competitors_g,
-                    "excerpt": excerpt_g[:200],
+                    "provider": provider,
+                    "mentioned": mentioned,
+                    "competitors": competitors,
+                    "excerpt": excerpt[:200],
                 })
 
     return summary

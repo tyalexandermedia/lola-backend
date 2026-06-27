@@ -8,6 +8,9 @@
 - Industry: Pressure washing / exterior cleaning / power washing
 - Market: Tampa Bay, Florida
 - Primary service area: Tampa Bay
+- SEO system version: 2026 local discovery stack
+- Launch checklist: `OPERATIONS/tampa-bay-power-clean-2026-launch-checklist.md`
+- Reporting onboarding payload: `CLIENTS/tampa-bay-power-clean/reporting-client.payload.json`
 
 Services configured for tracking and landing-page copy:
 
@@ -24,10 +27,20 @@ Services configured for tracking and landing-page copy:
 - Paver Cleaning
 - Concrete Cleaning
 
+2026 discovery targets:
+
+- Google organic and Google Maps / GBP.
+- AI assistants: Claude, ChatGPT, Perplexity, Gemini, and AI Overview-style
+  recommendation surfaces.
+- Bing search and Bing Places.
+- Apple Maps / Siri-style local discovery.
+- Future local surfaces that rely on consistent NAP, service categories,
+  structured data, project proof, and review velocity.
+
 ## Routes Created
 
 - Public client dashboard: `/r/client/tampa-bay-power-clean`
-- Temporary public landing page: `https://www.sandbarsoftwash.com/tampa-bay-power-clean`
+- Public landing page: `/lp/tampa-bay-power-clean`
 - Preserved client landing page: `/lp/tampa-bay-power-clean`
 - Revenue admin UI: `/admin/revenue/tampa-bay-power-clean`
 - Revenue agent run endpoint: `POST /admin/revenue/tampa-bay-power-clean/run`
@@ -35,10 +48,23 @@ Services configured for tracking and landing-page copy:
 - Admin calls endpoint: `/admin/calls/tampa-bay-power-clean`
 - Admin tracking endpoint: `/admin/tracking/tampa-bay-power-clean`
 
+## Current Status
+
+- Built and ready for static deploy without API keys.
+- Client config is separate from Sandbar.
+- Dashboard route uses the shared slug-based client system.
+- Landing page includes local SEO copy, service schema, FAQ schema, service-area
+  copy, proof slots, and a 2026 discovery-stack section.
+- No fake GBP, review, ranking, call, or revenue metrics are published.
+- First live rankings, competitor watchlist, AI visibility, Bing performance,
+  and GBP cards require keys/account access and a fresh snapshot run.
+
 ## Config Files Added or Updated
 
 - `CLIENTS/tampa-bay-power-clean/client.json`
   - Canonical non-secret client metadata, services, and tracking prompts.
+- `CLIENTS/tampa-bay-power-clean/reporting-client.payload.json`
+  - Reusable admin payload for creating the production reporting row.
 - `CLIENTS/tampa-bay-power-clean/README.md`
   - Client-specific scaffold documentation.
 - `client_configs.py`
@@ -110,24 +136,20 @@ Primary service areas:
 - Tarpon Springs
 - Tampa Bay
 
-Call and quote CTAs temporarily use Sandbar/LOLA intake:
+Call and quote CTAs temporarily use shared LOLA intake:
 
 - Temporary shared CallRail/intake phone: `727-712-6281`
 - Tel link format: `tel:+17277126281`
-- Intake destination: `https://www.sandbarsoftwash.com/#contact`
 - Campaign source: `lola`
 - Campaign name: `tampa_bay_power_clean`
-- Temporary public URL: `https://www.sandbarsoftwash.com/tampa-bay-power-clean`
-- Preserved URL: `https://www.sandbarsoftwash.com/lp/tampa-bay-power-clean`
+- Public URL: `https://lola.tyalexandermedia.com/lp/tampa-bay-power-clean`
+- Short URL: `https://lola.tyalexandermedia.com/tampa-bay-power-clean`
 
-The public page discloses this as active LOLA intake routing so Tampa Bay Power
-Clean remains presented as its own brand. Internally, that routing uses
-Sandbar's existing CallRail/intake number and the existing Sandbar/LOLA form
-until a dedicated Tampa Bay Power Clean CallRail number and tracked form
-endpoint are ready. The phone source is the Sandbar public schema/NAP entry in
-`docs/case-studies/sandbar-roof-cleaning-optimization.md`, which lists
-`+1-727-712-6281`. The landing page does not publish or fabricate a Tampa Bay
-Power Clean-owned phone number.
+The public page presents Tampa Bay Power Clean as its own brand. Until a
+dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint are
+ready, quote CTAs are phone-first and should be treated as temporary shared
+LOLA intake routing. The landing page does not publish fake rankings, fake
+reviews, or fabricated performance data.
 
 ## Pending Infrastructure
 
@@ -157,62 +179,14 @@ To make the dashboard live in production, configure or collect:
   has been identified, but admin access is still pending. GBP is not required for
   the current landing-page test and no GBP data is fabricated.
 - Dedicated Tampa Bay Power Clean CallRail number and tracked form endpoint.
-  The current page temporarily uses Sandbar's existing CallRail/intake number
-  and sends quote requests through the established Sandbar/LOLA intake form.
+  The current page is phone-first until a dedicated form path exists.
 - Verified testimonials/reviews and before/after photos for the landing page.
 - Brevo/weekly reporting recipient email and template, if weekly reports should send.
 
 Suggested onboarding payload:
 
 ```json
-{
-  "slug": "tampa-bay-power-clean",
-  "client_name": "Tampa Bay Power Clean",
-  "client_email": "replace-with-client-email@example.com",
-  "site_url": "https://www.tampabaypowerclean.com",
-  "target_url": "https://www.tampabaypowerclean.com",
-  "tier": "growth",
-  "service": "pressure washing",
-  "city": "Tampa Bay, FL",
-  "money_keywords": [
-    "paver sealing dunedin",
-    "paver sealing tampa bay",
-    "paver cleaning and sealing dunedin",
-    "commercial pressure washing dunedin",
-    "commercial pressure washing tampa bay",
-    "commercial roof cleaning dunedin",
-    "commercial roof cleaning tampa bay",
-    "residential roof cleaning dunedin",
-    "residential roof cleaning tampa bay",
-    "roof cleaning dunedin",
-    "roof cleaning tampa bay",
-    "house washing dunedin",
-    "house washing tampa bay",
-    "soft washing dunedin",
-    "driveway cleaning dunedin",
-    "concrete cleaning dunedin",
-    "paver sealing clearwater",
-    "commercial pressure washing clearwater",
-    "roof cleaning clearwater",
-    "house washing clearwater",
-    "roof cleaning palm harbor",
-    "pressure washing safety harbor",
-    "pressure washing tarpon springs"
-  ],
-  "ai_mode_prompts": [
-    "Who should I call for paver sealing in Dunedin, Florida?",
-    "Recommend a paver sealing company in Tampa Bay.",
-    "Best commercial pressure washing company in Dunedin, FL?",
-    "Who offers commercial pressure washing across Tampa Bay?",
-    "Recommend a residential roof cleaning company in Dunedin.",
-    "Who handles commercial roof cleaning in Tampa Bay?",
-    "Best house washing company in Dunedin or Clearwater?",
-    "Who should I call for roof cleaning and house washing in Tampa Bay?",
-    "Who offers soft washing and driveway cleaning in Dunedin?",
-    "Recommend an exterior cleaning company serving Palm Harbor, Safety Harbor, and Tarpon Springs."
-  ],
-  "seed_tasks": true
-}
+See `CLIENTS/tampa-bay-power-clean/reporting-client.payload.json`.
 ```
 
 ## Local Verification

@@ -33,6 +33,12 @@ export interface Recommendation {
   category: string;
 }
 
+export interface SchemaSuggestion {
+  type: string;
+  label: string;
+  html_block: string;
+}
+
 export interface ApiHealthEntry {
   last_ok_at: string | null;
   last_error: string | null;
@@ -89,6 +95,10 @@ export interface AuditResult {
   categories: Record<string, { score: number }>;
   signals: Record<string, SignalStatus>;
   recommendations: Recommendation[];
+  page_seo?: {
+    suggested_schemas?: SchemaSuggestion[];
+    [key: string]: unknown;
+  };
   agent_readiness?: AgentReadiness;
 }
 

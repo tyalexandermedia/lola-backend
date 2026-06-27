@@ -119,6 +119,29 @@ def build_config(args: argparse.Namespace) -> dict:
     }
 
 
+def build_reporting_payload(args: argparse.Namespace) -> dict:
+    services = split_csv(args.services)
+    areas = split_csv(args.service_areas)
+    google_queries = build_google_queries(
+        services, areas, split_csv(args.google_queries)
+    )
+    ai_prompts = build_ai_prompts(
+        args.name, services, areas, split_csv(args.ai_prompts)
+    )
+    return {
+        "slug": args.slug,
+        "client_name": args.name,
+        "client_email": "replace-with-client-email@example.com",
+        "site_url": args.website,
+        "target_url": args.website,
+        "money_keywords": google_queries,
+        "conversion_rate": 0.03,
+        "avg_job_value": 400,
+        "active": True,
+        "ai_mode_prompts": ai_prompts,
+    }
+
+
 def client_readme(args: argparse.Namespace) -> str:
     return f"""# {args.name}
 
@@ -297,6 +320,7 @@ def client_doc(args: argparse.Namespace) -> str:
 ## Generated Assets
 
 - Client config: `CLIENTS/{args.slug}/client.json`
+- Reporting payload: `CLIENTS/{args.slug}/reporting-client.payload.json`
 - Client README: `CLIENTS/{args.slug}/README.md`
 - Landing page: `frontend/public/lp/{args.slug}.html`
 - Landing route: `/{args.slug}`
@@ -326,18 +350,22 @@ AI visibility prompts:
 
 ## Reporting Setup
 
-Create or verify a reporting client row before sending weekly reports:
+Create or verify a reporting client row before sending weekly reports. Start
+from `CLIENTS/{args.slug}/reporting-client.payload.json` and replace the
+placeholder email before production:
 
 ```json
 {{
   "slug": "{args.slug}",
   "client_name": "{args.name}",
+  "client_email": "replace-with-client-email@example.com",
   "site_url": "{args.website}",
   "target_url": "{args.website}",
-  "tier": "growth",
-  "service": "{services[0] if services else args.industry}",
-  "city": "{args.market}",
-  "money_keywords": {json.dumps(google_queries, indent=2)}
+  "money_keywords": {json.dumps(google_queries, indent=2)},
+  "conversion_rate": 0.03,
+  "avg_job_value": 400,
+  "active": true,
+  "ai_mode_prompts": {json.dumps(ai_prompts, indent=2)}
 }}
 ```
 
@@ -473,8 +501,13 @@ def main() -> int:
         raise FileExistsError(f"Client folder already exists: {client_dir}")
 
     config = build_config(args)
+    reporting_payload = build_reporting_payload(args)
     write_new(client_dir / "README.md", client_readme(args))
     write_new(client_dir / "client.json", json.dumps(config, indent=2) + "\n")
+    write_new(
+        client_dir / "reporting-client.payload.json",
+        json.dumps(reporting_payload, indent=2) + "\n",
+    )
     write_new(lp_dir / f"{args.slug}.html", landing_page(args))
     write_new(docs_dir / f"{args.slug}.md", client_doc(args))
     rewrites_changed = (
@@ -484,6 +517,7 @@ def main() -> int:
     print(f"Created client onboarding scaffold for {args.name}: {args.slug}")
     print(f"- CLIENTS/{args.slug}/README.md")
     print(f"- CLIENTS/{args.slug}/client.json")
+    print(f"- CLIENTS/{args.slug}/reporting-client.payload.json")
     print(f"- frontend/public/lp/{args.slug}.html")
     print(f"- docs/clients/{args.slug}.md")
     if args.skip_vercel:

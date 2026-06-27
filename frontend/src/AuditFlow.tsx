@@ -1413,7 +1413,7 @@ function generateGbpPost(audit: AuditResult): string {
   );
 }
 
-function generateSchema(audit: AuditResult): string {
+function generateSchemaFallback(audit: AuditResult): string {
   // Pull verified business_info fields when available — they're populated by
   // the backend's Google Places lookup during the audit. Only emit keys with
   // non-empty values to avoid Rich Results warnings for empty required-ish
@@ -1443,6 +1443,13 @@ function generateSchema(audit: AuditResult): string {
   if (image) blob.image = image;
 
   return `<script type="application/ld+json">\n${JSON.stringify(blob, null, 2)}\n</script>`;
+}
+
+function getSuggestedSchema(audit: AuditResult): string {
+  const suggestions = audit.page_seo?.suggested_schemas || [];
+  const localBusiness = suggestions.find((schema) => schema.type === 'LocalBusiness');
+  const firstUsable = localBusiness || suggestions[0];
+  return firstUsable?.html_block || generateSchemaFallback(audit);
 }
 
 function CopyCard({
@@ -1496,7 +1503,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
   const titleTag = useMemo(() => generateTitleTag(audit), [audit]);
   const gbpDescription = useMemo(() => generateGbpDescription(audit), [audit]);
   const gbpPost = useMemo(() => generateGbpPost(audit), [audit]);
-  const schema = useMemo(() => generateSchema(audit), [audit]);
+  const schema = useMemo(() => getSuggestedSchema(audit), [audit]);
 
   // Score-aware messaging for "Lola's Take" closing
   let assessment: string;
