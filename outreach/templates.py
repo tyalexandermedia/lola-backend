@@ -95,9 +95,9 @@ Founder, Lola SEO · Tampa Bay, FL
 
 Quick honest question — are you paying one of the big agencies $2,500-$3,500/mo on a 12-month contract for SEO?
 
-If yes, they're doing about $697/mo worth of actual work. The rest is overhead and account management.
+If yes, a lot of that bill is overhead and account management, not execution.
 
-Lola does the same caliber of execution for $697/mo flat, no long-term contract, with a written First Win Promise: measurable result in 60 days or your next month is on us.
+Lola does the work for you on a phased roadmap — $297 to start the Foundation Sprint, then $497/mo Growth — done-for-you, no contract, with a written First Win Promise: measurable result in 60 days or your next month is on us.
 
 Free Agent-Ready Audit for {{business_name}}:
 
@@ -118,7 +118,7 @@ Founder, Lola SEO · Tampa Bay, FL
 
 If you're paying $99-$399/mo for an SEO tool (Semrush, Ahrefs, Search Atlas), you're also spending 10+ hours/week learning the platform and executing the fixes yourself.
 
-Lola does it FOR you at $697/mo. Same data — none of the manual work. Done-for-you, not DIY. Or grab the $47 DIY playbook if you'd rather learn the system yourself.
+Lola does it FOR you on a phased roadmap — done-for-you from $297 to start, $497/mo Growth. Same data — none of the manual work, no contract.
 
 Free Agent-Ready Audit for {{business_name}}:
 

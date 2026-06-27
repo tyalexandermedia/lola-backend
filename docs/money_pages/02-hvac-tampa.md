@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-hvac-contractors-tampa`
 - **Title tag**: `Local SEO for HVAC Contractors in Tampa | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Tampa HVAC contractors. Free audit. AI search visibility tracked. From $697/mo. Real work, real rankings, real revenue.`
+- **Meta description**: `Done-for-you local SEO for Tampa HVAC contractors. Free audit. AI search visibility tracked. From $297. Real work, real rankings, real revenue.`
 - **OG / Twitter / Canonical URL**: `https://tyalexandermedia.com/local-seo-hvac-contractors-tampa`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Tampa Bay, FL"
   },
   "areaServed": {"@type": "City", "name": "Tampa"},
-  "offers": {"@type": "AggregateOffer", "lowPrice": "47", "highPrice": "6970", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,7 +33,7 @@
 **Tampa HVAC Contractors: Get Booked Solid From Google + AI Search.**
 
 ### Subhead
-Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business ranking where buyers search — Google AND ChatGPT — so the next AC emergency call comes to you. Done for you. From $697/mo.
+Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business ranking where buyers search — Google AND ChatGPT — so the next AC emergency call comes to you. Done for you. From $297.
 
 ### Primary CTA
 **[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa&trade=HVAC)**
@@ -49,10 +49,10 @@ Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business r
 - Audits that mention "schema" 12 times but don't fix it
 
 **THIS:**
-- $697/mo, cancel anytime, no setup fee
+- Foundation Sprint from $297, no contract, cancel anytime, no setup fee
 - Built by a Tampa native who knows your service area
-- AI agents executing weekly: GMB posts, citations, content, links
-- 30-day First Win Promise, in writing
+- Coach Ty + team executing weekly: GMB posts, citations, content, links
+- First Win Promise (60 days) + 30-Day Half-Back Guarantee, in writing
 
 ---
 
@@ -70,26 +70,29 @@ Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business r
 
 ### Case study
 
-A Tampa-area soft wash company at score 76 hit 5 ranked keywords in 3 weeks on the same Retainer system. HVAC case studies coming as our first HVAC clients ramp — yours could be next.
+A Tampa-area soft wash company at score 76 hit 5 ranked keywords in 3 weeks on the same roadmap system (attributed case study — results vary). HVAC case studies coming as our first HVAC clients ramp — yours could be next.
 
 ---
 
 ### Pricing
 
+Start free: get your free Growth Score and free audit, then choose your phase.
+
 | Tier | Price |
 |---|---|
-| DIY Playbook | $47 one-time |
-| Local SEO Sprint | $397 one-time |
-| **Local SEO Retainer** | **$697/mo** |
-| Local SEO Pro | $6,970/yr |
+| Foundation Sprint | $297 one-time |
+| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
+| Scale System | $697/mo ($997+ competitive) |
 
-**[See full pricing →](https://lola.tyalexandermedia.com/pricing?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa)**
+No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+
+**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa)**
 
 ---
 
 ### Coach Ty trust block
 
-Coach Ty runs Ty Alexander Media in Tampa. Built Lola to fix the broken model for service contractors — six AI agents do the execution, Coach Ty handles strategy, you handle the AC calls. You answer your own phone. So does he.
+Coach Ty runs Ty Alexander Media in Tampa. Built Lola to fix the broken model for service contractors — Coach Ty and his team do the execution for you, you handle the AC calls. You answer your own phone. So does he.
 
 ---
 
@@ -105,7 +108,7 @@ Yes — "emergency ac repair Tampa," "ac not cooling Tampa," "hvac repair near m
 We don't outspend them on Google Ads. We out-rank them organically on Map Pack + AI search — where 73% of clicks actually go.
 
 **4. What if I'm a one-truck operation?**
-Perfect fit. Lola scales with you — we won't push you toward $3,000/mo features you don't need.
+Perfect fit. Start with the Foundation Sprint at $297. Lola scales with you — we won't push you toward features you don't need.
 
 **5. How do I track if it's working?**
 Bi-weekly performance reports in plain English (no jargon dashboards). Plus you'll see the calls.
@@ -124,7 +127,7 @@ Bi-weekly performance reports in plain English (no jargon dashboards). Plus you'
 - [Tampa plumbers →](/local-seo-plumbers-tampa)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
 - [Lola free audit →](https://lola.tyalexandermedia.com)
-- [Activate the Retainer →](https://lola.tyalexandermedia.com/retainer)
+- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
 
 ### External link
 

@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-roofers-florida`
 - **Title tag**: `Local SEO for Roofers in Florida | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Florida roofing contractors. Free audit. Storm-season ready. From $697/mo. Real rankings in 30 days or 50% refund.`
+- **Meta description**: `Done-for-you local SEO for Florida roofing contractors. Free audit. Storm-season ready. From $297. 30-Day Half-Back Guarantee + First Win Promise.`
 - **OG / Twitter / Canonical**: `https://tyalexandermedia.com/local-seo-roofers-florida`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Florida"
   },
   "areaServed": "Florida",
-  "offers": {"@type": "AggregateOffer", "lowPrice": "47", "highPrice": "6970", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,7 +33,7 @@
 **Florida Roofers: Own the Map Pack Before the Next Storm Season.**
 
 ### Subhead
-A single ranked keyword in Florida roofing is worth $20K–$80K/year in real jobs. Lola gets your roofing business ranking on Google AND ChatGPT — so when the next hurricane hits, you're the first call. Done for you. From $697/mo.
+A single ranked keyword in Florida roofing is worth $20K–$80K/year in real jobs. Lola gets your roofing business ranking on Google AND ChatGPT — so when the next hurricane hits, you're the first call. Done for you. From $297.
 
 ### Primary CTA
 **[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl&trade=Roofer)**
@@ -50,9 +50,9 @@ A single ranked keyword in Florida roofing is worth $20K–$80K/year in real job
 
 **THIS:**
 - Organic rankings you own forever, not rented leads
-- $697/mo all-in, no setup, no surprises
-- AI agents executing storm-season prep before hurricane season
-- 30-day First Win Promise, in writing
+- Foundation Sprint from $297, no contract, no setup, no surprises
+- Coach Ty + team executing storm-season prep before hurricane season
+- First Win Promise (60 days) + 30-Day Half-Back Guarantee, in writing
 
 ---
 
@@ -70,20 +70,23 @@ A single ranked keyword in Florida roofing is worth $20K–$80K/year in real job
 
 ### Case study
 
-The Lola Retainer system delivered 5 ranked keywords in 3 weeks for Sandbar Soft Wash (Palm Harbor). Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
+The Lola roadmap system delivered 5 ranked keywords in 3 weeks for Sandbar Soft Wash (Palm Harbor) — an attributed case study; results vary. Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
 
 ---
 
 ### Pricing
 
+Start free: get your free Growth Score and free audit, then choose your phase.
+
 | Tier | Price |
 |---|---|
-| DIY Playbook | $47 one-time |
-| Local SEO Sprint | $397 one-time |
-| **Local SEO Retainer** | **$697/mo** |
-| Local SEO Pro | $6,970/yr (save $1,394) |
+| Foundation Sprint | $297 one-time |
+| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
+| Scale System | $697/mo ($997+ competitive) |
 
-**[See full pricing →](https://lola.tyalexandermedia.com/pricing?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl)**
+No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+
+**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl)**
 
 ---
 
@@ -95,8 +98,8 @@ Tampa-based. Built Lola because his dad's soft wash business kept losing jobs to
 
 ### FAQ
 
-**1. What's the ROI on $697/mo for a roofing company?**
-One $8,000 reroof pays for 11 months of Lola. Most clients close 2-4 new jobs/mo from improved rankings within 90 days.
+**1. What's the ROI on the Growth Roadmap for a roofing company?**
+One $8,000 reroof pays for more than a year of Lola. Start with the Foundation Sprint at $297. Most clients close 2-4 new jobs/mo from improved rankings within 90 days.
 
 **2. Will you help us prep for storm season?**
 Yes. We pre-load content + GMB posts in April for June-November hurricane season. Storm chaser defense is built in.
@@ -124,7 +127,7 @@ Same system. We target commercial vertical keywords ("commercial flat roof Tampa
 - [Tampa plumbers →](/local-seo-plumbers-tampa)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
 - [Lola free audit →](https://lola.tyalexandermedia.com)
-- [Activate the Retainer →](https://lola.tyalexandermedia.com/retainer)
+- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
 
 ### External link
 

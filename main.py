@@ -936,23 +936,23 @@ Inside the report:
 
 WHAT NOW? 3 PATHS, YOUR CHOICE:
 
-OPTION 1 — Do It Yourself ($47)
-The DIY Playbook. Every checklist Lola uses, in plain English.
-{STRIPE_DIY_URL}
-
-OPTION 2 — Get Your Roadmap ($397)
-The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. First Win Promise backed.
+OPTION 1 — Start Free, Then Foundation Sprint ($297 one-time)
+Run your free Growth Score, then lock in the Foundation Sprint — your 90-Day Roadmap + 60-min strategy call with Coach Ty. First Win Promise backed. No setup fee, no contract.
 {STRIPE_SPRINT_URL}
 
+OPTION 2 — Growth Roadmap ($497/mo · Most Popular)
+The default step most clients choose. Done-for-you growth on the Foundation → Growth → Scale roadmap — Coach Ty and the team handle execution every week. Cancel anytime.
+{STRIPE_RETAINER_URL}
+
 OPTION 3 — Scale System ($697/mo)
-Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. $997+/mo for competitive or multi-location markets. Cancel anytime.
+Done-for-you growth on overdrive — Coach Ty and the team run your roadmap weekly. $997+/mo for competitive or multi-location markets. Cancel anytime.
 {STRIPE_RETAINER_URL}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🦴 Want Lola's 6 AI agents working YOUR account weekly?
+🦴 Want Lola's team running your Growth Roadmap every week?
 
 → See the Growth Roadmap: {retainer_url}
 → Apply (Coach Ty reviews every application): {apply_url}
@@ -1029,10 +1029,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — Do It Yourself</strong> <span style="color:#C9A84C;">($47)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The DIY Playbook. Every checklist Lola uses, in plain English. For contractors with time, not budget.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — Foundation Sprint</strong> <span style="color:#C9A84C;">($297 one-time)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Start free with your Growth Score, then lock in the Foundation Sprint — your 90-Day Roadmap + 60-min strategy call with Coach Ty. First Win Promise backed. No setup fee, no contract.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_DIY_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the Playbook — $47 →</a>
+<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Start the Foundation Sprint — $297 →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1040,10 +1040,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Get Your Roadmap</strong> <span style="color:#C9A84C;">($397)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The 90-Day Roadmap. Lola + Coach Ty build your custom 90-day action plan in a 60-min strategy call. You execute, we guide. First Win Promise backed.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Growth Roadmap</strong> <span style="color:#C9A84C;">($497/mo · Most Popular)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The default step most clients choose. Done-for-you growth on the Foundation → Growth → Scale roadmap — Coach Ty and the team handle execution every week. Cancel anytime.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get your roadmap — $397 →</a>
+<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the Growth Roadmap — $497/mo →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1052,7 +1052,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
 <p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Scale System</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Done-for-you growth — six specialist AI agents + Coach Ty working your account weekly. We fix what's broken — you focus on running the business. $997+/mo for competitive or multi-location markets. Cancel anytime.</p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Done-for-you growth on overdrive — Coach Ty and the team run your roadmap weekly. We fix what's broken — you focus on running the business. $997+/mo for competitive or multi-location markets. Cancel anytime.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
 <a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Scale with LOLA OS — $697/mo →</a>
 </td></tr></table>
@@ -1069,7 +1069,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
 
 <tr><td style="padding:24px 28px;">
-<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's 6 AI agents working YOUR account weekly?</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's team running your Growth Roadmap every week?</p>
 <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
 <a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Growth Roadmap →</a>
 </td></tr></table>
