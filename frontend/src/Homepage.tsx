@@ -149,7 +149,11 @@ export default function Homepage() {
       <section className="animate-slide-up relative pt-2 sm:pt-6">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.10)_0%,transparent_60%)] blur-2xl"
+          className="animate-aurora pointer-events-none absolute left-1/2 top-[-10%] -z-10 h-[640px] w-[min(1040px,124vw)] -translate-x-1/2 blur-[64px]"
+          style={{
+            background:
+              'radial-gradient(38% 50% at 22% 12%, rgba(111,155,255,0.13), transparent 70%), radial-gradient(46% 56% at 82% 6%, rgba(212,175,55,0.20), transparent 70%), radial-gradient(42% 46% at 56% 36%, rgba(165,96,231,0.10), transparent 70%)',
+          }}
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
@@ -253,23 +257,17 @@ export default function Homepage() {
           </p>
         </form>
 
-        {/* Secondary CTA — the call. Still higher-LTV conversion, but no
-            longer the front door (Grader took that). */}
-        <div className="mt-5">
+        {/* Secondary links — strategy call + Growth Roadmap, grouped on one
+            wrapping row so the mobile hero stays tight (less vertical stacking). */}
+        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
           <a
             href={CALENDAR_URL}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
           >
-            Or book a free 15-min strategy call →
+            Or book a free 15-min call →
           </a>
-        </div>
-
-        {/* Education-first wedge — the Growth Roadmap (/roadmap) lead-gen page.
-            Complements the Foundation-first narrative below by letting the
-            visitor SEE the phased journey. */}
-        <div className="mt-3">
           <a
             href="/roadmap"
             className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
