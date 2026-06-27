@@ -304,6 +304,18 @@ export default function Homepage() {
           </a>
         </div>
 
+        {/* Education-first wedge — the 4-stage Growth Roadmap. Shows the
+            visitor where they are, where they're going, and what they pay
+            for each month. Doubles as a lead-gen landing page (/roadmap). */}
+        <div className="mt-3">
+          <a
+            href="/roadmap"
+            className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
+          >
+            See the 4-stage Growth Roadmap →
+          </a>
+        </div>
+
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
