@@ -189,25 +189,6 @@ export default function PricingPage() {
         <p className="mx-auto mt-3 max-w-[680px] text-[13px] italic leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
           Month 1 creates the base. Days 31–90 build signals. After 90 days, the data compounds.
         </p>
-
-        {/* Above-the-fold price + CTA + honest Lock scarcity — first thing they see */}
-        <div className="mx-auto mt-7 flex max-w-[520px] flex-col items-center gap-3">
-          <p className="text-[15px] text-[#C5C5C8]">
-            Everything done-for-you — <span className="text-[22px] font-black text-[#D4AF37]">$697</span><span className="text-[13px] font-bold text-[#9CA3AF]">/mo</span>. No setup fee. Cancel anytime.
-          </p>
-          <a
-            href={growthHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => track('growth_cta_clicked', { from: 'hero' })}
-            className="flex h-14 w-full max-w-[420px] items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left text-[15px] font-black uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_24px_rgba(212,175,55,0.4)] transition-all hover:bg-right active:scale-[0.99] sm:h-16 sm:text-[16px]"
-          >
-            🔒 Lock my market — book a free call →
-          </a>
-          <p className="text-[12px] text-[#9CA3AF]">
-            One business per niche per city — when yours is locked, your competitor can&apos;t hire us.
-          </p>
-        </div>
       </section>
 
       {/* ── 1b. ROADMAP STEPPER ───────────────────────────────────────── */}

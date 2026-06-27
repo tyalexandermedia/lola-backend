@@ -763,19 +763,19 @@ export default function Homepage() {
           just a straight answer on what's leaking and what to fix first.
         </p>
 
-        {/* Offer snapshot — the Lola Leads package, one price (mirrors /pricing) */}
+        {/* Offer snapshot — the growth roadmap entry point (mirrors /pricing) */}
         <div className="mx-auto mt-7 max-w-[560px] rounded-[16px] border border-[#D4AF37]/30 bg-[#0A0A0B]/50 p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The Lola Leads package</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The LOLA OS growth roadmap</p>
           <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-[1.55] text-[#E8E4D8]">
-            A <span className="font-semibold text-white">free $3,000 website</span> + local SEO, Google Business,
-            AI-search visibility, call tracking &amp; a live dashboard — <span className="font-semibold text-white">everything, done for you</span>.
+            Start with a <span className="font-semibold text-white">$297 Foundation Sprint</span> — website foundation, local SEO,
+            tracking, a baseline audit &amp; your 90-day roadmap — <span className="font-semibold text-white">done for you</span>.
           </p>
           <p className="mt-4 text-[34px] font-black leading-none text-[#D4AF37] sm:text-[40px]">
-            $697<span className="text-[15px] font-bold text-[#9CA3AF]">/mo · one price</span>
+            $297<span className="text-[15px] font-bold text-[#9CA3AF]"> one-time, then $497–$997/mo</span>
           </p>
-          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime · 30-day half-back · one business per market</p>
+          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime on recurring stages · 30-day half-back</p>
           <a href="/pricing" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]">
-            See everything you get →
+            See your full roadmap →
           </a>
         </div>
 
