@@ -345,6 +345,17 @@ export default function PricingPage() {
             clicks, Google Business activity, and SEO movement where access exists.
           </p>
         </div>
+
+        <div className="mt-8 text-center">
+          <a
+            href="/growth-score"
+            onClick={() => track('pricing_growth_score_cta_clicked')}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#D4AF37]/50 bg-[#D4AF37]/[0.08] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37] hover:bg-[#D4AF37]/[0.16]"
+          >
+            Get your free Growth Score →
+          </a>
+          <p className="mt-3 text-[12px] text-[#8A8F98]">60 seconds · no signup · see your starting number</p>
+        </div>
       </section>
 
       {/* ── 6. 3-COLUMN COMPARISON TABLE ──────────────────────────────── */}

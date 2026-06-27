@@ -224,7 +224,7 @@ export default function Homepage() {
             const q = new URLSearchParams();
             if (biz) q.set('biz', biz);
             if (trade) q.set('trade', trade);
-            window.location.assign(`/grader${q.toString() ? '?' + q.toString() : ''}`);
+            window.location.assign(`/growth-score${q.toString() ? '?' + q.toString() : ''}`);
           }}
         >
           <label htmlFor="biz" className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
@@ -244,11 +244,11 @@ export default function Homepage() {
               type="submit"
               className="h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:text-[14px]"
             >
-              Get my AI Score →
+              Get my Growth Score →
             </button>
           </div>
           <p className="mt-3 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-            60 seconds · no signup · 5-category Visibility Score across Google + AI search
+            60 seconds · no signup · your 0–100 Growth Score across 6 dimensions + your next step
           </p>
         </form>
 

@@ -17,6 +17,7 @@ const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
+const GrowthScore = lazy(() => import('./GrowthScore'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
@@ -29,6 +30,7 @@ type Route =
   | { name: 'home' }
   | { name: 'audit' }
   | { name: 'grader' }
+  | { name: 'growth-score' }
   | { name: 'start' }
   | { name: 'methodology' }
   | { name: 'lola-os' }
@@ -52,6 +54,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
@@ -98,7 +101,7 @@ function App() {
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
-      : route.name === 'grader'
+      : route.name === 'grader' || route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
@@ -132,6 +135,7 @@ function App() {
           {route.name === 'home' && <Homepage />}
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
+          {route.name === 'growth-score' && <GrowthScore />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
@@ -210,6 +214,7 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
+          <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
           <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
