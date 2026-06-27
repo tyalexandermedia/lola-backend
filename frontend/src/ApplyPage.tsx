@@ -137,7 +137,17 @@ export default function ApplyPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col pt-2 sm:pt-6">
+    <main className="animate-slide-up relative flex flex-1 flex-col pt-2 sm:pt-6">
+      {/* Ambient aurora — shared premium glow across the funnel heroes. */}
+      <div
+        aria-hidden
+        className="animate-aurora pointer-events-none absolute left-1/2 top-[-10%] -z-10 h-[560px] w-[min(980px,124vw)] -translate-x-1/2 blur-[64px]"
+        style={{
+          background:
+            'radial-gradient(38% 50% at 22% 12%, rgba(111,155,255,0.12), transparent 70%), radial-gradient(46% 56% at 82% 6%, rgba(212,175,55,0.20), transparent 70%), radial-gradient(42% 46% at 56% 36%, rgba(165,96,231,0.10), transparent 70%)',
+        }}
+      />
+
       <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Apply</p>
       <h1
         className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
