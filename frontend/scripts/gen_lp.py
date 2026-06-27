@@ -98,8 +98,11 @@ summary::-webkit-details-marker{display:none}
 summary::after{content:"+";color:#D4AF37;font-size:18px;transition:transform 0.2s}
 details[open] summary::after{content:"\\2212"}
 details p{margin-top:14px;font-size:14px;color:#C8C0B0}
-.footer-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.08)}
-.footer-links a{font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px}
+.footer-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.footer-links a{font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px;transition:border-color .15s,background .15s}
+.footer-links a:hover{border-color:rgba(212,175,55,0.55);background:rgba(212,175,55,0.06);text-decoration:none}
+.footer-links-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.16em;color:#D4AF37;margin-top:28px}
+.cross-wrap{margin-top:40px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08)}
 .footer{margin-top:48px;padding:20px 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:12px;color:#5A5F68}
 .divider{height:1px;background:rgba(255,255,255,0.06);margin:32px 0}
 .founding{padding:24px;border-radius:14px;border:1.5px solid rgba(212,175,55,0.55);background:linear-gradient(135deg,#1A1408,rgba(212,175,55,0.04));margin-top:24px}
@@ -647,18 +650,32 @@ def render_page(svc_slug, svc, city_slug, city):
 
     primary_cta = cta_href(slug)
 
-    # Footer cross-links: this city's other top services + the hub.
-    cross = [
-        ("plumber", "Plumbing"), ("hvac", "HVAC"), ("roofing", "Roofing"),
-        ("pressure-washing", "Pressure Washing"),
-    ]
-    footer_links = ""
-    for s_slug, s_name in cross:
-        if s_slug == svc_slug:
-            continue
-        footer_links += (f'<a href="/lp/{s_slug}-seo-{city_slug}">'
-                         f'{esc(s_name)} {esc(cname)}</a>')
-    footer_links += '<a href="/lp/industries">All industries &amp; cities</a>'
+    # Footer cross-links — full internal-linking mesh for topical clustering:
+    #   1. Every OTHER service in THIS city (same-location relevance)
+    #   2. THIS service in every OTHER city (same-service relevance)
+    #   3. Hub + funnel (free Growth Score, the roadmap) — consistent across all pages
+    same_city = "".join(
+        f'<a href="/lp/{s_slug}-seo-{city_slug}">{esc(s["name"])} {esc(cname)}</a>'
+        for s_slug, s in SERVICES.items() if s_slug != svc_slug
+    )
+    other_cities = "".join(
+        f'<a href="/lp/{svc_slug}-seo-{c_slug}">{esc(svc["name"])} {esc(c["name"])}</a>'
+        for c_slug, c in CITIES.items() if c_slug != city_slug
+    )
+    footer_links = (
+        '<div class="cross-wrap">'
+        f'<p class="footer-links-h" style="margin-top:0">More services in {esc(cname)}</p>'
+        f'<div class="footer-links">{same_city}</div>'
+        f'<p class="footer-links-h">{esc(svc["name"])} in nearby cities</p>'
+        f'<div class="footer-links">{other_cities}</div>'
+        f'<p class="footer-links-h">Start here</p>'
+        f'<div class="footer-links">'
+        f'<a href="https://lola.tyalexandermedia.com/growth-score">&#128202; Free Growth Score</a>'
+        f'<a href="https://lola.tyalexandermedia.com/pricing">See the roadmap</a>'
+        f'<a href="/lp/industries">All industries &amp; cities</a>'
+        f'</div>'
+        '</div>'
+    )
 
     head = f"""<!DOCTYPE html>
 <html lang="en">
@@ -693,7 +710,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h1>{esc(svc["h1"](city))}</h1>
 <p class="sub">{esc(svc["sub"](city))}</p>
 <a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/audit?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or run a free 20-second audit first &rarr;</a>
+<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <h2>Not this. This.</h2>
 <div class="row row-2">
@@ -737,11 +754,9 @@ def render_page(svc_slug, svc, city_slug, city):
 {faq_details}
 
 <a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener" style="margin-top:40px">Book a free strategy call &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/audit?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or run a free 20-second audit first &rarr;</a>
+<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
-<div class="footer-links">
 {footer_links}
-</div>
 
 <div class="footer">
 <p>Lola SEO by Ty Alexander Media · Tampa Bay</p>
