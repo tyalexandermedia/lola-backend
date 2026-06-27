@@ -1257,7 +1257,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             onClick={onCaseStudyClick}
             className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
           >
-            → Read how Soft Wash Pro ranked 5 keywords in 3 weeks
+            → Read how Sandbar Soft Wash ranked 5 keywords in 3 weeks
           </a>
           {cta.href ? (
             <a

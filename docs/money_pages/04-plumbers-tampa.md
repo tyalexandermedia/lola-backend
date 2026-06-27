@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-plumbers-tampa`
 - **Title tag**: `Local SEO for Plumbers in Tampa | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Tampa plumbing contractors. Free 20-sec audit. Emergency-keyword optimized. From $697/mo. Cancel anytime.`
+- **Meta description**: `Done-for-you local SEO for Tampa plumbing contractors. Free 20-sec audit. Emergency-keyword optimized. From $297. Cancel anytime.`
 - **OG / Twitter / Canonical**: `https://tyalexandermedia.com/local-seo-plumbers-tampa`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Tampa Bay, FL"
   },
   "areaServed": {"@type": "City", "name": "Tampa"},
-  "offers": {"@type": "AggregateOffer", "lowPrice": "47", "highPrice": "6970", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,7 +33,7 @@
 **Tampa Plumbers: Be the First Result When Someone Searches "Plumber Near Me" at 11pm.**
 
 ### Subhead
-Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $697/mo.
+Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $297.
 
 ### Primary CTA
 **[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa&trade=Plumber)**
@@ -50,9 +50,9 @@ Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly d
 
 **THIS:**
 - Organic Map Pack rankings you own forever
-- $697/mo, cancel anytime, no setup fee
+- Foundation Sprint from $297, no contract, cancel anytime, no setup fee
 - Emergency-keyword targeting baked in
-- 30-day First Win Promise
+- First Win Promise (60 days) + 30-Day Half-Back Guarantee
 
 ---
 
@@ -64,32 +64,35 @@ Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly d
 4. **Citation cleanup** — fix NAP inconsistencies across HomeAdvisor, Yelp, Angi, BBB
 5. **AI Search Visibility** — track when ChatGPT recommends you for plumbing queries
 6. **Review velocity** — text-after-service requests, branded responses
-7. **Content built for plumbing buyers** — cost guides, "DIY vs call a pro," tankless vs traditional
+7. **Content built for plumbing buyers** — cost guides, "fix it yourself vs call a pro," tankless vs traditional
 
 ---
 
 ### Case study
 
-A Palm Harbor service contractor at score 76 hit 5 ranked keywords in 3 weeks on the Lola Retainer. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
+A Palm Harbor service contractor at score 76 hit 5 ranked keywords in 3 weeks on the Lola roadmap — an attributed case study; results vary. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
 
 ---
 
 ### Pricing
 
+Start free: get your free Growth Score and free audit, then choose your phase.
+
 | Tier | Price |
 |---|---|
-| DIY Playbook | $47 one-time |
-| Local SEO Sprint | $397 one-time |
-| **Local SEO Retainer** | **$697/mo** |
-| Local SEO Pro | $6,970/yr (save $1,394) |
+| Foundation Sprint | $297 one-time |
+| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
+| Scale System | $697/mo ($997+ competitive) |
 
-**[See full pricing →](https://lola.tyalexandermedia.com/pricing?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa)**
+No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+
+**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa)**
 
 ---
 
 ### Coach Ty trust block
 
-Tampa-based. Built Lola because his dad's contractor business kept losing jobs to bigger competitors who weren't actually doing better work — just better Google. Lola fixes that for service trades. You answer the phone. Coach Ty + six AI agents handle everything else.
+Tampa-based. Built Lola because his dad's contractor business kept losing jobs to bigger competitors who weren't actually doing better work — just better Google. Lola fixes that for service trades. You answer the phone. Coach Ty + team handle everything else.
 
 ---
 
@@ -99,16 +102,16 @@ Tampa-based. Built Lola because his dad's contractor business kept losing jobs t
 Yes — that's exactly the kind of high-intent local keyword we target. Map Pack + organic + AI search visibility.
 
 **2. How fast will I see new calls?**
-First Win Promise: a measurable ranking improvement in 30 days. Most clients see new GMB call volume within 6-8 weeks.
+First Win Promise: a measurable ranking improvement within 60 days, backed by our 30-Day Half-Back Guarantee. Most clients see new call volume within 6-8 weeks.
 
 **3. What if my GMB profile is a mess?**
-That's part of week 1. We audit, fix categories, add proper services, photo cadence, and post strategy. Included in the $697.
+That's part of week 1. We audit, fix categories, add proper services, photo cadence, and post strategy. Included from the Foundation Sprint on.
 
 **4. Do you do Google LSA (Local Service Ads)?**
 LSA is a separate paid channel. Lola handles organic + Map Pack. Many clients pause LSA after 60 days on Lola because organic catches up.
 
 **5. We have 10 service vans, will the system scale?**
-Yes — same $697/mo whether you're 1 truck or 20. We add service-area pages as you grow.
+Yes — the Scale System is built for it ($697/mo, vs $997+ competitive). We add service-area pages as you grow.
 
 ---
 
@@ -124,7 +127,7 @@ Yes — same $697/mo whether you're 1 truck or 20. We add service-area pages as 
 - [Florida roofers →](/local-seo-roofers-florida)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
 - [Lola free audit →](https://lola.tyalexandermedia.com)
-- [Activate the Retainer →](https://lola.tyalexandermedia.com/retainer)
+- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
 
 ### External link
 

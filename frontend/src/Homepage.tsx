@@ -424,7 +424,7 @@ export default function Homepage() {
         </p>
       </div>
 
-      {/* ── 3b. VALUE STACK — make $697 an obvious steal (mirrors /pricing) ─ */}
+      {/* ── 3b. VALUE STACK — anchor the roadmap against agency pricing (mirrors /pricing) ─ */}
       <section className="mt-14 sm:mt-20">
         <h2
           className="mx-auto max-w-[760px] text-center font-bold leading-[1.15] tracking-[-0.01em] text-white"
@@ -432,17 +432,17 @@ export default function Homepage() {
         >
           Everything you&apos;d pay an agency{' '}
           <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$2,000–$5,000/mo</span> for —
-          for <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$697</span>.
+          on a roadmap that starts at <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">{foundation.price}</span>.
         </h2>
         <div className="mx-auto mt-7 max-w-[600px] rounded-[18px] border border-[#D4AF37]/25 bg-white/[0.02] p-6 shadow-[0_0_44px_rgba(212,175,55,0.06)] sm:p-7">
           <ul className="space-y-2.5 text-[14px] sm:text-[15px]">
             {[
-              ['🌐 Done-for-you AI website', 'FREE ($3,000)'],
-              ['🔎 Local SEO — Google + Map Pack', '$1,500/mo'],
-              ['📍 Google Business + weekly posts', '$400/mo'],
-              ['✍️ Content + link building', '$600/mo'],
-              ['🤖 AI-search visibility + call tracking', '$350/mo'],
-              ['📊 Live dashboard + reporting', '$150/mo'],
+              [`🧱 ${foundation.name}`, `${foundation.price} ${foundation.period}`],
+              [`🚀 ${growth.name} (most popular)`, `${growth.price}${growth.period}`],
+              [`📈 ${scale.name}`, `${scale.price}${scale.period}`],
+              ['🌐 Done-for-you AI website', 'included'],
+              ['🤖 AI-search visibility + call tracking', 'included'],
+              ['📊 Live Growth Score dashboard', 'included'],
             ].map(([label, val]) => (
               <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2.5">
                 <span className="text-[#E8E4D8]">{label}</span>
@@ -451,8 +451,8 @@ export default function Homepage() {
             ))}
           </ul>
           <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4 text-center">
-            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Over $3,000/mo of marketing + a free website</p>
-            <p className="text-[15px] font-bold text-white">You pay <span className="text-[#D4AF37]">$697/mo</span> · $0 setup</p>
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Agencies charge $2,000–$5,000/mo — Lola is done-for-you on the roadmap</p>
+            <p className="text-[15px] font-bold text-white">Start at <span className="text-[#D4AF37]">{foundation.price} {foundation.period}</span>, then {growth.price}{growth.period} · $0 setup</p>
           </div>
           <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <a
@@ -632,7 +632,7 @@ export default function Homepage() {
             { n: '01', h: 'Audit', body: 'We baseline how AI agents see your business.', get: 'Total clarity on your visibility gaps', pro: false },
             { n: '02', h: 'Build', body: 'We fix the gaps. GMB, citations, reviews, schema.', get: 'AI-ready foundation in 30 days', pro: false },
             { n: '03', h: 'Reinforce', body: 'Monthly content, citations, reviews. Visibility compounds.', get: 'AI agent recommendations on autopilot', pro: false },
-            { n: '04', h: 'Dominate', body: 'Auto-Fix snippet pushes changes directly. White-glove support.', get: 'Competitors wonder how you did it', pro: true },
+            { n: '04', h: 'Dominate', body: 'Multi-service, multi-city execution with attribution and the Evidence Engine — the Scale System.', get: 'Competitors wonder how you did it', pro: true },
           ].map((step) => (
             <div
               key={step.n}
@@ -644,7 +644,7 @@ export default function Homepage() {
             >
               {step.pro && (
                 <span className="absolute right-4 top-4 rounded-full bg-[#D4AF37]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Pro
+                  Scale
                 </span>
               )}
               <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{step.n}</p>
