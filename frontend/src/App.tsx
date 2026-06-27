@@ -18,6 +18,7 @@ const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
 const Grader = lazy(() => import('./Grader'));
 const GrowthScore = lazy(() => import('./GrowthScore'));
+const RoadmapPage = lazy(() => import('./RoadmapPage'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
@@ -31,6 +32,7 @@ type Route =
   | { name: 'audit' }
   | { name: 'grader' }
   | { name: 'growth-score' }
+  | { name: 'roadmap' }
   | { name: 'start' }
   | { name: 'methodology' }
   | { name: 'lola-os' }
@@ -55,6 +57,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
   if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
+  if (pathname === '/roadmap' || pathname === '/roadmap/') return { name: 'roadmap' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
@@ -103,6 +106,8 @@ function App() {
       ? 'max-w-[640px] pt-3 sm:pt-6'
       : route.name === 'grader' || route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
+      : route.name === 'roadmap'
+      ? 'max-w-[1080px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
       : route.name === 'methodology'
@@ -136,6 +141,7 @@ function App() {
           {route.name === 'audit' && <AuditFlow />}
           {route.name === 'grader' && <Grader />}
           {route.name === 'growth-score' && <GrowthScore />}
+          {route.name === 'roadmap' && <RoadmapPage />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
@@ -281,7 +287,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
  * vs a single hero-only CTA. Pattern from Podium / Birdeye marketing sites.
  */
 function MobileStickyCTA({ route }: { route: Route }) {
-  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
+  const STICKY_ROUTES = new Set(['home', 'pricing', 'roadmap', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   const calendar =
@@ -295,7 +301,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
     <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
       <div className="mx-auto flex max-w-[640px] gap-2">
         <a
-          href="/grader"
+          href="/growth-score"
           className="flex h-12 flex-1 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37]"
         >
           Free Score
@@ -334,22 +340,22 @@ function Header() {
         </a>
 
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
-        <nav className="flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.12em] sm:gap-3 sm:text-[13px]">
+        <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
           <a
-            href="/"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            href="/roadmap"
+            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
-            Home
+            Roadmap
           </a>
           <a
-            href="/grader"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            href="/growth-score"
+            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
-            Free Grader
+            Free Score
           </a>
           <a
             href="/pricing"
-            className="flex min-h-[44px] items-center px-3 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37]"
+            className="flex min-h-[44px] items-center rounded-[8px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-3 py-3 font-bold text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
           >
             Pricing
           </a>

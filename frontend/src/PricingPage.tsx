@@ -19,7 +19,6 @@ import {
   ROADMAP,
   ADD_ONS,
   GUARANTEES,
-  GROWTH_SCORE_DIMENSIONS,
   type RoadmapStage,
 } from './lib/pricing';
 
@@ -106,16 +105,6 @@ function track(label: string, props?: Record<string, string | number>) {
   } catch {}
 }
 
-// Illustrative Growth Score snapshot (presentational — not live client data).
-const GROWTH_SCORE_DEMO: Record<string, number> = {
-  Foundation: 100,
-  Growth: 55,
-  Authority: 20,
-  'AI Visibility': 15,
-  Reputation: 60,
-  'Revenue Tracking': 40,
-};
-
 export default function PricingPage() {
   const promiseRef = useRef<HTMLDivElement>(null);
   const promiseSeen = useRef(false);
@@ -191,29 +180,6 @@ export default function PricingPage() {
         </p>
       </section>
 
-      {/* ── 1b. ROADMAP STEPPER ───────────────────────────────────────── */}
-      <section className="mt-10">
-        <div className="mx-auto flex max-w-[760px] items-stretch gap-2 sm:gap-3">
-          {ROADMAP.map((s, i) => (
-            <div key={s.id} className="flex flex-1 items-center gap-2 sm:gap-3">
-              <div className="flex-1 rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-3 text-center sm:p-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85">
-                  {s.phase}
-                </p>
-                <p className="mt-1 text-[13px] font-semibold text-white sm:text-[15px]">{s.name}</p>
-                <p className="mt-0.5 text-[12px] text-[#9CA3AF]">
-                  {s.price}
-                  <span className="text-[10px]"> {s.period}</span>
-                </p>
-              </div>
-              {i < ROADMAP.length - 1 && (
-                <span aria-hidden className="shrink-0 text-[#D4AF37]/60">→</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── 2. ROADMAP STAGE GRID ─────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
         <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-5">
@@ -231,70 +197,6 @@ export default function PricingPage() {
           Not sure where you are? Book the free roadmap call and Coach Ty will tell you
           straight — even if the honest answer is &quot;just start with Foundation.&quot;
           Move up a stage whenever the data says you&apos;re ready.
-        </p>
-      </section>
-
-      {/* ── 2a. WHAT TO EXPECT — 30/60/90 maturity timeline ──────────────
-          Answers the #1 objection ("how long until it works?") and frames the
-          recurring stages as maturity, not a meter running. Expectations, not
-          dated guarantees. */}
-      <section className="mt-16 sm:mt-20">
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          What to expect
-        </p>
-        <h2
-          className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          Visibility compounds. Here&apos;s the curve.
-        </h2>
-        <p className="mx-auto mt-4 max-w-[620px] text-center text-[14px] leading-[1.6] text-[#C5C5C8]">
-          You&apos;re not paying more each month for no reason — you&apos;re paying for a more
-          mature growth system. This is the honest timeline, not a dated promise.
-        </p>
-
-        <div className="mx-auto mt-8 grid max-w-[860px] grid-cols-1 gap-4 sm:grid-cols-3">
-          {[
-            {
-              tag: 'Days 1–30',
-              stage: 'Foundation',
-              h: 'Build the base',
-              body: 'Website foundation, core SEO + tracking, GBP cleanup, baseline audit + your visibility score. The work starts shipping — you watch it on the dashboard.',
-            },
-            {
-              tag: 'Days 31–60',
-              stage: 'Growth',
-              h: 'Signals start moving',
-              body: 'Content + service-area pages, posting cadence, review velocity. Rankings, impressions, and the first calls/forms begin showing up where access exists.',
-            },
-            {
-              tag: 'Days 61–90+',
-              stage: 'Scale',
-              h: 'It compounds',
-              body: 'Authority and AI visibility stack month over month. Better data means better decisions — and your Growth Score climbs toward the next number.',
-            },
-          ].map((t, i) => (
-            <div
-              key={t.tag}
-              className="relative flex flex-col rounded-[14px] border border-white/[0.10] bg-white/[0.02] p-6"
-            >
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37]/[0.12] text-[12px] font-bold text-[#D4AF37]">
-                  {i + 1}
-                </span>
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{t.tag}</span>
-              </div>
-              <p className="mt-3 text-[17px] font-bold text-white">{t.h}</p>
-              <p className="mt-2 flex-1 text-[13px] leading-[1.55] text-[#C5C5C8]">{t.body}</p>
-              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8A8F98]">
-                {t.stage} stage
-              </p>
-            </div>
-          ))}
-        </div>
-        <p className="mx-auto mt-5 max-w-[600px] text-center text-[11px] text-[#5A5F68]">
-          Timelines vary by market and starting point. The 30-Day Half-Back and First Win
-          guarantees put real accountability on the early days.
         </p>
       </section>
 
@@ -361,127 +263,32 @@ export default function PricingPage() {
         ✓ Foundation included · ✓ No setup fee · ✓ Cancel anytime on recurring stages · ✓ Month-to-month · ✓ Real work or you walk
       </div>
 
-      {/* ── 5. GROWTH SCORE ───────────────────────────────────────────── */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Your dashboard
-        </p>
-        <h2
-          className="mx-auto mt-3 max-w-[720px] text-center font-bold leading-[1.15] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          You never have to ask &quot;what are you doing this month?&quot;
-        </h2>
-        <p className="mx-auto mt-4 max-w-[640px] text-center text-[14px] leading-[1.6] text-[#C5C5C8]">
-          The dashboard is a <span className="text-white">Growth Score</span>. Log in and see
-          exactly where you are — and what&apos;s next. Pricing isn&apos;t &quot;$497/month,&quot;
-          it&apos;s &quot;we&apos;re getting you from 42 to 70.&quot;
-        </p>
-
-        <div className="mx-auto mt-8 max-w-[560px] rounded-2xl border border-[#D4AF37]/30 bg-[#0A0A0B] p-7 sm:p-9">
-          <div className="flex items-center justify-between">
-            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#8A8F98]">
-              Overall Growth Score
-            </p>
-            <p className="text-[28px] font-extrabold text-[#D4AF37]">48<span className="text-[14px] text-[#8A8F98]">/100</span></p>
-          </div>
-          <div className="mt-6 flex flex-col gap-4">
-            {GROWTH_SCORE_DIMENSIONS.map((dim) => {
-              const v = GROWTH_SCORE_DEMO[dim] ?? 0;
-              return (
-                <div key={dim}>
-                  <div className="flex items-center justify-between text-[12px] text-[#C5C5C8]">
-                    <span>{dim}</span>
-                    <span className="text-[#8A8F98]">{v}%</span>
-                  </div>
-                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#F4D47C]"
-                      style={{ width: `${v}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <p className="mt-6 text-center text-[11px] text-[#5A5F68]">
-            Illustrative. Live metrics appear as integrations are connected — calls, forms,
-            clicks, Google Business activity, and SEO movement where access exists.
+      {/* ── 5. SEE-MORE BAND — funnel links (detail lives on /roadmap, /vs) ── */}
+      <section className="mt-16 sm:mt-20">
+        <div className="mx-auto flex max-w-[760px] flex-col items-center gap-4 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-7 text-center sm:p-9">
+          <h2 className="font-bold leading-[1.15] tracking-[-0.02em] text-white" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}>
+            Not sure where you land?
+          </h2>
+          <p className="max-w-[520px] text-[14px] leading-[1.6] text-[#C5C5C8]">
+            Get your free Growth Score to see your starting number, or walk the full
+            visual roadmap stage by stage.
           </p>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <a
+              href="/growth-score"
+              onClick={() => track('pricing_growth_score_cta_clicked')}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
+            >
+              Get my free Growth Score →
+            </a>
+            <a
+              href="/roadmap"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
+            >
+              See the full roadmap →
+            </a>
+          </div>
         </div>
-
-        <div className="mt-8 text-center">
-          <a
-            href="/growth-score"
-            onClick={() => track('pricing_growth_score_cta_clicked')}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#D4AF37]/50 bg-[#D4AF37]/[0.08] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37] hover:bg-[#D4AF37]/[0.16]"
-          >
-            Get your free Growth Score →
-          </a>
-          <p className="mt-3 text-[12px] text-[#8A8F98]">60 seconds · no signup · see your starting number</p>
-        </div>
-      </section>
-
-      {/* ── 6. 3-COLUMN COMPARISON TABLE ──────────────────────────────── */}
-      <section className="mt-16 sm:mt-24">
-        <h2
-          className="text-center font-bold leading-[1.15] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          Why LOLA OS beats SEO tools <span className="text-[#D4AF37]">AND</span> premium agencies
-        </h2>
-
-        <div className="mt-10 overflow-hidden rounded-2xl border border-white/[0.08]">
-          <table className="w-full text-left text-[13px] sm:text-[14px]">
-            <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.18em] text-[#D4AF37]">
-              <tr>
-                <th className="px-3 py-4 sm:px-5">
-                  SEO Tools
-                  <span className="block text-[10px] font-normal text-[#8A8F98]">$99–$399/mo</span>
-                </th>
-                <th className="px-3 py-4 sm:px-5">
-                  Premium Agency
-                  <span className="block text-[10px] font-normal text-[#8A8F98]">$2,500–$3,500/mo</span>
-                </th>
-                <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] px-3 py-4 sm:px-5">
-                  LOLA OS
-                  <span className="block text-[10px] font-normal text-[#D4AF37]">$297 → $997/mo</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.06]">
-              {[
-                ['❌ You DIY', '✓ Done for you', '✓ Done for you'],
-                ['❌ A tool, not a plan', '⚠️ A retainer, not a roadmap', '✓ A phased growth roadmap'],
-                ['❌ Hidden total cost', '❌ Hidden pricing', '✓ Transparent, staged pricing'],
-                ['⚠️ Month-to-month (you handle it)', '❌ 12-month contracts', '✓ Month-to-month, cancel anytime'],
-                ['❌ No guarantee', '❌ "Results not guaranteed"', '✓ 30-Day Half-Back + First Win'],
-                ['❌ Pile of charts', '❌ PDF reports', '✓ A single Growth Score'],
-                ['❌ Generic audience', '❌ "Serve everyone"', '✓ Local service business specialist'],
-                ['⚠️ Steep learning curve', '⚠️ Long sales call', '✓ Free roadmap call, real answers'],
-              ].map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td
-                      key={j}
-                      className={`px-3 py-3 leading-[1.45] text-[#C5C5C8] sm:px-5 sm:py-4 ${
-                        j === 2 ? 'border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.03] text-white' : ''
-                      }`}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <p className="mx-auto mt-6 max-w-[680px] text-center text-[12px] italic leading-[1.6] text-[#8A8F98] sm:text-[13px]">
-          We&apos;re not against tools or agencies. We just believe local service businesses
-          deserve a clear roadmap, done-for-you execution, transparent pricing, and a
-          guarantee — without the learning curve of tools or the price tag of premium agencies.
-        </p>
       </section>
 
       {/* ── 7. TESTIMONIAL ────────────────────────────────────────────── */}
