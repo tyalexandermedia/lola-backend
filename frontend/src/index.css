@@ -21,6 +21,17 @@ body {
   color: #ffffff;
 }
 
+/* Global keyboard-focus ring. :focus-visible fires for keyboard / switch / AT
+   users but NOT mouse clicks, so this adds a clear gold ring for keyboard
+   navigation without changing the click experience. Closes the site-wide gap
+   where the native outline is nearly invisible on #0A0A0B. Low-specificity
+   :where() so any element can still override; the outline follows each
+   element's existing border-radius automatically. */
+:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid #F4D47C;
+  outline-offset: 2px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -95,7 +106,20 @@ textarea::placeholder {
   animation: aurora 16s ease-in-out infinite alternate;
 }
 @media (prefers-reduced-motion: reduce) {
-  .animate-aurora { animation: none; }
+  /* Kill every looping / entrance animation for users who ask for reduced
+     motion. Each animation's end-state is the visible state, so disabling
+     them never hides content — the marquee simply freezes, dots stop
+     pulsing, heroes appear without the drift/slide. */
+  .animate-aurora,
+  .animate-marquee,
+  .animate-sniff,
+  .animate-pulse-slow,
+  .animate-bounce-slow,
+  .animate-pulse,
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none !important;
+  }
 }
 
 /* Stats marquee — slow infinite horizontal scroll, pause on parent hover. */

@@ -26,7 +26,9 @@ export default function Marquee() {
         style={{ animationPlayState: 'running' }}
       >
         {[0, 1].map((copy) => (
-          <div key={copy} className="flex shrink-0 items-center gap-8">
+          // Second copy exists only for the seamless loop — hide it from the
+          // a11y tree so screen readers announce each stat once, not twice.
+          <div key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center gap-8">
             {STATS.map((s, i) => (
               <div key={`${copy}-${i}`} className="flex shrink-0 items-center gap-8">
                 <span>{s}</span>
