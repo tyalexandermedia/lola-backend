@@ -21,6 +21,7 @@ import {
   GUARANTEES,
   type RoadmapStage,
 } from './lib/pricing';
+import { useSeo } from './lib/seo';
 
 // Page-scoped FAQs — each entry powers the visible accordion AND the
 // FAQPage JSON-LD we inject into <head> at mount (route-specific schema
@@ -108,6 +109,12 @@ function track(label: string, props?: Record<string, string | number>) {
 export default function PricingPage() {
   const promiseRef = useRef<HTMLDivElement>(null);
   const promiseSeen = useRef(false);
+
+  useSeo({
+    title: 'Pricing — The Growth Roadmap, $297–$997 | Lola',
+    description:
+      "Lola's pricing is a phased growth roadmap, not a package: Foundation Sprint $297 one-time, Growth $497/mo, Scale $697/mo ($997+ competitive). No setup fee, no contract, 30-day half-back guarantee.",
+  });
 
   useEffect(() => {
     const el = promiseRef.current;
