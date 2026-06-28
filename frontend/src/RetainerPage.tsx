@@ -32,6 +32,7 @@ import { useEffect, useState } from 'react';
 import { API_URL } from './api';
 import { track } from './analytics';
 import { ROADMAP } from './lib/pricing';
+import { useSeo } from './lib/seo';
 
 // Roadmap stage prices, pulled from the canonical pricing source.
 const FOUNDATION = ROADMAP.find((s) => s.id === 'foundation')!;
@@ -64,6 +65,12 @@ function withUtm(url: string, content: string) {
 export default function RetainerPage() {
   const [slotsRemaining, setSlotsRemaining] = useState<number | null>(null);
   const [foundingCap, setFoundingCap] = useState<number>(10);
+
+  useSeo({
+    title: 'Done-For-You Local SEO & AI Visibility | The Lola Growth Roadmap',
+    description:
+      'The done-for-you growth roadmap for local service businesses — Foundation, Growth, and Scale. Google + AI search visibility, a live dashboard, 30-day half-back guarantee.',
+  });
 
   // Pull founding-member count from backend; fall back gracefully if unreachable.
   useEffect(() => {

@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { useEffect, useState, lazy, Suspense } from 'react';
+import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
 // Core Web Vitals (LCP). Each lazy import becomes its own JS chunk under
@@ -81,6 +82,30 @@ function parseRoute(pathname: string): Route {
   return { name: 'unknown' };
 }
 
+/**
+ * Canonical path for a route, or null for non-indexable tool/dashboard routes
+ * (we drop the canonical on those so Google never indexes a private URL).
+ */
+function canonicalPathForRoute(route: Route): string | null {
+  switch (route.name) {
+    case 'home': return '/';
+    case 'pricing': return '/pricing';
+    case 'retainer': return '/retainer';
+    case 'apply': return '/apply';
+    case 'grader': return '/grader';
+    case 'growth-score': return '/growth-score';
+    case 'start': return '/start';
+    case 'methodology': return '/methodology';
+    case 'lola-os': return '/os';
+    case 'case-studies-index': return '/case-studies';
+    case 'case-study': return `/case-studies/${route.slug}`;
+    case 'vs-hub': return '/vs';
+    case 'vs': return `/vs/${route.slug}`;
+    case 'audit': return '/audit';
+    default: return null; // lead-gen, swarm, report, client-report, admin*, unknown
+  }
+}
+
 function App() {
   const [route, setRoute] = useState<Route>(() =>
     parseRoute(typeof window !== 'undefined' ? window.location.pathname : '/')
@@ -91,6 +116,30 @@ function App() {
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
+
+  // ── Per-route canonical + og:url ─────────────────────────────
+  // One static index.html serves every path, so without this every route would
+  // share the homepage's canonical/og:url. Derived from the route (not the
+  // document title), so it's correct even before a lazy route chunk mounts.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const head = document.head;
+    const path = canonicalPathForRoute(route);
+    let link = head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const ogUrl = head.querySelector<HTMLMetaElement>('meta[property="og:url"]');
+    if (path) {
+      const url = SITE_ORIGIN + (path === '/' ? '' : path);
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'canonical';
+        head.appendChild(link);
+      }
+      link.href = url;
+      ogUrl?.setAttribute('content', url);
+    } else if (link) {
+      link.remove(); // non-indexable route — don't advertise a private URL
+    }
+  }, [route]);
 
   // Tighter top padding on /audit — Step 5 CTA must be above the fold at 375x667.
   // Other routes keep generous breathing room.
