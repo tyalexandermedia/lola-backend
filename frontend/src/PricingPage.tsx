@@ -131,22 +131,70 @@ export default function PricingPage() {
   // "lola os pricing" with stage-specific facts. Cleaned up on unmount.
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const ld = {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: PRICING_FAQS.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-      })),
-    };
-    const tag = document.createElement('script');
-    tag.type = 'application/ld+json';
-    tag.dataset.lola = 'pricing-faq';
-    tag.textContent = JSON.stringify(ld);
-    document.head.appendChild(tag);
+    const blocks: object[] = [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: PRICING_FAQS.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      },
+      // Service + per-stage Offer schema → eligible for rich pricing results.
+      // Prices come straight from the canonical ROADMAP (lib/pricing.ts) so the
+      // structured data can never drift from what's rendered on the page.
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: 'LOLA OS — Local SEO & AI Visibility Roadmap',
+        serviceType: 'Local SEO and AI search visibility for service businesses',
+        provider: {
+          '@type': 'Organization',
+          name: 'LOLA OS',
+          url: 'https://lola.tyalexandermedia.com',
+        },
+        areaServed: { '@type': 'Country', name: 'United States' },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Growth Roadmap stages',
+          itemListElement: ROADMAP.map((stage) => {
+            const amount = stage.price.replace(/[^0-9]/g, '');
+            const recurring = stage.period !== 'one-time';
+            return {
+              '@type': 'Offer',
+              name: stage.name,
+              description: stage.outcome,
+              price: amount,
+              priceCurrency: 'USD',
+              url: 'https://lola.tyalexandermedia.com/pricing',
+              category: recurring ? 'Subscription' : 'OneTimePayment',
+              ...(recurring
+                ? {
+                    priceSpecification: {
+                      '@type': 'UnitPriceSpecification',
+                      price: amount,
+                      priceCurrency: 'USD',
+                      unitCode: 'MON',
+                      unitText: 'month',
+                    },
+                  }
+                : {}),
+            };
+          }),
+        },
+      },
+    ];
+    const tags = blocks.map((b) => {
+      const t = document.createElement('script');
+      t.type = 'application/ld+json';
+      t.dataset.lola = 'pricing-schema';
+      t.textContent = JSON.stringify(b);
+      document.head.appendChild(t);
+      return t;
+    });
     return () => {
-      tag.parentNode?.removeChild(tag);
+      tags.forEach((t) => t.parentNode?.removeChild(t));
     };
   }, []);
 
