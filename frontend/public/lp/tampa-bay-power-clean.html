@@ -125,7 +125,7 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Inter Tight",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Inter Tight",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;touch-action:pan-y}
 body::before{position:fixed;inset:0;z-index:-2;content:"";background:linear-gradient(135deg,#04101b 0%,#07223d 42%,#0d3f61 100%)}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
@@ -190,9 +190,11 @@ section{padding:82px 0}
 .service-card li::before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;border-radius:50%;background:var(--blue2)}
 .service-link{display:inline-flex;margin-top:auto;font-weight:900;color:var(--blue2)}
 .split{display:grid;grid-template-columns:minmax(0,.8fr) minmax(320px,.6fr);gap:22px;align-items:stretch}
-.photo-card{min-height:420px;position:relative;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:linear-gradient(180deg,rgba(8,18,22,.16),rgba(8,18,22,.84)),url("../images/tampa-bay-power-clean-hero.png") center/cover no-repeat;box-shadow:inset 0 -120px 180px rgba(8,18,22,.72);overflow:hidden}
-.photo-card::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,18,22,.72) 0%,rgba(8,18,22,.08) 45%,rgba(8,18,22,.08) 55%,rgba(255,255,255,.12) 100%)}
-.photo-label{position:absolute;top:20px;z-index:2;padding:10px 14px;border-radius:999px;background:rgba(8,18,22,.8);color:#f8f5ec;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.photo-card{min-height:420px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:0;overflow:hidden;background:rgba(255,255,255,.04);box-shadow:0 30px 90px rgba(0,0,0,.22)}
+.photo-card img{width:100%;height:100%;object-fit:cover;display:block}
+.before-panel,.after-panel{position:relative;overflow:hidden}
+.before-panel::after,.after-panel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.04));pointer-events:none}
+.photo-label{position:absolute;top:18px;z-index:2;padding:10px 14px;border-radius:999px;background:rgba(8,18,22,.88);color:#f8f5ec;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 12px 30px rgba(0,0,0,.22)}
 .photo-label-left{left:18px}
 .photo-label-right{right:18px}
 .check-list{display:grid;gap:14px;margin-top:24px;padding:0;list-style:none}
@@ -233,7 +235,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:32px 0 44px;color:#859
 </style>
 </head>
 <body>
-<div class="topbar">Dunedin roof cleaning • house washing • free local quotes</div>
+<div class="topbar">Dunedin roof cleaning experts · before & after proof · fast local quote</div>
 <header class="nav">
   <div class="shell nav-inner">
     <a class="brand" href="../" aria-label="Tampa Bay Power Clean home">
@@ -254,8 +256,8 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:32px 0 44px;color:#859
     <div class="shell hero-grid">
       <div>
         <p class="eyebrow">Dunedin roof cleaning specialists</p>
-        <h1>Roof cleaning and house washing built for Pinellas County homes.</h1>
-        <p class="intro">Tampa Bay Power Clean delivers premium soft wash roof cleaning, home washing, and exterior care for homeowners and businesses from Dunedin to Clearwater. See before/after roof cleaning results from local properties and get a fast quote today.</p>
+        <h1>See Dunedin roof cleaning before & after results built for Pinellas County homeowners.</h1>
+        <p class="intro">Tampa Bay Power Clean delivers premium soft wash roof cleaning and house washing across Dunedin and Clearwater. Get a fast local quote and see real before/after roof cleaning outcomes for your home.</p>
         <div class="actions">
           <a class="button" href="tel:+17277126281" aria-label="Call Tampa Bay Power Clean at 727-712-6281">Call 727-712-6281</a>
           <a class="button secondary" href="#quote" aria-label="Request a free local quote">Request a free quote</a>
@@ -264,7 +266,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:32px 0 44px;color:#859
           <span class="badge">Fast local response</span>
           <span class="badge">Soft wash roof care</span>
           <span class="badge">Before/after results</span>
-          <span class="badge">Pinellas County focus</span>
+          <span class="badge">Same-day quote</span>
         </div>
       </div>
       <aside class="hero-panel" aria-label="Why Tampa Bay Power Clean is the local choice">
@@ -292,7 +294,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:32px 0 44px;color:#859
         <p class="eyebrow">Core services</p>
         <h2>Two primary services designed to protect your roof and home.</h2>
       </div>
-      <p class="section-copy">Roof cleaning and house washing are the highest-value services for Dunedin homeowners. Every detail on this page points buyers to those two core needs.</p>
+      <p class="section-copy">Roof cleaning and house washing are the highest-value services for Dunedin homeowners. Every detail on this page points buyers to roof cleaning, house washing, and before/after results that turn traffic into calls.</p>
     </div>
     <div class="service-grid">
       <article class="service-card featured">
@@ -321,13 +323,19 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:32px 0 44px;color:#859
   </section>
   <section class="shell">
     <div class="split">
-      <div class="photo-card before-after" role="img" aria-label="Roof cleaning before and after result for Dunedin property">
-        <span class="photo-label photo-label-left">Before</span>
-        <span class="photo-label photo-label-right">After</span>
+      <div class="photo-card before-after">
+        <div class="before-panel">
+          <img src="../gallery/roof-1-before.jpg" alt="Before roof cleaning in Dunedin">
+          <span class="photo-label photo-label-left">Before</span>
+        </div>
+        <div class="after-panel">
+          <img src="../gallery/roof-1-after.jpg" alt="After roof cleaning in Dunedin">
+          <span class="photo-label photo-label-right">After</span>
+        </div>
       </div>
       <div class="card primary">
         <span class="mini">Premium local brand</span>
-        <h2>Modern Duckets, focused on service clarity and local trust.</h2>
+      <h2>Tampa Bay Power Clean focused on roof cleaning clarity and local trust.</h2>
         <p>Every section is built to remove friction and answer the most important questions for Dunedin homeowners. It is designed to feel more like a refined local brand than a generic contractor page.</p>
         <ul class="check-list">
           <li><b>1</b><span>Roof cleaning and house washing services are presented clearly so customers know exactly what is offered.</span></li>
