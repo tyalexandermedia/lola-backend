@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Clients — Lola Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Inter Tight',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0A0A0B;color:#E8E4D8;line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+input,textarea,select{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#F0EAD6;width:100%;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#D4AF37}
+:focus-visible{outline:2px solid #D4AF37;outline-offset:2px;border-radius:6px}
+a{color:#D4AF37}
+
+.wrap{max-width:920px;margin:0 auto;padding:24px 16px 96px}
+header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.01em;color:#F0EAD6}
+.sub{font-size:13px;color:#9CA3AF;margin-top:2px}
+
+section{margin-bottom:32px}
+h2{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#D4AF37;letter-spacing:.03em;margin-bottom:12px;text-transform:uppercase}
+
+.card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.row.tri{grid-template-columns:1fr 1fr 1fr}
+.row.single{grid-template-columns:1fr}
+label{display:block;font-size:12px;font-weight:600;color:#C8C0B0;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;background:#D4AF37;color:#0A0A0B;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;padding:10px 18px;border-radius:8px;min-height:42px;transition:opacity .12s,transform .1s;-webkit-tap-highlight-color:transparent}
+.btn:hover{opacity:.92}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:#E8E4D8}
+.btn-ghost:hover{border-color:#D4AF37;color:#D4AF37;opacity:1}
+.btn-sm{padding:6px 12px;min-height:32px;font-size:11px}
+.btn-danger{background:transparent;border:1.5px solid rgba(239,68,68,0.4);color:#FCA5A5}
+.btn-danger:hover{border-color:#EF4444;color:#EF4444;opacity:1}
+
+.muted{color:#6B7280;font-size:12px}
+.hint{font-size:12px;color:#9CA3AF;margin-top:4px}
+
+.preview{margin-top:12px;padding:12px;background:rgba(212,175,55,0.04);border:1px dashed rgba(212,175,55,0.22);border-radius:10px}
+.preview h3{font-family:'Bebas Neue',sans-serif;font-size:13px;color:#D4AF37;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.preview ul{list-style:none;padding:0}
+.preview li{font-size:12px;color:#C8C0B0;padding:4px 0;display:flex;gap:8px;align-items:flex-start}
+.preview li::before{content:"›";color:#D4AF37;flex-shrink:0}
+.pill{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:10px;background:rgba(212,175,55,0.12);color:#D4AF37;margin-left:6px}
+
+.empty{padding:32px;text-align:center;color:#6B7280;font-style:italic;border:1px dashed rgba(255,255,255,0.08);border-radius:12px}
+.list{display:flex;flex-direction:column;gap:8px}
+.biz{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden}
+.biz-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px}
+.biz-meta{min-width:0}
+.biz-name{font-weight:700;font-size:15px;color:#F0EAD6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.biz-sub{font-size:12px;color:#9CA3AF;margin-top:2px}
+.biz-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+.expand{display:none;padding:14px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.2)}
+.expand.show{display:block}
+.expand h3{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#D4AF37;letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px}
+.tasks{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
+.task .t-status{font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:10px}
+.task .t-status.done{background:rgba(16,185,129,0.14);color:#6EE7B7}
+.task .t-status.in_progress{background:rgba(244,212,124,0.14);color:#F4D47C}
+.task .t-status.next_up{background:rgba(156,163,175,0.14);color:#9CA3AF}
+.task .t-title{font-size:13px;color:#E8E4D8}
+.task .t-cat{font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(60px);background:#0A0A0B;color:#E8E4D8;border:1.5px solid #D4AF37;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:1000;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{border-color:#EF4444;color:#FCA5A5}
+
+#key-prompt{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;z-index:2000}
+#key-prompt .card{max-width:380px;width:100%}
+#key-prompt h2{margin-bottom:8px}
+
+.success{margin-top:12px;padding:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px;font-size:13px;display:none}
+.success.show{display:block}
+.success a{font-weight:700}
+
+@media(max-width:600px){
+  .row,.row.tri{grid-template-columns:1fr}
+  .biz-head{grid-template-columns:1fr;grid-template-rows:auto auto}
+  .biz-actions{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<div id="key-prompt">
+  <div class="card">
+    <h2>Admin key</h2>
+    <p class="sub" style="margin-bottom:12px">Stored in this browser only. Used as <code>X-Admin-Key</code> on every request.</p>
+    <input id="key-in" type="password" placeholder="LOLA_SECRET_ADMIN_KEY" autocomplete="off" autofocus>
+    <button class="btn" style="margin-top:12px;width:100%" onclick="saveKey()">Save</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>🐾 Clients</h1>
+      <p class="sub">Onboard retainer clients · seed tier playbooks · log work delivered</p>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="signOut()">Sign out admin</button>
+  </header>
+
+  <!-- ── 1. ONBOARD ─────────────────────────────────────────── -->
+  <section>
+    <h2>Onboard a new client</h2>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Slug <span class="muted">(URL: /r/client/&lt;slug&gt;)</span></label>
+          <input id="o-slug" placeholder="sandbar" pattern="[a-z0-9-]+">
+        </div>
+        <div>
+          <label>Tier</label>
+          <select id="o-tier" onchange="refreshPreview()">
+            <option value="foundation">Foundation Sprint — $297 one-time</option>
+            <option value="growth" selected>Growth Roadmap — $497/mo (Most Popular)</option>
+            <option value="scale">Scale System — $697/mo ($997+ competitive)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Business name</label>
+          <input id="o-name" placeholder="Sandbar Soft Wash">
+        </div>
+        <div>
+          <label>Client email</label>
+          <input id="o-email" type="email" placeholder="team@example.com">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Website</label>
+          <input id="o-site" type="url" placeholder="https://sandbarsoftwash.com">
+        </div>
+        <div>
+          <label>Target URL <span class="muted">(optional)</span></label>
+          <input id="o-target" type="url" placeholder="https://… (page being ranked)">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Primary service</label>
+          <input id="o-service" placeholder="soft wash, plumbing, HVAC…" oninput="refreshPreview()">
+        </div>
+        <div>
+          <label>City / market</label>
+          <input id="o-city" placeholder="Palm Harbor, FL" oninput="refreshPreview()">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>GSC property <span class="muted">(optional)</span></label>
+          <input id="o-gsc" placeholder="sc-domain:sandbarsoftwash.com">
+        </div>
+        <div>
+          <label>GA4 property ID <span class="muted">(optional)</span></label>
+          <input id="o-ga" placeholder="properties/123456789">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Forward number <span class="muted">(Growth/Pro call tracking)</span></label>
+          <input id="o-forward" placeholder="+17273006573">
+          <p class="hint">Client's REAL phone. The Twilio tracking number forwards here. Leave blank on the Foundation Sprint.</p>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- Live playbook preview -->
+      <div id="o-preview" class="preview" style="display:none">
+        <h3>This will create <span id="o-tier-label">growth</span> playbook
+          <span class="pill" id="o-task-count">0 tasks</span>
+        </h3>
+        <div style="display:grid;grid-template-columns:1fr;gap:10px">
+          <div>
+            <p class="muted" style="margin-bottom:4px">Tracked keywords</p>
+            <ul id="o-kw-list"></ul>
+          </div>
+          <div>
+            <p class="muted" style="margin-bottom:4px">AI Mode prompts</p>
+            <ul id="o-ai-list"></ul>
+          </div>
+          <div>
+            <p class="muted" style="margin-bottom:4px">Seeded tasks</p>
+            <ul id="o-task-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn" onclick="onboard()">🦴 Onboard client</button>
+        <span class="muted">Idempotent on slug — re-running updates the row. Tasks append (don't re-seed an existing client).</span>
+      </div>
+
+      <div id="o-success" class="success"></div>
+    </div>
+  </section>
+
+  <!-- ── 2. EXISTING CLIENTS ─────────────────────────────────── -->
+  <section>
+    <h2>Active clients</h2>
+    <div id="clients" class="list"></div>
+  </section>
+
+  <!-- ── 3. TRACKING-LINK SNIPPET GENERATOR ────────────────── -->
+  <section>
+    <h2>📡 Tracking links generator</h2>
+    <div class="card">
+      <p class="hint" style="margin-bottom:14px">Paste the client's slug + phone + site URL — we'll emit paste-ready links and HTML snippets. Drop these on their Google Business Profile, website, and forms; calls/clicks/leads land on the dashboard automatically.</p>
+      <div class="row">
+        <div>
+          <label>Client slug</label>
+          <input id="t-slug" placeholder="sandbar">
+        </div>
+        <div>
+          <label>Phone (with country code)</label>
+          <input id="t-phone" placeholder="+17273006573">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Their website URL</label>
+          <input id="t-site" placeholder="https://sandbarsoftwash.com">
+        </div>
+        <div>
+          <label>Their form/contact page <span class="muted">(optional)</span></label>
+          <input id="t-form" placeholder="https://sandbarsoftwash.com/contact">
+        </div>
+      </div>
+      <button class="btn" style="margin-top:10px" onclick="genSnippets()">Generate links + snippets →</button>
+      <div id="snippets" style="margin-top:14px;display:none"></div>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const KEY_STORAGE = 'lola.adminKey';
+let adminKey = localStorage.getItem(KEY_STORAGE) || '';
+let PLAYBOOKS = {};       // tier -> [{title,category,status}]
+let TASK_OPEN = new Set(); // slugs whose task drawer is expanded
+
+function toast(msg, err) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('err', !!err);
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function authHeaders(extra) {
+  return Object.assign({'X-Admin-Key': adminKey, 'Content-Type': 'application/json'}, extra || {});
+}
+
+async function api(path, opts) {
+  const res = await fetch(path, Object.assign({headers: authHeaders()}, opts || {}));
+  if (res.status === 401) {
+    localStorage.removeItem(KEY_STORAGE); adminKey = '';
+    document.getElementById('key-prompt').style.display = 'flex';
+    throw new Error('Admin key rejected');
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error((body && (body.detail || body.error)) || ('HTTP ' + res.status));
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+function showKeyPrompt() { document.getElementById('key-prompt').style.display = 'flex'; }
+function hideKeyPrompt() { document.getElementById('key-prompt').style.display = 'none'; }
+function saveKey() {
+  const v = document.getElementById('key-in').value.trim();
+  if (!v) return;
+  adminKey = v; localStorage.setItem(KEY_STORAGE, v);
+  hideKeyPrompt(); boot();
+}
+function signOut() {
+  localStorage.removeItem(KEY_STORAGE); adminKey = '';
+  showKeyPrompt();
+}
+
+// ── Onboard form: live preview from /admin/reporting/playbooks ───
+async function refreshPreview() {
+  const tier = document.getElementById('o-tier').value;
+  const service = document.getElementById('o-service').value.trim();
+  const city = document.getElementById('o-city').value.trim();
+  document.getElementById('o-tier-label').textContent = tier;
+
+  // Cached PLAYBOOKS gets us the task list instantly; we re-call only when
+  // service/city change so the kw/prompt suggestions update.
+  let data;
+  try {
+    const qs = new URLSearchParams({});
+    if (service) qs.set('service', service);
+    if (city) qs.set('city', city);
+    data = await api('/admin/reporting/playbooks?' + qs.toString());
+    PLAYBOOKS = data.playbooks || PLAYBOOKS;
+  } catch (e) { return; /* will surface on submit */ }
+
+  const tasks = PLAYBOOKS[tier] || [];
+  document.getElementById('o-task-count').textContent = tasks.length + ' tasks';
+
+  const tl = document.getElementById('o-task-list');
+  tl.innerHTML = tasks.map(t => `<li>${escape(t.title)} <span class="muted">· ${t.category}</span></li>`).join('');
+
+  const kwl = document.getElementById('o-kw-list');
+  const kws = data.suggested_money_keywords || [];
+  kwl.innerHTML = kws.length
+    ? kws.map(k => `<li>${escape(k)}</li>`).join('')
+    : '<li class="muted">Add service + city to suggest keywords</li>';
+
+  const ail = document.getElementById('o-ai-list');
+  const ais = data.suggested_ai_mode_prompts || [];
+  ail.innerHTML = ais.length
+    ? ais.map(p => `<li>${escape(p)}</li>`).join('')
+    : '<li class="muted">Add service + city to suggest prompts</li>';
+
+  document.getElementById('o-preview').style.display = 'block';
+}
+
+async function onboard() {
+  const slug = document.getElementById('o-slug').value.trim().toLowerCase();
+  const body = {
+    slug,
+    client_name: document.getElementById('o-name').value.trim(),
+    client_email: document.getElementById('o-email').value.trim(),
+    site_url: document.getElementById('o-site').value.trim(),
+    target_url: document.getElementById('o-target').value.trim() || null,
+    tier: document.getElementById('o-tier').value,
+    service: document.getElementById('o-service').value.trim() || null,
+    city: document.getElementById('o-city').value.trim() || null,
+    gsc_property: document.getElementById('o-gsc').value.trim() || null,
+    ga_property_id: document.getElementById('o-ga').value.trim() || null,
+    forward_number: document.getElementById('o-forward').value.trim() || null,
+    seed_tasks: true,
+  };
+  if (!slug.match(/^[a-z0-9-]+$/)) return toast('Slug must be lowercase letters / numbers / hyphens', true);
+  if (!body.client_name || !body.client_email || !body.site_url) return toast('Name, email, and website are required', true);
+
+  try {
+    const r = await api('/admin/reporting/onboard', {method: 'POST', body: JSON.stringify(body)});
+    const url = `/r/client/${r.slug}`;
+    const ok = document.getElementById('o-success');
+    ok.innerHTML = `✅ Onboarded <b>${escape(r.slug)}</b> — ${r.tasks_seeded} ${r.tier} tasks seeded.
+      Dashboard: <a href="${url}" target="_blank">${url}</a>`;
+    ok.classList.add('show');
+    toast('Client onboarded');
+    document.getElementById('o-slug').value = '';
+    document.getElementById('o-name').value = '';
+    document.getElementById('o-email').value = '';
+    document.getElementById('o-site').value = '';
+    document.getElementById('o-target').value = '';
+    await loadClients();
+  } catch (e) { toast(e.message, true); }
+}
+
+// ── Existing clients + task drawer ──────────────────────────────
+async function loadClients() {
+  try {
+    const r = await api('/admin/reporting/clients');
+    const list = document.getElementById('clients');
+    if (!r.clients || r.clients.length === 0) {
+      list.innerHTML = '<div class="empty">No clients yet. Onboard your first one above.</div>';
+      return;
+    }
+    list.innerHTML = r.clients.map(c => clientCard(c)).join('');
+    for (const slug of TASK_OPEN) await renderTasks(slug);
+  } catch (e) { toast(e.message, true); }
+}
+
+function clientCard(c) {
+  const safeSlug = escape(c.slug);
+  return `
+    <div class="biz" id="biz-${safeSlug}">
+      <div class="biz-head">
+        <div class="biz-meta">
+          <div class="biz-name">${escape(c.client_name)} <span class="muted">· ${safeSlug}</span></div>
+          <div class="biz-sub">${escape(c.site_url || '')}</div>
+        </div>
+        <div class="biz-actions">
+          <a class="btn btn-ghost btn-sm" href="/r/client/${safeSlug}" target="_blank">Dashboard ↗</a>
+          <button class="btn btn-ghost btn-sm" onclick="snapshot('${safeSlug}')">Run snapshot</button>
+          <button class="btn btn-sm" onclick="toggleTasks('${safeSlug}')">Tasks</button>
+        </div>
+      </div>
+      <div class="expand" id="exp-${safeSlug}">
+        <h3>Add a task</h3>
+        <div class="row tri">
+          <input id="nt-title-${safeSlug}" placeholder="Built 12 citations">
+          <select id="nt-cat-${safeSlug}">
+            <option value="content">content</option>
+            <option value="citation">citation</option>
+            <option value="review">review</option>
+            <option value="gbp">gbp</option>
+            <option value="fix">fix</option>
+            <option value="other">other</option>
+          </select>
+          <select id="nt-status-${safeSlug}">
+            <option value="done" selected>done</option>
+            <option value="in_progress">in progress</option>
+            <option value="next_up">next up</option>
+          </select>
+        </div>
+        <button class="btn btn-sm" onclick="addTask('${safeSlug}')">Log task</button>
+        <div class="tasks" id="tasks-${safeSlug}"><div class="muted">Loading…</div></div>
+      </div>
+    </div>
+  `;
+}
+
+async function toggleTasks(slug) {
+  const exp = document.getElementById('exp-' + slug);
+  const open = exp.classList.toggle('show');
+  if (open) { TASK_OPEN.add(slug); await renderTasks(slug); }
+  else TASK_OPEN.delete(slug);
+}
+
+async function renderTasks(slug) {
+  try {
+    const r = await api('/admin/reporting/tasks/' + encodeURIComponent(slug));
+    const el = document.getElementById('tasks-' + slug);
+    if (!el) return;
+    if (!r.tasks || r.tasks.length === 0) {
+      el.innerHTML = '<div class="muted">No tasks logged yet.</div>';
+      return;
+    }
+    el.innerHTML = r.tasks.map(t => `
+      <div class="task">
+        <span class="t-status ${t.status}">${t.status.replace('_',' ')}</span>
+        <div>
+          <div class="t-title">${escape(t.title)}</div>
+          <div class="t-cat">${t.category}${t.week_of ? ' · week of ' + t.week_of : ''}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="delTask(${t.id}, '${slug}')">Delete</button>
+      </div>
+    `).join('');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function addTask(slug) {
+  const body = {
+    slug,
+    title: document.getElementById('nt-title-' + slug).value.trim(),
+    category: document.getElementById('nt-cat-' + slug).value,
+    status: document.getElementById('nt-status-' + slug).value,
+  };
+  if (!body.title) return toast('Title required', true);
+  try {
+    await api('/admin/reporting/tasks', {method: 'POST', body: JSON.stringify(body)});
+    document.getElementById('nt-title-' + slug).value = '';
+    toast('Task logged');
+    await renderTasks(slug);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function delTask(id, slug) {
+  try {
+    await api('/admin/reporting/tasks/' + id, {method: 'DELETE'});
+    toast('Deleted');
+    await renderTasks(slug);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function snapshot(slug) {
+  try {
+    await api('/admin/case-study/' + encodeURIComponent(slug) + '/run', {method: 'POST'});
+    toast('Snapshot run');
+  } catch (e) { toast(e.message, true); }
+}
+
+// ── Tracking-link snippet generator ───────────────────────────────
+// Emits paste-ready URLs + HTML snippets for the client's GBP, website,
+// forms, and a 1x1 view pixel. All routes through /t/* on the brand domain
+// so calls/leads/clicks land on the dashboard with full source attribution.
+function genSnippets() {
+  const slug = (document.getElementById('t-slug').value || '').trim().toLowerCase();
+  const phone = (document.getElementById('t-phone').value || '').trim();
+  const site = (document.getElementById('t-site').value || '').trim();
+  const form = (document.getElementById('t-form').value || '').trim();
+  if (!slug) return toast('Slug is required', true);
+  const base = window.location.origin; // serves /t/* via vercel.json proxy
+
+  const phoneClean = phone.replace(/[^+\d]/g, '');
+  const telUri = phoneClean ? (phoneClean.startsWith('+') ? `tel:${phoneClean}` : `tel:+${phoneClean}`) : '';
+
+  const callUrl = telUri
+    ? `${base}/t/c/${slug}?to=${encodeURIComponent(telUri)}&source=gbp`
+    : '(set phone first)';
+  const siteUrl = site
+    ? `${base}/t/go/${slug}?to=${encodeURIComponent(site)}&source=gbp`
+    : '(set site first)';
+  const formUrl = form
+    ? `${base}/t/go/${slug}?to=${encodeURIComponent(form)}&source=gbp_form`
+    : '(set form URL first)';
+  const pixelUrl = `${base}/t/pixel/${slug}.gif?source=site`;
+  const leadBeacon = `${base}/t/lead/${slug}?source=form`;
+
+  const blocks = [
+    { title: '📞 Google Business Profile — Call button', desc: 'In GBP, edit your business → set the Phone field as a CTA link to this URL. Every click counts as an attributed call.', body: callUrl },
+    { title: '🌐 GBP — Website button', desc: 'In GBP, set the Website field to this URL (it redirects to your real site). Tracks click-throughs from Maps + Search.', body: siteUrl },
+    { title: '📝 GBP — Contact / Form CTA', desc: 'Optional — if your GBP has a "Get a Quote" / form button, use this URL. Pre-tagged source=gbp_form.', body: formUrl },
+    { title: '👁️ Page view pixel — embed in <head> of every client page', desc: 'A 1×1 GIF that logs a view event per page load. Lets the dashboard show traffic alongside calls/leads.',
+      body: `<img src="${pixelUrl}" width="1" height="1" alt="" style="position:absolute;left:-9999px" />` },
+    { title: '✅ Form-submit lead beacon — drop in the form\'s onsubmit', desc: 'Fires a no-CORS GET on the lead beacon on submit. Counts the lead even if the form posts elsewhere. Paste inside the existing onsubmit.',
+      body: `<script>
+document.querySelector('form').addEventListener('submit', function(){
+  new Image().src = ${JSON.stringify(leadBeacon)};
+});
+</` + 'script>' },
+  ];
+
+  const out = blocks.map((b, i) => `
+    <div class="card" style="margin-bottom:10px">
+      <p style="font-weight:700;color:#F0EAD6;font-size:14px">${b.title}</p>
+      <p class="hint" style="margin-top:4px">${b.desc}</p>
+      <textarea id="snip-${i}" readonly rows="${b.body.includes('\\n') || b.body.length > 80 ? 4 : 2}" style="margin-top:8px;font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#0F0F12">${escape(b.body)}</textarea>
+      <button class="btn btn-sm" style="margin-top:8px" onclick="copySnip(${i})">Copy</button>
+    </div>`).join('');
+
+  const dashUrl = `${base}/r/client/${slug}`;
+  const wrap = document.getElementById('snippets');
+  wrap.innerHTML = `
+    <div class="card" style="background:rgba(212,175,55,0.05);border-color:rgba(212,175,55,0.4)">
+      <p style="font-weight:700;color:#D4AF37;font-size:13px;text-transform:uppercase;letter-spacing:.05em">Client dashboard URL</p>
+      <p style="margin-top:6px"><a href="${dashUrl}" target="_blank" style="color:#D4AF37">${dashUrl} ↗</a></p>
+      <p class="hint" style="margin-top:6px">Hand this to your client. Public, no login (PII stripped server-side). Drives SEO + social proof.</p>
+    </div>
+    <div style="margin-top:14px">${out}</div>`;
+  wrap.style.display = 'block';
+  toast('Snippets ready');
+}
+
+function copySnip(i) {
+  const el = document.getElementById('snip-' + i);
+  el.select(); el.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(el.value).then(() => toast('Copied'), () => toast('Copy failed', true));
+}
+
+function escape(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function boot() {
+  if (!adminKey) return showKeyPrompt();
+  hideKeyPrompt();
+  await loadClients();
+  await refreshPreview();
+}
+
+boot();
+</script>
+</body>
+</html>
