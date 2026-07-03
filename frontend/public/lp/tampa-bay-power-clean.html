@@ -124,11 +124,11 @@
 }
 </script>
 <style>
-:root{--ink:#f8f5ec;--muted:#c9d4d0;--soft:#8fa09c;--line:rgba(255,255,255,.14);--gold:#e8c25d;--gold2:#f8df87;--green:#49c09a;--navy:#081216;--blue:#102932;--cream:#fff7df}
+:root{--ink:#f8f5ec;--muted:#c9d4d0;--soft:#80bbe0;--line:rgba(255,255,255,.14);--gold:#e8c25d;--gold2:#f8df87;--blue:#0f4d72;--blue2:#2f8dc2;--navy:#081216;--cream:#fff7df}
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--navy);color:var(--ink);font-family:"Inter Tight",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.52;-webkit-font-smoothing:antialiased}
-body::before{position:fixed;inset:0;z-index:-2;content:"";background:linear-gradient(135deg,#071115 0%,#0d252d 42%,#173822 100%)}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{margin:0;background:var(--navy);color:var(--ink);font-family:"Inter Tight",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.52;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{position:fixed;inset:0;z-index:-2;content:"";background:linear-gradient(135deg,#071115 0%,#08243d 42%,#112f46 100%)}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 .shell{width:min(1180px,calc(100% - 40px));margin:0 auto}
@@ -144,7 +144,7 @@ img{display:block;max-width:100%}
 .nav-links a:hover{color:var(--gold2)}
 .nav-call{display:inline-flex;min-height:44px;align-items:center;border-radius:999px;background:var(--gold2);padding:0 17px;color:#071115!important}
 .hero{position:relative;overflow:hidden;border-bottom:1px solid rgba(248,223,135,.26)}
-.hero::before{position:absolute;inset:0;z-index:-2;content:"";background:linear-gradient(90deg,rgba(8,18,22,.96) 0%,rgba(8,18,22,.72) 46%,rgba(8,18,22,.24) 100%),url("../images/tampa-bay-power-clean-hero.png") center right/cover no-repeat}
+.hero::before{position:absolute;inset:0;z-index:-2;content:"";background:linear-gradient(90deg,rgba(8,18,22,.96) 0%,rgba(10,63,100,.74) 46%,rgba(8,18,22,.24) 100%),url("../images/tampa-bay-power-clean-hero.png") center right/cover no-repeat}
 .hero::after{position:absolute;right:0;bottom:0;left:0;height:34%;z-index:-1;content:"";background:linear-gradient(0deg,var(--navy),rgba(8,18,22,0))}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(320px,.62fr);gap:42px;align-items:end;min-height:calc(100vh - 112px);padding:82px 0 58px}
 .eyebrow{margin:0 0 14px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.18em;color:var(--gold2)}
@@ -155,9 +155,9 @@ h3{margin:0;color:#fff;font-size:22px;line-height:1.15}
 p{color:var(--muted)}
 .intro{max-width:720px;margin:22px 0 0;font-size:clamp(18px,2vw,22px);color:#edf5ef}
 .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-.button{display:inline-flex;min-height:56px;align-items:center;justify-content:center;border-radius:8px;padding:0 22px;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#071115;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 16px 38px rgba(232,194,93,.22)}
-.button.secondary{border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.06);color:#fff;box-shadow:none}
-.hero-panel{border:1px solid rgba(248,223,135,.28);border-radius:10px;background:rgba(8,18,22,.72);padding:24px;box-shadow:0 28px 90px rgba(0,0,0,.36)}
+.button{display:inline-flex;min-height:56px;align-items:center;justify-content:center;border-radius:8px;padding:0 22px;background:linear-gradient(135deg,var(--blue2),var(--blue));color:#f8f5ec;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 16px 38px rgba(15,77,114,.28)}
+.button.secondary{border:1px solid rgba(255,255,255,.24);background:rgba(15,77,114,.16);color:#f8f5ec;box-shadow:none}
+.hero-panel{border:1px solid rgba(47,141,194,.28);border-radius:10px;background:rgba(8,18,22,.78);padding:24px;box-shadow:0 28px 90px rgba(0,0,0,.36)}
 .score-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
 .stat{border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:14px;background:rgba(255,255,255,.045)}
 .stat strong{display:block;color:#fff;font-size:24px;line-height:1}
@@ -170,24 +170,24 @@ section{padding:82px 0}
 .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .card{position:relative;overflow:hidden;min-height:178px;border:1px solid var(--line);border-radius:10px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.032))}
-.card::before{position:absolute;top:0;left:0;right:0;height:3px;content:"";background:linear-gradient(90deg,var(--gold2),rgba(73,192,154,.72))}
-.card.primary{border-color:rgba(248,223,135,.34);background:linear-gradient(180deg,rgba(248,223,135,.12),rgba(255,255,255,.035))}
+.card::before{position:absolute;top:0;left:0;right:0;height:3px;content:"";background:linear-gradient(90deg,var(--blue2),rgba(15,77,114,.72))}
+.card.primary{border-color:rgba(47,141,194,.34);background:linear-gradient(180deg,rgba(47,141,194,.12),rgba(255,255,255,.035))}
 .card p{margin:12px 0 0}
-.mini{display:inline-flex;margin-bottom:16px;border:1px solid rgba(248,223,135,.24);border-radius:999px;padding:6px 9px;color:var(--gold2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em}
+.mini{display:inline-flex;margin-bottom:16px;border:1px solid rgba(47,141,194,.24);border-radius:999px;padding:6px 9px;color:var(--blue2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em}
 .split{display:grid;grid-template-columns:minmax(0,.88fr) minmax(320px,.72fr);gap:20px;align-items:stretch}
 .photo-card{min-height:430px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:linear-gradient(180deg,rgba(8,18,22,.12),rgba(8,18,22,.78)),url("../images/tampa-bay-power-clean-hero.png") center/cover no-repeat;box-shadow:inset 0 -120px 160px rgba(8,18,22,.72)}
 .checklist{display:grid;gap:12px;margin-top:24px}
 .check{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:16px;background:rgba(255,255,255,.04)}
-.check b{display:grid;flex:0 0 26px;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(73,192,154,.18);color:#88f1c9}
+.check b{display:grid;flex:0 0 26px;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(47,141,194,.18);color:#94c6ff}
 .check p{margin:0}
 .areas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:26px 0 0;padding:0;list-style:none}
 .areas li{border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:14px 15px;background:rgba(255,255,255,.035);color:#eef2ed;font-weight:900}
 .areas span{display:block;margin-top:3px;color:var(--soft);font-size:12px;font-weight:700}
 .process{counter-reset:step}
 .process .card{min-height:210px}
-.process .card::after{position:absolute;right:18px;bottom:8px;counter-increment:step;content:"0" counter(step);font-family:"Bebas Neue",sans-serif;font-size:78px;line-height:1;color:rgba(248,223,135,.14)}
-.proof-band{border-block:1px solid rgba(248,223,135,.24);background:linear-gradient(90deg,rgba(248,223,135,.08),rgba(73,192,154,.07))}
-.proof-note{border-left:4px solid var(--gold2);padding-left:20px}
+.process .card::after{position:absolute;right:18px;bottom:8px;counter-increment:step;content:"0" counter(step);font-family:"Bebas Neue",sans-serif;font-size:78px;line-height:1;color:rgba(15,77,114,.14)}
+.proof-band{border-block:1px solid rgba(47,141,194,.24);background:linear-gradient(90deg,rgba(47,141,194,.12),rgba(47,141,194,.06))}
+.proof-note{border-left:4px solid var(--blue2);padding-left:20px}
 .gbp-list{display:grid;gap:10px;margin:18px 0 0;padding:0;list-style:none}
 .gbp-list li{border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.035);padding:13px 14px;color:#dce7e1;font-weight:800}
 .gbp-list span{display:block;margin-top:3px;color:var(--soft);font-size:12px;font-weight:700}
@@ -214,14 +214,14 @@ footer{border-top:1px solid rgba(255,255,255,.1);padding:26px 0 42px;color:#8496
   .mark{width:38px;height:38px;font-size:21px}
   .wordmark{font-size:26px}
   .wordmark span{font-size:14px}
-  .hero::before{background:linear-gradient(180deg,rgba(8,18,22,.72),rgba(8,18,22,.95)),url("../images/tampa-bay-power-clean-hero.png") center/cover no-repeat}
+  .hero::before{background:linear-gradient(180deg,rgba(8,18,22,.72),rgba(10,63,100,.95)),url("../images/tampa-bay-power-clean-hero.png") center/cover no-repeat}
   h1{font-size:clamp(50px,16vw,74px)}
   section{padding:64px 0}
   .grid-2,.grid-3,.areas,.score-row{grid-template-columns:1fr}
   .button{width:100%}
   .photo-card{min-height:300px}
 }
-.trust-bar{border-block:1px solid rgba(248,223,135,.22);background:rgba(248,223,135,.06)}
+.trust-bar{border-block:1px solid rgba(47,141,194,.22);background:rgba(15,77,114,.08)}
 .trust-bar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 0}
 .trust-pill{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:12px 14px;text-align:center;background:rgba(255,255,255,.03)}
 .trust-pill strong{display:block;color:#fff;font-size:15px}
@@ -231,7 +231,7 @@ footer{border-top:1px solid rgba(255,255,255,.1);padding:26px 0 42px;color:#8496
 .hero-panel ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
 .hero-panel li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
 .hero-panel li:first-child{border-top:0;padding-top:0}
-.hero-panel li b{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:rgba(73,192,154,.16);color:#7de8bc;font-size:12px;font-weight:900}
+.hero-panel li b{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:rgba(47,141,194,.16);color:#94c6ff;font-size:12px;font-weight:900}
 .service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .service-card{position:relative;display:flex;flex-direction:column;gap:12px;min-height:280px;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
 .service-card.featured{border-color:rgba(248,223,135,.32);background:linear-gradient(180deg,rgba(248,223,135,.12),rgba(255,255,255,.035))}
@@ -241,7 +241,7 @@ footer{border-top:1px solid rgba(255,255,255,.1);padding:26px 0 42px;color:#8496
 .service-link{display:inline-flex;margin-top:auto;font-weight:800;color:var(--gold2)}
 .check-list{display:grid;gap:10px;margin-top:20px;padding:0;list-style:none}
 .check-list li{display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;background:rgba(255,255,255,.04)}
-.check-list b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(73,192,154,.16);color:#7de8bc;font-size:12px;font-weight:900;flex-shrink:0}
+.check-list b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(47,141,194,.16);color:#94c6ff;font-size:12px;font-weight:900;flex-shrink:0}
 .area-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
 .area-link{display:block;border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:16px 18px;background:rgba(255,255,255,.04);color:#f1f6f2;font-weight:800}
 .area-link span{display:block;margin-top:4px;color:var(--soft);font-size:13px;font-weight:700}
