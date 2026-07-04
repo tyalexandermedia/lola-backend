@@ -1,0 +1,65 @@
+# ------------------------------------------------------------------
+# Lola Cloud — reusable client site server block (STATIC SITE)
+#
+# To use for a new client:
+#   1. Copy this file:
+#        sudo cp client-site.conf.template /etc/nginx/sites-available/CLIENTDOMAIN.com
+#   2. Replace every CLIENTDOMAIN and CLIENTFOLDER below
+#   3. Enable + reload:
+#        sudo ln -s /etc/nginx/sites-available/CLIENTDOMAIN.com /etc/nginx/sites-enabled/
+#        sudo nginx -t && sudo systemctl reload nginx
+#   4. Once DNS points at this VPS, add free SSL (Certbot rewrites this file):
+#        sudo certbot --nginx -d CLIENTDOMAIN.com -d www.CLIENTDOMAIN.com
+#
+# For a Node app instead of a static site, swap the `location /` block
+# for the commented proxy block at the bottom.
+# ------------------------------------------------------------------
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name CLIENTDOMAIN.com www.CLIENTDOMAIN.com;
+
+    root /opt/lola-cloud/clients/CLIENTFOLDER;
+    index index.html index.htm;
+
+    # Basic security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Cache static assets hard (they change filename when rebuilt)
+    location ~* \.(css|js|jpg|jpeg|png|gif|webp|svg|ico|woff2?)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Don't serve dotfiles (.git, .env, etc.)
+    location ~ /\. {
+        deny all;
+    }
+
+    access_log /var/log/nginx/CLIENTFOLDER.access.log;
+    error_log  /var/log/nginx/CLIENTFOLDER.error.log;
+}
+
+# ------------------------------------------------------------------
+# NODE APP VARIANT — replace `location /` above with this and remove
+# the root/index lines (app listens on its own port via PM2):
+#
+#    location / {
+#        proxy_pass http://127.0.0.1:3000;
+#        proxy_http_version 1.1;
+#        proxy_set_header Host $host;
+#        proxy_set_header X-Real-IP $remote_addr;
+#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#        proxy_set_header X-Forwarded-Proto $scheme;
+#        proxy_set_header Upgrade $http_upgrade;
+#        proxy_set_header Connection "upgrade";
+#    }
+# ------------------------------------------------------------------
