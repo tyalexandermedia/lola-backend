@@ -54,7 +54,13 @@ say "Step 2/5: Installing scripts into $ROOT/scripts"
 install -m 755 "$KIT_DIR"/scripts/deploy.sh       "$ROOT/scripts/deploy.sh"
 install -m 755 "$KIT_DIR"/scripts/backup.sh       "$ROOT/scripts/backup.sh"
 install -m 755 "$KIT_DIR"/scripts/health-check.sh "$ROOT/scripts/health-check.sh"
-ok "deploy.sh, backup.sh, health-check.sh installed."
+install -m 755 "$KIT_DIR"/scripts/new-client.sh   "$ROOT/scripts/new-client.sh"
+ok "deploy.sh, backup.sh, health-check.sh, new-client.sh installed."
+
+if [[ -d "$KIT_DIR/templates" ]]; then
+    cp -rf "$KIT_DIR"/templates/. "$ROOT/templates/"
+    ok "Site templates installed: $(ls "$ROOT/templates" | tr '\n' ' ')"
+fi
 
 say "Step 3/5: Copying documentation into $ROOT/docs"
 cp -f "$KIT_DIR"/docs/*.md "$ROOT/docs/"
@@ -75,7 +81,8 @@ chmod 700 "$ROOT/backups"
 ln -sf "$ROOT/scripts/deploy.sh"       /usr/local/bin/lola-deploy
 ln -sf "$ROOT/scripts/backup.sh"       /usr/local/bin/lola-backup
 ln -sf "$ROOT/scripts/health-check.sh" /usr/local/bin/lola-health
-ok "Owned by '$OWNER'. Shortcuts: lola-deploy, lola-backup, lola-health"
+ln -sf "$ROOT/scripts/new-client.sh"   /usr/local/bin/lola-new-client
+ok "Owned by '$OWNER'. Shortcuts: lola-deploy, lola-backup, lola-health, lola-new-client"
 
 say "Done. Structure:"
 tree -L 2 -d "$ROOT" 2>/dev/null || find "$ROOT" -maxdepth 2 -type d | sort

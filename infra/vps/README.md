@@ -24,13 +24,18 @@ infra/vps/
 ├── scripts/
 │   ├── deploy.sh              Pull latest → install deps → restart → reload Nginx → log
 │   ├── backup.sh              Timestamped tar.gz backups into /opt/lola-cloud/backups
-│   └── health-check.sh        Uptime, disk, memory, Nginx, firewall, tool versions
+│   ├── health-check.sh        Uptime, disk, memory, Nginx, firewall, tool versions
+│   └── new-client.sh          Scaffold a client site from the template (lola-new-client)
+├── templates/
+│   └── local-business-starter/  Mobile-first one-pager: LocalBusiness schema,
+│                                call-first CTAs, quote form — filled by new-client.sh
 └── docs/                      Copied to /opt/lola-cloud/docs by 03-folders.sh
     ├── VPS_SETUP.md
     ├── SECURITY.md
     ├── DEPLOYMENT.md
     ├── BACKUPS.md
-    └── CLIENT_ONBOARDING.md
+    ├── CLIENT_ONBOARDING.md
+    └── MIGRATION.md           Site-by-site plan off Vercel/Wix (audited stacks)
 ```
 
 ## Order of operations (fresh VPS)
@@ -64,6 +69,7 @@ Every script:
 lola-health                          # server health at a glance
 lola-backup                          # manual backup now
 lola-deploy <client-folder>          # deploy one client site
+lola-new-client <folder> <domain>    # scaffold a new client site from the template
 ```
 
 (These are symlinks in /usr/local/bin created by 03-folders.sh.)

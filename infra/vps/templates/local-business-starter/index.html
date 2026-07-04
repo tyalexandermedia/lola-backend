@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{SERVICE}} in {{CITY}} | {{BUSINESS_NAME}}</title>
+  <meta name="description" content="{{BUSINESS_NAME}} — trusted {{SERVICE}} in {{CITY}} and surrounding areas. Free quotes, licensed and insured. Call {{PHONE_DISPLAY}} today.">
+  <link rel="canonical" href="https://{{DOMAIN}}/">
+  <meta property="og:title" content="{{SERVICE}} in {{CITY}} | {{BUSINESS_NAME}}">
+  <meta property="og:description" content="Trusted {{SERVICE}} in {{CITY}}. Free quotes. Call {{PHONE_DISPLAY}}.">
+  <meta property="og:url" content="https://{{DOMAIN}}/">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "{{BUSINESS_NAME}}",
+    "url": "https://{{DOMAIN}}/",
+    "telephone": "{{PHONE}}",
+    "description": "{{SERVICE}} serving {{CITY}} and surrounding areas.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{CITY}}",
+      "addressRegion": "FL",
+      "addressCountry": "US"
+    },
+    "areaServed": "{{CITY}}",
+    "priceRange": "$$"
+  }
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <span class="brand">{{BUSINESS_NAME}}</span>
+      <a class="btn btn-call" href="tel:{{PHONE}}">Call {{PHONE_DISPLAY}}</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>{{SERVICE}} in {{CITY}}, Done Right</h1>
+      <p class="hero-sub">Licensed &amp; insured. Free same-day quotes. 100% satisfaction guarantee.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="tel:{{PHONE}}">📞 Call for a Free Quote</a>
+        <a class="btn btn-secondary" href="#quote">Get a Quote Online</a>
+      </div>
+      <ul class="trust-strip">
+        <li>⭐⭐⭐⭐⭐ Rated by local homeowners</li>
+        <li>✔ Licensed &amp; Insured</li>
+        <li>✔ Serving {{CITY}} &amp; nearby</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="container">
+      <h2>What We Do</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>Service One</h3>
+          <p>One-sentence benefit of this service — what problem it solves for the homeowner.</p>
+        </div>
+        <div class="card">
+          <h3>Service Two</h3>
+          <p>One-sentence benefit of this service — what problem it solves for the homeowner.</p>
+        </div>
+        <div class="card">
+          <h3>Service Three</h3>
+          <p>One-sentence benefit of this service — what problem it solves for the homeowner.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reviews">
+    <div class="container">
+      <h2>What Neighbors in {{CITY}} Say</h2>
+      <blockquote>
+        <p>“Replace with a real review — specific, local, with a result.”</p>
+        <cite>— Customer Name, {{CITY}}</cite>
+      </blockquote>
+      <blockquote>
+        <p>“Replace with a second real review.”</p>
+        <cite>— Customer Name, {{CITY}}</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="quote" id="quote">
+    <div class="container">
+      <h2>Get Your Free Quote</h2>
+      <p>Fastest: call or text <a href="tel:{{PHONE}}">{{PHONE_DISPLAY}}</a>. Or send this and we'll reply within one business day.</p>
+      <!-- Wire action to your lead endpoint (e.g. Formspree, or the Lola lead API) -->
+      <form class="quote-form" method="POST" action="#">
+        <label>Name <input type="text" name="name" required autocomplete="name"></label>
+        <label>Phone <input type="tel" name="phone" required autocomplete="tel"></label>
+        <label>What do you need? <textarea name="message" rows="3" required></textarea></label>
+        <button class="btn btn-primary" type="submit">Request My Free Quote</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>{{BUSINESS_NAME}}</strong> — {{SERVICE}} in {{CITY}}, FL</p>
+      <p><a href="tel:{{PHONE}}">{{PHONE_DISPLAY}}</a></p>
+      <p class="fineprint">© {{BUSINESS_NAME}}. Licensed &amp; insured.</p>
+    </div>
+  </footer>
+
+  <a class="sticky-call" href="tel:{{PHONE}}">📞 Tap to Call — Free Quote</a>
+
+</body>
+</html>

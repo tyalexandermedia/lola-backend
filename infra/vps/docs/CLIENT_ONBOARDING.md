@@ -9,18 +9,27 @@ Target time once practiced: **under 30 minutes** (plus DNS wait).
 - [ ] Brand assets → save to `/opt/lola-cloud/assets/<client>/`
 - [ ] Business info (name, address, phone, hours) for local SEO schema
 
-## 1. Repo
+## 1. Scaffold (one command)
 
-Create a GitHub repo (private) named after the client, ideally by copying a
-template repo, then:
+```bash
+lola-new-client client-name clientdomain.com
+```
+
+This copies the `local-business-starter` template into
+`/opt/lola-cloud/clients/client-name`, asks for the business details (name,
+phone, city, service) and fills them in everywhere, creates the Nginx config
+(not enabled), initializes git with a first commit, and prints the exact
+remaining steps — including creating the private GitHub repo and pushing.
+
+Naming convention: folder = `kebab-case` business name
+(`sandbar-soft-wash`, `tampa-bay-power-clean`).
+
+If the client already has a repo, clone instead of scaffolding:
 
 ```bash
 cd /opt/lola-cloud/clients
 git clone git@github.com:tyalexandermedia/CLIENT-REPO.git client-name
 ```
-
-Naming convention: folder = `kebab-case` business name
-(`sandbar-soft-wash`, `tampa-bay-power-clean`).
 
 ## 2. Build the site
 
