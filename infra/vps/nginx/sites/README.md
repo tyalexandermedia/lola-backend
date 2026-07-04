@@ -13,6 +13,23 @@ One config per known domain, pre-filled from `../client-site.conf.template`:
 whose DNS points at a live site elsewhere does nothing harmful (traffic never
 arrives), but we still keep it manual so nothing surprises you.
 
+## ⚠️ Current DNS state (checked 2026-07-04)
+
+All four domains are **live on other hosts right now**. Do NOT change DNS for
+a domain until its site is built, deployed, and tested on the VPS — moving DNS
+is the cutover moment.
+
+| Domain | Currently hosted on |
+|---|---|
+| sandbarsoftwash.com | Vercel |
+| tampabaypowerclean.com | Wix |
+| travelsbyval.com | Vercel |
+| lola.tyalexandermedia.com | Vercel |
+
+Safe cutover order per site: build on VPS → test via `curl -H "Host: DOMAIN" http://VPS_IP/`
+→ lower the DNS TTL to 300 a day ahead → switch the A records → run Certbot
+→ verify → keep the old host live a few days as fallback.
+
 ## Enable a site (2 commands)
 
 ```bash
