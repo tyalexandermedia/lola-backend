@@ -24,6 +24,126 @@
       "source": "/lp/local-seo-pool-service-florida",
       "destination": "/lp/pool-service-seo-tampa",
       "permanent": true
+    },
+    {
+      "source": "/auto-repair-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/chiropractor-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/dentist-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/electrician-seo-tampa",
+      "destination": "/lp/electrician-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/gym-seo-clearwater",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/gym-seo-st-petersburg",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/gym-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/hvac-seo-tampa",
+      "destination": "/lp/hvac-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/landscaping-seo-tampa",
+      "destination": "/lp/lawn-care-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/law-firm-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/med-spa-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/pet-grooming-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-clearwater",
+      "destination": "/lp/plumber-seo-clearwater",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-st-petersburg",
+      "destination": "/lp/plumber-seo-st-petersburg",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-tampa",
+      "destination": "/lp/plumber-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/pressure-washing-seo-tampa",
+      "destination": "/lp/pressure-washing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/real-estate-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/restaurant-seo-clearwater",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/restaurant-seo-st-petersburg",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/restaurant-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/roofer-seo-tampa",
+      "destination": "/lp/roofing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/salon-seo-clearwater",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/salon-seo-st-petersburg",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/salon-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
     }
   ],
   "rewrites": [
