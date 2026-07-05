@@ -43,11 +43,15 @@ nginx config (`client-site.conf.template`, replace CLIENTDOMAIN/CLIENTFOLDER
 with the real domain once known). The repo's `vercel.json` is ignored on the
 VPS — harmless.
 
-## 3. lola-seo (static landing pages)
+## 3. lola-seo (static landing pages + serverless functions)
 
-Clone into `/opt/lola-cloud/seo/lola-seo`. It has an `/api` folder — check
-whether those are Vercel serverless functions before cutover; if so they need
-a PM2 port + nginx `location /api` proxy, or fold them into lola-backend.
+Clone into `/opt/lola-cloud/seo/lola-seo`. **Audited:** the `/api` folder IS
+Vercel serverless functions (`module.exports = (req, res)` style):
+`capture-lead.js` (lead emails via Resend), `purchase-intent.js`,
+`ig-profile.js`. On the VPS these need a small Express wrapper under PM2 with
+an nginx `location /api` proxy — or fold them into lola-backend's FastAPI.
+They require `RESEND_API_KEY` as an env var (never hardcoded — a previously
+committed key was removed 2026-07-05 and must stay rotated).
 Serve under a subdomain (e.g. `seo.tyalexandermedia.com`) when ready.
 
 ## 4. lola-backend (FastAPI app → lola.tyalexandermedia.com)
@@ -66,25 +70,30 @@ uvicorn to 127.0.0.1 keeps the app reachable only through Nginx.
 
 ## 5. sandbarsoftwash.com (Astro hybrid — the careful one)
 
-The Vercel adapter doesn't run on a VPS. One-time repo change (do this in a
-branch first):
+**Already done (2026-07-05, branch `claude/lola-cloud-vps-setup-k8cnhr`):**
+the repo now has a dual adapter — the default build still targets Vercel
+(live site unaffected), and `DEPLOY_TARGET=vps npm run build` produces a
+standalone Node server. Both builds verified; the VPS server was smoke-tested
+(pages 200, `/api/reviews` 200, `/api/lead` validates input). Merge that
+branch, then on the VPS:
 
 ```bash
 cd /opt/lola-cloud/clients/sandbar-soft-wash
-npx astro add node        # installs @astrojs/node, sets adapter in astro.config.mjs
-# in astro.config.mjs: remove the vercel adapter import/entry; keep output: 'hybrid'
-npm run build             # produces dist/server/entry.mjs
-pm2 start dist/server/entry.mjs --name sandbar-soft-wash   # listens on :4321 by default
+npm ci
+# Required env vars (from the Vercel dashboard) into .env, chmod 600:
+#   RESEND_API_KEY        (lead emails — /api/lead)
+#   GOOGLE_MAPS_API_KEY   (reviews — /api/reviews)
+DEPLOY_TARGET=vps npm run build             # produces dist/server/entry.mjs
+pm2 start "env $(cat .env | xargs) HOST=127.0.0.1 PORT=4321 node dist/server/entry.mjs" --name sandbar-soft-wash
 pm2 save
 ```
 
 Nginx: use the **proxy variant** of the template pointed at `127.0.0.1:4321`.
 
 **Pre-cutover checklist (non-negotiable — this site takes leads):**
-- [ ] `curl -X POST` a test lead to `/api/lead` on the VPS and confirm it lands
-      wherever leads go (email/CRM) — check `src/pages/api/lead.ts` for required
-      env vars and put them in `.env` on the VPS first
-- [ ] `/api/reviews` returns data
+- [ ] `curl -X POST` a REAL test lead to `/api/lead` on the VPS and confirm the
+      email arrives at ty@tyalexandermedia.com
+- [ ] `/api/reviews` returns live data (needs GOOGLE_MAPS_API_KEY set)
 - [ ] A dozen key pages render (home, instant-quote, calculator, 2–3 city pages)
 - [ ] Only then move DNS; watch `pm2 logs sandbar-soft-wash` during the first hours
 
