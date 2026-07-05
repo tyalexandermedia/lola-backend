@@ -6,8 +6,8 @@ import html as htmllib
 
 OUT_DIR = "/home/user/lola-backend/frontend/public/lp/tampa-bay-power-clean"
 BASE = "https://www.tampabaypowerclean.com"
-PHONE_DISPLAY = "727-712-6281"
-PHONE_HREF = "tel:+17277126281"
+PHONE_DISPLAY = "727-210-5668"
+PHONE_HREF = "tel:+17272105668"
 
 CSS = """
 :root{--navy:#0b2233;--navy2:#10344c;--ink:#152430;--body:#43555f;--soft:#6b7c85;--line:#e4e0d5;--gold:#c99a2e;--gold2:#e8c25d;--cream:#faf7f0;--white:#fff;--green:#1d7a5f}
@@ -232,8 +232,21 @@ def build_page_schema(svc):
                     "@type": "HomeAndConstructionBusiness",
                     "@id": f"{BASE}/#business",
                     "name": "Tampa Bay Power Clean",
-                    "telephone": "+17277126281",
+                    "legalName": "Tampa Bay Power Clean LLC",
+                    "telephone": "+17272105668",
                     "url": f"{BASE}/",
+                    "address": {
+                        "@type": "PostalAddress",
+                        "streetAddress": "73 Patricia Ave #D",
+                        "addressLocality": "Dunedin",
+                        "addressRegion": "FL",
+                        "postalCode": "34698",
+                        "addressCountry": "US",
+                    },
+                    "sameAs": [
+                        "https://www.facebook.com/61563395487955/",
+                        "https://www.bbb.org/us/fl/dunedin/profile/property-maintenance/tampa-bay-power-clean-llc-0653-90455402",
+                    ],
                 },
                 "areaServed": [
                     {"@type": "City", "name": c} for c in
@@ -513,7 +526,7 @@ SERVICES = [
         "service_name": "Roof Cleaning",
         "service_type": "Soft wash roof cleaning",
         "title": "Roof Cleaning Dunedin FL | Soft Wash Roof Cleaning Pinellas County",
-        "meta_desc": "Soft wash roof cleaning in Dunedin, Clearwater, Palm Harbor & Pinellas County. Remove black algae streaks safely, protect your warranty, and extend roof life. Free 24-hour quote — 727-712-6281.",
+        "meta_desc": "Soft wash roof cleaning in Dunedin, Clearwater, Palm Harbor & Pinellas County. Remove black algae streaks safely, protect your warranty, and extend roof life. Free 24-hour quote — 727-210-5668.",
         "og_image": f"{WIX}/a210f4_e6a878454e9542d3af3a62d72f8fa8ab~mv2.png/v1/fill/w_640,h_583,al_c,lg_1,q_90,enc_avif,quality_auto/Roof%20Wash.png",
         "eyebrow": "Soft Wash Roof Cleaning · Dunedin & Pinellas County",
         "h1": 'Roof cleaning that protects your roof — <span style="color:var(--gold2)">not just your curb appeal</span>',
@@ -590,7 +603,7 @@ SERVICES = [
         "service_name": "House Washing",
         "service_type": "Soft wash house washing",
         "title": "House Washing Dunedin FL | Soft Wash Exterior Cleaning Pinellas County",
-        "meta_desc": "Low-pressure house washing in Dunedin, Clearwater, Palm Harbor & Pinellas County. Safely remove algae, mildew & salt film from stucco and siding. Free 24-hour quote — 727-712-6281.",
+        "meta_desc": "Low-pressure house washing in Dunedin, Clearwater, Palm Harbor & Pinellas County. Safely remove algae, mildew & salt film from stucco and siding. Free 24-hour quote — 727-210-5668.",
         "og_image": f"{WIX}/a210f4_4f27034c8d1e4066bcd94fab3580bd6d~mv2.png/v1/fill/w_640,h_583,al_c,lg_1,q_90,enc_avif,quality_auto/Soft%20Wash.png",
         "eyebrow": "Soft Wash House Washing · Dunedin & Pinellas County",
         "h1": 'House washing that renews your exterior — <span style="color:var(--gold2)">without blasting it apart</span>',
@@ -667,7 +680,7 @@ SERVICES = [
         "service_name": "Paver Cleaning & Sealing",
         "service_type": "Paver cleaning and sealing",
         "title": "Paver Sealing Pinellas County | Paver Cleaning & Sealing Dunedin FL",
-        "meta_desc": "Paver cleaning, re-sanding & sealing in Dunedin, Clearwater, Palm Harbor & Pinellas County. Lock in color, stop weeds & mold, protect your investment. Free 24-hour quote — 727-712-6281.",
+        "meta_desc": "Paver cleaning, re-sanding & sealing in Dunedin, Clearwater, Palm Harbor & Pinellas County. Lock in color, stop weeds & mold, protect your investment. Free 24-hour quote — 727-210-5668.",
         "og_image": f"{WIX}/a210f4_dc8a0bd33484469288860e8270c2bb27~mv2.png/v1/fill/w_640,h_583,al_c,lg_1,q_90,enc_avif,quality_auto/driveway.png",
         "eyebrow": "Paver Cleaning & Sealing · Dunedin & Pinellas County",
         "h1": 'Paver sealing that locks in the color — <span style="color:var(--gold2)">and locks out the weeds</span>',
