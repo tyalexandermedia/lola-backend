@@ -1,0 +1,25 @@
+#cloud-config
+# ═══════════════════════════════════════════════════════════════════
+# LOLA CLOUD — paste this whole file into Hetzner's "Cloud config"
+# box on the Create Server screen (also works on DigitalOcean's
+# "User data" box). The server sets itself up completely on first
+# boot: security hardening, firewall, Fail2Ban, Node, Python, Nginx,
+# Certbot, PM2, and the /opt/lola-cloud workspace. No terminal needed.
+#
+# IMPORTANT: also select your SSH key on the same screen — the setup
+# copies it to the 'lola' user and then disables password/root login.
+#
+# Takes ~5-10 minutes after boot. Then: ssh lola@YOUR_SERVER_IP
+# (a status summary greets you at login). Progress/troubleshooting
+# log on the server: /var/log/lola-bootstrap.log
+# ═══════════════════════════════════════════════════════════════════
+packages:
+  - git
+runcmd:
+  - >
+    bash -c 'git clone --branch claude/lola-cloud-vps-setup-k8cnhr
+    https://github.com/tyalexandermedia/lola-backend.git /root/lola-backend
+    >> /var/log/lola-bootstrap.log 2>&1
+    && bash /root/lola-backend/infra/vps/setup/bootstrap-cloudinit.sh
+    >> /var/log/lola-bootstrap.log 2>&1'
+final_message: "Lola Cloud bootstrap kicked off — full setup finishes in the background within ~10 minutes. Log: /var/log/lola-bootstrap.log"

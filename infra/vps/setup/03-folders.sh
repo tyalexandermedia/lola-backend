@@ -26,8 +26,10 @@ die()  { printf '\033[1;31m  ✖ %s\033[0m\n' "$*"; exit 1; }
 
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # .../infra/vps
 ROOT=/opt/lola-cloud
-OWNER=${SUDO_USER:-$USER}
+# LOLA_OWNER is set by bootstrap-cloudinit.sh (which runs as root with no sudo user)
+OWNER=${LOLA_OWNER:-${SUDO_USER:-$USER}}
 [[ "$OWNER" != "root" ]] || die "Run via sudo from your normal user, not as root directly."
+id "$OWNER" &>/dev/null || die "User '$OWNER' does not exist."
 
 say "Step 1/5: Creating folder structure at $ROOT"
 # What each folder is for:
