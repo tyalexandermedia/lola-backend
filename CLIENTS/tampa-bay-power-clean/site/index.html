@@ -419,8 +419,11 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
   main>section.shell{padding:36px 20px}
   .hero-grid{padding:52px 0 44px}
   body{padding-bottom:78px}
-  .mobile-cta{position:fixed;left:12px;right:12px;bottom:12px;z-index:40;display:flex;align-items:center;justify-content:center;min-height:52px;
-    border-radius:12px;background:var(--btn);color:#fff;font-size:14px;font-weight:800;letter-spacing:.01em;box-shadow:0 12px 30px rgba(3,105,161,.34)}
+  .mobile-cta{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.14);box-shadow:0 -6px 20px rgba(4,16,26,.22);padding-bottom:env(safe-area-inset-bottom)}
+  .mobile-cta a{display:flex;align-items:center;justify-content:center;gap:6px;min-height:54px;font-size:14px;font-weight:800;color:#fff}
+  .mobile-cta .mc-call{background:#0b2233}
+  .mobile-cta .mc-text{background:#0f3049}
+  .mobile-cta .mc-quote{background:var(--btn)}
 }
 @media(max-width:620px){
   .shell{width:min(100% - 28px,1180px)}
@@ -450,6 +453,20 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
 .final p{color:#c3d4e2}
 .final .quote-form{background:#fff;border-color:rgba(0,0,0,.06);box-shadow:0 20px 50px rgba(0,0,0,.28)}
 .final .form-note{color:#555}
+
+/* ---- ROI: above-the-fold hero quote form (white card on dark hero) ---- */
+.hero-quote{margin:32px auto 0;max-width:440px;text-align:left;background:#fff;border-radius:16px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.hero-quote .hq-title{margin:0 0 12px;text-align:center;color:var(--ink);font-weight:900;font-size:18px;letter-spacing:-.01em}
+.hq-form{display:grid;gap:10px}
+.hq-form input,.hq-form select{width:100%;min-height:46px;border:1.5px solid #d7dde3;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font-size:16px}
+.hq-form input::placeholder{color:#6b7280}
+.hq-form input:focus,.hq-form select:focus{outline:0;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(2,132,199,.18)}
+.hq-form .button{width:100%;margin-top:2px}
+.hq-note{margin:2px 0 0;text-align:center;color:#555;font-size:12px;font-weight:600}
+
+/* ---- ROI: footer trust links (real profiles) ---- */
+.foot-links{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.foot-links a{min-width:44px;justify-content:center}
 </style>
 </head>
 <body>
@@ -488,14 +505,21 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
           <span class="badge">Same-house proof</span>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="Why Tampa Bay Power Clean is the local choice">
-        <p class="eyebrow">Clean results, safer service</p>
-        <h3>Safe roof cleaning and house washing that helps preserve your home.</h3>
-        <ul>
-          <li><b>1</b><span>Roof cleaning that removes algae, moss, and black streaks without pressure damage.</span></li>
-          <li><b>2</b><span>House washing that restores siding, trim, and lanais with gentle soft wash chemistry.</span></li>
-          <li><b>3</b><span>Local Dunedin crews with quick estimates, responsive follow-up, and strong service area knowledge.</span></li>
-        </ul>
+      <aside class="hero-quote" aria-label="Get a free same-day quote">
+        <p class="hq-title">Get your free same-day quote</p>
+        <form id="hero-form" class="hq-form" novalidate>
+          <input class="focus-ring" id="h-name" name="name" placeholder="Full name" autocomplete="name" aria-label="Full name" required>
+          <input class="focus-ring" id="h-phone" name="phone" placeholder="Phone number" inputmode="tel" autocomplete="tel" aria-label="Phone number" required>
+          <select class="focus-ring" id="h-service" name="service" aria-label="Service needed" required>
+            <option value="">What do you need cleaned?</option>
+            <option>Roof Cleaning</option>
+            <option>House Washing</option>
+            <option>Roof + House Combo</option>
+            <option>Other Exterior Cleaning</option>
+          </select>
+          <button class="button focus-ring" type="submit">Get My Free Quote</button>
+          <p class="hq-note" id="hero-status" role="status" aria-live="polite">Free &middot; same-day reply &middot; no spam</p>
+        </form>
       </aside>
     </div>
   </section>
@@ -666,8 +690,8 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
             <input class="focus-ring" id="q-email" name="email" type="email" autocomplete="email">
           </div>
           <div class="field">
-            <label for="q-city">Service Area</label>
-            <select class="focus-ring" id="q-city" name="city" required>
+            <label for="q-city">Service Area (optional)</label>
+            <select class="focus-ring" id="q-city" name="city">
               <option value="">Select city</option>
               <option>Dunedin</option>
               <option>Clearwater</option>
@@ -716,52 +740,63 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
 <footer>
   <div class="shell footer-grid">
     <span>Tampa Bay Power Clean · 73 Patricia Ave #D, Dunedin, FL 34698 · Dunedin roof cleaning &amp; house washing</span>
-    <a href="tel:+17272105668">Call 727-210-5668</a>
+    <span class="foot-links">
+      <a href="https://www.google.com/search?q=Tampa+Bay+Power+Clean+Dunedin+FL" target="_blank" rel="noopener">Google</a>
+      <a href="https://www.facebook.com/61563395487955/" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.bbb.org/us/fl/dunedin/profile/property-maintenance/tampa-bay-power-clean-llc-0653-90455402" target="_blank" rel="noopener">BBB</a>
+      <a href="tel:+17272105668">Call 727-210-5668</a>
+    </span>
   </div>
 </footer>
-<a class="mobile-cta" href="sms:+17272105668?&body=Hi%20Tampa%20Bay%20Power%20Clean%2C%20I%20need%20a%20roof%20cleaning%20quote%20in%20Dunedin." aria-label="Text Tampa Bay Power Clean now for a quick quote">Text Now For Quick Quote</a>
+<nav class="mobile-cta" aria-label="Quick contact">
+  <a class="mc-call" href="tel:+17272105668" aria-label="Call Tampa Bay Power Clean">☎ Call</a>
+  <a class="mc-text" href="sms:+17272105668?&body=Hi%20Tampa%20Bay%20Power%20Clean%2C%20I%20need%20a%20roof%20cleaning%20quote%20in%20Dunedin." aria-label="Text Tampa Bay Power Clean">💬 Text</a>
+  <a class="mc-quote" href="#quote" aria-label="Go to the quote form">Free Quote</a>
+</nav>
 <script>
-/* Quote form: captures high-intent leads and routes to quick text + email fallback */
+/* Quote forms (hero + full): capture high-intent leads and route to a text app,
+   with an email app fallback. Self-contained, no backend. */
 (function(){
-  var form = document.getElementById('quote-form');
-  var status = document.getElementById('form-status');
-  if(!form || !status){ return; }
-
   function enc(v){ return encodeURIComponent(v || ''); }
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    var name = document.getElementById('q-name').value.trim();
-    var phone = document.getElementById('q-phone').value.trim();
-    var email = document.getElementById('q-email').value.trim();
-    var city = document.getElementById('q-city').value.trim();
-    var service = document.getElementById('q-service').value.trim();
-    var notes = document.getElementById('q-notes').value.trim();
+  function wire(o){
+    var form = document.getElementById(o.form);
+    if(!form){ return; }
+    var status = o.status ? document.getElementById(o.status) : null;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = val(o.name), phone = val(o.phone), service = val(o.service);
+      var email = o.email ? val(o.email) : '';
+      var city = o.city ? val(o.city) : '';
+      var notes = o.notes ? val(o.notes) : '';
 
-    if(!name || !phone || !city || !service){
-      status.textContent = 'Please complete name, phone, city, and service to submit your quote request.';
-      return;
-    }
+      if(!name || !phone || !service){
+        if(status){ status.textContent = 'Please add your name, phone, and the service you need.'; }
+        return;
+      }
 
-    var msg =
-      'New Quote Request - Tampa Bay Power Clean%0A' +
-      'Name: ' + enc(name) + '%0A' +
-      'Phone: ' + enc(phone) + '%0A' +
-      'Email: ' + enc(email || 'Not provided') + '%0A' +
-      'City: ' + enc(city) + '%0A' +
-      'Service: ' + enc(service) + '%0A' +
-      'Notes: ' + enc(notes || 'None');
+      var msg =
+        'New Quote Request - Tampa Bay Power Clean%0A' +
+        'Name: ' + enc(name) + '%0A' +
+        'Phone: ' + enc(phone) + '%0A' +
+        'Email: ' + enc(email || 'Not provided') + '%0A' +
+        'City: ' + enc(city || 'Not provided') + '%0A' +
+        'Service: ' + enc(service) + '%0A' +
+        'Notes: ' + enc(notes || 'None');
 
-    var smsUrl = 'sms:+17272105668?&body=' + msg;
-    var mailtoUrl = 'mailto:info@tampabaypowerclean.com?subject=' + enc('Quote Request - ' + service + ' - ' + city) + '&body=' + msg;
+      var smsUrl = 'sms:+17272105668?&body=' + msg;
+      var mailtoUrl = 'mailto:info@tampabaypowerclean.com?subject=' +
+        enc('Quote Request - ' + service + ' - ' + (city || 'Dunedin area')) + '&body=' + msg;
 
-    status.textContent = 'Opening your text app now. If it does not open, your email app will open as backup.';
-    window.location.href = smsUrl;
+      if(status){ status.textContent = 'Opening your text app now. If it does not open, your email app will open as backup.'; }
+      window.location.href = smsUrl;
+      setTimeout(function(){ window.location.href = mailtoUrl; }, 800);
+    });
+  }
 
-    setTimeout(function(){
-      window.location.href = mailtoUrl;
-    }, 800);
-  });
+  wire({form:'quote-form', status:'form-status', name:'q-name', phone:'q-phone', email:'q-email', city:'q-city', service:'q-service', notes:'q-notes'});
+  wire({form:'hero-form', status:'hero-status', name:'h-name', phone:'h-phone', service:'h-service'});
 })();
 </script>
 </body>
