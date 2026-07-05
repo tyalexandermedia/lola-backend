@@ -99,9 +99,12 @@ Nginx: use the **proxy variant** of the template pointed at `127.0.0.1:4321`.
 
 ## tampabaypowerclean.com (Wix — rebuild, not migrate)
 
-Wix can't be exported. The play: build a new site in
-`clients/tampa-bay-power-clean` (start from `lola-new-client` /
-`templates/local-business-starter`, reuse sandbar's page structure as the
-model since it's the same trade), then cut DNS over when it beats the Wix
-site. Until then, leave Wix alone. Note `tyalexandermedia.com` itself is also
-on Wix — same treatment, later.
+Wix can't be exported. **The rebuild is DONE (2026-07-05):** a deployable
+static site lives at `CLIENTS/tampa-bay-power-clean/site/` in this repo —
+built from the vetted landing page copy (roof cleaning/house washing,
+Dunedin + Pinellas), full schema (business/FAQ/services), real before-after
+proof photos, optimized hero (352KB), self-contained SMS quote form
+(727-712-6281), favicon/robots/sitemap. Verified rendering at 390px and
+1280px; a mobile overflow bug in the source page was fixed. Deploy steps are
+in that folder's README; DNS stays on Wix until Ty approves the new site.
+Note `tyalexandermedia.com` itself is also on Wix — same treatment, later.
