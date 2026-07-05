@@ -28,6 +28,42 @@
   ],
   "rewrites": [
     {
+      "source": "/tampa-bay-power-clean",
+      "destination": "/lp/tampa-bay-power-clean.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean",
+      "destination": "/lp/tampa-bay-power-clean.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/roof-cleaning",
+      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/house-washing",
+      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/paver-sealing",
+      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/roof-cleaning",
+      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/house-washing",
+      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/paver-sealing",
+      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
+    },
+    {
+      "source": "/lead-gen/(.*)",
+      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"
+    },
+    {
       "source": "/lp/pressure-washing-seo-tampa",
       "destination": "/lp/pressure-washing-seo-tampa.html"
     },
