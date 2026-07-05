@@ -20,8 +20,8 @@
 <meta name="twitter:image" content="https://www.tampabaypowerclean.com/images/tampa-bay-power-clean-hero.jpg">
 <meta name="twitter:image:alt" content="Same-house roof cleaning before and after proof from Dunedin, FL">
 <meta name="keywords" content="roof cleaning Dunedin FL, roof washing Dunedin, house washing Dunedin FL, pressure washing Dunedin, soft washing Pinellas County, driveway cleaning Dunedin, paver sealing Pinellas, exterior cleaning Clearwater">
-<meta name="theme-color" content="#081216">
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#0b2233">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta name="format-detection" content="telephone=yes">
 <link rel="icon" href="favicon.svg">
 <link rel="preload" as="image" href="images/tampa-bay-power-clean-hero.jpg">
@@ -476,6 +476,21 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
 .ba-cell b{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:999px;background:rgba(11,34,51,.82);color:#fff;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .ba-cell + .ba-cell b{left:auto;right:8px;background:rgba(29,122,95,.92)}
 @media(max-width:900px){.proof-gallery{grid-template-columns:1fr}}
+
+/* ---- Final completion pass: mobile UX, FAQ affordance, motion + touch polish ---- */
+[id]{scroll-margin-top:84px}                       /* anchors clear the sticky nav */
+h1,h2,h3{text-wrap:balance}
+p{text-wrap:pretty}
+a,button{-webkit-tap-highlight-color:transparent}
+.button,.money-btn,.nav-call,.mobile-cta a,summary{touch-action:manipulation}
+summary{justify-content:space-between;gap:12px}
+summary::after{content:"+";flex:0 0 auto;color:var(--accent-text);font-weight:800;font-size:20px;line-height:1}
+details[open] summary::after{content:"\2013"}
+details{transition:border-color .15s ease}
+details:hover,details[open]{border-color:var(--accent-2)}
+.trust-pill,.ba-mini{transition:transform .15s ease,box-shadow .15s ease}
+.trust-pill:hover,.ba-mini:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
