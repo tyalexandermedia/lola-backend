@@ -48,7 +48,8 @@ else
     ok "PM2 $(pm2 --version) installed."
 fi
 # Make PM2-managed apps start on reboot for the invoking (non-root) user
-REAL_USER=${SUDO_USER:-$USER}
+# cloud-init runs with no USER in the environment — fall back safely
+REAL_USER=${SUDO_USER:-${USER:-root}}
 if [[ "$REAL_USER" != "root" ]]; then
     env PATH="$PATH" pm2 startup systemd -u "$REAL_USER" --hp "$(getent passwd "$REAL_USER" | cut -d: -f6)" >/dev/null
     ok "PM2 will restart '$REAL_USER' apps automatically after a reboot."
