@@ -66,6 +66,120 @@ Maps/GBP, AI assistants, Bing, Apple Maps, and future local discovery surfaces.
   - Dedicated Tampa Bay Power Clean tracking number.
   - Dedicated form endpoint or event source.
 
+## Google Business Profile Setup Values
+
+Use these values when GBP access is available. Keep the website, GBP, Bing
+Places, Apple Business Connect, citations, and future service pages consistent.
+
+### Core Profile
+
+- Business name: `Tampa Bay Power Clean`
+- Website: `https://www.tampabaypowerclean.com/`
+- Temporary phone: `727-712-6281`
+- Final phone: replace with the dedicated Tampa Bay Power Clean tracking number
+  once it exists.
+- Public landing page while domain access is pending:
+  `https://lola.tyalexandermedia.com/lp/tampa-bay-power-clean`
+- Appointment/quote URL:
+  `https://www.tampabaypowerclean.com/?utm_source=google&utm_medium=organic&utm_campaign=gbp`
+
+### Category Plan
+
+- Primary category: pressure washing service or closest verified GBP category.
+- Secondary categories, only if available and accurate:
+  - Cleaning service
+  - Commercial cleaning service
+  - Gutter cleaning service
+  - Window cleaning service, only if actually offered
+
+Do not add categories for services the business will not perform.
+
+### Service List
+
+Add each service with short, non-spammy descriptions:
+
+- Pressure Washing
+- Power Washing
+- Roof Cleaning
+- Roof Washing
+- House Washing
+- Soft Washing
+- Paver Sealing
+- Paver Cleaning
+- Driveway Cleaning
+- Concrete Cleaning
+- Pool Cage Cleaning
+- Lanai Cleaning
+- Commercial Pressure Washing
+- Commercial Roof Cleaning
+
+### Service Areas
+
+Start with:
+
+- Dunedin
+- Clearwater
+- Palm Harbor
+- Safety Harbor
+- Oldsmar
+- Tarpon Springs
+- Ozona
+- Crystal Beach
+- Countryside
+- Belleair
+- Pinellas County
+- Tampa Bay
+
+Keep service areas tight. Do not add every Florida city unless there is real
+service coverage and a reason to compete there.
+
+### First Photo Upload Batch
+
+Upload real, approved photos only:
+
+- Logo
+- Cover image
+- Team or equipment photo
+- Before/after: roof cleaning
+- Before/after: pressure washing
+- Before/after: paver sealing
+- Before/after: driveway or concrete cleaning
+- Before/after: pool cage or lanai cleaning
+- Commercial exterior cleaning photo, if available
+
+Name files descriptively before uploading, for example:
+
+- `tampa-bay-power-clean-roof-cleaning-dunedin.jpg`
+- `tampa-bay-power-clean-paver-sealing-clearwater.jpg`
+- `tampa-bay-power-clean-pool-cage-cleaning-palm-harbor.jpg`
+
+### First GBP Post
+
+Suggested first post:
+
+```text
+Tampa Bay Power Clean is now accepting pressure washing, roof cleaning,
+soft washing, paver sealing, driveway cleaning, pool cage cleaning, and
+commercial exterior cleaning requests in Dunedin and nearby Pinellas County
+communities. Call 727-712-6281 to request a quote.
+```
+
+Use a real service photo, not a stock image or AI image, for the first post.
+
+### Review Request Language
+
+Send only after a real job is completed:
+
+```text
+Thanks again for choosing Tampa Bay Power Clean. If the work looked great,
+would you leave us a quick Google review? It helps local Dunedin and Pinellas
+County homeowners find us for pressure washing, roof cleaning, paver sealing,
+and soft washing.
+```
+
+Do not script customers to mention a specific city or service. Ask naturally;
+real review language is safer and more durable.
+
 ## API Keys To Add Later
 
 - `GOOGLE_CUSTOM_SEARCH_API_KEY` and `GOOGLE_CUSTOM_SEARCH_CX`

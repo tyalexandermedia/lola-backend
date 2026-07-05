@@ -496,7 +496,7 @@ export default function Homepage() {
           ))}
         </div>
         <p className="mt-5 text-center text-[13px] italic text-[#8A8F98]">
-          Currently working with Sandbar Soft Wash and growing. Your business could be next.
+          Currently working with <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">Sandbar Soft Wash</a> and growing. Your business could be next.
         </p>
       </section>
 
