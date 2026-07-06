@@ -1,0 +1,105 @@
+/* Local Business Starter — mobile-first, no framework */
+:root {
+  --brand: #0b5cab;        /* swap for the client's brand color */
+  --brand-dark: #08447e;
+  --accent: #ff9f1c;       /* CTA color — keep high-contrast */
+  --ink: #1a2330;
+  --paper: #ffffff;
+  --wash: #f2f6fa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.6;
+  /* room for the sticky call bar on phones */
+  padding-bottom: 64px;
+}
+
+.container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); line-height: 1.2; }
+h2 { font-size: clamp(1.4rem, 4vw, 2rem); margin-bottom: 1rem; }
+section { padding: 48px 0; }
+
+/* Buttons — 48px min height for touch targets */
+.btn {
+  display: inline-block;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: #221600; }
+.btn-secondary { background: var(--paper); color: var(--brand); border: 2px solid var(--brand); }
+.btn-call { background: var(--brand); color: #fff; padding: 10px 16px; }
+
+/* Header */
+.site-header { background: var(--paper); border-bottom: 1px solid #e3e9f0; position: sticky; top: 0; z-index: 10; }
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 10px 16px; }
+.brand { font-weight: 800; font-size: 1rem; }
+.btn-call { font-size: .95rem; min-height: 44px; white-space: nowrap; }
+
+/* Hero — swap the gradient for a real photo:
+   background: linear-gradient(rgba(8,68,126,.75), rgba(8,68,126,.75)), url('img/hero.jpg') center/cover; */
+.hero {
+  background: linear-gradient(160deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 64px 0;
+}
+.hero-sub { font-size: 1.15rem; margin: 12px 0 24px; opacity: .95; }
+.hero-ctas { display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 0 auto; }
+.trust-strip { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 6px; font-size: .95rem; }
+
+/* Services */
+.services { background: var(--wash); }
+.card-grid { display: grid; gap: 16px; }
+.card { background: var(--paper); border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(16,42,67,.08); }
+.card h3 { margin-bottom: 6px; color: var(--brand-dark); }
+
+/* Reviews */
+.reviews blockquote { border-left: 4px solid var(--accent); padding: 8px 16px; margin: 16px 0; background: var(--wash); border-radius: 0 8px 8px 0; }
+.reviews cite { display: block; margin-top: 6px; font-style: normal; font-weight: 600; color: var(--brand-dark); }
+
+/* Quote form */
+.quote { background: var(--wash); }
+.quote-form { display: grid; gap: 14px; max-width: 480px; margin-top: 16px; }
+.quote-form label { display: grid; gap: 4px; font-weight: 600; }
+.quote-form input, .quote-form textarea {
+  font: inherit; padding: 12px; border: 1px solid #c3cfdb; border-radius: 8px; background: var(--paper);
+}
+.quote-form input:focus, .quote-form textarea:focus { outline: 3px solid rgba(11,92,171,.35); border-color: var(--brand); }
+
+/* Footer */
+.site-footer { background: var(--ink); color: #dbe4ee; text-align: center; padding: 32px 0; }
+.site-footer a { color: #fff; }
+.fineprint { font-size: .85rem; opacity: .7; margin-top: 8px; }
+
+/* Sticky call bar — mobile only */
+.sticky-call {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: var(--accent); color: #221600;
+  text-align: center; font-weight: 800; font-size: 1.05rem;
+  padding: 14px; text-decoration: none;
+}
+
+/* Belt-and-suspenders: nothing may ever cause sideways scroll */
+html, body { overflow-x: hidden; }
+
+/* Tablet & up */
+@media (min-width: 700px) {
+  .brand { font-size: 1.1rem; }
+  .hero-ctas { flex-direction: row; max-width: none; justify-content: center; }
+  .trust-strip { flex-direction: row; justify-content: center; gap: 24px; }
+  .card-grid { grid-template-columns: repeat(3, 1fr); }
+  .sticky-call { display: none; }
+  body { padding-bottom: 0; }
+}
