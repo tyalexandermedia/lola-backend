@@ -90,7 +90,8 @@ KbdInteractiveAuthentication no
 PubkeyAuthentication yes
 MaxAuthTries 4
 EOF
-    if sshd -t; then
+    SSHD_BIN=$(command -v sshd || echo /usr/sbin/sshd)
+    if "$SSHD_BIN" -t; then
         systemctl reload ssh 2>/dev/null || systemctl reload sshd || fail "reload sshd"
     else
         rm -f /etc/ssh/sshd_config.d/99-lola-hardening.conf
@@ -101,7 +102,7 @@ else
 fi
 
 stage "8/8 Summary"
-IP=$(hostname -I | awk '{print $1}')
+IP=$(curl -fsS -m 2 http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || hostname -I | awk '{print $1}')
 {
     echo "════════════════════════════════════════════════════"
     echo "  LOLA CLOUD — automatic setup finished $(date '+%Y-%m-%d %H:%M UTC')"
