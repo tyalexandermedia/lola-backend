@@ -34,11 +34,18 @@ usermod -aG sudo "$NEW_USER"
 echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-lola
 chmod 440 /etc/sudoers.d/90-lola
 mkdir -p /home/$NEW_USER/.ssh
-if [[ -s /root/.ssh/authorized_keys ]]; then
-    cp /root/.ssh/authorized_keys /home/$NEW_USER/.ssh/authorized_keys
-else
-    touch /home/$NEW_USER/.ssh/authorized_keys
-    fail "no SSH key found on root — select your SSH key when creating the server"
+touch /home/$NEW_USER/.ssh/authorized_keys
+# Providers inject the chosen SSH key differently: Hetzner → root,
+# AWS Lightsail / EC2 Ubuntu images → the 'ubuntu' user. Collect from both.
+for SRC in /root/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys; do
+    [[ -s "$SRC" && "$SRC" != "/home/$NEW_USER/.ssh/authorized_keys" ]] || continue
+    while IFS= read -r key; do
+        [[ -n "$key" ]] || continue
+        grep -qF "$key" /home/$NEW_USER/.ssh/authorized_keys || echo "$key" >> /home/$NEW_USER/.ssh/authorized_keys
+    done < "$SRC"
+done
+if [[ ! -s /home/$NEW_USER/.ssh/authorized_keys ]]; then
+    fail "no SSH key found on root or ubuntu — select/upload your SSH key when creating the server"
 fi
 chmod 700 /home/$NEW_USER/.ssh
 chmod 600 /home/$NEW_USER/.ssh/authorized_keys
