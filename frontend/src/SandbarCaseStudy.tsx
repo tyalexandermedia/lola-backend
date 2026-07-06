@@ -45,7 +45,7 @@ export default function SandbarCaseStudy() {
         publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
         about: 'Sandbar Soft Wash',
         mentions: [
-          { '@type': 'LocalBusiness', name: 'Sandbar Soft Wash', address: { '@type': 'PostalAddress', addressLocality: 'Palm Harbor', addressRegion: 'FL', addressCountry: 'US' } },
+          { '@type': 'LocalBusiness', name: 'Sandbar Soft Wash', url: 'https://www.sandbarsoftwash.com', address: { '@type': 'PostalAddress', addressLocality: 'Palm Harbor', addressRegion: 'FL', addressCountry: 'US' } },
         ],
         url: 'https://lola.tyalexandermedia.com/case-studies/sandbar',
         inLanguage: 'en-US',
@@ -109,7 +109,8 @@ export default function SandbarCaseStudy() {
           The original proof story. Lola was built to fix Sandbar — Coach Ty&apos;s father&apos;s
           15+ year master-certified pressure-washing business in Palm Harbor, FL. Great
           work, dialed crew, near-invisible on Google. Here&apos;s what the playbook actually
-          did.
+          did. See the live site at{' '}
+          <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">sandbarsoftwash.com</a>.
         </p>
 
         {/* Verified-claims stat bar — every number here appears elsewhere

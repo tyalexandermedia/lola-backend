@@ -732,7 +732,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <div class="founding">
 <p class="eyebrow">&#129446; The 30-day promise</p>
 <h3 style="margin-top:8px">If Lola doesn't move your ranking in 30 days, I refund half.</h3>
-<p>That's the deal. Real proof you can verify: <strong>Sandbar Soft Wash</strong> — Coach Ty's father's Palm Harbor pressure-washing business, 15+ years, master certified. We rank local service businesses on Google <em>and</em> ChatGPT, Perplexity, Gemini, and Google AI Overviews — that's where your next customer is already searching. Your {esc(cname)} {esc(svc["name"])} case study is being written right now. Want to be it?</p>
+<p>That's the deal. Real proof you can verify: <strong><a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a></strong> — Coach Ty's father's Palm Harbor pressure-washing business, 15+ years, master certified. We rank local service businesses on Google <em>and</em> ChatGPT, Perplexity, Gemini, and Google AI Overviews — that's where your next customer is already searching. Your {esc(cname)} {esc(svc["name"])} case study is being written right now. Want to be it?</p>
 <span class="spots">30-day move-the-ranking promise · half back if not</span>
 </div>
 
@@ -748,7 +748,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <div class="divider"></div>
 
 <h2>Built by Coach Ty in Tampa Bay</h2>
-<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (Sandbar Soft Wash, Palm Harbor) kept losing jobs to bigger competitors who weren't doing better work — just better Google. Lola fixes that for local service businesses across {esc(cname)} and {esc(city["nearby"])}. You answer the phone. I plus a team of AI agents handle the ranking — on Google and on AI search.</p>
+<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (<a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a>, Palm Harbor) kept losing jobs to bigger competitors who weren't doing better work — just better Google. Lola fixes that for local service businesses across {esc(cname)} and {esc(city["nearby"])}. You answer the phone. I plus a team of AI agents handle the ranking — on Google and on AI search.</p>
 
 <h2>FAQ</h2>
 {faq_details}
@@ -925,7 +925,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 
 <div class="coachty">
 <p class="eyebrow">Why Lola</p>
-<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (Sandbar Soft Wash, Palm Harbor — 15+ years, master certified) kept losing jobs to bigger competitors with worse work but better Google. Lola fixes that for local service businesses. If Lola doesn't move your ranking in 30 days, I refund half. Built with faith, run with hustle, and yes — there's a dog named Lola. &#128062;</p>
+<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (<a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a>, Palm Harbor — 15+ years, master certified) kept losing jobs to bigger competitors with worse work but better Google. Lola fixes that for local service businesses. If Lola doesn't move your ranking in 30 days, I refund half. Built with faith, run with hustle, and yes — there's a dog named Lola. &#128062;</p>
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.08)">
