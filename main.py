@@ -306,7 +306,11 @@ class AuditRequest(BaseModel):
     website: str
     city: str
     business_type: str = "soft wash"
-    email: str
+    # Phone is the primary contact for the Growth Score (required on the form);
+    # email is optional. Keep both so a phone-only lead isn't dropped.
+    phone: str = ""
+    email: str = ""
+    sms_consent: bool = False
 
 
 class AuditRevenueLeak(BaseModel):
@@ -1222,6 +1226,8 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 "city": request.city,
                 "business_type": business_type,
                 "email": request.email,
+                "phone": request.phone,
+                "sms_consent": request.sms_consent,
                 "total_score": total_score,
                 "grade": grade,
                 "grade_label": grade_label,
@@ -1252,6 +1258,7 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 audit_id,
                 {
                     "email": request.email,
+                    "phone": request.phone,
                     "business_name": request.business_name,
                     "website": website,
                     "city": request.city,
@@ -1284,28 +1291,33 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 monthly_leak=revenue_leak["monthly_leak"],
             )
 
-            # If this email was in a cold-outreach batch, mark it converted +
-            # auto-suppress so Agent 4 never re-targets a customer who audited.
-            await mark_audit_submitted(request.email)
+            # Email-only side effects. The Growth Score form makes email optional
+            # (phone is the required contact), so only run these when we actually
+            # have an email — otherwise we'd key on / send to an empty address.
+            # Phone-only leads are still captured in the saved audit above.
+            if request.email:
+                # If this email was in a cold-outreach batch, mark it converted +
+                # auto-suppress so Agent 4 never re-targets a customer who audited.
+                await mark_audit_submitted(request.email)
 
-            # Fire-and-forget side effects so the user doesn't wait on Brevo/Resend.
-            # Phase 1 is low-volume; if the process restarts mid-send, the next
-            # audit will sync this lead again.
-            asyncio.create_task(
-                _followups(
-                    email=request.email,
-                    business_name=request.business_name,
-                    city=request.city,
-                    business_type=business_type,
-                    total_score=total_score,
-                    grade=grade,
-                    grade_label=grade_label,
-                    revenue_leak=revenue_leak,
-                    lola_message=lola_message,
-                    temperature=temperature,
-                    audit_id=audit_id,
+                # Fire-and-forget side effects so the user doesn't wait on Brevo/Resend.
+                # Phase 1 is low-volume; if the process restarts mid-send, the next
+                # audit will sync this lead again.
+                asyncio.create_task(
+                    _followups(
+                        email=request.email,
+                        business_name=request.business_name,
+                        city=request.city,
+                        business_type=business_type,
+                        total_score=total_score,
+                        grade=grade,
+                        grade_label=grade_label,
+                        revenue_leak=revenue_leak,
+                        lola_message=lola_message,
+                        temperature=temperature,
+                        audit_id=audit_id,
+                    )
                 )
-            )
 
             print(f"📞 API calls used: {budget.used}/{budget.cap}")
             return audit_response
@@ -1562,13 +1574,16 @@ REVENUE_LABELS = {
 }
 
 TIER_LABELS = {
+    # Current two-tier offer (what the apply form posts).
+    "diy": "DIY — Growth Score + 5-step fix-it checklist ($197 one-time)",
+    "build": "Full Build ($997 one-time · Half-Back Guarantee)",
+    "both": "Tell me which fits better",
+    # Back-compat for older/retired inbound payloads.
     "foundation": "DIY — Growth Score + 5-step fix-it checklist ($197 one-time)",
     "growth": "Full Build ($997 one-time · Half-Back Guarantee)",
     "scale": "Full Build ($997 one-time · Half-Back Guarantee)",
-    # Back-compat for older inbound payloads.
     "retainer": "Full Build ($997 one-time · Half-Back Guarantee)",
     "pro": "Full Build ($997 one-time · Half-Back Guarantee)",
-    "both": "Tell me which fits better",
 }
 
 

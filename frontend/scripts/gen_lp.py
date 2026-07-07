@@ -178,7 +178,7 @@ SERVICES = {
     "pressure-washing": _svc(
         "Pressure Washing", "pressure washing pros", "Pressure Washing", "Pressure Washing",
         h1=lambda c: f'{c["name"]} pressure washing: own the "{c["name"].lower()} house washing near me" search.',
-        sub=lambda c: f'Homeowners in {c["name"]} search the second they see the green creeping up the driveway. Lola gets your soft-wash business ranking on Google + ChatGPT for those exact searches. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'Homeowners in {c["name"]} search the second they see the green creeping up the driveway. Lola gets your soft-wash business ranking on Google + ChatGPT for those exact searches. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Buying shared leads you split with 3 other washers',
             'Boosting Facebook posts that never reach buyers ready to book',
@@ -217,7 +217,7 @@ SERVICES = {
     "plumber": _svc(
         "Plumbing", "plumbers", "Plumber", "Plumbing",
         h1=lambda c: f'{c["name"]} plumbers: be the first result when someone searches "plumber near me" at 11pm.',
-        sub=lambda c: f'Emergency plumbing searches in {c["name"]} happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'Emergency plumbing searches in {c["name"]} happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             '"Pay $50/lead" services that share your leads with 3 competitors',
             '$2,500/mo plumbing agencies with 12-month contracts',
@@ -256,7 +256,7 @@ SERVICES = {
     "hvac": _svc(
         "HVAC", "HVAC contractors", "HVAC", "HVAC",
         h1=lambda c: f'{c["name"]} HVAC: be the "AC not cooling near me" call before your competitor is.',
-        sub=lambda c: f'When the AC dies in a {c["name"]} summer, people grab a phone and search — fast. Lola gets your HVAC business ranking on Google + ChatGPT for those emergency moments. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'When the AC dies in a {c["name"]} summer, people grab a phone and search — fast. Lola gets your HVAC business ranking on Google + ChatGPT for those emergency moments. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Lead resellers who sell the same homeowner to 4 HVAC shops',
             '$3,000/mo agencies locking you into a year',
@@ -295,7 +295,7 @@ SERVICES = {
     "roofing": _svc(
         "Roofing", "roofers", "Roofing", "Roofing",
         h1=lambda c: f'{c["name"]} roofers: own the search the morning after the storm.',
-        sub=lambda c: f'After a {c["name"]} storm, homeowners search "roof repair near me" and call whoever shows up first on Google. Lola gets you ranking on Google + ChatGPT before the storm-chasers do. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'After a {c["name"]} storm, homeowners search "roof repair near me" and call whoever shows up first on Google. Lola gets you ranking on Google + ChatGPT before the storm-chasers do. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Out-of-state storm-chasers buying your local keywords',
             '$4,000/mo agencies on 12-month contracts',
@@ -334,7 +334,7 @@ SERVICES = {
     "pool-service": _svc(
         "Pool Service", "pool service pros", "Pool Service", "Pool Service",
         h1=lambda c: f'{c["name"]} pool service: lock in recurring weekly accounts from "pool cleaning near me."',
-        sub=lambda c: f'In {c["name"]}, a pool that turns green sends the owner straight to Google. Lola gets your pool business ranking on Google + ChatGPT so you win the recurring weekly contract, not just the one-off. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'In {c["name"]}, a pool that turns green sends the owner straight to Google. Lola gets your pool business ranking on Google + ChatGPT so you win the recurring weekly contract, not just the one-off. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Shared-lead apps that pit you against every other route',
             '$2,000/mo agencies that never sold a weekly service plan',
@@ -373,7 +373,7 @@ SERVICES = {
     "lawn-care": _svc(
         "Lawn Care", "lawn care pros", "Lawn Care", "Lawn Care",
         h1=lambda c: f'{c["name"]} lawn care: win the route, not just the one-time mow.',
-        sub=lambda c: f'In {c["name"]}, "lawn care near me" searches turn into recurring weekly routes — if you show up first. Lola gets your lawn business ranking on Google + ChatGPT for that local demand. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'In {c["name"]}, "lawn care near me" searches turn into recurring weekly routes — if you show up first. Lola gets your lawn business ranking on Google + ChatGPT for that local demand. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Lead apps that auction you against every mower in town',
             '$1,500/mo agencies that never built a route business',
@@ -412,7 +412,7 @@ SERVICES = {
     "electrician": _svc(
         "Electrical", "electricians", "Electrician", "Electrical",
         h1=lambda c: f'{c["name"]} electricians: be the "electrician near me" call when the power\'s out.',
-        sub=lambda c: f'When a panel trips or the power\'s out in {c["name"]}, people search and call the first trusted result. Lola gets your electrical business ranking on Google + ChatGPT for those urgent moments. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'When a panel trips or the power\'s out in {c["name"]}, people search and call the first trusted result. Lola gets your electrical business ranking on Google + ChatGPT for those urgent moments. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Lead resellers selling the same homeowner to 4 shops',
             '$2,500/mo agencies on 12-month contracts',
@@ -451,7 +451,7 @@ SERVICES = {
     "cleaning": _svc(
         "Cleaning Services", "cleaning companies", "Cleaning", "Cleaning",
         h1=lambda c: f'{c["name"]} cleaning services: win recurring clients from "house cleaning near me."',
-        sub=lambda c: f'In {c["name"]}, "house cleaning near me" and "move-out cleaning" searches turn into recurring clients — if you rank. Lola gets your cleaning business ranking on Google + ChatGPT for that local demand. Done for you. From $197 to see your score and fix it yourself, up to a $997 full build we rank for you — backed by our Half-Back Guarantee.',
+        sub=lambda c: f'In {c["name"]}, "house cleaning near me" and "move-out cleaning" searches turn into recurring clients — if you rank. Lola gets your cleaning business ranking on Google + ChatGPT for that local demand. Done for you — start with your free 60-second Growth Score.',
         not_this=[
             'Lead apps that auction you against every cleaner in town',
             '$1,800/mo agencies that never sold a recurring plan',
@@ -496,6 +496,37 @@ OLD_TO_NEW = [
     ("/lp/local-seo-plumbers-tampa", "/lp/plumber-seo-tampa"),
     ("/lp/local-seo-pool-service-florida", "/lp/pool-service-seo-tampa"),
 ]
+
+# Vanity bare-slug SEO URLs (301). Point at the matching /lp page where one
+# exists, otherwise the industries hub. Not generated from a template, so kept
+# here explicitly — regeneration would otherwise drop them and break inbound
+# links / redirected vanity URLs already indexed and shared.
+VANITY_REDIRECTS = {
+    "/hvac-seo-tampa": "/lp/hvac-seo-tampa",
+    "/plumber-seo-tampa": "/lp/plumber-seo-tampa",
+    "/plumber-seo-clearwater": "/lp/plumber-seo-clearwater",
+    "/plumber-seo-st-petersburg": "/lp/plumber-seo-st-petersburg",
+    "/pressure-washing-seo-tampa": "/lp/pressure-washing-seo-tampa",
+    "/roofer-seo-tampa": "/lp/roofing-seo-tampa",
+    "/electrician-seo-tampa": "/lp/electrician-seo-tampa",
+    "/landscaping-seo-tampa": "/lp/lawn-care-seo-tampa",
+    "/auto-repair-seo-tampa": "/lp/industries",
+    "/chiropractor-seo-tampa": "/lp/industries",
+    "/dentist-seo-tampa": "/lp/industries",
+    "/gym-seo-tampa": "/lp/industries",
+    "/gym-seo-clearwater": "/lp/industries",
+    "/gym-seo-st-petersburg": "/lp/industries",
+    "/law-firm-seo-tampa": "/lp/industries",
+    "/med-spa-seo-tampa": "/lp/industries",
+    "/pet-grooming-seo-tampa": "/lp/industries",
+    "/real-estate-seo-tampa": "/lp/industries",
+    "/restaurant-seo-tampa": "/lp/industries",
+    "/restaurant-seo-clearwater": "/lp/industries",
+    "/restaurant-seo-st-petersburg": "/lp/industries",
+    "/salon-seo-tampa": "/lp/industries",
+    "/salon-seo-clearwater": "/lp/industries",
+    "/salon-seo-st-petersburg": "/lp/industries",
+}
 
 # Stale hand-written files to delete after generation.
 STALE_FILES = [
@@ -633,16 +664,6 @@ def render_page(svc_slug, svc, city_slug, city):
         f"<li><strong>{esc(label)}</strong> — {esc(detail)}</li>"
         for label, detail in do_items
     )
-    pricing_rows = ""
-    for t in TIERS:
-        cls = ' class="featured"' if t["featured"] else ""
-        label = t["name"] + (" · Most Popular" if t["featured"] else "")
-        # One-time stages don't "cancel" — only recurring stages get that note.
-        terms = "one-time" if "one-time" in t["price"] else "cancel anytime"
-        price_cell = t["price"].replace(" one-time", "") + " · " + terms
-        pricing_rows += (f'<tr{cls}><td>{esc(label)}</td>'
-                         f'<td>{esc(price_cell)}</td></tr>')
-
     faq_details = "".join(
         f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>"
         for q, a in faqs
@@ -736,14 +757,10 @@ def render_page(svc_slug, svc, city_slug, city):
 <span class="spots">Half-Back Guarantee · half your money back if we don't rank you</span>
 </div>
 
-<h2>Pricing</h2>
-<table class="pricing">
-<thead><tr><th>Plan</th><th>Price</th></tr></thead>
-<tbody>
-{pricing_rows}
-</tbody>
-</table>
+<h2>Two ways in</h2>
+<p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. From there it's simple — <strong>$197</strong> to see your score and fix it yourself, or <strong>$997</strong> and we build it and rank it for you. Both one-time. No contract. The build is backed by the Half-Back Guarantee.</p>
 <a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
+<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <div class="divider"></div>
 
@@ -872,13 +889,6 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 .coachty p{margin-top:12px;font-size:14px;color:#C8C0B0;line-height:1.65}
 </style>"""
 
-    pricing_rows = ""
-    for t in TIERS:
-        cls = ' class="featured"' if t["featured"] else ""
-        label = t["name"] + (" · Most Popular" if t["featured"] else "")
-        pricing_rows += (f'<tr{cls}><td>{esc(label)}</td>'
-                         f'<td>{esc(t["price"])}</td><td>{esc(t["blurb"])}</td></tr>')
-
     cta = cta_href("industries-hub")
 
     page = f"""<!DOCTYPE html>
@@ -915,13 +925,8 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 
 {sections}
 
-<h2>Pricing</h2>
-<table class="pricing">
-<thead><tr><th>Plan</th><th>Price</th><th>What you get</th></tr></thead>
-<tbody>
-{pricing_rows}
-</tbody>
-</table>
+<h2>Two ways in</h2>
+<p>Start free with your <strong>60-second Growth Score</strong>. From there it's simple: <strong>$197</strong> to see your score and fix it yourself, or <strong>$997</strong> and we build it and rank it for you. Both one-time, no contract — and the build is backed by the Half-Back Guarantee.</p>
 <a class="cta" href="{esc(cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
 
 <div class="coachty">
@@ -1002,11 +1007,24 @@ def render_vercel(slugs):
     # 2b. Interactive Growth Score page (hand-built static page; clean + /lp URLs).
     rewrites.append({"source": "/roadmap", "destination": "/lp/roadmap.html"})
     rewrites.append({"source": "/lp/roadmap", "destination": "/lp/roadmap.html"})
-    # 3. Backend proxies — reviews + tracking (/t/*) live on Railway.
+    # 2c. Hand-built client micro-site (Tampa Bay Power Clean) — clean + /lp URLs.
+    #     These pages are NOT generated by this script, so they must be listed
+    #     explicitly or regeneration would drop them (existing inbound links break).
+    for path in (
+        "tampa-bay-power-clean",
+        "tampa-bay-power-clean/roof-cleaning",
+        "tampa-bay-power-clean/house-washing",
+        "tampa-bay-power-clean/paver-sealing",
+    ):
+        rewrites.append({"source": f"/{path}", "destination": f"/lp/{path}.html"})
+        rewrites.append({"source": f"/lp/{path}", "destination": f"/lp/{path}.html"})
+    # 3. Backend proxies — reviews + tracking (/t/*) + lead-gen live on Railway.
     rewrites.append({"source": "/reviews/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/reviews/$1"})
     rewrites.append({"source": "/t/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/t/$1"})
+    rewrites.append({"source": "/lead-gen/(.*)",
+                     "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"})
     # 4. Catch-all LAST.
     rewrites.append({"source": "/(.*)", "destination": "/index.html"})
 
@@ -1014,6 +1032,11 @@ def render_vercel(slugs):
         {"source": old, "destination": new, "permanent": True}
         for old, new in OLD_TO_NEW
     ]
+    # Vanity bare-slug SEO URLs (301 → the matching /lp page, or the hub when no
+    # dedicated page exists). Preserved here so regeneration never drops the
+    # inbound link equity these earn.
+    for src, dest in VANITY_REDIRECTS.items():
+        redirects.append({"source": src, "destination": dest, "permanent": True})
 
     obj = {"redirects": redirects, "rewrites": rewrites}
     return json.dumps(obj, indent=2) + "\n"
