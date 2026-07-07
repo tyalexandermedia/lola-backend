@@ -233,10 +233,9 @@ git status                                  # eyeball before committing
 git commit -m "$(cat <<'EOF'
 Phase 1 final: roadmap pricing + Agent 4 cold outreach
 
-- Pricing: roadmap model (Foundation Sprint $297 one-time / Growth
-  Roadmap $497/mo / Scale System $697/mo, $997+ competitive) with
-  founding-member counter, responsive sizing (clamp + minmax(0,1fr)),
-  CTA hierarchy, mobile sticky CTA, BulletItem tooltips.
+- Pricing: two-tier model (DIY $197 one-time / Full Build $997 one-time,
+  Half-Back Guarantee on the build), responsive sizing (clamp +
+  minmax(0,1fr)), CTA hierarchy, mobile sticky CTA, BulletItem tooltips.
   Canonical source: docs/PRICING.md
 - Agent 4: db/outreach.py, outreach/* module, CLI
   (send/status/suppress/preview), Tier 2 Resend webhook,
@@ -337,10 +336,9 @@ cd frontend && npm run dev
 - ✅ One-question-at-a-time frontend with shake validation + gold focus
 - ✅ Polished questionnaire (sticky blurred header, continuous gold
   progress bar, 44px headline, 64px gold-focus input)
-- ✅ Pricing surface (DB-backed via `db/pricing.py`) with founding-member
-  counter, anchors, and CTA badges — now follows the roadmap model
-  (Foundation Sprint $297 one-time · Growth Roadmap $497/mo · Scale System
-  $697/mo, $997+ competitive). Canonical: [`docs/PRICING.md`](docs/PRICING.md)
+- ✅ Pricing surface (DB-backed via `db/pricing.py`) — now follows the two-tier
+  model (DIY $197 one-time · Full Build $997 one-time, with the Half-Back
+  Guarantee on the build). Canonical: [`docs/PRICING.md`](docs/PRICING.md)
 - ✅ Mobile sticky CTA (appears past pricing, dismissible)
 - ✅ Lola playbook recommendations engine (signal-driven, ≤5 ranked)
 - ✅ Per-audit recommendations + upsell CTA
@@ -378,8 +376,8 @@ cd frontend && npm run dev
   with three placeholder rows (ChatGPT / Perplexity / Google AI Overviews,
   "Tracking — ships Q3").
 - ✅ **Email 3 reframe** — moved off the "SEO retainer" framing toward the
-  growth-roadmap positioning ("we don't just tell you what's broken, we fix
-  it weekly"). Pricing now follows the roadmap model in
+  AI-Leads-Expert positioning ("we build it and we rank it — everywhere people
+  search now"). Pricing now follows the two-tier model in
   [`docs/PRICING.md`](docs/PRICING.md). Subject updated from "SEO" to "AI visibility."
 - ✅ **PostHog wired** — `posthog-js` installed, `src/analytics.ts` wrapper,
   `initAnalytics()` called from `main.tsx`. `trackClick` fans out to PostHog +
@@ -397,9 +395,9 @@ cd frontend && npm run dev
 - **Set `VITE_POSTHOG_KEY` + `VITE_POSTHOG_HOST` in Vercel** — Project →
   Settings → Environment Variables. Grab Project API key from
   PostHog → Project Settings.
-- **Set 4 Stripe Payment Link env vars in Vercel** — `VITE_STRIPE_SPRINT_URL`,
-  `VITE_STRIPE_RETAINER_MONTHLY_URL`, `VITE_STRIPE_RETAINER_ANNUAL_URL`,
-  `VITE_STRIPE_PRO_URL`.
+- **Set the 2 Stripe Payment Link env vars in Vercel** — one for the DIY $197
+  one-time and one for the Full Build $997 one-time (two-tier offer). Any
+  legacy monthly/annual retainer or "Pro" Payment Link vars are retired.
 - **Set `VITE_CAL_COM_URL` in Vercel** to your real Cal.com strategy link.
 
 ### Awaiting decision (flagged, not built)
@@ -410,51 +408,57 @@ cd frontend && npm run dev
 
 ---
 
-## Pricing & positioning — roadmap model (current)
+## Pricing & positioning — two-tier model (current)
 
 > **Canonical source of truth:** [`docs/PRICING.md`](docs/PRICING.md). Update that
 > file first, then sync the mirrors (`frontend/src/lib/pricing.ts`, `db/pricing.py`,
 > `frontend/scripts/gen_lp.py`). The matrix below is a convenience snapshot — if it
 > disagrees with `docs/PRICING.md`, `docs/PRICING.md` wins.
 
-LOLA OS is positioned as a **phased growth roadmap / business growth operating
-system**, not an SEO package. The dashboard is the **Growth Score**. Core narrative:
-*"Most businesses don't have a marketing problem first — they have a foundation
-problem."* Month 1 builds the base, days 31–90 build signals, and after 90 days the
-data compounds. (The earlier "Local Lock" 3-tier model — Starter $297/mo · Growth
-$697/mo · Pro $997/mo — is retired and replaced by the roadmap below.)
+LOLA is the **AI Leads Expert** for local service businesses: we get you ranked on
+Google **and** in the AI answer engines (ChatGPT, Perplexity, Gemini). The free lead
+magnet is the **Growth Score** (never an "audit"), and the client dashboard is the
+**Growth Score** too. The earlier phased roadmap (Foundation Sprint $297 · Growth
+Roadmap $497/mo · Scale System $697/mo, $997+ competitive) and the older "Local Lock"
+3-tier model are **both retired** — replaced by the two one-time options below.
 
-### Core roadmap (offer ladder)
+### The two-tier offer
 
-| Stage | Price | Type | Role |
+| Option | Price | Type | Role |
 |---|---|---|---|
-| Foundation Sprint | **$297** | one-time | Low-risk front door — create/clean/rebuild the online foundation |
-| Growth Roadmap | **$497/mo** | monthly | Default recurring — build momentum and start surfacing signals |
-| Scale System | **$697/mo** (**$997+** competitive markets) | monthly | Repeatable lead-gen system across services/areas/channels |
+| **DIY** | **$197** | one-time | "See your score. Fix it yourself." — Growth Score + a 5-step fix-it checklist |
+| **Full Build** | **$997** | one-time | "We build it. We rank it — everywhere people search now." — custom site + 30 days of Google/AI visibility work + GBP optimization + direct access to Ty during the build |
 
-### Add-ons (bolt onto any stage)
+Only these two paid options are ever shown on a page — no tier tables with more than
+two options, no add-ons grid on public pages.
 
-| Add-on | Price |
-|---|---|
-| Social Posting System | $200–$500/mo |
-| Video / Shorts System | from $200/mo |
-| Email / SMS Follow-Up | $99–$300/mo |
-| SEO Sprint | $197–$497 one-time |
-| AI Visibility Add-On | premium (paid-tier only) |
+### Guarantee (the only one)
 
-See [`docs/PRICING.md`](docs/PRICING.md) for full inclusions, guarantees, Growth
-Score dimensions, and onboarding entry points.
+**Half-Back Guarantee** on the $997 Full Build: we pick 5 money keywords together in
+week 1; if we don't get at least 1 ranking on page 1 or in the map pack within 30
+days, you get half your investment back. No fine print. (The old **First Win Promise**
+is retired.)
+
+### Optional retainer — EMAIL ONLY (never a public page/tier)
+
+$299/month ongoing management, totally optional, introduced **only** in the final
+follow-up email touch: *"Once it's live, some clients want us to keep it optimized —
+that's $299/month, totally optional."*
+
+See [`docs/PRICING.md`](docs/PRICING.md) for full inclusions, guarantee language,
+Growth Score dimensions, lead-magnet form fields, SMS compliance, and onboarding entry
+points.
 
 ### Stripe / Vercel env vars
 
-Set the recurring + one-time Payment Link URLs per the current roadmap stages.
-Apply to **Production + Preview + Development**, then redeploy.
+Set the two one-time Payment Link URLs (DIY $197 + Full Build $997) per the current
+two-tier offer. Apply to **Production + Preview + Development**, then redeploy.
 
-### Earlier rewrite (historical — superseded by the roadmap model above)
+### Earlier rewrites (historical — superseded by the two-tier model above)
 
-This section previously documented a retired front-end pricing layout (DIY / Sprint
-/ Retainer / Pro). The files below were touched in that pass; their pricing now
-follows the roadmap model and `docs/PRICING.md`:
+Earlier passes documented retired pricing layouts (DIY / Sprint / Retainer / Pro, then
+the Foundation → Growth → Scale roadmap). The files below were touched in those passes;
+their pricing now follows the two-tier model and `docs/PRICING.md`:
 
 - `frontend/src/PricingPage.tsx`
 - `frontend/src/AuditFlow.tsx`

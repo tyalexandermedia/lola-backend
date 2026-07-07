@@ -16,7 +16,7 @@
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://lola.tyalexandermedia.com/audit</loc>
+    <loc>https://lola.tyalexandermedia.com/growth-score</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -334,25 +334,5 @@
     <loc>https://lola.tyalexandermedia.com/lp/cleaning-seo-sarasota</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://lola.tyalexandermedia.com/tampa-bay-power-clean</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://lola.tyalexandermedia.com/tampa-bay-power-clean/roof-cleaning</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://lola.tyalexandermedia.com/tampa-bay-power-clean/house-washing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://lola.tyalexandermedia.com/tampa-bay-power-clean/paver-sealing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
   </url>
 </urlset>

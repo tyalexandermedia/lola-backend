@@ -252,7 +252,7 @@ export default function AuditFlow() {
   };
 
   const advance = async () => {
-    const value = form[currentQuestion.key];
+    const value = form[currentQuestion.key] ?? '';
     if (!currentQuestion.options && currentQuestion.validate) {
       const err = currentQuestion.validate(value);
       if (err) {
@@ -289,7 +289,7 @@ export default function AuditFlow() {
         question={currentQuestion}
         stepIndex={stepIndex}
         totalSteps={totalSteps}
-        value={form[currentQuestion.key]}
+        value={form[currentQuestion.key] ?? ''}
         onChange={(value) => updateField(currentQuestion.key, value)}
         onAdvance={advance}
         onBack={goBack}
@@ -836,7 +836,7 @@ export function ResultsStage({
 
       {/* AI Search Visibility — v1 placeholder section. Frames the upcoming
           metric (where you actually show up across ChatGPT/Perplexity/Gemini)
-          and tells the reader honestly that live tracking is a Scale-stage feature. */}
+          and tells the reader honestly that live tracking is part of the Full Build. */}
       <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
         <div className="flex items-center gap-2">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
@@ -853,7 +853,7 @@ export function ResultsStage({
           Your Agent Readiness Score above predicts <em>how well</em> AI agents can
           understand your business. The next layer — live tracking of <strong className="text-white">where you actually appear</strong> in
           ChatGPT, Perplexity, Gemini, and Google AI Overviews for the queries
-          buyers run in {audit.city} — rolls out at the Scale stage of the roadmap.
+          buyers run in {audit.city} — is part of the done-for-you Full Build.
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -875,26 +875,26 @@ export function ResultsStage({
         </div>
 
         <p className="mt-5 text-[12px] leading-[1.5] text-[#7A7F8A]">
-          Honest note: this section is a roadmap placeholder. Today's score reflects
+          Honest note: this section is a placeholder for what&apos;s coming. Today&apos;s score reflects
           AI-readability signals (entities, reviews, schema, site speed). Live citation
-          tracking goes live at the{' '}
+          tracking is part of the{' '}
           <a
-            href="/pricing#scale"
-            onClick={() => trackClick('scale_cta_clicked', { from: 'ai_search_visibility_note' })}
+            href="/pricing"
+            onClick={() => trackClick('build_cta_clicked', { from: 'ai_search_visibility_note' })}
             className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
           >
-            Scale stage
+            $997 Full Build
           </a>.
         </p>
 
         <a
-          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'scale_upgrade' })}
+          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'full_build' })}
           target="_blank"
           rel="noreferrer"
           onClick={() => trackClick('book_call_clicked', { from: 'ai_search_visibility_button' })}
           className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
         >
-          Skip the wait — book a call about Scale live tracking →
+          Book a call about the Full Build →
         </a>
       </section>
 
@@ -1630,7 +1630,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
             onClick={() => trackClick('roadmap_cta_clicked', { from: 'lolas_take' })}
             className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
           >
-            See the Growth Roadmap →
+            See pricing →
           </a>
           <a
             href="/apply"
@@ -1964,7 +1964,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
               className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >
-              {payload.ctas.dfy_label || 'Start the Growth Roadmap — $497/mo'}
+              {payload.ctas.dfy_label || 'Start my build — $997'}
             </a>
           )}
         </div>

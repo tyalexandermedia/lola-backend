@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-roofers-florida`
 - **Title tag**: `Local SEO for Roofers in Florida | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Florida roofing contractors. Free audit. Storm-season ready. From $297. 30-Day Half-Back Guarantee + First Win Promise.`
+- **Meta description**: `Done-for-you local SEO for Florida roofing contractors. Storm-season ready. Free Growth Score, then DIY ($197) or Full Build ($997). Half-Back Guarantee.`
 - **OG / Twitter / Canonical**: `https://tyalexandermedia.com/local-seo-roofers-florida`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Florida"
   },
   "areaServed": "Florida",
-  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "197", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,10 +33,12 @@
 **Florida Roofers: Own the Map Pack Before the Next Storm Season.**
 
 ### Subhead
-A single ranked keyword in Florida roofing is worth $20K–$80K/year in real jobs. Lola gets your roofing business ranking on Google AND ChatGPT — so when the next hurricane hits, you're the first call. Done for you. From $297.
+A single ranked keyword in Florida roofing is worth $20K–$80K/year in real jobs. Lola gets your roofing business ranking on Google AND ChatGPT — so when the next hurricane hits, you're the first call. We build it. We rank it. Full Build is a one-time $997, backed by our Half-Back Guarantee.
 
 ### Primary CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl&trade=Roofer)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl&trade=Roofer)**
+
+60-second scan · delivered by text + email within 24 hours.
 
 ---
 
@@ -46,13 +48,13 @@ A single ranked keyword in Florida roofing is worth $20K–$80K/year in real job
 - Roofing "lead gen" agencies selling shared $80 leads to 5 competitors
 - Pay-per-click services with no organic foundation (rankings vanish when budget stops)
 - Bloated agencies that bill setup + management + reporting separately
-- Audits that mention "core web vitals" but never fix them
+- Reports that mention "core web vitals" but never fix them
 
 **THIS:**
 - Organic rankings you own forever, not rented leads
-- Foundation Sprint from $297, no contract, no setup, no surprises
-- Coach Ty + team executing storm-season prep before hurricane season
-- First Win Promise (60 days) + 30-Day Half-Back Guarantee, in writing
+- One-time **$997 Full Build** — a new site, built and ranked. No monthly contract, no setup, no surprises.
+- 30 days getting you found on Google AND the AI answer engines (ChatGPT, Perplexity, Gemini), storm-season prep included — with direct access to Ty during the build
+- **Half-Back Guarantee**, in writing: at least 1 of your 5 money keywords on page 1 or in the map pack in 30 days, or half back
 
 ---
 
@@ -70,36 +72,43 @@ A single ranked keyword in Florida roofing is worth $20K–$80K/year in real job
 
 ### Case study
 
-The Lola roadmap system delivered 5 ranked keywords in 3 weeks for Sandbar Soft Wash (Palm Harbor) — an attributed case study; results vary. Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
+{{CASE_STUDY}} (Palm Harbor) went from buried to 5 ranked keywords in 3 weeks on the Lola playbook — an attributed case study; results vary. Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
 
 ---
 
 ### Pricing
 
-Start free: get your free Growth Score and free audit, then choose your phase.
+Start free: get your **free Growth Score** — a 60-second scan of how you show up on Google and in AI answers, delivered by text + email within 24 hours. Then pick your path:
 
-| Tier | Price |
-|---|---|
-| Foundation Sprint | $297 one-time |
-| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
-| Scale System | $697/mo ($997+ competitive) |
+| Option | Price | What you get |
+|---|---|---|
+| **DIY** | **$197** one-time | See your score. Fix it yourself. Your full Growth Score + a simple 5-step fix-it checklist. |
+| **Full Build** | **$997** one-time | We build it. We rank it — everywhere people search now. |
 
-No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+**Full Build includes:**
+- Custom website build
+- 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini)
+- Google Business Profile optimization
+- Direct access to Ty during the build
 
-**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl)**
+**Half-Back Guarantee.** We pick 5 money keywords for your {{VERTICAL}} business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.
+
+**[Start My Build →](https://lola.tyalexandermedia.com/build?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl)**
+
+Prefer we just handle it? See the full build. Want to fix it yourself first? Grab the $197 DIY guide.
 
 ---
 
 ### Coach Ty trust block
 
-Tampa-based. Built Lola because his dad's soft wash business kept losing jobs to bigger companies with worse work but better Google rankings. Same pattern in roofing — except higher stakes. Lola fixes it weekly. Coach Ty handles strategy. You handle the install.
+Tampa-based. Built Lola because his dad's soft wash business kept losing jobs to bigger companies with worse work but better Google rankings. Same pattern in roofing — except higher stakes. Lola builds it, ranks it, and backs it. Coach Ty handles strategy. You handle the install.
 
 ---
 
 ### FAQ
 
-**1. What's the ROI on the Growth Roadmap for a roofing company?**
-One $8,000 reroof pays for more than a year of Lola. Start with the Foundation Sprint at $297. Most clients close 2-4 new jobs/mo from improved rankings within 90 days.
+**1. What's the ROI on the Full Build for a roofing company?**
+One $8,000 reroof pays for the $997 build many times over. See your free Growth Score first, then start with the $197 DIY guide or the $997 Full Build. Most clients close new jobs from improved rankings within the first 90 days.
 
 **2. Will you help us prep for storm season?**
 Yes. We pre-load content + GMB posts in April for June-November hurricane season. Storm chaser defense is built in.
@@ -107,8 +116,8 @@ Yes. We pre-load content + GMB posts in April for June-November hurricane season
 **3. We're certified GAF/Owens Corning — does that matter?**
 Yes. We add credential schema so Google + AI display your certifications in snippets. Plus we link them in your trust-block content.
 
-**4. Do you do Google LSA (Local Service Ads)?**
-LSA is a separate channel. We focus on organic + Map Pack. If you're already running LSA, organic Lola amplifies it (and you stop paying $80/lead).
+**4. What if you don't rank me?**
+You get half back, no argument. We pick 5 money keywords together in week 1; if we don't get at least 1 on page 1 or in the map pack within 30 days, half your investment comes back.
 
 **5. What about commercial roofing?**
 Same system. We target commercial vertical keywords ("commercial flat roof Tampa," "TPO membrane installation") with separate landing pages.
@@ -116,7 +125,7 @@ Same system. We target commercial vertical keywords ("commercial flat roof Tampa
 ---
 
 ### Final CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl&trade=Roofer)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=roofers-fl&trade=Roofer)**
 
 ---
 
@@ -126,8 +135,8 @@ Same system. We target commercial vertical keywords ("commercial flat roof Tampa
 - [HVAC contractors Tampa →](/local-seo-hvac-contractors-tampa)
 - [Tampa plumbers →](/local-seo-plumbers-tampa)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
-- [Lola free audit →](https://lola.tyalexandermedia.com)
-- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
+- [Get your free Growth Score →](https://lola.tyalexandermedia.com)
+- [See the full build →](https://lola.tyalexandermedia.com/build)
 
 ### External link
 

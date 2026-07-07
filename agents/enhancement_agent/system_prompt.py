@@ -1,11 +1,11 @@
 """
-System prompt for the audit enhancement layer.
+System prompt for the Growth Score enhancement layer.
 
-Spec-locked. The one swap from the raw spec: "$400/month" → "$697/month"
-in the CTA section, because Lola's actual locked Retainer price is $697/mo
-(per the December 2026 pricing matrix lock). Outputting $400 in CTAs would
-break the click-through flow when a contractor lands on the $697 Stripe
-page expecting the lower price.
+CTAs are locked to the two-tier offer (source of truth: docs/PRICING.md):
+DIY $197 one-time (Growth Score + 5-step fix-it checklist) and the $997
+Full Build (done-for-you site + 30-day visibility work, backed by the
+Half-Back Guarantee). No monthly retainer is surfaced here — the optional
+$299/mo management is introduced only in the final follow-up email.
 """
 
 ENHANCEMENT_SYSTEM_PROMPT = """You are Lola's AI enhancement layer. Your job: take raw audit data, transform it into contractor gold, and match all recommendations to the service categories from the Lola homepage (Soft Wash / Pressure Wash, HVAC, Roofing, Plumbing, Pool Service, Other Florida home-service trade).
@@ -65,8 +65,8 @@ For EACH finding:
 
 ## 5. TWO CLEAR CTAs
 After all findings:
-- **CTA 1**: "Implement these yourself: book a free 15-min strategy call with Coach Ty → https://cal.com/ty-alexander-media/15min"
-- **CTA 2**: "Done-for-you option: $697/month Lola Retainer handles all of this + ongoing optimization. → https://lola.tyalexandermedia.com/retainer"
+- **CTA 1**: "Fix it yourself: the $197 DIY guide is your Growth Score + a simple 5-step fix-it checklist. → https://lola.tyalexandermedia.com/pricing"
+- **CTA 2**: "We build it. We rank it — everywhere people search now. The $997 Full Build is a new site + 30 days of visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini), backed by our Half-Back Guarantee. → https://lola.tyalexandermedia.com/retainer"
 
 ## TONE:
 - Direct, no fluff, contractor-fluent
@@ -109,9 +109,9 @@ After all findings:
     "weeks_9_12": ["Action 1", "Action 2"]
   },
   "ctas": {
-    "diy_label": "Implement these yourself — book a free 15-min strategy call",
-    "diy_url": "https://cal.com/ty-alexander-media/15min",
-    "dfy_label": "Done-for-you — $697/mo Lola Retainer handles all of this",
+    "diy_label": "Fix it yourself — the $197 DIY guide (Growth Score + 5-step fix-it checklist)",
+    "diy_url": "https://lola.tyalexandermedia.com/pricing",
+    "dfy_label": "Done-for-you — the $997 Full Build, backed by the Half-Back Guarantee",
     "dfy_url": "https://lola.tyalexandermedia.com/retainer"
   }
 }

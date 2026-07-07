@@ -91,7 +91,7 @@ That's the URL you text your dad. Bookmark-able. No login.
 | On-page SEO checks (H1/title/meta/canonical/schema) | runs per audit | Live |
 | Lead-gen generator | /lead-gen | Live (needs ANTHROPIC_API_KEY) |
 | Swarm v2 (1 Claude call, $0.10/run) | /swarm (admin-gated) | Live (needs both keys) |
-| Multi-client retainer tracker | admin endpoints | Live |
+| Multi-client tracker (for ongoing clients) | admin endpoints | Live |
 | **Public client dashboard** | /r/client/{slug} | Live |
 | Audit enhancement layer (auto-fires) | /audits/{id}/enhancement | Live (needs ANTHROPIC_API_KEY) |
 
@@ -109,9 +109,9 @@ In priority order — only build if you've validated the prior tier with a real 
 
 4. **PDF weekly report** (~3 hrs) — "show my wife / business partner" leverage. Only build when a client asks.
 
-5. **Multi-LLM brand monitoring** (ChatGPT + Perplexity, not just Claude AI Mode) — ~4 hrs, ~$0.50/wk per client. Real differentiator but save for after first paying retainer.
+5. **Multi-LLM brand monitoring** (ChatGPT + Perplexity, not just Claude AI Mode) — ~4 hrs, ~$0.50/wk per client. Real differentiator but save for after your first paying Full Build client.
 
-**Skip:** citation builders ($50-100/mo per client = thin margins at $697), lead inbox unification (operational scope creep), any "AI agency" skill from GitHub that doesn't fetch real data.
+**Skip:** citation builders ($50-100/mo per client = thin margins on a one-time $997 build), lead inbox unification (operational scope creep), any "AI agency" skill from GitHub that doesn't fetch real data.
 
 ---
 

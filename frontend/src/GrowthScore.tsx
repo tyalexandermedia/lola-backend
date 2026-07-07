@@ -9,8 +9,8 @@
  * Reputation, Revenue Tracking).
  *
  * Why it exists: it's the front door of the funnel. The score creates the gap
- * ("you're at 42 — here's the path to 70"), and the recommended first step is
- * always the $297 Foundation Sprint. Free tool → Foundation → Growth → Scale.
+ * ("you're at 42 — here's the fastest fix"), and from there the owner can do it
+ * themselves ($197 DIY) or have us handle it ($997 Full Build).
  *
  * Critical: reuse the audit funnel logic verbatim — only the framing changes.
  */
@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
-import { GROWTH_SCORE_DIMENSIONS, ROADMAP } from './lib/pricing';
+import { GROWTH_SCORE_DIMENSIONS, TIERS } from './lib/pricing';
 
 const TRADE_TO_SERVICE: Record<string, string> = {
   'Soft Wash / Pressure Wash': 'soft wash',
@@ -46,6 +46,8 @@ interface Errors {
   city?: string;
   website?: string;
   email?: string;
+  phone?: string;
+  consent?: string;
 }
 
 const SCORING_LINES = [
@@ -56,16 +58,16 @@ const SCORING_LINES = [
   'Scoring your six growth dimensions…',
 ];
 
-// Maps each roadmap dimension to what we actually measure + which stage owns it.
-// Keeps the marketing honest: the score is built from the same audit signals
-// the report already returns.
+// Maps each dimension to what we actually measure + a short plain-English tag
+// for what it gets you. Keeps the marketing honest: the score is built from the
+// same audit signals the report already returns.
 const DIMENSION_DETAIL: Record<string, { measures: string; stage: string }> = {
-  Foundation: { measures: 'Website, indexing, on-page SEO, tracking', stage: 'Foundation Sprint' },
-  Growth: { measures: 'Content, service-area pages, GBP posting cadence', stage: 'Growth Roadmap' },
-  Authority: { measures: 'Citations, links, local relevance', stage: 'Scale System' },
-  'AI Visibility': { measures: 'ChatGPT, Perplexity, Gemini, Google AI answers', stage: 'Scale System' },
-  Reputation: { measures: 'Review rating, count, and recent velocity', stage: 'Growth Roadmap' },
-  'Revenue Tracking': { measures: 'Calls, forms, and lead attribution wired up', stage: 'Growth Roadmap' },
+  Foundation: { measures: 'Website, indexing, on-page SEO, tracking', stage: 'Gets you found' },
+  Growth: { measures: 'Content, service-area pages, GBP posting cadence', stage: 'More rankings' },
+  Authority: { measures: 'Citations, links, local relevance', stage: 'More trust' },
+  'AI Visibility': { measures: 'ChatGPT, Perplexity, Gemini, Google AI answers', stage: 'Found in AI answers' },
+  Reputation: { measures: 'Review rating, count, and recent velocity', stage: 'More calls booked' },
+  'Revenue Tracking': { measures: 'Calls, forms, and lead attribution wired up', stage: 'Proof of leads' },
 };
 
 export default function GrowthScore() {
@@ -75,7 +77,9 @@ export default function GrowthScore() {
     business_type: 'other',
     website: '',
     email: '',
+    phone: '',
   });
+  const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [phase, setPhase] = useState<Phase>('idle');
   const [apiError, setApiError] = useState<string | null>(null);
@@ -142,14 +146,14 @@ export default function GrowthScore() {
       {
         '@context': 'https://schema.org',
         '@type': 'HowTo',
-        name: 'How the LOLA OS Growth Score works',
-        description: 'Get a 0–100 Growth Score for your local business in 60 seconds across six dimensions, plus your next step on the roadmap.',
+        name: 'How the LOLA Growth Score works',
+        description: 'Get a 0–100 Growth Score for your local business in 60 seconds across six dimensions, plus the one move that lifts you fastest.',
         totalTime: 'PT1M',
         step: [
-          { '@type': 'HowToStep', name: 'Enter your business', text: 'Business name, city, and website. No signup required.' },
+          { '@type': 'HowToStep', name: 'Enter your business', text: 'Business name, city, website, and phone. No signup required.' },
           { '@type': 'HowToStep', name: 'Lola scores you', text: 'We measure Foundation, Growth, Authority, AI Visibility, Reputation, and Revenue Tracking.' },
-          { '@type': 'HowToStep', name: 'See your starting stage', text: 'Your score maps to where you are on the roadmap and what to fix first.' },
-          { '@type': 'HowToStep', name: 'Get the report', text: 'A shareable scorecard link emailed to you, with your priority fixes.' },
+          { '@type': 'HowToStep', name: 'See what to fix first', text: 'Your score shows exactly where you are on Google and in AI answers and what to fix first.' },
+          { '@type': 'HowToStep', name: 'Get your results', text: 'Your scorecard is delivered by text and email within 24 hours, with your priority fixes.' },
         ],
       },
     ];
@@ -185,7 +189,12 @@ export default function GrowthScore() {
     if (form.city.trim().length < 2) e.city = 'City + state works best.';
     const w = form.website.trim();
     if (w.length < 4 || !/\./.test(w)) e.website = "That doesn't look like a URL.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = 'Real email, please.';
+    // Phone is required; email is optional but validated if provided.
+    const phone = (form.phone ?? '').trim();
+    if (phone.replace(/\D/g, '').length < 10) e.phone = 'Real phone number, please.';
+    const email = form.email.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'That email looks off.';
+    if (!consent) e.consent = 'Please check the box so we can send your results.';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -367,8 +376,19 @@ export default function GrowthScore() {
             </Field>
           </div>
 
-          <div className="mt-4">
-            <Field label="Where should we send your scorecard?" error={errors.email}>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Phone" error={errors.phone}>
+              <input
+                type="tel"
+                value={form.phone ?? ''}
+                onChange={(e) => update('phone', e.target.value)}
+                placeholder="(727) 555-0142"
+                autoComplete="tel"
+                className={inputCls(!!errors.phone)}
+              />
+            </Field>
+
+            <Field label="Email (optional)" error={errors.email}>
               <input
                 type="email"
                 value={form.email}
@@ -380,15 +400,33 @@ export default function GrowthScore() {
             </Field>
           </div>
 
+          <label className="mt-5 flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => {
+                setConsent(e.target.checked);
+                if (errors.consent) setErrors((prev) => ({ ...prev, consent: undefined }));
+              }}
+              className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-[#D4AF37]/40 bg-[#0F0F12] accent-[#D4AF37]"
+            />
+            <span className="text-[13px] leading-[1.5] text-[#C5C5C8]">
+              By submitting, you agree to receive texts and emails about your results.
+            </span>
+          </label>
+          {errors.consent && (
+            <p className="mt-2 text-[12px] text-[#E5A95B]">{errors.consent}</p>
+          )}
+
           <button
             type="submit"
             className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
           >
-            Get my Growth Score →
+            Get my free Growth Score →
           </button>
 
           <p className="mt-4 text-center text-[12px] text-[#7A7F8A]">
-            No credit card · No spam · Free shareable scorecard
+            Your score lands by text + email within 24 hours · No spam · Reply STOP to opt out
           </p>
         </form>
       </section>
@@ -405,8 +443,8 @@ export default function GrowthScore() {
           Six dimensions. One number. A clear next step.
         </h2>
         <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Your Growth Score rolls these six up into a single 0–100. Each one maps to a
-          stage of the roadmap — so the score doesn&apos;t just grade you, it tells you what to do next.
+          Your Growth Score rolls these six up into a single 0–100 — so it doesn&apos;t just grade
+          you, it tells you exactly what to fix to get more calls and leads.
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -430,37 +468,39 @@ export default function GrowthScore() {
         </div>
       </section>
 
-      {/* ── ROADMAP TIE-IN — score → starting stage ───────────────── */}
+      {/* ── AFTER YOUR SCORE — two ways to act ─────────────────────── */}
       <section className="mt-16 sm:mt-20">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Your score → your starting stage
+          After your score
         </p>
         <h2
           className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
-          We&apos;re getting you from where you are to where you want to be.
+          See it, then fix it — yourself or with us.
         </h2>
         <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Pricing isn&apos;t &quot;$497/month&quot; — it&apos;s &quot;42 to 70.&quot; Your score sets the
-          starting line. Most businesses begin with the Foundation Sprint, then advance as the data compounds.
+          Your score shows exactly where you&apos;re losing calls. From there you pick one: do it
+          yourself, or have us build it and rank it.
         </p>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {ROADMAP.map((s, i) => (
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {TIERS.map((t) => (
             <div
-              key={s.id}
+              key={t.id}
               className={`rounded-[14px] border p-5 sm:p-6 ${
-                s.featured ? 'border-[#D4AF37] bg-[#D4AF37]/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
+                t.featured ? 'border-[#D4AF37] bg-[#D4AF37]/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
               }`}
             >
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{s.phase}</p>
-              <p className="mt-2 text-[18px] font-bold text-white">{s.name}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{t.tagline}</p>
+              <p className="mt-2 text-[18px] font-bold text-white">{t.name}</p>
               <p className="mt-1 text-[15px] font-extrabold text-[#D4AF37]">
-                {s.price}<span className="text-[12px] font-medium text-[#9CA3AF]"> {s.period}</span>
+                {t.price}<span className="text-[12px] font-medium text-[#9CA3AF]"> {t.period}</span>
               </p>
               <p className="mt-3 text-[13px] leading-[1.5] text-[#C5C5C8]">
-                {i === 0 ? 'Where most scores start — build the base.' : i === 1 ? 'Build momentum, watch the score climb.' : 'Compete + compound across markets.'}
+                {t.id === 'diy'
+                  ? 'Your full Growth Score plus a simple 5-step fix-it checklist. Fix it on your own time.'
+                  : 'We build the site and get you found on Google and in AI answers. Backed by the Half-Back Guarantee.'}
               </p>
             </div>
           ))}
@@ -470,19 +510,20 @@ export default function GrowthScore() {
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
         <h2 className="text-[22px] font-bold leading-[1.15] text-white sm:text-[28px]">
-          Get your number first. The roadmap follows.
+          Get your number first. Your score lands within 24 hours.
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Run your free Growth Score above, then start with the{' '}
-          <span className="font-semibold text-white">$297 Foundation Sprint</span> — you walk away
-          with a real foundation and a 90-day roadmap even if you stop there. No contracts, 30-day half-back.
+          Run your free Growth Score above — we send it by text and email within 24 hours. Then do it
+          yourself with the <span className="font-semibold text-white">$197 DIY guide</span>, or have us
+          handle it with the <span className="font-semibold text-white">$997 Full Build</span> — backed
+          by our Half-Back Guarantee.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
             href="/pricing"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
           >
-            See the roadmap →
+            See pricing →
           </a>
           <a
             href="https://calendar.app.google/J7idjUDitd2Hziuc7"
@@ -490,7 +531,7 @@ export default function GrowthScore() {
             rel="noreferrer"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-white transition hover:border-white/[0.3]"
           >
-            Book a free roadmap call
+            Book a free call
           </a>
         </div>
       </section>

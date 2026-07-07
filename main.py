@@ -866,7 +866,7 @@ def _derive_first_name(business_name: str, email: str) -> str:
 def _pick_subject(business_name: str, monthly_leak: int, audit_id: str) -> str:
     leak_fmt = f"${monthly_leak:,}"
     variants = [
-        f"{business_name} — your audit's in (and there's {leak_fmt}/mo on the table)",
+        f"{business_name} — your Growth Score's in (and there's {leak_fmt}/mo on the table)",
         f"[{business_name}] Lola sniffed out {leak_fmt}/mo leaking from your site",
     ]
     return variants[hash(audit_id) % 2]
@@ -903,8 +903,10 @@ async def send_audit_email(
     except Exception:
         founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
     founding_line = (
-        f"P.P.S. — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. "
-        f"We're at {FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP} right now."
+        "P.P.S. — The $997 Full Build comes with our Half-Back Guarantee: we pick 5 money "
+        "keywords for your business together in week 1. If we don't get at least 1 of them "
+        "ranking on page 1 or in the map pack within 30 days, you get half your investment "
+        "back. No fine print."
     )
 
     # Plain-text fallback (Gmail uses this for the preview pane + accessibility)
@@ -924,7 +926,7 @@ That's not theoretical. That's the estimated revenue slipping to competitors eve
 
 {yearly_fmt}/year. Every year. Until it's fixed.
 
-VIEW YOUR FULL AUDIT REPORT:
+VIEW YOUR FULL GROWTH SCORE REPORT:
 {report_url}
 
 Inside the report:
@@ -934,27 +936,23 @@ Inside the report:
 - Citation cleanup opportunities
 - The exact moves to lock in your lead
 
-WHAT NOW? 3 PATHS, YOUR CHOICE:
+WHAT NOW? YOUR CHOICE:
 
-OPTION 1 — Start Free, Then Foundation Sprint ($297 one-time)
-Run your free Growth Score, then lock in the Foundation Sprint — your 90-Day Roadmap + 60-min strategy call with Coach Ty. First Win Promise backed. No setup fee, no contract.
+OPTION 1 — DIY ($197 one-time)
+See your score. Fix it yourself. You get your full Growth Score plus a simple 5-step fix-it checklist — the exact moves for every gap Lola found. $197 one-time. Yours forever.
 {STRIPE_SPRINT_URL}
 
-OPTION 2 — Growth Roadmap ($497/mo · Most Popular)
-The default step most clients choose. Done-for-you growth on the Foundation → Growth → Scale roadmap — Coach Ty and the team handle execution every week. Cancel anytime.
-{STRIPE_RETAINER_URL}
-
-OPTION 3 — Scale System ($697/mo)
-Done-for-you growth on overdrive — Coach Ty and the team run your roadmap weekly. $997+/mo for competitive or multi-location markets. Cancel anytime.
+OPTION 2 — Full Build ($997 one-time)
+We build it. We rank it — everywhere people search now. A custom website build, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build. We get you found when people ask ChatGPT or Google for a company like yours. Backed by our Half-Back Guarantee: we pick 5 money keywords together in week 1, and if we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.
 {STRIPE_RETAINER_URL}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🦴 Want Lola's team running your Growth Roadmap every week?
+🦴 Want us to build it and rank it for you?
 
-→ See the Growth Roadmap: {retainer_url}
+→ See the $997 Full Build: {retainer_url}
 → Apply (Coach Ty reviews every application): {apply_url}
 
 Coach Ty
@@ -1004,7 +1002,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:28px 28px 12px;">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
 <tr><td style="border-radius:8px;background:#C9A84C;">
-<a href="{report_url}" target="_blank" rel="noopener" style="display:inline-block;padding:16px 32px;font-size:16px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.2;">📊 View Your Full Audit Report →</a>
+<a href="{report_url}" target="_blank" rel="noopener" style="display:inline-block;padding:16px 32px;font-size:16px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.2;">📊 View Your Full Growth Score Report →</a>
 </td></tr></table>
 <p style="margin:14px 0 0;text-align:center;font-size:12px;color:#7A7268;word-break:break-all;">{report_url}</p>
 </td></tr>
@@ -1023,27 +1021,16 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
 
 <tr><td style="padding:28px 28px 8px;">
-<p style="margin:0 0 18px;font-family:'DM Mono',monospace,Courier;font-size:11px;letter-spacing:0.16em;color:#A89F94;text-transform:uppercase;font-weight:600;">WHAT NOW? 3 PATHS, YOUR CHOICE:</p>
+<p style="margin:0 0 18px;font-family:'DM Mono',monospace,Courier;font-size:11px;letter-spacing:0.16em;color:#A89F94;text-transform:uppercase;font-weight:600;">WHAT NOW? YOUR CHOICE:</p>
 </td></tr>
 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — Foundation Sprint</strong> <span style="color:#C9A84C;">($297 one-time)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Start free with your Growth Score, then lock in the Foundation Sprint — your 90-Day Roadmap + 60-min strategy call with Coach Ty. First Win Promise backed. No setup fee, no contract.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — DIY</strong> <span style="color:#C9A84C;">($197 one-time)</span></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">See your score. Fix it yourself. You get your full Growth Score plus a simple 5-step fix-it checklist — the exact moves for every gap Lola found. $197 one-time. Yours forever.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Start the Foundation Sprint — $297 →</a>
-</td></tr></table>
-</td></tr></table>
-</td></tr>
-
-<tr><td style="padding:0 28px 14px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
-<tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Growth Roadmap</strong> <span style="color:#C9A84C;">($497/mo · Most Popular)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">The default step most clients choose. Done-for-you growth on the Foundation → Growth → Scale roadmap — Coach Ty and the team handle execution every week. Cancel anytime.</p>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the Growth Roadmap — $497/mo →</a>
+<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the $197 DIY Plan →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1051,10 +1038,11 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 3 — Scale System</strong> <span style="color:#C9A84C;">($697/mo)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Done-for-you growth on overdrive — Coach Ty and the team run your roadmap weekly. We fix what's broken — you focus on running the business. $997+/mo for competitive or multi-location markets. Cancel anytime.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Full Build</strong> <span style="color:#C9A84C;">($997 one-time)</span></p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;">We build it. We rank it — everywhere people search now. A custom website build, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build. We get you found when people ask ChatGPT or Google for a company like yours.</p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>Half-Back Guarantee:</strong> we pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Scale with LOLA OS — $697/mo →</a>
+<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start My Build — $997 →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1069,9 +1057,9 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px;"><hr style="border:0;border-top:1px solid #1F1F1F;margin:0;"></td></tr>
 
 <tr><td style="padding:24px 28px;">
-<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want Lola's team running your Growth Roadmap every week?</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want us to build it and rank it for you?</p>
 <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the Growth Roadmap →</a>
+<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the $997 Full Build →</a>
 </td></tr></table>
 <p style="margin:0 0 18px;font-size:13px;line-height:1.55;color:#A89F94;"><a href="{apply_url}" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none;font-weight:600;">Or apply first — Coach Ty reviews every application →</a></p>
 <p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
@@ -1083,7 +1071,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — First {FOUNDING_CAP} Growth Roadmap clients lock the $497/mo founding rate. We're at <strong style="color:#C9A84C">{FOUNDING_CAP - founding_remaining} of {FOUNDING_CAP}</strong> right now.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — The $997 Full Build comes with our <strong style="color:#C9A84C">Half-Back Guarantee</strong>: we pick 5 money keywords together in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.</p>
 </td></tr>
 
 </table>
@@ -1539,21 +1527,17 @@ async def pricing():
     drive the Standard tier label/strikethrough; counter is real and stored
     in `founding_signups` (see db/pricing.py).
     """
-    count = await get_founding_count("growth")
-    growth_price, founding_active = standard_price_for_count(count)
+    count = await get_founding_count("build")
+    _price, founding_active = standard_price_for_count(count)
     slots_remaining = max(0, FOUNDING_CAP - count)
     return {
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        # Roadmap model (source of truth: docs/PRICING.md).
-        "stages": {
-            "foundation": {"one_time": 297},
-            "growth": {
-                "monthly": growth_price,
-                "monthly_regular": 597,
-            },
-            "scale": {"monthly": 697, "monthly_competitive": 997},
+        # Two-tier offer (source of truth: docs/PRICING.md).
+        "tiers": {
+            "diy": {"one_time": 197},
+            "build": {"one_time": 997},
         },
     }
 
@@ -1578,13 +1562,13 @@ REVENUE_LABELS = {
 }
 
 TIER_LABELS = {
-    "foundation": "Foundation Sprint ($297 one-time)",
-    "growth": "Growth Roadmap ($497/mo)",
-    "scale": "Scale System ($697/mo · $997+ competitive)",
+    "foundation": "DIY — Growth Score + 5-step fix-it checklist ($197 one-time)",
+    "growth": "Full Build ($997 one-time · Half-Back Guarantee)",
+    "scale": "Full Build ($997 one-time · Half-Back Guarantee)",
     # Back-compat for older inbound payloads.
-    "retainer": "Growth Roadmap ($497/mo)",
-    "pro": "Scale System ($697/mo · $997+ competitive)",
-    "both": "Tell me which stage fits better",
+    "retainer": "Full Build ($997 one-time · Half-Back Guarantee)",
+    "pro": "Full Build ($997 one-time · Half-Back Guarantee)",
+    "both": "Tell me which fits better",
 }
 
 
@@ -1904,22 +1888,25 @@ async def public_client_dashboard(slug: str):
     rc = await _safe(_get_client(slug), None)
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
-    # Map any active stage → monthly $ for CPL math. Falls back to the Growth
-    # Roadmap ($497) when none — the modal recurring client price. Legacy tier
-    # names (starter/pro) still resolve for older records.
+    # Map any active client → the monthly $ basis for CPL math. Ongoing clients
+    # are on the optional $299/mo management retainer; the one-time DIY guide has
+    # no recurring spend. Legacy roadmap/tier names still resolve for older records.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
-    tier = (held[0]["tier"] if held else "growth").lower()
+    tier = (held[0]["tier"] if held else "build").lower()
     retainer = {
-        "foundation": 297, "growth": 497, "scale": 697,
-        "starter": 297, "pro": 997,  # back-compat
-    }.get(tier, 497)
+        "diy": 0, "build": 299,
+        # back-compat with retired roadmap / tier names
+        "foundation": 0, "growth": 299, "scale": 299,
+        "starter": 0, "pro": 299,
+    }.get(tier, 299)
     cpl = cost_per_lead(tracking, monthly_retainer=retainer)
     annual = annualized_value(attributed)
 
-    # Stage gating: call tracking + GSC are premium (Growth + Scale). Foundation
-    # gets clicks/leads/rankings/AI — the upgrade carrot for the rest.
-    call_tracking_on = tier in ("growth", "scale", "pro")
-    premium = tier in ("growth", "scale", "pro")
+    # Feature gating: call tracking + GSC are for done-for-you clients (Full
+    # Build / ongoing). The DIY guide gets clicks/leads/rankings/AI — the
+    # upgrade carrot. Legacy tier names still resolve for older records.
+    call_tracking_on = tier in ("build", "growth", "scale", "pro")
+    premium = tier in ("build", "growth", "scale", "pro")
     call_quality = await _safe(call_quality_stats(slug), None) if call_tracking_on else None
     gsc = await _safe(get_gsc_snapshot(slug), None) if premium else None
     gbp = await _safe(get_provider_snapshot(slug, "gbp"), None) if premium else None
@@ -2451,7 +2438,7 @@ def draft_outreach_email(
     specific, one ask. Returns (subject, body). No fabricated numbers; every
     figure comes from the grade we just ran."""
     niche_label = (niche or "local").strip()
-    score_line = f"a {score}/100 AI Visibility Score" if score is not None else "some gaps in your AI visibility"
+    score_line = f"a {score}/100 Growth Score" if score is not None else "some gaps in your AI visibility"
     leak_line = (
         f"about ${monthly_leak:,}/mo in jobs slipping to competitors"
         if monthly_leak else "jobs slipping to competitors who show up first"
@@ -2461,7 +2448,7 @@ def draft_outreach_email(
     subject = f"{business_name} — invisible when people ask AI for a {niche_label} in {city}?"
     body = (
         f"Hey — Coach Ty here, Tampa.\n\n"
-        f"I ran {business_name} through our free AI Visibility Grader and you came back with "
+        f"I ran {business_name} through our free Growth Score and you came back with "
         f"{score_line}. When someone asks Google, ChatGPT, or Gemini for a {niche_label} in "
         f"{city}, you're getting skipped — that's {leak_line}.\n\n"
         f"{fix_line}\n\n"
@@ -3476,7 +3463,7 @@ async def admin_health_keys(
 
 class FoundingSignupRequest(BaseModel):
     email: str
-    tier: str = "growth"  # founding rate tracks the Growth Roadmap stage
+    tier: str = "build"  # signup counter tracks the $997 Full Build
 
 
 @app.post("/admin/founding-signup")

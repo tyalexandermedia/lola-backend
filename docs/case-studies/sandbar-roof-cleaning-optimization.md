@@ -3,7 +3,7 @@
 **Client:** Sandbar Soft Wash (Palm Harbor, FL)
 **URL audited:** [sandbarsoftwash.com/roof-cleaning](https://www.sandbarsoftwash.com/roof-cleaning)
 **Date started:** 2026-05-24
-**Lola tier applied:** Local SEO Retainer playbook (P9 system — same we ship to paying clients)
+**Lola offer applied:** Full Build playbook (the same 30-day visibility work we ship in the $997 Full Build)
 **Author:** Coach Ty
 **Status:** ⏳ In progress — BEFORE captured, AFTER measurement at day 30 (2026-06-23)
 
@@ -16,7 +16,7 @@ Sandbar Soft Wash is Coach Ty's father's operation — a real Palm Harbor pressu
 Stakes:
 - Sandbar wins real revenue
 - Lola gets a verifiable before/after to cite in cold outreach
-- Every Florida contractor seeing this case study is one step closer to a $697/mo Retainer
+- Every Florida contractor seeing this case study is one step closer to booking a $997 Full Build
 
 The roof cleaning page is the highest-intent commercial query Sandbar competes for — buyers searching "roof cleaning Palm Harbor" have wallets out.
 
@@ -106,7 +106,7 @@ That gives you weekly rankings forever, free, no manual touching.
 
 ---
 
-## The optimization spec (Lola Retainer playbook applied)
+## The optimization spec (Lola Full Build playbook applied)
 
 ### 1. SEO — Title + Meta + Canonical (Wix → Page Settings → SEO)
 
@@ -309,9 +309,9 @@ Once the day-30 deltas land, this becomes:
 
 1. **Cold outreach proof** — every Florida contractor email links to this exact doc as "what we just did for Sandbar Soft Wash"
 2. **/lp/local-seo-pressure-washing-florida hero update** — replace "Coach Ty's father's operation" with "Sandbar Soft Wash — X keywords ranked in Y days using this playbook"
-3. **/retainer page case study slot** — replaces the placeholder Sandbar reference with verifiable, dated, repeatable results
+3. **$997 Build page case study slot** — replaces the placeholder Sandbar reference with verifiable, dated, repeatable results
 4. **Real testimonial from Coach Ty's dad** — recorded and embedded post-launch
-5. **The Lola product itself** — this doc is literally the deliverable a Retainer client gets in their first 14 days
+5. **The Lola product itself** — this doc is literally the deliverable a Full Build client gets in their first 14 days
 
 ---
 

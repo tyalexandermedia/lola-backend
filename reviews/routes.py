@@ -98,7 +98,7 @@ def _sms_template(business_name: str, link: str) -> str:
     (Google Voice, iMessage, WhatsApp). Coach Ty plain voice."""
     return (
         f"Hey it's {business_name} — would you take 30 seconds to share how "
-        f"we did? {link}"
+        f"we did? {link}\n\nReply STOP to opt out."
     )
 
 
