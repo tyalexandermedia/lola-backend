@@ -12,7 +12,7 @@ whenever the infrastructure changes.
 | Region / AZ | us-east-1 (Virginia) / us-east-1a |
 | Size | 2 GB RAM · 2 vCPU · 60 GB SSD |
 | OS | Ubuntu 24.04 LTS |
-| Public IP | 44.197.194.252 at creation — ⚠ attach a Static IP and record it here |
+| Static IP | **98.95.48.64** (Lightsail "StaticIp-1", attached to Ubuntu-1) — permanent |
 | First provisioned | 2026-07-06 (auto-bootstrap from this repo, branch claude/lola-cloud-vps-setup-k8cnhr) |
 
 ## Access
