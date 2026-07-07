@@ -4,6 +4,8 @@ export interface BusinessAuditRequest {
   city: string;
   business_type: string;
   email: string;
+  /** Optional — phone captured on the Growth Score opt-in (required in that UI). */
+  phone?: string;
 }
 
 export interface RevenueLeak {

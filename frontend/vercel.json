@@ -26,6 +26,46 @@
       "permanent": true
     },
     {
+      "source": "/hvac-seo-tampa",
+      "destination": "/lp/hvac-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-tampa",
+      "destination": "/lp/plumber-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-clearwater",
+      "destination": "/lp/plumber-seo-clearwater",
+      "permanent": true
+    },
+    {
+      "source": "/plumber-seo-st-petersburg",
+      "destination": "/lp/plumber-seo-st-petersburg",
+      "permanent": true
+    },
+    {
+      "source": "/pressure-washing-seo-tampa",
+      "destination": "/lp/pressure-washing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/roofer-seo-tampa",
+      "destination": "/lp/roofing-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/electrician-seo-tampa",
+      "destination": "/lp/electrician-seo-tampa",
+      "permanent": true
+    },
+    {
+      "source": "/landscaping-seo-tampa",
+      "destination": "/lp/lawn-care-seo-tampa",
+      "permanent": true
+    },
+    {
       "source": "/auto-repair-seo-tampa",
       "destination": "/lp/industries",
       "permanent": true
@@ -41,8 +81,8 @@
       "permanent": true
     },
     {
-      "source": "/electrician-seo-tampa",
-      "destination": "/lp/electrician-seo-tampa",
+      "source": "/gym-seo-tampa",
+      "destination": "/lp/industries",
       "permanent": true
     },
     {
@@ -53,21 +93,6 @@
     {
       "source": "/gym-seo-st-petersburg",
       "destination": "/lp/industries",
-      "permanent": true
-    },
-    {
-      "source": "/gym-seo-tampa",
-      "destination": "/lp/industries",
-      "permanent": true
-    },
-    {
-      "source": "/hvac-seo-tampa",
-      "destination": "/lp/hvac-seo-tampa",
-      "permanent": true
-    },
-    {
-      "source": "/landscaping-seo-tampa",
-      "destination": "/lp/lawn-care-seo-tampa",
       "permanent": true
     },
     {
@@ -86,27 +111,12 @@
       "permanent": true
     },
     {
-      "source": "/plumber-seo-clearwater",
-      "destination": "/lp/plumber-seo-clearwater",
-      "permanent": true
-    },
-    {
-      "source": "/plumber-seo-st-petersburg",
-      "destination": "/lp/plumber-seo-st-petersburg",
-      "permanent": true
-    },
-    {
-      "source": "/plumber-seo-tampa",
-      "destination": "/lp/plumber-seo-tampa",
-      "permanent": true
-    },
-    {
-      "source": "/pressure-washing-seo-tampa",
-      "destination": "/lp/pressure-washing-seo-tampa",
-      "permanent": true
-    },
-    {
       "source": "/real-estate-seo-tampa",
+      "destination": "/lp/industries",
+      "permanent": true
+    },
+    {
+      "source": "/restaurant-seo-tampa",
       "destination": "/lp/industries",
       "permanent": true
     },
@@ -121,13 +131,8 @@
       "permanent": true
     },
     {
-      "source": "/restaurant-seo-tampa",
+      "source": "/salon-seo-tampa",
       "destination": "/lp/industries",
-      "permanent": true
-    },
-    {
-      "source": "/roofer-seo-tampa",
-      "destination": "/lp/roofing-seo-tampa",
       "permanent": true
     },
     {
@@ -139,50 +144,9 @@
       "source": "/salon-seo-st-petersburg",
       "destination": "/lp/industries",
       "permanent": true
-    },
-    {
-      "source": "/salon-seo-tampa",
-      "destination": "/lp/industries",
-      "permanent": true
     }
   ],
   "rewrites": [
-    {
-      "source": "/tampa-bay-power-clean",
-      "destination": "/lp/tampa-bay-power-clean.html"
-    },
-    {
-      "source": "/lp/tampa-bay-power-clean",
-      "destination": "/lp/tampa-bay-power-clean.html"
-    },
-    {
-      "source": "/tampa-bay-power-clean/roof-cleaning",
-      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
-    },
-    {
-      "source": "/tampa-bay-power-clean/house-washing",
-      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
-    },
-    {
-      "source": "/tampa-bay-power-clean/paver-sealing",
-      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
-    },
-    {
-      "source": "/lp/tampa-bay-power-clean/roof-cleaning",
-      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
-    },
-    {
-      "source": "/lp/tampa-bay-power-clean/house-washing",
-      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
-    },
-    {
-      "source": "/lp/tampa-bay-power-clean/paver-sealing",
-      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
-    },
-    {
-      "source": "/lead-gen/(.*)",
-      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"
-    },
     {
       "source": "/lp/pressure-washing-seo-tampa",
       "destination": "/lp/pressure-washing-seo-tampa.html"
@@ -404,12 +368,48 @@
       "destination": "/lp/roadmap.html"
     },
     {
+      "source": "/tampa-bay-power-clean",
+      "destination": "/lp/tampa-bay-power-clean.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean",
+      "destination": "/lp/tampa-bay-power-clean.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/roof-cleaning",
+      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/roof-cleaning",
+      "destination": "/lp/tampa-bay-power-clean/roof-cleaning.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/house-washing",
+      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/house-washing",
+      "destination": "/lp/tampa-bay-power-clean/house-washing.html"
+    },
+    {
+      "source": "/tampa-bay-power-clean/paver-sealing",
+      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
+    },
+    {
+      "source": "/lp/tampa-bay-power-clean/paver-sealing",
+      "destination": "/lp/tampa-bay-power-clean/paver-sealing.html"
+    },
+    {
       "source": "/reviews/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/reviews/$1"
     },
     {
       "source": "/t/(.*)",
       "destination": "https://lola-backend-production.up.railway.app/t/$1"
+    },
+    {
+      "source": "/lead-gen/(.*)",
+      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"
     },
     {
       "source": "/(.*)",

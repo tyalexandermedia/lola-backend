@@ -19,7 +19,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
-import { ROADMAP } from './lib/pricing';
+import { DIY, BUILD } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
 // every primary CTA points here. Env-overridable so the calendar link can be
@@ -130,12 +130,6 @@ export default function Homepage() {
       /* ignore */
     }
   };
-
-  // Roadmap stages, pulled from the canonical pricing source so homepage copy
-  // never drifts from docs/PRICING.md.
-  const foundation = ROADMAP.find((s) => s.id === 'foundation')!;
-  const growth = ROADMAP.find((s) => s.id === 'growth')!;
-  const scale = ROADMAP.find((s) => s.id === 'scale')!;
 
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
@@ -249,7 +243,7 @@ export default function Homepage() {
               type="submit"
               className="h-14 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:text-[14px]"
             >
-              Get my Growth Score →
+              Get Your Free Growth Score →
             </button>
           </div>
           <p className="mt-3 text-[12px] text-[#7A7F8A] sm:text-[13px]">
@@ -257,7 +251,7 @@ export default function Homepage() {
           </p>
         </form>
 
-        {/* Secondary links — strategy call + Growth Roadmap, grouped on one
+        {/* Secondary links — strategy call + pricing, grouped on one
             wrapping row so the mobile hero stays tight (less vertical stacking). */}
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
           <a
@@ -269,10 +263,10 @@ export default function Homepage() {
             Or book a free 15-min call →
           </a>
           <a
-            href="/roadmap"
+            href="/pricing"
             className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
           >
-            See the full Growth Roadmap →
+            See pricing: DIY $197 or Full Build $997 →
           </a>
         </div>
 
@@ -285,17 +279,17 @@ export default function Homepage() {
             quote-gate every CTA — Lola's public pricing is the moat, so we
             surface it the moment the visitor commits to looking. */}
         <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          <span><span className="font-semibold text-white">Foundation from {foundation.price} {foundation.period}</span> · a phased growth roadmap, all done-for-you</span>
+          <span><span className="font-semibold text-white">{DIY.price} DIY or {BUILD.price} Full Build</span> · one-time, done-for-you</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>🛡️ 30-day half-back guarantee</span>
+          <span>🛡️ Half-Back Guarantee</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>No contract · cancel anytime</span>
+          <span>No contract</span>
         </p>
 
-        {/* Foundation-first positioning — the core narrative wedge. */}
+        {/* Two-ways-to-win positioning — the core narrative wedge. */}
         <p className="mt-6 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          <span className="font-semibold text-white">Most businesses don&apos;t have a marketing problem first — they have a foundation problem.</span>{' '}
-          Lola starts there. Month 1 builds the base, days 31–90 build the signals, and after 90 days the data compounds.
+          <span className="font-semibold text-white">See your score and fix it yourself, or we build it and rank it.</span>{' '}
+          We get you found when people ask ChatGPT or Google for a company like yours.
         </p>
       </section>
 
@@ -308,18 +302,18 @@ export default function Homepage() {
           className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
-          Start free. Advance by maturity.
+          Start free. Then pick your path.
         </h2>
         <p className="mx-auto mt-4 mb-10 max-w-[600px] text-center text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-          One number, then a phased roadmap — not a generic monthly package. Here&apos;s the whole journey.
+          Get your free Growth Score, then fix it yourself for $197 or have us build and rank it for $997.
         </p>
         <RoadmapJourney />
         <div className="mt-8 text-center">
           <a
-            href="/roadmap"
+            href="/pricing"
             className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C]"
           >
-            See the full roadmap →
+            See pricing →
           </a>
         </div>
       </section>
@@ -353,7 +347,7 @@ export default function Homepage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] leading-[1.5] text-[#7A7F8A] sm:text-[12px]">
-          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola tracks all four across your growth roadmap, as integrations are connected.
+          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola gets you found across all four when people ask them for a company like yours.
         </p>
       </section>
 
@@ -398,8 +392,7 @@ export default function Homepage() {
       <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
         Premium agencies charge $2,500/mo to fix it.{' '}
-        <span className="font-bold text-[#D4AF37]">Lola builds the foundation for {foundation.price}, then runs your growth roadmap from {growth.price}{growth.period}</span> — with a
-        guarantee.{' '}
+        <span className="font-bold text-[#D4AF37]">$997 gets you a new site built and ranked — with our Half-Back Guarantee.</span>{' '}
         <span className="font-bold text-white">Real work or you walk.</span>
       </p>
 
@@ -422,7 +415,7 @@ export default function Homepage() {
         </p>
       </div>
 
-      {/* ── 3b. VALUE STACK — anchor the roadmap against agency pricing (mirrors /pricing) ─ */}
+      {/* ── 3b. VALUE STACK — anchor the Full Build against agency pricing (mirrors /pricing) ─ */}
       <section className="mt-14 sm:mt-20">
         <h2
           className="mx-auto max-w-[760px] text-center font-bold leading-[1.15] tracking-[-0.01em] text-white"
@@ -430,17 +423,16 @@ export default function Homepage() {
         >
           Everything you&apos;d pay an agency{' '}
           <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$2,000–$5,000/mo</span> for —
-          on a roadmap that starts at <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">{foundation.price}</span>.
+          for a one-time <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">{BUILD.price}</span>.
         </h2>
         <div className="mx-auto mt-7 max-w-[600px] rounded-[18px] border border-[#D4AF37]/25 bg-white/[0.02] p-6 shadow-[0_0_44px_rgba(212,175,55,0.06)] sm:p-7">
           <ul className="space-y-2.5 text-[14px] sm:text-[15px]">
             {[
-              [`🧱 ${foundation.name}`, `${foundation.price} ${foundation.period}`],
-              [`🚀 ${growth.name} (most popular)`, `${growth.price}${growth.period}`],
-              [`📈 ${scale.name}`, `${scale.price}${scale.period}`],
-              ['🌐 Done-for-you AI website', 'included'],
-              ['🤖 AI-search visibility + call tracking', 'included'],
-              ['📊 Live Growth Score dashboard', 'included'],
+              ['🌐 Custom website build', 'included'],
+              ['🤖 30 days of visibility work — Google + AI answers', 'included'],
+              ['📍 Google Business Profile optimization', 'included'],
+              ['🤝 Direct access to Ty during the build', 'included'],
+              ['🛡️ Half-Back Guarantee', 'included'],
             ].map(([label, val]) => (
               <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2.5">
                 <span className="text-[#E8E4D8]">{label}</span>
@@ -449,8 +441,8 @@ export default function Homepage() {
             ))}
           </ul>
           <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4 text-center">
-            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Agencies charge $2,000–$5,000/mo — Lola is done-for-you on the roadmap</p>
-            <p className="text-[15px] font-bold text-white">Start at <span className="text-[#D4AF37]">{foundation.price} {foundation.period}</span>, then {growth.price}{growth.period} · $0 setup</p>
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Agencies charge $2,000–$5,000/mo — the Full Build is done-for-you, one-time</p>
+            <p className="text-[15px] font-bold text-white">Prefer to do it yourself? <span className="text-[#D4AF37]">{DIY.price} DIY</span> · or <span className="text-[#D4AF37]">{BUILD.price} Full Build</span> · $0 setup</p>
           </div>
           <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <a
@@ -480,7 +472,7 @@ export default function Homepage() {
             { num: '20 sec', label: 'Audit completion time' },
             { num: '$1,800/mo', label: 'Saved vs premium agencies' },
             { num: '20+ cities', label: 'Sandbar Soft Wash service area' },
-            { num: '60 days', label: 'To first guaranteed win' },
+            { num: '30 days', label: 'Half-Back Guarantee window' },
           ].map((s, i) => (
             <div
               key={i}
@@ -630,7 +622,7 @@ export default function Homepage() {
             { n: '01', h: 'Audit', body: 'We baseline how AI agents see your business.', get: 'Total clarity on your visibility gaps', pro: false },
             { n: '02', h: 'Build', body: 'We fix the gaps. GMB, citations, reviews, schema.', get: 'AI-ready foundation in 30 days', pro: false },
             { n: '03', h: 'Reinforce', body: 'Monthly content, citations, reviews. Visibility compounds.', get: 'AI agent recommendations on autopilot', pro: false },
-            { n: '04', h: 'Dominate', body: 'Multi-service, multi-city execution with attribution and the Evidence Engine — the Scale System.', get: 'Competitors wonder how you did it', pro: true },
+            { n: '04', h: 'Dominate', body: 'You keep the calls coming in — found on Google and recommended in AI answers when buyers search.', get: 'Competitors wonder how you did it', pro: true },
           ].map((step) => (
             <div
               key={step.n}
@@ -642,7 +634,7 @@ export default function Homepage() {
             >
               {step.pro && (
                 <span className="absolute right-4 top-4 rounded-full bg-[#D4AF37]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Scale
+                  Ongoing
                 </span>
               )}
               <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{step.n}</p>
@@ -685,11 +677,11 @@ export default function Homepage() {
             <tbody className="divide-y divide-white/[0.06]">
               {[
                 ['Built for local service businesses', '✅', '✅', '❌', '❌'],
-                ['Done-for-you retainer',       '✅', '❌', '❌', '❌'],
+                ['Done-for-you build',          '✅', '❌', '❌', '❌'],
                 ['AI Search Visibility',        '✅', '❌', '❌', '❌'],
                 ['Personal brand backed',       '✅', '❌', '❌', '❌'],
                 ['Florida-focused',             '✅', '❌', '❌', '❌'],
-                ['Under $1,000/mo',             '✅', '✅', '❌', '⚠️'],
+                ['One-time, under $1,000',      '✅', '✅', '❌', '⚠️'],
                 ['Coach Ty on Slack/text',      '✅', '❌', '❌', '❌'],
               ].map((row, i) => (
                 <tr key={i}>
@@ -742,7 +734,7 @@ export default function Homepage() {
             },
             {
               q: 'How much does Lola cost?',
-              a: "It's a phased growth roadmap, not a one-size package. You start with the Foundation Sprint — $297 one-time — to build a searchable, trackable base. From there, Growth Roadmap is $497/mo (most popular) once the foundation's in place, and Scale System is $697/mo ($997+ in competitive or multi-location markets). No setup fee, no contract, month-to-month on the recurring stages. You're not paying more for no reason — you're paying for maturity as the work expands.",
+              a: "Two simple options, both one-time. DIY is $197 — you get your full Growth Score plus a simple 5-step fix-it checklist and do the work yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score to see where you stand.",
             },
             {
               q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
@@ -750,7 +742,7 @@ export default function Homepage() {
             },
             {
               q: 'How fast will I see results?',
-              a: "Think in roadmap stages. Month 1 (the Foundation Sprint) builds the base. Days 31–90 build the signals — this is where rankings, impressions, calls, and lead signals start becoming visible. After 90 days the data compounds. Two real guarantees back it: the 30-Day Half-Back — if Lola doesn't move your ranking in your first 30 days, your next month is 50% off — and the First Win Promise — at least one measurable win (a new ranking, a new lead, or a Google Business improvement) in your first 60 days, or your next month is on us.",
+              a: "The Full Build backs it with the Half-Back Guarantee: we pick 5 money keywords for your business together in week 1, and if we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print. We build the site fast, then spend 30 days getting you found on Google and in AI answers.",
             },
             {
               q: "Do you only work with Florida businesses?",
@@ -761,8 +753,8 @@ export default function Homepage() {
               a: "Cancel anytime. No contracts, no minimum commitment. If we're not earning back your investment, you don't owe another dollar.",
             },
             {
-              q: "What's actually included at each stage?",
-              a: "The Foundation Sprint ($297 one-time) creates the base: landing page / website foundation, core SEO setup, Google indexing basics, on-page SEO, local service-area targeting, call CTA + tracking setup, and your first roadmap snapshot + visibility score. Growth Roadmap ($497/mo) adds ongoing SEO, content expansion, Google Business posting (where access exists), call/form/message tracking review, monthly roadmap updates, and review strategy. Scale System ($697/mo, $997+ competitive) layers on multi-service and multi-city strategy, advanced dashboard reporting, attribution, conversion optimization, and the Evidence Engine. See /pricing for the full breakdown.",
+              q: "What's actually included in the Full Build?",
+              a: "For a one-time $997: a custom website built for you, 30 days of visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build — all backed by the Half-Back Guarantee. Prefer to do it yourself? The $197 DIY guide gives you your full Growth Score plus a simple 5-step fix-it checklist. See /pricing for the full breakdown.",
             },
             {
               q: 'Who is behind Lola?',
@@ -799,19 +791,19 @@ export default function Homepage() {
           just a straight answer on what's leaking and what to fix first.
         </p>
 
-        {/* Offer snapshot — the growth roadmap entry point (mirrors /pricing) */}
+        {/* Offer snapshot — the Full Build (mirrors /pricing) */}
         <div className="mx-auto mt-7 max-w-[560px] rounded-[16px] border border-[#D4AF37]/30 bg-[#0A0A0B]/50 p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The LOLA OS growth roadmap</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The LOLA Full Build</p>
           <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-[1.55] text-[#E8E4D8]">
-            Start with a <span className="font-semibold text-white">$297 Foundation Sprint</span> — website foundation, local SEO,
-            tracking, a baseline audit &amp; your 90-day roadmap — <span className="font-semibold text-white">done for you</span>.
+            <span className="font-semibold text-white">$997 gets you a new site built and ranked</span> — on Google and in AI
+            answers — <span className="font-semibold text-white">with our Half-Back Guarantee</span>.
           </p>
           <p className="mt-4 text-[34px] font-black leading-none text-[#D4AF37] sm:text-[40px]">
-            $297<span className="text-[15px] font-bold text-[#9CA3AF]"> one-time, then $497–$997/mo</span>
+            $997<span className="text-[15px] font-bold text-[#9CA3AF]"> one-time · or $197 DIY</span>
           </p>
-          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · cancel anytime on recurring stages · 30-day half-back</p>
+          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · no contract · Half-Back Guarantee on the Full Build</p>
           <a href="/pricing" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]">
-            See your full roadmap →
+            See pricing →
           </a>
         </div>
 

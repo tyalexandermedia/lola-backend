@@ -30,7 +30,7 @@ I ran a quick check. When ChatGPT looks up "{{city}} {{business_type}}," it's re
 
 That's not a ranking problem. It's an AI visibility problem. Different signals, different fix.
 
-I built a free 20-second audit that shows exactly what AI agents see (and don't see) about your business:
+I built a free 20-second Growth Score that shows exactly what AI agents see (and don't see) about your business:
 
 {{audit_link}}
 
@@ -51,11 +51,11 @@ Founder, Lola SEO · Tampa Bay, FL
 
 AI agents (ChatGPT, Perplexity, Google AI Overviews, Gemini) are recommending contractors directly to homeowners now. Whoever's "agent-ready" wins. Whoever's not becomes invisible — even if they rank in Google.
 
-Free Agent-Ready Audit for {{business_name}} in 20 seconds:
+Free Growth Score for {{business_name}} in 20 seconds:
 
 {{audit_link}}
 
-You get an Agent Readiness Score plus the 3 fixes that move it most.
+You get your Growth Score plus the 3 fixes that move it most.
 
 — Ty
 Founder, Lola SEO · Tampa Bay, FL
@@ -72,7 +72,7 @@ Founder, Lola SEO · Tampa Bay, FL
 
 Last month Sandbar Soft Wash in Palm Harbor became the contractor AI agents recommend in their service area. 5 keywords ranked in 3 weeks. Real local results.
 
-I built the system that did it — now I'm offering free audits to Florida contractors who want the same thing.
+I built the system that did it — now I'm offering free Growth Scores to Florida contractors who want the same thing.
 
 Yours for {{business_name}}:
 
@@ -97,9 +97,9 @@ Quick honest question — are you paying one of the big agencies $2,500-$3,500/m
 
 If yes, a lot of that bill is overhead and account management, not execution.
 
-Lola does the work for you on a phased roadmap — $297 to start the Foundation Sprint, then $497/mo Growth — done-for-you, no contract, with a written First Win Promise: measurable result in 60 days or your next month is on us.
+Lola does the work for you — a one-time $997 Full Build gets you a new site built and ranked everywhere people search now (Google, ChatGPT, Perplexity, Gemini). No contract. Backed by our Half-Back Guarantee: if we don't rank at least 1 of your 5 money keywords in 30 days, you get half back.
 
-Free Agent-Ready Audit for {{business_name}}:
+Free Growth Score for {{business_name}}:
 
 {{audit_link}}
 
@@ -118,9 +118,9 @@ Founder, Lola SEO · Tampa Bay, FL
 
 If you're paying $99-$399/mo for an SEO tool (Semrush, Ahrefs, Search Atlas), you're also spending 10+ hours/week learning the platform and executing the fixes yourself.
 
-Lola does it FOR you on a phased roadmap — done-for-you from $297 to start, $497/mo Growth. Same data — none of the manual work, no contract.
+Lola does it FOR you — a one-time $997 Full Build gets you a new site built and ranked everywhere people search now. Same data — none of the manual work, no contract. Backed by our Half-Back Guarantee.
 
-Free Agent-Ready Audit for {{business_name}}:
+Free Growth Score for {{business_name}}:
 
 {{audit_link}}
 

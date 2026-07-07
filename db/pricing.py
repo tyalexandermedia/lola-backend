@@ -1,18 +1,20 @@
 """
-LOLA OS — pricing & roadmap (backend source of truth).
+LOLA — pricing & offer (backend source of truth).
 
 Mirror of docs/PRICING.md. When pricing changes: update docs/PRICING.md first,
 then this file, then frontend/src/lib/pricing.ts and frontend/scripts/gen_lp.py.
 
-Model: a phased growth roadmap (Foundation → Growth → Scale), NOT a generic
-monthly SEO package. Replaces the retired "Local Lock" 3-tier model.
+Model: a simple two-tier offer, both one-time.
 
-  - Foundation Sprint  $297 one-time   (the low-risk front door)
-  - Growth Roadmap     $497/mo         (default recurring stage)
-  - Scale System       $697/mo         ($997+ competitive markets)
+  - DIY         $197 one-time   "See your score. Fix it yourself."
+  - Full Build  $997 one-time   "We build it. We rank it — everywhere people search now."
 
-The DB-backed founding counter still powers an honest "first N at the founding
-rate" scarcity line in outreach. It now tracks the Growth Roadmap stage.
+Replaces the retired Foundation → Growth → Scale roadmap ($297 / $497 / $697 / $997+).
+The Growth Score stays the free, branded, top-of-funnel lead magnet. The optional
+$299/mo retainer is introduced ONLY in the final follow-up email, never modeled as a tier.
+
+The DB-backed counter is retained (function signatures unchanged for import
+compatibility) as a simple build-signup counter.
 """
 
 import os
@@ -22,24 +24,22 @@ import aiosqlite
 
 DB_PATH = os.getenv("DB_PATH", "lola.db")
 
-# ── Roadmap prices (source of truth) ──────────────────────────────
-FOUNDATION_PRICE = 297          # one-time
-GROWTH_PRICE = 497              # /mo — default recurring stage
-SCALE_PRICE = 697              # /mo — standard
-SCALE_PRICE_COMPETITIVE = 997   # /mo — competitive / multi-location
+# ── Offer prices (source of truth) ────────────────────────────────
+DIY_PRICE = 197            # one-time — Growth Score + 5-step fix-it checklist
+BUILD_PRICE = 997          # one-time — Full Build (site + 30-day visibility + GBP + Ty access)
 
-PRICE_RANGE = "$297-$997"
+# Optional, EMAIL-ONLY retainer. Never surfaced on a page; introduced only in the
+# final follow-up email. Modeled here purely so backend copy has one source.
+RETAINER_PRICE = 299       # /mo — totally optional ongoing management
 
-# ── Founding-rate counter ─────────────────────────────────────────
-# First N Growth Roadmap clients lock the founding rate; after the cap it
-# returns to the regular rate. Kept simple and easy to tune.
+PRICE_RANGE = "$197-$997"
+
+# ── Signup counter ────────────────────────────────────────────────
+# Retained for import compatibility with main.py. No longer drives a monthly
+# founding rate (the two-tier offer is one-time), but kept as a simple counter.
 FOUNDING_CAP = 10
-FOUNDING_GROWTH_PRICE = GROWTH_PRICE   # $497 founding
-REGULAR_GROWTH_PRICE = 597             # $597 once the cap is hit
-
-# Back-compat aliases (older imports referenced "standard" naming).
-FOUNDING_STANDARD_PRICE = FOUNDING_GROWTH_PRICE
-REGULAR_STANDARD_PRICE = REGULAR_GROWTH_PRICE
+FOUNDING_STANDARD_PRICE = BUILD_PRICE
+REGULAR_STANDARD_PRICE = BUILD_PRICE
 
 CREATE_FOUNDING = """
 CREATE TABLE IF NOT EXISTS founding_signups (
@@ -58,7 +58,7 @@ async def init_pricing_table():
     print(f"✅ Pricing table ready at {DB_PATH}")
 
 
-async def get_founding_count(tier: str = "growth") -> int:
+async def get_founding_count(tier: str = "build") -> int:
     async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute(
             "SELECT COUNT(*) FROM founding_signups WHERE tier = ?",
@@ -68,8 +68,8 @@ async def get_founding_count(tier: str = "growth") -> int:
     return int(row[0]) if row else 0
 
 
-async def record_founding_signup(email: str, tier: str = "growth") -> int:
-    """Record a founding-member signup and return the new count."""
+async def record_founding_signup(email: str, tier: str = "build") -> int:
+    """Record a signup and return the new count."""
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             "INSERT INTO founding_signups (email, tier) VALUES (?, ?)",
@@ -81,13 +81,11 @@ async def record_founding_signup(email: str, tier: str = "growth") -> int:
 
 def growth_price_for_count(count: int) -> Tuple[int, bool]:
     """
-    Returns (monthly_price, founding_active) for the Growth Roadmap stage.
-    Founding active while there are slots left; once the cap is hit, the price
-    returns to the regular recurring rate.
+    Returns (price, founding_active). The two-tier offer is one-time, so this
+    always returns the Full Build price and False (no monthly founding rate).
+    Kept for import compatibility.
     """
-    if count < FOUNDING_CAP:
-        return FOUNDING_GROWTH_PRICE, True
-    return REGULAR_GROWTH_PRICE, False
+    return BUILD_PRICE, False
 
 
 # Back-compat alias — older callers used `standard_price_for_count`.

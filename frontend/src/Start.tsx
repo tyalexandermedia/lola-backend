@@ -25,7 +25,7 @@ export default function Start() {
     const desc = document.querySelector('meta[name="description"]');
     const prevDesc = desc?.getAttribute('content') || '';
     document.title = 'Get Found Online — Done For You | Lola';
-    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + a live dashboard, done for you. Start with a $297 Foundation Sprint, then $497–$997/mo. No setup fee, cancel anytime. You do nothing but answer the phone.');
+    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + AI-search visibility, done for you. The $997 Full Build, one-time — backed by the Half-Back Guarantee. Prefer to do it yourself? $197 DIY. You answer the phone; we handle the rest.');
     track('start_page_viewed');
     return () => { document.title = prevTitle; if (desc) desc.setAttribute('content', prevDesc); };
   }, []);
@@ -66,7 +66,7 @@ export default function Start() {
           Book a free 15-min call →
         </a>
         <p className="mt-4 text-[13px] text-[#9CA3AF]">
-          <span className="font-semibold text-white">$297 to start</span>, then $497–$997/mo · no setup fee · cancel anytime
+          <span className="font-semibold text-white">$997 Full Build</span>, one-time · no setup fee · Half-Back Guarantee
         </p>
       </section>
 
@@ -90,7 +90,7 @@ export default function Start() {
           ))}
         </div>
         <p className="mx-auto mt-4 max-w-[520px] text-center text-[13px] text-[#8A8F98]">
-          Want your social posted too? Add it from <span className="text-white">+$200/mo</span> — we post to Google, Facebook + Instagram for you.
+          Prefer to do it yourself? The <span className="text-white">$197 DIY</span> guide gives you your Growth Score plus a simple 5-step fix-it checklist.
         </p>
       </section>
 
@@ -114,8 +114,9 @@ export default function Start() {
       {/* PROOF + GUARANTEE strip */}
       <section className="mx-auto mt-12 flex max-w-[640px] flex-col items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 text-center sm:mt-16">
         <p className="text-[14px] leading-[1.6] text-[#C5C5C8]">
-          🛡️ <span className="font-semibold text-white">30-Day Half-Back Guarantee.</span>{' '}
-          If Lola doesn&apos;t move your ranking in 30 days, Coach Ty refunds half.
+          🛡️ <span className="font-semibold text-white">Half-Back Guarantee.</span>{' '}
+          We pick 5 money keywords together in week 1. If we don&apos;t get at least 1 ranking on
+          page 1 or in the map pack within 30 days, you get half back.
         </p>
         <p className="text-[13px] text-[#9CA3AF]">
           Real proof:{' '}
@@ -128,10 +129,10 @@ export default function Start() {
       {/* FINAL CTA */}
       <section className="mx-auto mt-12 w-full max-w-[640px] rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-10">
         <h2 className="font-bold leading-[1.1] tracking-[-0.02em] text-white" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.5rem)' }}>
-          Start the roadmap today.
+          Start your build today.
         </h2>
         <p className="mx-auto mt-3 max-w-[440px] text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          Begin with a $297 Foundation Sprint — you walk away with a real foundation and a 90-day roadmap, even if you stop there. Book the call to map yours.
+          The $997 Full Build gets you a new site built and ranked — on Google and in AI answers — backed by the Half-Back Guarantee. Book the call to get started.
         </p>
         <a
           href={callHref}
@@ -140,7 +141,7 @@ export default function Start() {
           onClick={() => track('start_cta_clicked', { spot: 'final' })}
           className="mt-6 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-8 text-[15px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right active:scale-[0.98] sm:h-16"
         >
-          Start your roadmap →
+          Start my build →
         </a>
       </section>
 

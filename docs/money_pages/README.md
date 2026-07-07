@@ -25,8 +25,8 @@ For each page in the table above:
 3. **Page content**:
    - Use Wix's H1/H2/paragraph blocks
    - Copy sections from the .md file 1:1
-   - Buttons → set link to the Lola URL shown in the doc (audit or retainer)
-   - All audit links use `?utm_source=tam&utm_medium=landing&utm_campaign=<slug>`
+   - Buttons → set link to the Lola URL shown in the doc (free Growth Score opt-in or the $997 Full Build page)
+   - All Growth Score / Full Build links use `?utm_source=tam&utm_medium=landing&utm_campaign=<slug>`
 4. **Schema markup**:
    - Wix → Page settings → Advanced SEO → Structured Data
    - Paste the JSON-LD block from the .md file
@@ -50,9 +50,9 @@ For each page in the table above:
 ## CTA funnel
 
 ```
-Money page → Lola audit (?utm_source=tam&utm_medium=landing&utm_campaign=<slug>)
-           → Audit email arrives
-           → /retainer close page
+Money page → free Growth Score opt-in (?utm_source=tam&utm_medium=landing&utm_campaign=<slug>)
+           → Growth Score arrives via text + email within 24h
+           → DIY $197 self-serve  OR  $997 Full Build page (Half-Back Guarantee)
            → Stripe checkout
 ```
 

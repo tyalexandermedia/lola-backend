@@ -263,13 +263,12 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
-          <FooterLink href="/roadmap">The Growth Roadmap</FooterLink>
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
-          <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
-          <FooterLink href="/pricing">Pricing &amp; Roadmap</FooterLink>
+          <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
+          <FooterLink href="/retainer">The $997 Full Build</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
-          <FooterLink href="/audit">Deep audit (5-step)</FooterLink>
+          <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
         </FooterCol>
 
         <FooterCol title="Compare">
@@ -283,7 +282,6 @@ function SiteFooter({ route }: { route: Route }) {
         <FooterCol title="Trust">
           <FooterLink href="/methodology">Scoring methodology</FooterLink>
           <FooterLink href="/lp/industries">Industries we serve</FooterLink>
-          <FooterLink href="/retainer">The Retainer</FooterLink>
           <FooterLink href="/apply">Apply for a slot</FooterLink>
         </FooterCol>
       </div>
@@ -291,7 +289,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          A phased growth roadmap for local service businesses — Foundation, Growth, Scale. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See your roadmap</a>.
+          Get found on Google and in AI answers — DIY $197 or Full Build $997. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
         </p>
       </div>
     </footer>
@@ -385,10 +383,10 @@ function Header() {
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
         <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
           <a
-            href="/roadmap"
+            href="/retainer"
             className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
-            Roadmap
+            Full Build
           </a>
           <a
             href="/growth-score"

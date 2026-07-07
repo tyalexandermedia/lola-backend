@@ -16,7 +16,7 @@ import { track } from './analytics';
 import { useSeo } from './lib/seo';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
-type TierInterest = 'foundation' | 'growth' | 'scale' | 'both';
+type TierInterest = 'diy' | 'build' | 'both';
 
 const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
@@ -35,14 +35,12 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
   { value: '100k_plus', label: '$100K+' },
 ];
 
-// Roadmap stages (Foundation → Growth → Scale). Values map to the phased
-// growth-roadmap model in docs/PRICING.md; the applicant picks where they want
-// to start and Coach Ty confirms the fit on the roadmap call.
+// Two-tier offer (DIY / Full Build) from docs/PRICING.md; the applicant picks
+// which they want and Coach Ty confirms the fit on the call.
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'foundation', label: 'Foundation Sprint — $297 one-time' },
-  { value: 'growth', label: 'Growth Roadmap — $497/mo' },
-  { value: 'scale', label: 'Scale System — $697/mo ($997+ competitive)' },
-  { value: 'both', label: 'Help me pick the right stage' },
+  { value: 'diy', label: 'DIY — $197 one-time' },
+  { value: 'build', label: 'Full Build — $997 one-time' },
+  { value: 'both', label: 'Help me pick the right one' },
 ];
 
 export default function ApplyPage() {
@@ -113,7 +111,7 @@ export default function ApplyPage() {
         const body = await resp.json().catch(() => null);
         throw new Error(body?.detail || 'Submission failed — please try again or email ty@tyalexandermedia.com directly.');
       }
-      track(tier === 'scale' ? 'scale_application_completed' : 'roadmap_application_completed', { tier });
+      track(tier === 'build' ? 'build_application_completed' : 'application_completed', { tier });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something broke.');

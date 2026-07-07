@@ -1,21 +1,17 @@
 /**
- * RoadmapJourney — the signature visual roadmap.
+ * RoadmapJourney — the signature visual path.
  *
  * Renders the customer journey as a connected path:
- *   Free Growth Score → Foundation → Growth → Scale
+ *   Free Growth Score → DIY ($197) → Full Build ($997)
  *
  * Two purpose-built layouts (no awkward reflow): a horizontal stepped path on
  * sm+ and a vertical timeline on mobile. Prices come from the canonical
- * ROADMAP (lib/pricing) so the visual never drifts from docs/PRICING.md.
+ * TIERS (lib/pricing) so the visual never drifts from docs/PRICING.md.
  *
- * Used on /roadmap (the dedicated page), /pricing, and the homepage.
+ * Used on /pricing and the homepage.
  */
 
-import { ROADMAP } from './lib/pricing';
-
-const f = ROADMAP.find((s) => s.id === 'foundation')!;
-const g = ROADMAP.find((s) => s.id === 'growth')!;
-const sc = ROADMAP.find((s) => s.id === 'scale')!;
+import { DIY, BUILD } from './lib/pricing';
 
 interface Step {
   icon: string;
@@ -34,36 +30,27 @@ const STEPS: Step[] = [
     kicker: 'Step 1 · Free',
     name: 'Growth Score',
     price: 'Free',
-    period: '60-second tool',
-    blurb: 'See your 0–100 starting number across all six dimensions.',
+    period: '60-second scan',
+    blurb: 'See your 0–100 score and exactly where you are on Google and in AI answers.',
     href: '/growth-score',
     free: true,
   },
   {
-    icon: '🧱',
+    icon: '🧭',
     kicker: 'Step 2 · One-time',
-    name: f.name,
-    price: f.price,
-    period: f.period,
-    blurb: 'Build a searchable, trackable base — plus your 90-day roadmap.',
-    href: '/pricing',
-  },
-  {
-    icon: '📈',
-    kicker: 'Step 3 · Monthly',
-    name: g.name,
-    price: g.price,
-    period: g.period,
-    blurb: 'Momentum: content, posting, reviews — the score starts climbing.',
+    name: DIY.name,
+    price: DIY.price,
+    period: DIY.period,
+    blurb: 'See your score, then fix it yourself with a simple 5-step checklist.',
     href: '/pricing',
   },
   {
     icon: '🚀',
-    kicker: 'Step 4 · Monthly',
-    name: sc.name,
-    price: sc.price,
-    period: sc.period,
-    blurb: 'Compete + compound across services, cities, and AI search.',
+    kicker: 'Step 3 · One-time',
+    name: BUILD.name,
+    price: BUILD.price,
+    period: BUILD.period,
+    blurb: 'We build the site and get you ranked — on Google and in AI answers. Half-Back Guarantee.',
     href: '/pricing',
   },
 ];
@@ -76,9 +63,9 @@ export default function RoadmapJourney({ className = '' }: { className?: string 
         {/* connector line behind the nodes */}
         <div
           aria-hidden
-          className="absolute left-[12.5%] right-[12.5%] top-[26px] h-[2px] bg-gradient-to-r from-[#D4AF37]/20 via-[#D4AF37]/60 to-[#D4AF37]/20"
+          className="absolute left-[16.66%] right-[16.66%] top-[26px] h-[2px] bg-gradient-to-r from-[#D4AF37]/20 via-[#D4AF37]/60 to-[#D4AF37]/20"
         />
-        <ol className="relative grid grid-cols-4 gap-4">
+        <ol className="relative grid grid-cols-3 gap-4">
           {STEPS.map((s, i) => (
             <li key={s.name} className="flex flex-col items-center text-center">
               <span

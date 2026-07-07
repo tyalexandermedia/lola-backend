@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-plumbers-tampa`
 - **Title tag**: `Local SEO for Plumbers in Tampa | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Tampa plumbing contractors. Free 20-sec audit. Emergency-keyword optimized. From $297. Cancel anytime.`
+- **Meta description**: `Done-for-you local SEO for Tampa plumbing contractors. Emergency-keyword optimized. Free Growth Score, then DIY ($197) or Full Build ($997). No contracts.`
 - **OG / Twitter / Canonical**: `https://tyalexandermedia.com/local-seo-plumbers-tampa`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Tampa Bay, FL"
   },
   "areaServed": {"@type": "City", "name": "Tampa"},
-  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "197", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,10 +33,12 @@
 **Tampa Plumbers: Be the First Result When Someone Searches "Plumber Near Me" at 11pm.**
 
 ### Subhead
-Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. Done for you. From $297.
+Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly desperate. Lola gets your business ranking on Google + ChatGPT for those high-intent moments. We build it. We rank it. Full Build is a one-time $997, backed by our Half-Back Guarantee.
 
 ### Primary CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa&trade=Plumber)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa&trade=Plumber)**
+
+60-second scan · delivered by text + email within 24 hours.
 
 ---
 
@@ -46,13 +48,13 @@ Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly d
 - "Pay $50/lead" services that share your leads with 3 competitors
 - $2,500/mo plumbing-specific agencies with 12-month contracts
 - Generic SEO that ignores emergency-intent keywords
-- 50-page audits that don't actually move rankings
+- 50-page reports that don't actually move rankings
 
 **THIS:**
 - Organic Map Pack rankings you own forever
-- Foundation Sprint from $297, no contract, cancel anytime, no setup fee
-- Emergency-keyword targeting baked in
-- First Win Promise (60 days) + 30-Day Half-Back Guarantee
+- One-time **$997 Full Build** — a new site, built and ranked. No monthly contract, no setup fee.
+- 30 days getting you found on Google AND the AI answer engines (ChatGPT, Perplexity, Gemini), emergency-keyword targeting baked in — with direct access to Ty during the build
+- **Half-Back Guarantee**: at least 1 of your 5 money keywords on page 1 or in the map pack in 30 days, or half back
 
 ---
 
@@ -70,29 +72,36 @@ Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly d
 
 ### Case study
 
-A Palm Harbor service contractor at score 76 hit 5 ranked keywords in 3 weeks on the Lola roadmap — an attributed case study; results vary. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
+{{CASE_STUDY}} — a Palm Harbor service contractor — went from buried to 5 ranked keywords in 3 weeks on the Lola playbook; an attributed case study, results vary. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
 
 ---
 
 ### Pricing
 
-Start free: get your free Growth Score and free audit, then choose your phase.
+Start free: get your **free Growth Score** — a 60-second scan of how you show up on Google and in AI answers, delivered by text + email within 24 hours. Then pick your path:
 
-| Tier | Price |
-|---|---|
-| Foundation Sprint | $297 one-time |
-| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
-| Scale System | $697/mo ($997+ competitive) |
+| Option | Price | What you get |
+|---|---|---|
+| **DIY** | **$197** one-time | See your score. Fix it yourself. Your full Growth Score + a simple 5-step fix-it checklist. |
+| **Full Build** | **$997** one-time | We build it. We rank it — everywhere people search now. |
 
-No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+**Full Build includes:**
+- Custom website build
+- 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini)
+- Google Business Profile optimization
+- Direct access to Ty during the build
 
-**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa)**
+**Half-Back Guarantee.** We pick 5 money keywords for your {{VERTICAL}} business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.
+
+**[Start My Build →](https://lola.tyalexandermedia.com/build?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa)**
+
+Prefer we just handle it? See the full build. Want to fix it yourself first? Grab the $197 DIY guide.
 
 ---
 
 ### Coach Ty trust block
 
-Tampa-based. Built Lola because his dad's contractor business kept losing jobs to bigger competitors who weren't actually doing better work — just better Google. Lola fixes that for service trades. You answer the phone. Coach Ty + team handle everything else.
+Tampa-based. Built Lola because his dad's contractor business kept losing jobs to bigger competitors who weren't actually doing better work — just better Google. Lola fixes that for service trades. You answer the phone. Coach Ty + team build it, rank it, and back it.
 
 ---
 
@@ -102,21 +111,21 @@ Tampa-based. Built Lola because his dad's contractor business kept losing jobs t
 Yes — that's exactly the kind of high-intent local keyword we target. Map Pack + organic + AI search visibility.
 
 **2. How fast will I see new calls?**
-First Win Promise: a measurable ranking improvement within 60 days, backed by our 30-Day Half-Back Guarantee. Most clients see new call volume within 6-8 weeks.
+Half-Back Guarantee: we pick 5 money keywords together in week 1 and get at least 1 on page 1 or in the map pack within 30 days — or half your investment comes back. Most clients see new call volume within 6-8 weeks.
 
 **3. What if my GMB profile is a mess?**
-That's part of week 1. We audit, fix categories, add proper services, photo cadence, and post strategy. Included from the Foundation Sprint on.
+That's part of week 1. We audit it internally, fix categories, add proper services, photo cadence, and post strategy. Included in the Full Build.
 
-**4. Do you do Google LSA (Local Service Ads)?**
-LSA is a separate paid channel. Lola handles organic + Map Pack. Many clients pause LSA after 60 days on Lola because organic catches up.
+**4. What if you don't rank me?**
+You get half back, no argument. We only succeed if you do.
 
 **5. We have 10 service vans, will the system scale?**
-Yes — the Scale System is built for it ($697/mo, vs $997+ competitive). We add service-area pages as you grow.
+Yes — the Full Build handles it, and we add service-area pages as you grow. Start with your free Growth Score, then choose the $197 DIY guide or the $997 Full Build.
 
 ---
 
 ### Final CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa&trade=Plumber)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=plumbers-tampa&trade=Plumber)**
 
 ---
 
@@ -126,8 +135,8 @@ Yes — the Scale System is built for it ($697/mo, vs $997+ competitive). We add
 - [HVAC contractors Tampa →](/local-seo-hvac-contractors-tampa)
 - [Florida roofers →](/local-seo-roofers-florida)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
-- [Lola free audit →](https://lola.tyalexandermedia.com)
-- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
+- [Get your free Growth Score →](https://lola.tyalexandermedia.com)
+- [See the full build →](https://lola.tyalexandermedia.com/build)
 
 ### External link
 

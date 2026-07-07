@@ -3,7 +3,7 @@
 ## Wix page settings
 - **Slug**: `/local-seo-hvac-contractors-tampa`
 - **Title tag**: `Local SEO for HVAC Contractors in Tampa | Ty Alexander Media`
-- **Meta description**: `Done-for-you local SEO for Tampa HVAC contractors. Free audit. AI search visibility tracked. From $297. Real work, real rankings, real revenue.`
+- **Meta description**: `Done-for-you local SEO for Tampa HVAC contractors. Get found on Google + AI search. Free Growth Score, then DIY ($197) or Full Build ($997). Real rankings, real revenue.`
 - **OG / Twitter / Canonical URL**: `https://tyalexandermedia.com/local-seo-hvac-contractors-tampa`
 
 ## JSON-LD
@@ -21,7 +21,7 @@
     "areaServed": "Tampa Bay, FL"
   },
   "areaServed": {"@type": "City", "name": "Tampa"},
-  "offers": {"@type": "AggregateOffer", "lowPrice": "297", "highPrice": "997", "priceCurrency": "USD"}
+  "offers": {"@type": "AggregateOffer", "lowPrice": "197", "highPrice": "997", "priceCurrency": "USD"}
 }
 ```
 
@@ -33,10 +33,12 @@
 **Tampa HVAC Contractors: Get Booked Solid From Google + AI Search.**
 
 ### Subhead
-Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business ranking where buyers search — Google AND ChatGPT — so the next AC emergency call comes to you. Done for you. From $297.
+Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business ranking where buyers search — Google AND ChatGPT — so the next AC emergency call comes to you. We build it. We rank it. Full Build is a one-time $997, backed by our Half-Back Guarantee.
 
 ### Primary CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa&trade=HVAC)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa&trade=HVAC)**
+
+60-second scan · delivered by text + email within 24 hours.
 
 ---
 
@@ -46,13 +48,13 @@ Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business r
 - HVAC-specific "marketing agencies" that charge $3,500/mo + setup fees
 - 6-month contracts with no measurable wins until month 5
 - Generic "Google Ads" pitches that drain $40/click on the wrong keywords
-- Audits that mention "schema" 12 times but don't fix it
+- Reports that mention "schema" 12 times but never fix a thing
 
 **THIS:**
-- Foundation Sprint from $297, no contract, cancel anytime, no setup fee
+- One-time **$997 Full Build** — a new site, built and ranked. No monthly contract, no setup fee.
 - Built by a Tampa native who knows your service area
-- Coach Ty + team executing weekly: GMB posts, citations, content, links
-- First Win Promise (60 days) + 30-Day Half-Back Guarantee, in writing
+- 30 days getting you found on Google AND the AI answer engines (ChatGPT, Perplexity, Gemini) — with direct access to Ty during the build
+- **Half-Back Guarantee**, in writing: at least 1 of your 5 money keywords on page 1 or in the map pack in 30 days, or half back
 
 ---
 
@@ -70,23 +72,30 @@ Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business r
 
 ### Case study
 
-A Tampa-area soft wash company at score 76 hit 5 ranked keywords in 3 weeks on the same roadmap system (attributed case study — results vary). HVAC case studies coming as our first HVAC clients ramp — yours could be next.
+{{CASE_STUDY}} — a Tampa Bay soft wash company — went from buried to ranking 5 money keywords in 3 weeks and now shows up in the map pack for their money terms (attributed case study — results vary). HVAC case studies coming as our first HVAC clients ramp — yours could be next.
 
 ---
 
 ### Pricing
 
-Start free: get your free Growth Score and free audit, then choose your phase.
+Start free: get your **free Growth Score** — a 60-second scan of how you show up on Google and in AI answers, delivered by text + email within 24 hours. Then pick your path:
 
-| Tier | Price |
-|---|---|
-| Foundation Sprint | $297 one-time |
-| **Growth Roadmap** *(Most Popular)* | **$497/mo** |
-| Scale System | $697/mo ($997+ competitive) |
+| Option | Price | What you get |
+|---|---|---|
+| **DIY** | **$197** one-time | See your score. Fix it yourself. Your full Growth Score + a simple 5-step fix-it checklist. |
+| **Full Build** | **$997** one-time | We build it. We rank it — everywhere people search now. |
 
-No setup fee, no contract, cancel anytime. Backed by the 30-Day Half-Back Guarantee and the First Win Promise (60 days).
+**Full Build includes:**
+- Custom website build
+- 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini)
+- Google Business Profile optimization
+- Direct access to Ty during the build
 
-**[See the roadmap →](https://lola.tyalexandermedia.com/roadmap?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa)**
+**Half-Back Guarantee.** We pick 5 money keywords for your {{VERTICAL}} business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.
+
+**[Start My Build →](https://lola.tyalexandermedia.com/build?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa)**
+
+Prefer we just handle it? That's the Full Build. Want to fix it yourself first? Grab the $197 DIY guide.
 
 ---
 
@@ -107,16 +116,16 @@ Yes — "emergency ac repair Tampa," "ac not cooling Tampa," "hvac repair near m
 **3. How do you compete with Service Champions and other big chains?**
 We don't outspend them on Google Ads. We out-rank them organically on Map Pack + AI search — where 73% of clicks actually go.
 
-**4. What if I'm a one-truck operation?**
-Perfect fit. Start with the Foundation Sprint at $297. Lola scales with you — we won't push you toward features you don't need.
+**4. What if you don't rank me?**
+You get half back, no argument. We pick 5 money keywords together in week 1; if we don't get at least 1 on page 1 or in the map pack within 30 days, half your investment comes back. We only succeed if you do.
 
-**5. How do I track if it's working?**
-Bi-weekly performance reports in plain English (no jargon dashboards). Plus you'll see the calls.
+**5. What if I'm a one-truck operation?**
+Perfect fit. Start with your free Growth Score, then choose the $197 DIY guide or the $997 Full Build. Lola scales with you — we won't push you toward features you don't need.
 
 ---
 
 ### Final CTA
-**[Run my free 20-second audit →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa&trade=HVAC)**
+**[Get Your Free Growth Score →](https://lola.tyalexandermedia.com/audit?utm_source=tam&utm_medium=landing&utm_campaign=hvac-tampa&trade=HVAC)**
 
 ---
 
@@ -126,8 +135,8 @@ Bi-weekly performance reports in plain English (no jargon dashboards). Plus you'
 - [Florida roofers →](/local-seo-roofers-florida)
 - [Tampa plumbers →](/local-seo-plumbers-tampa)
 - [SEO agency Tampa →](/seo-agency-tampa-fl)
-- [Lola free audit →](https://lola.tyalexandermedia.com)
-- [See the roadmap →](https://lola.tyalexandermedia.com/roadmap)
+- [Get your free Growth Score →](https://lola.tyalexandermedia.com)
+- [See the full build →](https://lola.tyalexandermedia.com/build)
 
 ### External link
 
