@@ -132,6 +132,7 @@ from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webma
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
+from reviews.sms import send_growth_score_sms
 from db.case_studies import (
     init_case_studies_table,
     get_latest_run,
@@ -1279,6 +1280,19 @@ async def audit(request: AuditRequest) -> AuditResponse:
             asyncio.create_task(
                 _generate_and_cache_enhancement(audit_id, audit_response)
             )
+
+            # Deliver the Growth Score by text (best-effort). Gated on the lead
+            # giving a phone + consenting; send_growth_score_sms itself no-ops
+            # when Twilio isn't enabled/configured, so this is safe either way.
+            # This is how phone-only leads (email optional) get their results.
+            if request.phone and request.sms_consent:
+                asyncio.create_task(
+                    send_growth_score_sms(
+                        request.phone,
+                        request.business_name,
+                        f"{PUBLIC_APP_URL}/r/{audit_id}",
+                    )
+                )
 
             await upsert_lead(
                 audit_id=audit_id,

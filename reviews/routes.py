@@ -343,7 +343,8 @@ async def admin_send_review_request(body: ReviewRequestIn):
             logo_url=biz.get("logo_url"),
         )
     else:
-        # Stub raises NotImplementedError — visible codepath, no silent no-op.
+        # Sends via Twilio (reviews.sms). Best-effort: returns False if the send
+        # fails, and the opt-out line is appended automatically.
         sent = await send_sms_review_request(
             to_phone=body.customer_phone,
             business_name=biz["name"],
