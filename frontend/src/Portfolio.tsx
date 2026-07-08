@@ -333,11 +333,13 @@ export default function Portfolio({
   eyebrow = 'The work',
   subhead = 'Not mockups — live sites, ranking for the searches that bring their owners real jobs. Tap any one to scroll through it.',
   items = PORTFOLIO,
+  showHeader = true,
 }: {
   title?: string;
   eyebrow?: string;
   subhead?: string;
   items?: PortfolioSite[];
+  showHeader?: boolean;
 }) {
   const [active, setActive] = useState<PortfolioSite | null>(null);
 
@@ -349,17 +351,21 @@ export default function Portfolio({
   if (!items.length) return null;
 
   return (
-    <section id="work" className="mt-16 scroll-mt-24 sm:mt-24">
-      <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">{eyebrow}</p>
-      <h2
-        className="mt-3 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
-        style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-      >
-        {title}
-      </h2>
-      <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">{subhead}</p>
+    <section id="work" className={`scroll-mt-24 ${showHeader ? 'mt-16 sm:mt-24' : 'mt-8'}`}>
+      {showHeader && (
+        <>
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">{eyebrow}</p>
+          <h2
+            className="mt-3 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
+            style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
+          >
+            {title}
+          </h2>
+          <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">{subhead}</p>
+        </>
+      )}
 
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 ${showHeader ? 'mt-8' : ''}`}>
         {items.map((s) => (
           <Card key={s.url} site={s} onOpen={open} />
         ))}
