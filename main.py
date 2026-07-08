@@ -45,6 +45,18 @@ from db.leads import (
     get_warm_leads,
     classify_temperature,
 )
+from db.followups import (
+    init_followups_table,
+    enroll as enroll_followup,
+    mark_purchased as mark_followup_purchased,
+)
+from followup.runner import (
+    run_loop as followup_run_loop,
+    process_due as followup_process_due,
+    stats as followup_stats,
+    followup_enabled,
+    first_delay_sec as followup_first_delay,
+)
 from db.pricing import (
     init_pricing_table,
     get_founding_count,
@@ -224,7 +236,14 @@ async def startup_event():
     await init_reporting_tables()
     await init_enhancements_table()
     await init_swarm_tables()
+    await init_followups_table()
     await cache_purge_expired()
+
+    # Growth Score follow-up sequencer. Dormant until an email/SMS provider is
+    # configured, and only ever touches leads enrolled AFTER this deploy, so
+    # switching it on never retro-blasts the back catalogue.
+    if followup_enabled():
+        asyncio.create_task(followup_run_loop())
 
 
 app.include_router(reviews_router)
@@ -1315,6 +1334,21 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 monthly_leak=revenue_leak["monthly_leak"],
             )
 
+            # Enroll in the Growth Score follow-up sequence (nudge → guarantee →
+            # final email). Runs for phone-only and email leads; the runner
+            # itself is dormant until a provider is configured.
+            asyncio.create_task(
+                enroll_followup(
+                    audit_id=audit_id,
+                    email=request.email,
+                    phone=request.phone,
+                    sms_consent=request.sms_consent,
+                    business_name=request.business_name,
+                    report_url=f"{PUBLIC_APP_URL}/r/{audit_id}",
+                    first_delay_sec=followup_first_delay(),
+                )
+            )
+
             # Email-only side effects. The Growth Score form makes email optional
             # (phone is the required contact), so only run these when we actually
             # have an email — otherwise we'd key on / send to an empty address.
@@ -1722,6 +1756,20 @@ def _check_admin(key: str) -> None:
     expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "")
     if not expected or key != expected:
         raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/followups/stats")
+async def followups_stats_endpoint(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Admin — counts for the Growth Score follow-up sequence."""
+    _check_admin(x_admin_key)
+    return {"enabled": followup_enabled(), **(await followup_stats())}
+
+
+@app.post("/followups/run")
+async def followups_run_endpoint(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Admin — process any currently-due follow-ups now (for testing the cadence)."""
+    _check_admin(x_admin_key)
+    return await followup_process_due()
 
 
 @app.post("/admin/case-study/{slug}/run")
@@ -3723,6 +3771,9 @@ async def stripe_webhook(request: Request):
     path = "/build/start" if tier == "build" else "/diy"
     link = f"{PUBLIC_APP_URL}{path}?session_id={sid}"
     print(f"💳 Stripe paid: {tier} · {email or phone or 'no-contact'}")
+
+    # Converted — stop any Growth Score follow-ups for this buyer.
+    asyncio.create_task(mark_followup_purchased(email=email, phone=phone))
 
     if email:
         try:
