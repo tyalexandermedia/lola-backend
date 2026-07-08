@@ -3534,6 +3534,75 @@ async def unsubscribe(email: str, token: str):
     return {"ok": True, "email": email, "message": "Unsubscribed. No more emails."}
 
 
+# ── AI Visibility: what an AI assistant would say about this business ──
+# Powers the "what AI actually says about you" proof block on the results page.
+# One Claude call per unique (business, city, trade), cached in-process to keep
+# cost near zero. Gated on ANTHROPIC_API_KEY — unset → {available: false} and
+# the UI hides the block. Framed to avoid inventing competitor names.
+_AI_VIS_CACHE: dict = {}
+
+
+@app.get("/ai-visibility")
+async def ai_visibility(business: str = "", city: str = "", trade: str = ""):
+    business = business.strip()
+    city = city.strip()
+    trade = (trade or "").strip() or "local service business"
+    if not business or not city:
+        return {"available": True, "names_you": False, "summary": "", "skipped": True}
+
+    api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+    if not api_key:
+        return {"available": False}
+
+    cache_key = f"{business}|{city}|{trade}".lower()
+    if cache_key in _AI_VIS_CACHE:
+        return _AI_VIS_CACHE[cache_key]
+
+    prompt = (
+        f'Simulate how a general AI assistant (like ChatGPT) would answer if a user asked '
+        f'"What\'s the best {trade} in {city}?". Based only on what such an assistant would '
+        f'plausibly already know today, would it name "{business}" as a recommendation?\n\n'
+        f'Respond with ONLY a JSON object, no prose:\n'
+        f'{{"names_you": true or false, "summary": "one honest, plain-language sentence on '
+        f'whether an AI assistant would currently recommend {business} for {trade} in {city}"}}\n'
+        f'Do not invent specific competitor business names.'
+    )
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                json={
+                    "model": ENHANCEMENT_MODEL,
+                    "max_tokens": 300,
+                    "messages": [{"role": "user", "content": prompt}],
+                },
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+            )
+        if resp.status_code != 200:
+            print(f"❌ ai-visibility HTTP {resp.status_code}: {resp.text[:160]}")
+            return {"available": False}
+        data = resp.json()
+        text = "".join(
+            b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"
+        ).strip()
+        start, end = text.find("{"), text.rfind("}")
+        parsed = json.loads(text[start : end + 1]) if 0 <= start < end else {}
+        result = {
+            "available": True,
+            "names_you": bool(parsed.get("names_you", False)),
+            "summary": str(parsed.get("summary", "")).strip(),
+        }
+        _AI_VIS_CACHE[cache_key] = result
+        return result
+    except Exception as e:
+        print(f"❌ ai-visibility error: {e}")
+        return {"available": False}
+
+
 # ── Stripe checkout: server-side verification + fulfillment webhook ───
 def _verify_stripe_sig(secret: str, header: str, body: bytes) -> bool:
     """Verify a Stripe-Signature header (t=...,v1=...) via HMAC-SHA256."""

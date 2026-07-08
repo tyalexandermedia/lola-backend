@@ -360,39 +360,52 @@ export default function RetainerPage() {
           </div>
         </section>
 
-        {/* ── 7. FOUNDER STORY ────────────────────────────────────────── */}
-        <section className="mt-16 sm:mt-20">
+        {/* ── 7. FOUNDER STORY (matches the homepage bio) ─────────────── */}
+        <section className="mt-16 text-left sm:mt-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-            Why Lola exists
+            Meet Ty &amp; Lola
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[160px_1fr] sm:items-start sm:gap-10">
-            <div className="mx-auto h-[160px] w-[160px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] sm:mx-0">
-              <div className="flex h-full w-full items-center justify-center text-[44px]">🐾</div>
-            </div>
+          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-10">
+            <figure className="mx-auto w-[220px] max-w-full sm:mx-0">
+              <div className="aspect-[3/4] overflow-hidden rounded-2xl border border-[#D4AF37]/30 shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
+                <img
+                  src="/images/ty-lola-beach.jpg"
+                  alt="Coach Ty and his dog Lola on a Tampa Bay beach at sunset"
+                  loading="lazy"
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-[11px] text-[#8A8F98] sm:text-left">
+                Ty &amp; Lola · Tampa Bay
+              </figcaption>
+            </figure>
 
             <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
               <p>
-                I built Lola because I watched too many local service businesses lose jobs
-                to competitors with worse work but better Google presence.
+                Hey — I'm Ty. Lola's the name on the door, and she's exactly who you think:{' '}
+                <span className="font-semibold text-white">my dog.</span> She turns 9 on February 16
+                (a 2018 girl), and honestly she's the whole reason this exists.
               </p>
               <p>
-                I'm Coach Ty. I run Ty Alexander Media in Tampa. My first proof story is my
-                dad's business — Sandbar Soft Wash in Palm Harbor —{' '}
+                By day I'm a personal trainer and a full-time general manager. The dream is to go
+                hybrid — keep coaching people in the gym, and run{' '}
+                <span className="font-semibold text-white">Lola Leads</span> the rest of the time:
+                building local businesses a site that actually gets them found and gets the phone
+                ringing, on Google and on AI.
+              </p>
+              <p>
+                My first proof story is my dad's business — Sandbar Soft Wash in Palm Harbor —{' '}
                 <a href="/case-studies/sandbar" className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
                   5 keywords ranked in 3 weeks
                 </a>
-                .
-              </p>
-              <p>
-                Lola isn't a SaaS tool I'm trying to scale to a $100M exit. She's a real
-                system I run for local owners I actually know.{' '}
-                <span className="font-semibold text-white">Starting with my dad.</span>
+                . Same system I'll run on yours.
               </p>
               <p className="text-white">
-                <span className="font-bold text-[#D4AF37]">
-                  You answer your own phones. So do I. Let's work.
-                </span>
+                You answer your own phone. So do I. And the real goal? Enough of you win with Lola
+                that I can buy{' '}
+                <span className="font-bold text-[#D4AF37]">the actual Lola her beach house</span> 🐾.
+                She's earned it.
               </p>
             </div>
           </div>

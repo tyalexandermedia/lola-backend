@@ -188,7 +188,6 @@ function App() {
        `hidden`) prevents a scroll container so the sticky header keeps
        working. Invisible on desktop — nothing overflows there. */
     <div className="min-h-screen scroll-smooth overflow-x-clip bg-[#0A0A0B] text-white">
-      <ScrollProgress />
       <Header />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
@@ -222,46 +221,6 @@ function App() {
       <SiteFooter route={route} />
       <MobileStickyCTA route={route} />
       <BackToTop route={route} />
-    </div>
-  );
-}
-
-/**
- * Reading-progress bar — a thin gold line at the very top that fills as you
- * scroll. Premium, near-invisible touch. Hidden for reduced-motion users.
- */
-function ScrollProgress() {
-  const [pct, setPct] = useState(0);
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    setReduced(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        const el = document.documentElement;
-        const max = el.scrollHeight - el.clientHeight;
-        setPct(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0);
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, []);
-  if (reduced) return null;
-  return (
-    <div aria-hidden className="no-print pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
-      <div
-        className="h-full bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.6)]"
-        style={{ width: `${pct}%` }}
-      />
     </div>
   );
 }
