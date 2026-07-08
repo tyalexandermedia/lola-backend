@@ -20,6 +20,7 @@ import {
   type OfferTier,
 } from './lib/pricing';
 import { useSeo } from './lib/seo';
+import { checkoutUrl } from './lib/checkout';
 
 // Page-scoped FAQs — each entry powers the visible accordion AND the
 // FAQPage JSON-LD we inject into <head> at mount (route-specific schema
@@ -178,10 +179,15 @@ export default function PricingPage() {
 
   // DIY starts with the free Growth Score (self-service front door); the Full
   // Build books a call / starts the build.
-  const hrefFor = (tier: OfferTier) =>
-    tier.id === 'diy'
+  const hrefFor = (tier: OfferTier) => {
+    // Pay-now → instant access when the Stripe Payment Link is configured.
+    const pay = checkoutUrl(tier.id);
+    if (pay) return pay;
+    // Fallback before links exist: DIY → free score, Build → book a call.
+    return tier.id === 'diy'
       ? withUtm('/growth-score', 'diy', 'diy')
       : withUtm(CALENDAR_URL, tier.id, tier.id);
+  };
 
   return (
     <main className="flex flex-1 flex-col">

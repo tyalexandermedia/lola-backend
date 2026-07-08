@@ -24,6 +24,7 @@ import { useEffect } from 'react';
 import { track } from './analytics';
 import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 import { useSeo } from './lib/seo';
+import { checkoutUrl } from './lib/checkout';
 
 // Call-first: every Full Build CTA books a free call / starts the build.
 // VITE_STRATEGY_CALL_URL / VITE_CALENDAR_URL override the default.
@@ -53,9 +54,12 @@ export default function RetainerPage() {
     track('retainer_page_viewed');
   }, []);
 
-  const retainerHref = withUtm(BOOKING_URL, 'sticky_cta');
-  const heroHref = withUtm(BOOKING_URL, 'hero_cta');
-  const finalHref = withUtm(BOOKING_URL, 'final_cta');
+  // Pay-now → instant onboarding when the Stripe Payment Link is configured;
+  // otherwise fall back to booking a call (nothing breaks before the link exists).
+  const buildPay = checkoutUrl('build');
+  const retainerHref = buildPay || withUtm(BOOKING_URL, 'sticky_cta');
+  const heroHref = buildPay || withUtm(BOOKING_URL, 'hero_cta');
+  const finalHref = buildPay || withUtm(BOOKING_URL, 'final_cta');
 
   return (
     <>
