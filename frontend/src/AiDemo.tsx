@@ -3,17 +3,84 @@
  *
  * On scroll-in it types out a ChatGPT-style answer that names a business, and
  * ticks a Growth Score ring from 0 → 84. It shows — not tells — the thing Lola
- * sells: being the name the AI tools give when someone asks. Fully
- * prefers-reduced-motion-safe (renders the finished state instantly).
+ * sells: being the name the AI tools give when someone asks.
+ *
+ * Personalized: if the visitor has typed their business name (and optionally
+ * picked a trade) in the hero, the demo names THEM instead of the Sandbar
+ * default — the site literally shows the AI recommending the visitor. The
+ * personalization is captured at reveal time (via a ref), so typing never
+ * restarts the typewriter mid-animation.
+ *
+ * Fully prefers-reduced-motion-safe (renders the finished state instantly).
  */
 
 import { useEffect, useRef, useState } from 'react';
 
-const LEAD = "For pressure washing near Palm Harbor, I'd go with ";
-const NAME = 'Sandbar Soft Wash';
-const TAIL = ' — top-rated, and they show up the moment you search.';
-const FULL = LEAD + NAME + TAIL;
 const TARGET = 84;
+
+// Default (no input): the real Sandbar proof story.
+const DEFAULT_VERTICAL = 'pressure washing';
+const DEFAULT_NEARBY = 'near Palm Harbor';
+const DEFAULT_NAME = 'Sandbar Soft Wash';
+
+// Trades whose raw label doesn't read naturally in "best ___ near me".
+const TRADE_PHRASE: Record<string, string> = {
+  'Soft Wash / Pressure Wash': 'pressure washing',
+  'Pool Services': 'pool service',
+  'Salon / Barber': 'a salon',
+  Plumber: 'a plumber',
+  Roofer: 'a roofer',
+  Electrician: 'an electrician',
+  Landscaper: 'a landscaper',
+  Painter: 'a painter',
+  Handyman: 'a handyman',
+  Carpenter: 'a carpenter',
+  Locksmith: 'a locksmith',
+  Arborist: 'an arborist',
+  'General Contractor': 'a contractor',
+};
+
+function verticalFor(trade?: string): string {
+  const t = (trade || '').trim();
+  if (!t) return '';
+  return TRADE_PHRASE[t] || t.toLowerCase();
+}
+
+interface Content {
+  prompt: string;
+  lead: string;
+  name: string;
+  tail: string;
+  full: string;
+}
+
+function buildContent(bizName?: string, trade?: string): Content {
+  const name = (bizName || '').trim();
+  const vertical = verticalFor(trade);
+  if (name.length >= 2) {
+    // Personalized to the visitor's own business.
+    const v = vertical || 'a business like yours';
+    const lead = `For ${v} near you, I'd go with `;
+    const tail = ' — top-rated, and they show up the moment you search.';
+    return {
+      prompt: vertical ? `best ${vertical} near me?` : 'who should I hire near me?',
+      lead,
+      name,
+      tail,
+      full: lead + name + tail,
+    };
+  }
+  // Default Sandbar proof story.
+  const lead = `For ${DEFAULT_VERTICAL} ${DEFAULT_NEARBY}, I'd go with `;
+  const tail = ' — top-rated, and they show up the moment you search.';
+  return {
+    prompt: `who should I hire to pressure wash my driveway ${DEFAULT_NEARBY}?`,
+    lead,
+    name: DEFAULT_NAME,
+    tail,
+    full: lead + DEFAULT_NAME + tail,
+  };
+}
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -28,17 +95,26 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export default function AiDemo() {
+export default function AiDemo({ bizName, trade }: { bizName?: string; trade?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
   const [started, setStarted] = useState(false);
   const [typed, setTyped] = useState(0);
   const [score, setScore] = useState(0);
 
+  // Latest input, read at reveal time so keystrokes never restart the typing.
+  const latest = useRef<{ bizName?: string; trade?: string }>({ bizName, trade });
+  latest.current = { bizName, trade };
+  const [content, setContent] = useState<Content>(() => buildContent(bizName, trade));
+
   // Kick off when the card scrolls into view (or immediately if reduced-motion).
   useEffect(() => {
-    if (reduced) {
+    const reveal = () => {
+      setContent(buildContent(latest.current.bizName, latest.current.trade));
       setStarted(true);
+    };
+    if (reduced) {
+      reveal();
       return;
     }
     const el = ref.current;
@@ -46,7 +122,7 @@ export default function AiDemo() {
     const obs = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          setStarted(true);
+          reveal();
           obs.disconnect();
         }
       },
@@ -59,13 +135,15 @@ export default function AiDemo() {
   useEffect(() => {
     if (!started) return;
     if (reduced) {
-      setTyped(FULL.length);
+      setTyped(content.full.length);
       setScore(TARGET);
       return;
     }
+    setTyped(0);
+    setScore(0);
     const typer = setInterval(() => {
       setTyped((n) => {
-        if (n >= FULL.length) {
+        if (n >= content.full.length) {
           clearInterval(typer);
           return n;
         }
@@ -85,16 +163,16 @@ export default function AiDemo() {
       clearInterval(typer);
       clearInterval(counter);
     };
-  }, [started, reduced]);
+  }, [started, reduced, content]);
 
   // Typed substring, with the business name highlighted once it's reached.
-  const shown = FULL.slice(0, typed);
-  const nameStart = LEAD.length;
-  const nameEnd = LEAD.length + NAME.length;
+  const shown = content.full.slice(0, typed);
+  const nameStart = content.lead.length;
+  const nameEnd = content.lead.length + content.name.length;
   const before = shown.slice(0, Math.min(typed, nameStart));
   const namePart = shown.slice(nameStart, Math.min(typed, nameEnd));
   const after = shown.slice(nameEnd);
-  const typing = typed < FULL.length && !reduced;
+  const typing = typed < content.full.length && !reduced;
 
   // Ring geometry.
   const R = 34;
@@ -117,7 +195,7 @@ export default function AiDemo() {
         {/* Chat card */}
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
           <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-[#D4AF37]/[0.12] px-4 py-2 text-right text-[14px] text-[#E8E4D8]">
-who should I hire to pressure wash my driveway near Palm Harbor?
+            {content.prompt}
           </div>
           <div className="mt-4 flex items-start gap-3">
             <span
