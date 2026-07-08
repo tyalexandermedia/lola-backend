@@ -2,8 +2,8 @@
  * Lola SEO — marketing homepage at `/`.
  *
  * Sections (top to bottom):
- *   1. Hero — eyebrow, H1, subhead, AI line, trade dropdown, CTAs
- *   2. 3-step flow graphic
+ *   1. Hero — eyebrow, H1, subhead, business-name form, CTAs
+ *   2. AI-answer demo (types an answer + count-up score ring)
  *   3. Execution-first framing line
  *   4. Scrolling stats marquee
  *   5. Outcome stats (4 numbers)
@@ -16,10 +16,11 @@
  * mount to pre-fill the business_type question.
  */
 
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
 import AiDemo from './AiDemo';
+import { useReveal } from './lib/useReveal';
 import { DIY, BUILD } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
@@ -132,33 +133,8 @@ export default function Homepage() {
     }
   };
 
-  // Scroll-reveal: each section below the hero drifts up + fades in as it
-  // enters the viewport. Applied here (not per-section) so it stays a single,
-  // low-touch effect. Reduced-motion / no-IO users just see everything.
-  const mainRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const root = mainRef.current;
-    if (!root || typeof IntersectionObserver === 'undefined') return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const sections = Array.from(root.querySelectorAll<HTMLElement>(':scope > section'));
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add('reveal-in');
-            io.unobserve(e.target);
-          }
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -6% 0px' },
-    );
-    sections.forEach((s, i) => {
-      if (i === 0) return; // hero shows instantly
-      s.classList.add('reveal');
-      io.observe(s);
-    });
-    return () => io.disconnect();
-  }, []);
+  // Scroll-reveal every section below the hero (shared across all pages).
+  useReveal();
 
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
@@ -167,7 +143,7 @@ export default function Homepage() {
   const graderHref = trade ? `/grader?trade=${encodeURIComponent(trade)}` : '/grader';
 
   return (
-    <main ref={mainRef} className="flex flex-1 flex-col">
+    <main className="flex flex-1 flex-col">
       {/* ── 1. HERO ─────────────────────────────────────────────────── */}
       <section className="animate-slide-up relative pt-2 sm:pt-6">
         <div
@@ -368,42 +344,6 @@ export default function Homepage() {
       </section>
 
       {/* ── 2. 3-STEP FLOW GRAPHIC ──────────────────────────────────── */}
-      <section className="mt-12 sm:mt-16">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-stretch sm:gap-4">
-          {[
-            { n: '1', h: 'Pick your business type', sub: 'Tell Lola what you do' },
-            { n: '2', h: 'Lola sniffs your site', sub: '~20 seconds' },
-            { n: '3', h: 'Get your fix list', sub: 'Plus revenue math' },
-          ].map((step, i) => (
-            <Fragment key={step.n}>
-              <div className="flex flex-col rounded-[12px] border border-[#D4AF37]/20 bg-white/[0.02] p-5 sm:p-6">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Step {step.n}
-                </p>
-                <p className="mt-2 text-[18px] font-bold text-white sm:text-[20px]">{step.h}</p>
-                <p className="mt-1 text-[13px] text-[#9AA0A6]">{step.sub}</p>
-              </div>
-              {i < 2 && (
-                <div
-                  aria-hidden
-                  className="hidden items-center justify-center text-[#D4AF37]/60 sm:flex"
-                >
-                  <svg viewBox="0 0 24 8" width="36" height="14" fill="none">
-                    <path
-                      d="M1 4h18m0 0l-4-3m4 3l-4 3"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              )}
-            </Fragment>
-          ))}
-        </div>
-      </section>
-
       {/* ── 3. EXECUTION-FIRST FRAMING LINE ─────────────────────────── */}
       <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
         <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
@@ -566,7 +506,7 @@ export default function Homepage() {
       {/* ── 6. COACH TY ABOUT ────────────────────────────────────────── */}
       <section className="mt-16 sm:mt-24">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Built by Coach Ty in Tampa
+          Meet Ty &amp; Lola
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[160px_1fr] sm:items-start sm:gap-10">
@@ -577,29 +517,31 @@ export default function Homepage() {
 
           <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
             <p>
-              Most SEO guys hand you a wall of client logos. I'll show you one:{' '}
-              <span className="font-semibold text-white">my dad's.</span>
+              Hey — I'm Ty. Lola's the name on the door, and she's exactly who you think:{' '}
+              <span className="font-semibold text-white">my dog.</span> She turns 9 on February 16
+              (a 2018 girl), and honestly she's the whole reason this exists.
             </p>
             <p>
-              Sandbar Soft Wash — Palm Harbor, 15+ years, master certified. Does great work,
-              but was nearly invisible on Google for the searches that actually book jobs. So I
-              built Lola to fix it, and I'm doing it in public: real site, live dashboard, no
-              cherry-picking the numbers.
-            </p>
-            <p>
-              That's the offer. No 50-page audit that dies in your inbox. No $5K/mo agency
-              retainer. I run the same system on your business that I run on my father's —{' '}
-              <span className="font-semibold text-white">and I show you the receipts every week.</span>
+              By day I'm a personal trainer and a full-time general manager. The dream is to go
+              hybrid — keep coaching people in the gym, and run{' '}
+              <span className="font-semibold text-white">Lola Leads</span> the rest of the time:
+              building local businesses a site that actually gets them found and gets the phone
+              ringing, on Google and on AI.
             </p>
             <p className="text-white">
-              I'm faith-driven, I answer my own phone, and if Lola doesn't move your ranking in
-              30 days, I refund half.{' '}
-              <span className="font-bold text-[#D4AF37]">Same way I'd want to be treated.</span>
+              No $5K/mo agency games. No 50-page report that dies in your inbox. I answer my own
+              phone, I do the work, and if I don't get you ranking,{' '}
+              <span className="font-bold text-[#D4AF37]">you get half back — the Half-Back Guarantee.</span>
+            </p>
+            <p>
+              And the real goal? Enough of you win with Lola that I can buy{' '}
+              <span className="font-semibold text-white">the actual Lola her beach house</span> 🐾.
+              She's earned it.
             </p>
             <p className="text-[14px] text-[#D4AF37]">
               — Coach Ty
               <span className="block text-[12px] text-[#8A8F98] sm:inline sm:before:content-['_·_']">
-                Founder, Lola | Ty Alexander Media | Tampa Bay, FL
+                Founder, Lola Leads | Ty Alexander Media | Tampa Bay, FL
               </span>
             </p>
             <p className="mt-3">

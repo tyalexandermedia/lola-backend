@@ -11,6 +11,7 @@
  */
 
 import { useState } from 'react';
+import { useReveal } from './lib/useReveal';
 import { API_URL } from './api';
 import { track } from './analytics';
 import { useSeo } from './lib/seo';
@@ -44,6 +45,7 @@ const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
 ];
 
 export default function ApplyPage() {
+  useReveal();
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [email, setEmail] = useState('');

@@ -14,6 +14,7 @@
  */
 
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
 const CALENDAR_URL =
@@ -21,6 +22,7 @@ const CALENDAR_URL =
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
 export default function SandbarCaseStudy() {
+  useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
 

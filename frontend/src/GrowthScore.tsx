@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useReveal } from './lib/useReveal';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
@@ -71,6 +72,7 @@ const DIMENSION_DETAIL: Record<string, { measures: string; stage: string }> = {
 };
 
 export default function GrowthScore() {
+  useReveal();
   const [form, setForm] = useState<BusinessAuditRequest>({
     business_name: '',
     city: '',

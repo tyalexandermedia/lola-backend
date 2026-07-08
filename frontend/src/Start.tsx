@@ -10,6 +10,7 @@
  */
 
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
 const CALENDAR_URL =
@@ -19,6 +20,7 @@ const CALENDAR_URL =
 const callHref = `${CALENDAR_URL}${CALENDAR_URL.includes('?') ? '&' : '?'}utm_source=start&utm_medium=page&utm_campaign=start_cta`;
 
 export default function Start() {
+  useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const prevTitle = document.title;

@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
@@ -43,6 +44,7 @@ const STEPS: ReadonlyArray<{ n: string; title: string; body: string }> = [
 ];
 
 export default function BuildOnboarding() {
+  useReveal();
   const [paid, setPaid] = useState(false);
 
   useSeo({
