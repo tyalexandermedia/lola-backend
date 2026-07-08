@@ -26,6 +26,7 @@ import { track } from './analytics';
 import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
+import Portfolio from './Portfolio';
 
 // Single booking destination for the whole app: Google Calendar. One env var
 // (VITE_CALENDAR_URL) so every "book a call" CTA points to the same place —
@@ -410,6 +411,13 @@ export default function RetainerPage() {
             </div>
           </div>
         </section>
+
+        {/* ── 7·5. PORTFOLIO — real builds, right before the decision ──── */}
+        <Portfolio
+          eyebrow="The work"
+          title="Sites we've already built and ranked."
+          subhead="Real businesses, live right now. Tap any one to scroll through the real site."
+        />
 
         {/* ── 8. FINAL CTA ────────────────────────────────────────────── */}
         <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">

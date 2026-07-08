@@ -20,6 +20,8 @@ import { useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
 import AiDemo from './AiDemo';
+import Portfolio from './Portfolio';
+import StatCounter from './StatCounter';
 import { useReveal } from './lib/useReveal';
 import { DIY, BUILD } from './lib/pricing';
 
@@ -182,7 +184,7 @@ export default function Homepage() {
           style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
         >
           Get found on Google.{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="animate-shimmer bg-gradient-to-r from-[#D4AF37] via-[#FFF0B8] to-[#D4AF37] bg-clip-text text-transparent">
             Get picked by AI.
           </span>
         </h1>
@@ -246,6 +248,9 @@ export default function Homepage() {
           <span className="font-semibold text-white">See your score and fix it yourself, or we build it and rank it.</span>{' '}
           We get you found when people ask ChatGPT or Google for a company like yours.
         </p>
+
+        {/* Scroll cue — invites the scroll, fades once the visitor starts. */}
+        <ScrollCue />
       </section>
 
       {/* ── 1·5. AGENTIC AI DEMO — types an AI answer + counts up a score ── */}
@@ -391,17 +396,17 @@ export default function Homepage() {
       <section className="mt-14 sm:mt-20">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
-            { num: '20 sec', label: 'Audit completion time' },
-            { num: '$1,800/mo', label: 'Saved vs premium agencies' },
-            { num: '20+ cities', label: 'Sandbar Soft Wash service area' },
-            { num: '30 days', label: 'Half-Back Guarantee window' },
+            { value: 20, suffix: ' sec', label: 'Audit completion time' },
+            { value: 1800, prefix: '$', suffix: '/mo', label: 'Saved vs premium agencies' },
+            { value: 20, suffix: '+ cities', label: 'Sandbar Soft Wash service area' },
+            { value: 30, suffix: ' days', label: 'Half-Back Guarantee window' },
           ].map((s, i) => (
             <div
               key={i}
               className="rounded-[12px] border border-[#D4AF37]/20 bg-white/[0.02] p-5 sm:p-6"
             >
               <p className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[28px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[34px]">
-                {s.num}
+                <StatCounter value={s.value} prefix={s.prefix} suffix={s.suffix} />
               </p>
               <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-[#C5C5C8] sm:text-[13px]">
                 {s.label}
@@ -413,6 +418,9 @@ export default function Homepage() {
           Currently working with <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">Sandbar Soft Wash</a> and growing. Your business could be next.
         </p>
       </section>
+
+      {/* ── 5a. PORTFOLIO — live sites Lola built (scrollable in-page preview) ── */}
+      <Portfolio />
 
       {/* ── 5b. INDUSTRIES WE SERVE ──────────────────────────────────
           8 tiles linking to the programmatic [service]-seo-[city] hubs.
@@ -717,5 +725,53 @@ export default function Homepage() {
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>
     </main>
+  );
+}
+
+/**
+ * ScrollCue — a soft "keep scrolling" nudge under the hero. Fades out the
+ * moment the visitor scrolls, and never shows for reduced-motion users. Pure
+ * decoration (aria-hidden), absolutely no layout cost once hidden.
+ */
+function ScrollCue() {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      setHidden(true);
+      return;
+    }
+    const onScroll = () => {
+      if (window.scrollY > 40) setHidden(true);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <div
+      aria-hidden
+      className={`mt-10 flex flex-col items-center gap-1.5 transition-opacity duration-500 sm:mt-12 ${
+        hidden ? 'pointer-events-none opacity-0' : 'opacity-100'
+      }`}
+    >
+      <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#7A7F8A]">
+        Scroll
+      </span>
+      <svg
+        className="animate-scroll-cue text-[#D4AF37]"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </div>
   );
 }
