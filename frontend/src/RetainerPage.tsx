@@ -27,10 +27,10 @@ import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
 
-// Call-first: every Full Build CTA books a free call / starts the build.
-// VITE_STRATEGY_CALL_URL / VITE_CALENDAR_URL override the default.
+// Single booking destination for the whole app: Google Calendar. One env var
+// (VITE_CALENDAR_URL) so every "book a call" CTA points to the same place —
+// pay CTAs go to Stripe, call CTAs go here.
 const BOOKING_URL =
-  (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 

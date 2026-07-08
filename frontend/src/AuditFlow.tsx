@@ -1037,17 +1037,15 @@ export function ResultsStage({
   );
 }
 
-// Strategy-call destination. Env-overridable so you can swap to a dedicated
-// Calendly link later without touching code. Defaults to the existing book
-// page until VITE_STRATEGY_CALL_URL is set.
 // Pricing destination. Default = /pricing route (standalone PricingPage).
 // Override with VITE_PRICING_URL for an external Wix page later.
 const PRICING_URL =
   (import.meta.env.VITE_PRICING_URL as string | undefined) ||
   '/pricing';
 
+// Single booking destination site-wide (Google Calendar). Call CTAs → here,
+// pay CTAs → Stripe. One env var so the funnel never splits across tools.
 const STRATEGY_CALL_URL =
-  (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
