@@ -559,54 +559,6 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* ── 7. 4-STEP PROCESS BLOCK ─────────────────────────────────── */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Our Process
-        </p>
-        <h2
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
-        >
-          We don't just diagnose. We execute.
-        </h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          I'm not an SEO consultant who read a book about local business. I built AI
-          visibility from the trenches — on my own father's service business first.
-        </p>
-
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { n: '01', h: 'Audit', body: 'We baseline how AI agents see your business.', get: 'Total clarity on your visibility gaps', pro: false },
-            { n: '02', h: 'Build', body: 'We fix the gaps. GMB, citations, reviews, schema.', get: 'AI-ready foundation in 30 days', pro: false },
-            { n: '03', h: 'Reinforce', body: 'Monthly content, citations, reviews. Visibility compounds.', get: 'AI agent recommendations on autopilot', pro: false },
-            { n: '04', h: 'Dominate', body: 'You keep the calls coming in — found on Google and recommended in AI answers when buyers search.', get: 'Competitors wonder how you did it', pro: true },
-          ].map((step) => (
-            <div
-              key={step.n}
-              className={`group relative flex flex-col rounded-[12px] border bg-white/[0.02] p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6 ${
-                step.pro
-                  ? 'border-[#D4AF37]/40 hover:border-[#D4AF37]/65 hover:shadow-[0_0_28px_rgba(212,175,55,0.20)]'
-                  : 'border-white/[0.08] hover:border-white/[0.18]'
-              }`}
-            >
-              {step.pro && (
-                <span className="absolute right-4 top-4 rounded-full bg-[#D4AF37]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Ongoing
-                </span>
-              )}
-              <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{step.n}</p>
-              <h3 className="mt-2 text-[22px] font-bold text-white sm:text-[24px]">{step.h}</h3>
-              <p className="mt-3 flex-1 text-[14px] leading-[1.55] text-[#C5C5C8]">{step.body}</p>
-              <p className="mt-5 border-t border-white/[0.06] pt-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]/70">
-                You get:
-              </p>
-              <p className="mt-1.5 text-[13px] font-medium leading-[1.45] text-white">{step.get}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── 8. WHY LOLA COMPARISON TABLE ────────────────────────────── */}
       <section className="mt-16 sm:mt-24">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
@@ -742,11 +694,11 @@ export default function Homepage() {
           className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
-          Let's get your business recommended — by Google and by AI.
+          Let's get your phone ringing — from Google and AI.
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          Book a free 15-minute strategy call with Coach Ty. No pressure, no pitch deck —
-          just a straight answer on what's leaking and what to fix first.
+          Book a free 15-minute call with Coach Ty. No pressure, no pitch deck — just a
+          straight answer on why you're missing calls and what to fix first.
         </p>
 
         {/* Offer snapshot — the Full Build (mirrors /pricing) */}
