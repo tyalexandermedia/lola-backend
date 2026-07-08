@@ -47,6 +47,7 @@ const ROUTES = [
   '/',
   '/pricing',
   '/retainer',
+  '/work',
   '/diy',
   '/methodology',
   '/case-studies',

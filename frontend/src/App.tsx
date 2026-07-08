@@ -28,6 +28,7 @@ const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
 const BuildOnboarding = lazy(() => import('./BuildOnboarding'));
+const WorkPage = lazy(() => import('./WorkPage'));
 
 type Route =
   | { name: 'home' }
@@ -43,6 +44,7 @@ type Route =
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
   | { name: 'retainer' }
+  | { name: 'work' }
   | { name: 'diy' }
   | { name: 'build-onboarding' }
   | { name: 'apply' }
@@ -68,6 +70,7 @@ function parseRoute(pathname: string): Route {
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
+  if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
   if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'build-onboarding' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
@@ -97,6 +100,7 @@ function canonicalPathForRoute(route: Route): string | null {
     case 'home': return '/';
     case 'pricing': return '/pricing';
     case 'retainer': return '/retainer';
+    case 'work': return '/work';
     case 'diy': return '/diy';
     case 'build-onboarding': return '/build/start';
     case 'apply': return '/apply';
@@ -154,7 +158,7 @@ function App() {
   const containerCls =
     route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
-      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer'
+      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer' || route.name === 'work'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
@@ -205,6 +209,7 @@ function App() {
           {route.name === 'vs-hub' && <VsHub />}
           {route.name === 'pricing' && <PricingPage />}
           {route.name === 'retainer' && <RetainerPage />}
+          {route.name === 'work' && <WorkPage />}
           {route.name === 'diy' && <DiyAccess />}
           {route.name === 'build-onboarding' && <BuildOnboarding />}
           {route.name === 'apply' && <ApplyPage />}
@@ -310,7 +315,7 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
           <FooterLink href="/retainer">The $997 Full Build</FooterLink>
-          <FooterLink href="/#work">See sites we've built</FooterLink>
+          <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>

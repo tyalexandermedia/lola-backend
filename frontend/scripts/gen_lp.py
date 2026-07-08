@@ -956,6 +956,11 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 # --------------------------------------------------------------------------- #
 
 def render_sitemap(slugs):
+    # <lastmod> = the date this sitemap is generated. Honest signal to crawlers
+    # (and the AI answer engines) that the content is fresh, so the now-static
+    # prerendered pages get re-crawled sooner. ISO-8601 date, no time.
+    import datetime
+    lastmod = datetime.date.today().isoformat()
     core = [
         ("/", "weekly", "1.0"),
         ("/start", "monthly", "0.95"),    # dead-simple texted front door
@@ -963,7 +968,9 @@ def render_sitemap(slugs):
         ("/growth-score", "monthly", "0.9"),   # free Growth Score opt-in
         ("/pricing", "monthly", "0.9"),
         ("/roadmap", "monthly", "0.88"),   # interactive Growth Score page (static LP)
+        ("/diy", "monthly", "0.85"),      # $197 DIY access page
         ("/retainer", "monthly", "0.9"),
+        ("/work", "monthly", "0.85"),     # portfolio of real builds
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
         ("/methodology", "monthly", "0.8"),
@@ -982,10 +989,12 @@ def render_sitemap(slugs):
     rows = ""
     for path, freq, pri in core:
         rows += (f"  <url>\n    <loc>{BASE_URL}{path}</loc>\n"
+                 f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>{freq}</changefreq>\n"
                  f"    <priority>{pri}</priority>\n  </url>\n")
     for slug in slugs:
         rows += (f"  <url>\n    <loc>{BASE_URL}/lp/{slug}</loc>\n"
+                 f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>monthly</changefreq>\n"
                  f"    <priority>0.9</priority>\n  </url>\n")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
