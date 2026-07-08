@@ -188,6 +188,7 @@ function App() {
        `hidden`) prevents a scroll container so the sticky header keeps
        working. Invisible on desktop — nothing overflows there. */
     <div className="min-h-screen scroll-smooth overflow-x-clip bg-[#0A0A0B] text-white">
+      <ScrollProgress />
       <Header />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
@@ -220,7 +221,79 @@ function App() {
       </div>
       <SiteFooter route={route} />
       <MobileStickyCTA route={route} />
+      <BackToTop route={route} />
     </div>
+  );
+}
+
+/**
+ * Reading-progress bar — a thin gold line at the very top that fills as you
+ * scroll. Premium, near-invisible touch. Hidden for reduced-motion users.
+ */
+function ScrollProgress() {
+  const [pct, setPct] = useState(0);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setReduced(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const el = document.documentElement;
+        const max = el.scrollHeight - el.clientHeight;
+        setPct(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0);
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+  if (reduced) return null;
+  return (
+    <div aria-hidden className="no-print pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
+      <div
+        className="h-full bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.6)]"
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Back-to-top button — appears after the visitor scrolls a screen down, and
+ * smooth-scrolls to the top. Sits above the mobile sticky CTA so they never
+ * overlap. Hidden on the routes that own their own chrome.
+ */
+function BackToTop({ route }: { route: Route }) {
+  const [show, setShow] = useState(false);
+  const HIDE = new Set(['audit', 'report', 'admin', 'admin-calls', 'admin-revenue']);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onScroll = () => setShow(window.scrollY > window.innerHeight);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  if (HIDE.has(route.name) || !show) return null;
+  const reduced = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  return (
+    <button
+      type="button"
+      aria-label="Back to top"
+      onClick={() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })}
+      className="no-print fixed bottom-20 right-4 z-[55] flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/40 bg-[#0A0A0B]/90 text-[#D4AF37] shadow-[0_4px_16px_rgba(0,0,0,0.5)] backdrop-blur-[10px] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12] sm:bottom-6"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M12 19V5M5 12l7-7 7 7" />
+      </svg>
+    </button>
   );
 }
 
@@ -279,6 +352,7 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
           <FooterLink href="/retainer">The $997 Full Build</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
+          <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
         </FooterCol>

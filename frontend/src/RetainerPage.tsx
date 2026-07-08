@@ -34,6 +34,29 @@ const BOOKING_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
+// Single source of truth for the Full Build FAQ — powers both the visible
+// accordion and the FAQPage JSON-LD (Google requires the two to match).
+const BUILD_FAQS: ReadonlyArray<{ q: string; a: string }> = [
+  { q: 'What if you don’t rank me?', a: 'You get half back, no argument. We only succeed if you do.' },
+  {
+    q: "What does 'done-for-you' actually mean?",
+    a: "Coach Ty and Lola do the work for you — we build the site, optimize your Google Business Profile, and spend 30 days getting you found on Google and in AI answers. You don't touch a dashboard unless you want to.",
+  },
+  {
+    q: 'Do you get me found in ChatGPT and AI search, not just Google?',
+    a: 'Yes — that’s the whole point. We get you found when people ask ChatGPT, Perplexity, or Gemini for a company like yours, on top of ranking you in Google and the map pack.',
+  },
+  { q: 'How does the Half-Back Guarantee work?', a: HALF_BACK_GUARANTEE.body },
+  {
+    q: "What if I'm already working with an SEO agency?",
+    a: 'Fire them, or run us in parallel and compare. Most agencies charge $2K–$5K/mo and drag it out. The Full Build is one-time and backed by the Half-Back Guarantee.',
+  },
+  {
+    q: "What if I'm not in Florida — or not a contractor?",
+    a: "Lola works for any local service business — home services, cleaning, salons, med spas, auto detailing, lawn care, the whole map. We're Tampa-based because that's our home network, but the work lands anywhere with Google Maps and AI search.",
+  },
+];
+
 function withUtm(url: string, content: string) {
   const p = new URLSearchParams({
     utm_source: 'lola_retainer',
@@ -54,6 +77,51 @@ export default function RetainerPage() {
 
   useEffect(() => {
     track('retainer_page_viewed');
+  }, []);
+
+  // Route-specific JSON-LD: Service + $997 Offer (rich pricing result) and a
+  // FAQPage built from the same BUILD_FAQS the accordion renders. Cleaned on unmount.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const amount = BUILD.price.replace(/[^0-9]/g, '');
+    const blocks: object[] = [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: 'Lola Full Build',
+        serviceType: 'Local SEO + AI search visibility website build',
+        description:
+          'A custom website built for you, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty — backed by the Half-Back Guarantee.',
+        provider: { '@type': 'Organization', name: 'Lola — Ty Alexander Media', url: 'https://lola.tyalexandermedia.com' },
+        areaServed: { '@type': 'Country', name: 'United States' },
+        offers: {
+          '@type': 'Offer',
+          price: amount,
+          priceCurrency: 'USD',
+          category: 'OneTimePayment',
+          url: 'https://lola.tyalexandermedia.com/retainer',
+          availability: 'https://schema.org/InStock',
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: BUILD_FAQS.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      },
+    ];
+    const tags = blocks.map((b) => {
+      const t = document.createElement('script');
+      t.type = 'application/ld+json';
+      t.dataset.lola = 'retainer-schema';
+      t.textContent = JSON.stringify(b);
+      document.head.appendChild(t);
+      return t;
+    });
+    return () => tags.forEach((t) => t.parentNode?.removeChild(t));
   }, []);
 
   // Pay-now → instant onboarding when the Stripe Payment Link is configured;
@@ -265,32 +333,7 @@ export default function RetainerPage() {
           </h2>
 
           <div className="mt-8 flex flex-col gap-3">
-            {[
-              {
-                q: 'What if you don’t rank me?',
-                a: 'You get half back, no argument. We only succeed if you do.',
-              },
-              {
-                q: "What does 'done-for-you' actually mean?",
-                a: "Coach Ty and Lola do the work for you — we build the site, optimize your Google Business Profile, and spend 30 days getting you found on Google and in AI answers. You don't touch a dashboard unless you want to.",
-              },
-              {
-                q: 'Do you get me found in ChatGPT and AI search, not just Google?',
-                a: 'Yes — that’s the whole point. We get you found when people ask ChatGPT, Perplexity, or Gemini for a company like yours, on top of ranking you in Google and the map pack.',
-              },
-              {
-                q: 'How does the Half-Back Guarantee work?',
-                a: HALF_BACK_GUARANTEE.body,
-              },
-              {
-                q: "What if I'm already working with an SEO agency?",
-                a: 'Fire them, or run us in parallel and compare. Most agencies charge $2K–$5K/mo and drag it out. The Full Build is one-time and backed by the Half-Back Guarantee.',
-              },
-              {
-                q: "What if I'm not in Florida — or not a contractor?",
-                a: "Lola works for any local service business — home services, cleaning, salons, med spas, auto detailing, lawn care, the whole map. We're Tampa-based because that's our home network, but the work lands anywhere with Google Maps and AI search.",
-              },
-            ].map((item, i) => (
+            {BUILD_FAQS.map((item, i) => (
               <details
                 key={i}
                 className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"

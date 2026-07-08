@@ -228,12 +228,6 @@ export default function Homepage() {
           >
             Or book a free 15-min call →
           </a>
-          <a
-            href="/pricing"
-            className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
-          >
-            See pricing →
-          </a>
         </div>
 
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
