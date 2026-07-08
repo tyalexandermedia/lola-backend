@@ -24,6 +24,7 @@ import { useEffect } from 'react';
 import { track } from './analytics';
 import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 import { useSeo } from './lib/seo';
+import { checkoutUrl } from './lib/checkout';
 
 // Call-first: every Full Build CTA books a free call / starts the build.
 // VITE_STRATEGY_CALL_URL / VITE_CALENDAR_URL override the default.
@@ -53,9 +54,12 @@ export default function RetainerPage() {
     track('retainer_page_viewed');
   }, []);
 
-  const retainerHref = withUtm(BOOKING_URL, 'sticky_cta');
-  const heroHref = withUtm(BOOKING_URL, 'hero_cta');
-  const finalHref = withUtm(BOOKING_URL, 'final_cta');
+  // Pay-now → instant onboarding when the Stripe Payment Link is configured;
+  // otherwise fall back to booking a call (nothing breaks before the link exists).
+  const buildPay = checkoutUrl('build');
+  const retainerHref = buildPay || withUtm(BOOKING_URL, 'sticky_cta');
+  const heroHref = buildPay || withUtm(BOOKING_URL, 'hero_cta');
+  const finalHref = buildPay || withUtm(BOOKING_URL, 'final_cta');
 
   return (
     <>
@@ -169,7 +173,7 @@ export default function RetainerPage() {
               >
                 Start my build →
               </a>
-              <p className="mt-3 text-[11px] text-[#8A8F98]">🔒 No payment to book a call</p>
+              <p className="mt-3 text-[11px] text-[#8A8F98]">{buildPay ? '🔒 Secure checkout · one-time $997 · Half-Back Guarantee' : '🔒 No payment to book a call'}</p>
             </div>
           </div>
         </section>
@@ -382,7 +386,7 @@ export default function RetainerPage() {
           </p>
 
           <p className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-[#8A8F98] sm:text-[12px]">
-            <span>🔒 No payment to book</span>
+            <span>{buildPay ? '🔒 Secure Stripe checkout' : '🔒 No payment to book'}</span>
             <span aria-hidden>·</span>
             <span>One-time {BUILD.price}</span>
             <span aria-hidden>·</span>

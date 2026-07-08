@@ -132,7 +132,7 @@ from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webma
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
-from reviews.sms import send_growth_score_sms
+from reviews.sms import send_growth_score_sms, send_sms
 from db.case_studies import (
     init_case_studies_table,
     get_latest_run,
@@ -273,6 +273,16 @@ STRIPE_SPRINT_URL = os.getenv(
 STRIPE_RETAINER_URL = os.getenv(
     "STRIPE_RETAINER_URL", "https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08"
 ).strip()
+
+# Stripe API secret + webhook signing secret — power server-side verification
+# of Checkout Sessions (so /diy can't be unlocked by guessing a URL param) and
+# fulfillment on payment. Both optional: unset → verification returns
+# "unconfigured" and the webhook 200s without doing anything.
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "").strip()
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
+# Amount (in cents) → which tier was bought, for fulfillment + gating.
+STRIPE_DIY_AMOUNT = int(os.getenv("STRIPE_DIY_AMOUNT", "19700"))
+STRIPE_BUILD_AMOUNT = int(os.getenv("STRIPE_BUILD_AMOUNT", "99700"))
 
 HOME_SERVICES_TYPES = {
     "soft wash",
@@ -3522,6 +3532,140 @@ async def unsubscribe(email: str, token: str):
         raise HTTPException(status_code=403, detail="Invalid unsubscribe token.")
     await suppress_email(email, reason="unsubscribed")
     return {"ok": True, "email": email, "message": "Unsubscribed. No more emails."}
+
+
+# ── Stripe checkout: server-side verification + fulfillment webhook ───
+def _verify_stripe_sig(secret: str, header: str, body: bytes) -> bool:
+    """Verify a Stripe-Signature header (t=...,v1=...) via HMAC-SHA256."""
+    if not (secret and header):
+        return False
+    parts = dict(p.split("=", 1) for p in header.split(",") if "=" in p)
+    t, v1 = parts.get("t", ""), parts.get("v1", "")
+    if not (t and v1):
+        return False
+    signed = f"{t}.".encode() + body
+    expected = hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, v1)
+
+
+async def _stripe_get_session(session_id: str) -> Optional[dict]:
+    if not (STRIPE_SECRET_KEY and session_id):
+        return None
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.get(
+                f"https://api.stripe.com/v1/checkout/sessions/{session_id}",
+                headers={"Authorization": f"Bearer {STRIPE_SECRET_KEY}"},
+            )
+        if r.status_code == 200:
+            return r.json()
+        print(f"❌ Stripe session {session_id} → HTTP {r.status_code}")
+    except Exception as e:
+        print(f"❌ Stripe session fetch error: {e}")
+    return None
+
+
+def _tier_for_amount(amount_cents: int) -> Optional[str]:
+    if amount_cents >= STRIPE_BUILD_AMOUNT:
+        return "build"
+    if amount_cents >= STRIPE_DIY_AMOUNT:
+        return "diy"
+    return None
+
+
+@app.get("/checkout/verify")
+async def checkout_verify(session_id: str = ""):
+    """
+    Confirm a Checkout Session was actually PAID before the frontend unlocks a
+    paid deliverable (the DIY guide). Never trusts a bare URL param.
+
+    Returns {configured, paid, tier}. When STRIPE_SECRET_KEY is unset we report
+    configured=false so the frontend stays locked rather than unlocking blind.
+    """
+    if not STRIPE_SECRET_KEY:
+        return {"configured": False, "paid": False, "tier": None}
+    sess = await _stripe_get_session(session_id.strip())
+    if not sess:
+        return {"configured": True, "paid": False, "tier": None}
+    paid = sess.get("payment_status") == "paid"
+    tier = _tier_for_amount(int(sess.get("amount_total") or 0))
+    return {"configured": True, "paid": paid, "tier": tier}
+
+
+async def _send_purchase_email(to_email: str, tier: str, link: str) -> None:
+    label = "Full Build" if tier == "build" else "DIY guide"
+    cta = "Start your build" if tier == "build" else "Open your guide"
+    html = (
+        f'<div style="font-family:sans-serif;max-width:520px;margin:0 auto">'
+        f"<h2>You're in! 🐾</h2>"
+        f"<p>Thanks for grabbing the {label}. Here's your access link:</p>"
+        f'<p><a href="{link}" style="display:inline-block;padding:12px 22px;'
+        f"background:#D4AF37;color:#0A0A0B;font-weight:700;border-radius:8px;"
+        f'text-decoration:none">{cta} →</a></p>'
+        f'<p style="color:#888;font-size:13px">Save this email — it\'s your link back in.</p>'
+        f"</div>"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            await client.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+                json={
+                    "from": os.getenv("AUDIT_FROM_EMAIL", "Lola <ty@tyalexandermedia.com>"),
+                    "to": [to_email],
+                    "subject": f"Your {label} is ready 🐾",
+                    "html": html,
+                },
+            )
+    except Exception as e:
+        print(f"❌ purchase email error: {e}")
+
+
+@app.post("/stripe/webhook")
+async def stripe_webhook(request: Request):
+    """
+    Stripe fulfillment. Verifies the signature (when STRIPE_WEBHOOK_SECRET is
+    set); on a paid checkout.session.completed it converts the lead and
+    best-effort texts + emails the buyer their access link. Always returns 200
+    on business-logic hiccups so Stripe doesn't retry forever.
+    """
+    body_bytes = await request.body()
+    if STRIPE_WEBHOOK_SECRET:
+        sig = request.headers.get("stripe-signature", "")
+        if not _verify_stripe_sig(STRIPE_WEBHOOK_SECRET, sig, body_bytes):
+            raise HTTPException(status_code=401, detail="Invalid Stripe signature")
+    try:
+        event = json.loads(body_bytes)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    if event.get("type") != "checkout.session.completed":
+        return {"received": True, "ignored": event.get("type")}
+
+    sess = event.get("data", {}).get("object", {}) or {}
+    if sess.get("payment_status") != "paid":
+        return {"received": True, "unpaid": True}
+
+    details = sess.get("customer_details") or {}
+    email = (details.get("email") or "").strip()
+    phone = (details.get("phone") or "").strip()
+    sid = sess.get("id", "")
+    tier = _tier_for_amount(int(sess.get("amount_total") or 0)) or "diy"
+    path = "/build/start" if tier == "build" else "/diy"
+    link = f"{PUBLIC_APP_URL}{path}?session_id={sid}"
+    print(f"💳 Stripe paid: {tier} · {email or phone or 'no-contact'}")
+
+    if email:
+        try:
+            await mark_audit_submitted(email)
+        except Exception:
+            pass
+        if RESEND_API_KEY:
+            asyncio.create_task(_send_purchase_email(email, tier, link))
+    if phone:
+        label = "Full Build" if tier == "build" else "DIY guide"
+        asyncio.create_task(send_sms(phone, f"You're in! 🐾 Here's your {label}: {link}"))
+    return {"received": True, "tier": tier}
 
 
 # ── Tier 2: Resend event webhook (opens/clicks/bounces/complaints) ────

@@ -19,6 +19,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
+import AiDemo from './AiDemo';
 import { DIY, BUILD } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
@@ -266,14 +267,9 @@ export default function Homepage() {
             href="/pricing"
             className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
           >
-            See pricing: DIY $197 or Full Build $997 →
+            See pricing →
           </a>
         </div>
-
-        {/* Free-website hook — lead with the biggest bonus (Hormozi: value up front) */}
-        <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.08] px-4 py-1.5 text-[12px] font-semibold text-[#E8E4D8] sm:text-[13px]">
-          🎁 Includes a <span className="font-bold text-white">free $3,000 website</span> — built + hosted, $0 setup
-        </p>
 
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
             quote-gate every CTA — Lola's public pricing is the moat, so we
@@ -292,6 +288,9 @@ export default function Homepage() {
           We get you found when people ask ChatGPT or Google for a company like yours.
         </p>
       </section>
+
+      {/* ── 1·5. AGENTIC AI DEMO — types an AI answer + counts up a score ── */}
+      <AiDemo />
 
       {/* ── 1a. VISUAL ROADMAP — the signature journey graphic ──────── */}
       <section className="mt-16 sm:mt-20">

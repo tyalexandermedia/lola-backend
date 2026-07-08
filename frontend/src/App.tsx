@@ -26,6 +26,8 @@ const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
+const DiyAccess = lazy(() => import('./DiyAccess'));
+const BuildOnboarding = lazy(() => import('./BuildOnboarding'));
 
 type Route =
   | { name: 'home' }
@@ -41,6 +43,8 @@ type Route =
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
   | { name: 'retainer' }
+  | { name: 'diy' }
+  | { name: 'build-onboarding' }
   | { name: 'apply' }
   | { name: 'lead-gen' }
   | { name: 'swarm' }
@@ -64,6 +68,8 @@ function parseRoute(pathname: string): Route {
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
+  if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
+  if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'build-onboarding' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
@@ -91,6 +97,8 @@ function canonicalPathForRoute(route: Route): string | null {
     case 'home': return '/';
     case 'pricing': return '/pricing';
     case 'retainer': return '/retainer';
+    case 'diy': return '/diy';
+    case 'build-onboarding': return '/build/start';
     case 'apply': return '/apply';
     case 'grader': return '/grader';
     case 'growth-score': return '/growth-score';
@@ -162,6 +170,8 @@ function App() {
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
       ? 'max-w-[960px] pt-6 sm:pt-10'
+      : route.name === 'diy' || route.name === 'build-onboarding'
+      ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'apply'
       ? 'max-w-[720px] pt-8 sm:pt-12'
       : route.name === 'lead-gen'
@@ -195,6 +205,8 @@ function App() {
           {route.name === 'vs-hub' && <VsHub />}
           {route.name === 'pricing' && <PricingPage />}
           {route.name === 'retainer' && <RetainerPage />}
+          {route.name === 'diy' && <DiyAccess />}
+          {route.name === 'build-onboarding' && <BuildOnboarding />}
           {route.name === 'apply' && <ApplyPage />}
           {route.name === 'lead-gen' && <LeadGenGenerator />}
           {route.name === 'swarm' && <SwarmWorkflow />}

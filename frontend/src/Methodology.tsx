@@ -135,7 +135,7 @@ export default function Methodology() {
               n: '01',
               weight: '25%',
               h: 'Google Business Profile completeness',
-              why: "GBP is still the #1 signal for &apos;[service] near me&apos; rankings and Maps presence. AI agents lean on GBP for hours, services, and category fit when answering local recommendation queries.",
+              why: "Your Google Business Profile is still the #1 thing that decides '[service] near me' rankings and whether you show on the Map. The AI tools read it for your hours, services, and category when they recommend a local company.",
               signals: [
                 'Profile claimed + verified status',
                 'Primary + secondary categories filled correctly',
@@ -191,7 +191,7 @@ export default function Methodology() {
               n: '05',
               weight: '25%',
               h: 'AI search presence',
-              why: 'The newest and fastest-growing category. We ask ChatGPT/Perplexity/Gemini/Claude the queries your buyers ask — "best [service] in [city]" — and record whether your business is named. If it isn&apos;t, we log who is, so the playbook can target their citation sources.',
+              why: 'The newest and fastest-growing way people find you. We ask ChatGPT, Perplexity, Gemini, and Claude the exact questions your buyers ask — "best [service] in [city]" — and record whether your business gets named. If it isn’t, we note who is, so we can go win the same mentions.',
               signals: [
                 'Mention rate across AI Mode prompts (% of runs where AI named you)',
                 'Share of Voice vs the top 3 competitors named instead',

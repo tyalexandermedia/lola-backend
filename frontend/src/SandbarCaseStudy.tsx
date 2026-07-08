@@ -207,9 +207,9 @@ export default function SandbarCaseStudy() {
             },
             {
               w: 'Ongoing',
-              h: 'Weekly cadence',
-              body: 'Same five-category playbook runs every week. The work-delivered feed on the public dashboard shows what shipped. The AI Share-of-Voice metric tracks whether AI agents are recommending Sandbar — and which competitor they recommend instead when they aren&apos;t.',
-              moves: ['Weekly GBP posts', 'Ongoing citation building', 'Weekly review velocity', 'AI Share-of-Voice tracked monthly'],
+              h: 'Every week, more visible',
+              body: 'The same proven checklist runs every week, and you can watch exactly what got done on a live dashboard. We also track whether ChatGPT, Perplexity, and Gemini name Sandbar when people ask for a pressure washer — and who they name instead when they don’t.',
+              moves: ['Fresh Google posts weekly', 'More 5-star reviews', 'Getting named by the AI tools', 'Checked every month'],
             },
           ].map((p) => (
             <div key={p.w} className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-7">
