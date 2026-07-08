@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
 import AiDemo from './AiDemo';
+import Portfolio from './Portfolio';
 import { useReveal } from './lib/useReveal';
 import { DIY, BUILD } from './lib/pricing';
 
@@ -413,6 +414,9 @@ export default function Homepage() {
           Currently working with <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">Sandbar Soft Wash</a> and growing. Your business could be next.
         </p>
       </section>
+
+      {/* ── 5a. PORTFOLIO — live sites Lola built (scrollable in-page preview) ── */}
+      <Portfolio />
 
       {/* ── 5b. INDUSTRIES WE SERVE ──────────────────────────────────
           8 tiles linking to the programmatic [service]-seo-[city] hubs.
