@@ -111,13 +111,31 @@ textarea::placeholder {
    no-JS / reduced-motion users still see everything immediately. */
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(26px) scale(0.985);
+  transition: opacity 0.7s ease, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 .reveal.reveal-in {
   opacity: 1;
   transform: none;
+}
+
+/* Scroll-cue chevron — nudges the visitor to keep scrolling; fades on scroll. */
+@keyframes scroll-cue {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%      { transform: translateY(7px); opacity: 1; }
+}
+.animate-scroll-cue { animation: scroll-cue 1.8s ease-in-out infinite; }
+
+/* Gold headline shimmer — slow light-sweep across the gradient text. Uses
+   background-position (compositor-friendly), so it never triggers layout. */
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 5.5s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -132,7 +150,9 @@ textarea::placeholder {
   .animate-bounce-slow,
   .animate-pulse,
   .animate-fade-in,
-  .animate-slide-up {
+  .animate-slide-up,
+  .animate-scroll-cue,
+  .animate-shimmer {
     animation: none !important;
   }
   /* Reveal content immediately — never gate visibility on motion. */
