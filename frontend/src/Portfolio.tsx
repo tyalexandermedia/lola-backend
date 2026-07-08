@@ -1,21 +1,36 @@
 /**
  * Portfolio — "the work" proof section.
  *
- * Renders a grid of real sites Lola built (from lib/portfolio.ts). Each card's
- * "Live preview" opens a modal that embeds the actual live site in a browser
- * frame the visitor can scroll through, with a desktop/phone toggle. Every
- * card and the modal also carry an "Open live ↗" link, so a host that blocks
- * framing (X-Frame-Options / CSP frame-ancestors) degrades gracefully to the
- * real site in a new tab instead of a blank box.
+ * Renders a grid of real sites Lola built (from lib/portfolio.ts). Preview is
+ * SCREENSHOT-first, because many client hosts block being embedded in a frame
+ * (X-Frame-Options / CSP), which made live <iframe> previews render blank.
+ *
+ * Per card:
+ *  - If a screenshot exists (site.thumb, or the build-time capture at
+ *    /images/work/<host>.jpg), the card shows it and "Preview" opens a modal
+ *    you can scroll through — the full-page screenshot of the real site.
+ *  - If no screenshot loads, the card falls back to a clean branded tile and
+ *    the click opens the real live site in a new tab. Never a blank box.
  *
  * Reusable: drop <Portfolio /> on any page. Auto-hides when the list is empty.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PORTFOLIO, displayHost, type PortfolioSite } from './lib/portfolio';
 import { track } from './analytics';
 
 const DOTS = ['#FF5F57', '#FEBC2E', '#28C840'] as const;
+
+/**
+ * Screenshot path for a site. Use site.thumb, or drop an image at
+ * /public/images/work/<host>.jpg (host with dots → dashes, e.g.
+ * sandbarsoftwash-com.jpg). Missing image → card falls back to a branded tile.
+ */
+function screenshotSrc(site: PortfolioSite): string {
+  if (site.thumb) return site.thumb;
+  const slug = displayHost(site.url).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+  return `/images/work/${slug}.jpg`;
+}
 
 function BrowserBar({ host, compact = false }: { host: string; compact?: boolean }) {
   return (
@@ -36,125 +51,58 @@ function BrowserBar({ host, compact = false }: { host: string; compact?: boolean
   );
 }
 
-/**
- * LivePreviewThumb — an auto-generated preview of the real site: a desktop
- * render (1280px wide) scaled down to fill the card, mounted only when the
- * card nears the viewport so it never costs first-paint. Non-interactive
- * (pointer-events off, no scroll) — clicking the card opens the full modal.
- *
- * Sits on top of the branded placeholder and fades in on load, so a slow or
- * embed-blocked site simply shows the branded tile instead of a broken box.
- * Skipped entirely during prerender (navigator.webdriver) so the static HTML
- * stays clean and fast.
- */
-function LivePreviewThumb({ url }: { url: string }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [inView, setInView] = useState(false);
-  const [width, setWidth] = useState(0);
-  const [loaded, setLoaded] = useState(false);
-  const isBot =
-    typeof navigator !== 'undefined' && (navigator as unknown as { webdriver?: boolean }).webdriver;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const w = entries[0]?.contentRect.width;
-      if (w) setWidth(w);
-    });
-    ro.observe(el);
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: '300px' }
-    );
-    io.observe(el);
-    return () => {
-      ro.disconnect();
-      io.disconnect();
-    };
-  }, []);
-
-  const RENDER_W = 1280;
-  const RENDER_H = Math.round((RENDER_W * 10) / 16); // match card's 16/10
-  const scale = width ? width / RENDER_W : 0;
-
+function BrandedTile({ name, host }: { name: string; host: string }) {
   return (
-    <div ref={ref} aria-hidden className="absolute inset-0 overflow-hidden">
-      {inView && !isBot && width > 0 && (
-        <iframe
-          src={url}
-          title=""
-          tabIndex={-1}
-          scrolling="no"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          sandbox="allow-scripts allow-same-origin"
-          onLoad={() => setLoaded(true)}
-          style={{
-            width: RENDER_W,
-            height: RENDER_H,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-            border: 0,
-            pointerEvents: 'none',
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 0.5s ease',
-          }}
-        />
-      )}
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
+      <span aria-hidden className="text-[26px]">🐾</span>
+      <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-[18px] font-bold text-transparent">
+        {name}
+      </span>
+      <span className="text-[11px] uppercase tracking-[0.16em] text-[#8A8F98]">{host}</span>
     </div>
   );
 }
 
 function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite) => void }) {
   const host = displayHost(site.url);
+  const [shotOk, setShotOk] = useState(true);
+  const shot = screenshotSrc(site);
+
+  const handleClick = () => {
+    if (shotOk) {
+      onOpen(site);
+    } else {
+      track('portfolio_open_live', { site: site.name, where: 'card_fallback' });
+      window.open(site.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-[14px] border border-white/[0.08] bg-white/[0.02] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_10px_32px_rgba(0,0,0,0.4)]">
       <BrowserBar host={host} />
 
-      {/* Preview well. Layered: a branded placeholder is always the base (so a
-          card never looks empty), then either a screenshot (if `thumb` is set)
-          or an auto live preview — the real site, scaled, straight from the
-          URL — renders on top. */}
       <button
         type="button"
-        onClick={() => onOpen(site)}
-        aria-label={`Open live preview of ${site.name}`}
+        onClick={handleClick}
+        aria-label={shotOk ? `Preview ${site.name}` : `Open ${site.name} live`}
         className="relative block aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-[#101014] to-[#17171b] text-left"
       >
-        {/* Base placeholder (fallback for slow / blocked / no-JS) */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
-          <span aria-hidden className="text-[26px]">🐾</span>
-          <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-[18px] font-bold text-transparent">
-            {site.name}
-          </span>
-          <span className="text-[11px] uppercase tracking-[0.16em] text-[#8A8F98]">{host}</span>
-        </div>
+        {/* Branded tile is always the base — no broken/blank state possible */}
+        <BrandedTile name={site.name} host={host} />
 
-        {site.thumb ? (
+        {/* Screenshot on top; hides itself if it fails to load */}
+        {shotOk && (
           <img
-            src={site.thumb}
-            alt={`${site.name} website preview`}
+            src={shot}
+            alt={`${site.name} website`}
             loading="lazy"
+            onError={() => setShotOk(false)}
             className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
           />
-        ) : (
-          <LivePreviewThumb url={site.url} />
         )}
 
-        {/* LIVE badge */}
-        <span className="absolute left-2.5 top-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-[#0A0A0B]/70 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-[#D4AF37] backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#28C840]" /> Live
-        </span>
-
-        {/* Hover affordance */}
         <span className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#0A0A0B]/90 to-transparent py-3 text-[12px] font-bold uppercase tracking-[0.08em] text-[#D4AF37] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          ▶ Scroll through it
+          {shotOk ? '▶ Scroll through it' : 'Visit live site ↗'}
         </span>
       </button>
 
@@ -163,21 +111,17 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
           <span className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
             {site.vertical}
           </span>
-          {site.location && (
-            <span className="text-[11px] text-[#8A8F98]">{site.location}</span>
-          )}
+          {site.location && <span className="text-[11px] text-[#8A8F98]">{site.location}</span>}
         </div>
         <p className="mt-2 text-[16px] font-bold text-white">{site.name}</p>
-        {site.blurb && (
-          <p className="mt-1 text-[13px] leading-[1.5] text-[#C5C5C8]">{site.blurb}</p>
-        )}
+        {site.blurb && <p className="mt-1 text-[13px] leading-[1.5] text-[#C5C5C8]">{site.blurb}</p>}
         <div className="mt-4 flex items-center gap-4 pt-1">
           <button
             type="button"
-            onClick={() => onOpen(site)}
+            onClick={handleClick}
             className="text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:text-[#F4D47C]"
           >
-            Live preview →
+            {shotOk ? 'Preview →' : 'Visit site ↗'}
           </button>
           <a
             href={site.url}
@@ -195,13 +139,9 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
 }
 
 function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => void }) {
-  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-  const [loaded, setLoaded] = useState(false);
-  const [slow, setSlow] = useState(false);
   const host = displayHost(site.url);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shot = screenshotSrc(site);
 
-  // Esc to close + lock body scroll while the modal is open.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -215,26 +155,16 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
     };
   }, [onClose]);
 
-  // If the frame hasn't reported load in a few seconds, surface the "open
-  // live" hint — the host is likely blocking embedding.
-  useEffect(() => {
-    timer.current = setTimeout(() => setSlow(true), 3500);
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, []);
-
   return (
     <div
       className="fixed inset-0 z-[80] flex flex-col bg-[#0A0A0B]/92 p-3 backdrop-blur-[6px] sm:p-6"
       role="dialog"
       aria-modal="true"
-      aria-label={`Live preview of ${site.name}`}
+      aria-label={`Preview of ${site.name}`}
       onClick={onClose}
     >
-      {/* Toolbar */}
       <div
-        className="mx-auto flex w-full max-w-[1100px] items-center justify-between gap-3 pb-3"
+        className="mx-auto flex w-full max-w-[1000px] items-center justify-between gap-3 pb-3"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="min-w-0">
@@ -242,21 +172,6 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
           <p className="truncate text-[12px] text-[#8A8F98]">{host}</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Device toggle */}
-          <div className="hidden items-center rounded-[10px] border border-white/[0.1] bg-white/[0.03] p-0.5 sm:flex">
-            {(['desktop', 'mobile'] as const).map((d) => (
-              <button
-                key={d}
-                type="button"
-                onClick={() => setDevice(d)}
-                className={`rounded-[8px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.06em] transition ${
-                  device === d ? 'bg-[#D4AF37]/[0.14] text-[#D4AF37]' : 'text-[#8A8F98] hover:text-white'
-                }`}
-              >
-                {d === 'desktop' ? '🖥 Desktop' : '📱 Phone'}
-              </button>
-            ))}
-          </div>
           <a
             href={site.url}
             target="_blank"
@@ -277,50 +192,12 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
         </div>
       </div>
 
-      {/* Framed live preview */}
-      <div
-        className="mx-auto flex w-full flex-1 justify-center overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className={`flex w-full flex-col overflow-hidden rounded-[14px] border border-white/[0.12] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.6)] transition-all duration-300 ${
-            device === 'mobile' ? 'max-w-[390px]' : 'max-w-[1100px]'
-          }`}
-        >
+      {/* Framed, scrollable full-page screenshot */}
+      <div className="mx-auto flex w-full max-w-[1000px] flex-1 justify-center overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="flex w-full flex-col overflow-hidden rounded-[14px] border border-white/[0.12] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
           <BrowserBar host={host} compact />
-          <div className="relative flex-1 bg-white">
-            {!loaded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0F0F12] text-center">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" />
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '120ms' }} />
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '240ms' }} />
-                </div>
-                <p className="text-[12px] text-[#8A8F98]">Loading {host}…</p>
-                {slow && (
-                  <p className="max-w-[280px] px-6 text-[11px] leading-[1.5] text-[#6A6F78]">
-                    Taking a while? Some sites block embedding.{' '}
-                    <a
-                      href={site.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#D4AF37] underline-offset-2 hover:underline"
-                    >
-                      Open it live ↗
-                    </a>
-                  </p>
-                )}
-              </div>
-            )}
-            <iframe
-              src={site.url}
-              title={`${site.name} — live site`}
-              onLoad={() => setLoaded(true)}
-              loading="eager"
-              referrerPolicy="no-referrer-when-downgrade"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
-              className="h-full min-h-[60vh] w-full border-0"
-            />
+          <div className="flex-1 overflow-y-auto overscroll-contain bg-white">
+            <img src={shot} alt={`${site.name} — full page`} className="block w-full" />
           </div>
         </div>
       </div>
@@ -331,7 +208,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
 export default function Portfolio({
   title = 'Real sites. Real businesses. Built by Lola.',
   eyebrow = 'The work',
-  subhead = 'Not mockups — live sites, ranking for the searches that bring their owners real jobs. Tap any one to scroll through it.',
+  subhead = 'Not mockups — live sites, ranking for the searches that bring their owners real jobs. Tap any one to take a look.',
   items = PORTFOLIO,
   showHeader = true,
 }: {
