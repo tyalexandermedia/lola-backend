@@ -16,7 +16,6 @@ import { checkoutUrl } from './lib/checkout';
 import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 
 const CALENDAR_URL =
-  (import.meta.env.VITE_STRATEGY_CALL_URL as string | undefined) ||
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
