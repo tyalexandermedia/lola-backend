@@ -64,6 +64,36 @@ export default function DiyAccess() {
       'The $197 DIY guide: your Growth Score plus a simple 5-step fix-it checklist to get found on Google and in AI answers — fix it yourself, on your own time.',
   });
 
+  // Product + $197 Offer JSON-LD → eligible for a rich pricing result.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const amount = DIY.price.replace(/[^0-9]/g, '');
+    const block = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: 'Lola DIY Fix-It Guide',
+      description:
+        'Your Growth Score plus a simple 5-step fix-it checklist to get found on Google and in AI answers — self-service.',
+      brand: { '@type': 'Brand', name: 'Lola' },
+      offers: {
+        '@type': 'Offer',
+        price: amount,
+        priceCurrency: 'USD',
+        category: 'OneTimePayment',
+        url: 'https://lola.tyalexandermedia.com/diy',
+        availability: 'https://schema.org/InStock',
+      },
+    };
+    const t = document.createElement('script');
+    t.type = 'application/ld+json';
+    t.dataset.lola = 'diy-schema';
+    t.textContent = JSON.stringify(block);
+    document.head.appendChild(t);
+    return () => {
+      t.parentNode?.removeChild(t);
+    };
+  }, []);
+
   // Unlock ONLY when the backend confirms the Stripe Checkout Session was paid —
   // never trust a bare URL param (a guessed ?session_id must not reveal the guide).
   useEffect(() => {
