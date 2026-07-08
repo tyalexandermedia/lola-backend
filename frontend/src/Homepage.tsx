@@ -19,6 +19,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
+import AiDemo from './AiDemo';
 import { DIY, BUILD } from './lib/pricing';
 
 // Books a free strategy call. Single source of truth for the whole homepage —
@@ -287,6 +288,9 @@ export default function Homepage() {
           We get you found when people ask ChatGPT or Google for a company like yours.
         </p>
       </section>
+
+      {/* ── 1·5. AGENTIC AI DEMO — types an AI answer + counts up a score ── */}
+      <AiDemo />
 
       {/* ── 1a. VISUAL ROADMAP — the signature journey graphic ──────── */}
       <section className="mt-16 sm:mt-20">

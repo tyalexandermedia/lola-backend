@@ -173,7 +173,7 @@ export default function RetainerPage() {
               >
                 Start my build →
               </a>
-              <p className="mt-3 text-[11px] text-[#8A8F98]">🔒 No payment to book a call</p>
+              <p className="mt-3 text-[11px] text-[#8A8F98]">{buildPay ? '🔒 Secure checkout · one-time $997 · Half-Back Guarantee' : '🔒 No payment to book a call'}</p>
             </div>
           </div>
         </section>
@@ -386,7 +386,7 @@ export default function RetainerPage() {
           </p>
 
           <p className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-[#8A8F98] sm:text-[12px]">
-            <span>🔒 No payment to book</span>
+            <span>{buildPay ? '🔒 Secure Stripe checkout' : '🔒 No payment to book'}</span>
             <span aria-hidden>·</span>
             <span>One-time {BUILD.price}</span>
             <span aria-hidden>·</span>

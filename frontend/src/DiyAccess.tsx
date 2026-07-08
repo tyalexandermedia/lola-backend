@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import { track } from './analytics';
+import { API_URL } from './api';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
 import { DIY, BUILD } from './lib/pricing';
@@ -50,8 +51,10 @@ const STEPS: ReadonlyArray<{ n: string; title: string; do_: string; win: string 
   },
 ];
 
+type Gate = 'checking' | 'locked' | 'unlocked';
+
 export default function DiyAccess() {
-  const [unlocked, setUnlocked] = useState(false);
+  const [gate, setGate] = useState<Gate>('checking');
 
   useSeo({
     title: 'Your DIY Fix-It Guide | Lola',
@@ -59,19 +62,57 @@ export default function DiyAccess() {
       'The $197 DIY guide: your Growth Score plus a simple 5-step fix-it checklist to get found on Google and in AI answers — fix it yourself, on your own time.',
   });
 
+  // Unlock ONLY when the backend confirms the Stripe Checkout Session was paid —
+  // never trust a bare URL param (a guessed ?session_id must not reveal the guide).
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const paid = params.get('session_id') || params.get('paid');
-    if (paid) {
-      setUnlocked(true);
-      track('diy_access_unlocked');
-    } else {
+    const sessionId = new URLSearchParams(window.location.search).get('session_id') || '';
+    if (!sessionId) {
+      setGate('locked');
       track('diy_access_locked_view');
+      return;
     }
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${API_URL}/checkout/verify?session_id=${encodeURIComponent(sessionId)}`);
+        const data = await r.json();
+        if (cancelled) return;
+        if (data?.paid) {
+          setGate('unlocked');
+          track('diy_access_unlocked');
+        } else {
+          setGate('locked');
+          track('diy_access_verify_failed');
+        }
+      } catch {
+        if (!cancelled) setGate('locked');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  const unlocked = gate === 'unlocked';
   const buyHref = checkoutUrl('diy') || '/pricing';
+
+  if (gate === 'checking') {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center py-24 text-center">
+        <div className="flex items-center gap-2">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-2.5 w-2.5 animate-sniff rounded-full bg-[#D4AF37]"
+              style={{ animationDelay: `${i * 160}ms` }}
+            />
+          ))}
+        </div>
+        <p className="mt-6 text-[14px] text-[#9AA0A6]">Confirming your purchase…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-1 flex-col">
