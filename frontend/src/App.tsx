@@ -310,6 +310,7 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
           <FooterLink href="/retainer">The $997 Full Build</FooterLink>
+          <FooterLink href="/#work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>

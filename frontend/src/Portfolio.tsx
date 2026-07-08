@@ -262,7 +262,7 @@ export default function Portfolio({
   if (!items.length) return null;
 
   return (
-    <section className="mt-16 sm:mt-24">
+    <section id="work" className="mt-16 scroll-mt-24 sm:mt-24">
       <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">{eyebrow}</p>
       <h2
         className="mt-3 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
