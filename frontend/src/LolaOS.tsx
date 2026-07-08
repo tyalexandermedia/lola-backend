@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
 type StatusState = 'done' | 'pending';
@@ -89,6 +90,7 @@ const ecosystem = [
 ];
 
 export default function LolaOS() {
+  useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const prevTitle = document.title;

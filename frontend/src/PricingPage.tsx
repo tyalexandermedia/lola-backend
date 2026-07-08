@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { useReveal } from './lib/useReveal';
 import {
   TIERS,
   GUARANTEES,
@@ -90,6 +91,7 @@ function track(label: string, props?: Record<string, string | number>) {
 }
 
 export default function PricingPage() {
+  useReveal();
   const promiseRef = useRef<HTMLDivElement>(null);
   const promiseSeen = useRef(false);
 

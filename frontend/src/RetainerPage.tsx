@@ -21,6 +21,7 @@
  */
 
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
 import { useSeo } from './lib/seo';
@@ -44,6 +45,7 @@ function withUtm(url: string, content: string) {
 }
 
 export default function RetainerPage() {
+  useReveal();
   useSeo({
     title: 'The Full Build — We Build It. We Rank It. $997 | Lola',
     description:

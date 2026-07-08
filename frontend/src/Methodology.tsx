@@ -12,9 +12,11 @@
  */
 
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
 export default function Methodology() {
+  useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
 

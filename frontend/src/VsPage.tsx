@@ -20,6 +20,7 @@
  */
 
 import { useEffect } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
 const CALENDAR_URL =
@@ -476,6 +477,7 @@ export function getCompetitorSlugs(): string[] {
 // ── Component ────────────────────────────────────────────────
 
 export default function VsPage({ slug }: { slug: string }) {
+  useReveal();
   const c = COMPETITORS[slug.toLowerCase()];
 
   // Inject route-specific FAQPage + BreadcrumbList JSON-LD on mount.

@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 import { API_URL } from './api';
 import { useSeo } from './lib/seo';
@@ -54,6 +55,7 @@ const STEPS: ReadonlyArray<{ n: string; title: string; do_: string; win: string 
 type Gate = 'checking' | 'locked' | 'unlocked';
 
 export default function DiyAccess() {
+  useReveal();
   const [gate, setGate] = useState<Gate>('checking');
 
   useSeo({
