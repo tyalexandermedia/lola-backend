@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { AuditResult } from './types';
 import { API_URL } from './api';
 import { ResultsStage } from './AuditFlow';
+import AiVisibility from './AiVisibility';
 
 export default function SharedReport({ auditId }: { auditId: string }) {
   const [audit, setAudit] = useState<AuditResult | null>(null);
@@ -64,6 +65,13 @@ export default function SharedReport({ auditId }: { auditId: string }) {
   }
 
   return (
-    <ResultsStage audit={audit} cta={{ label: 'Run your own audit', href: '/' }} />
+    <>
+      <ResultsStage audit={audit} cta={{ label: 'Run your own audit', href: '/' }} />
+      <AiVisibility
+        business={audit.business_name}
+        city={audit.city}
+        trade={audit.business_type}
+      />
+    </>
   );
 }
