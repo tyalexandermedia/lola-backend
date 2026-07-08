@@ -36,38 +36,125 @@ function BrowserBar({ host, compact = false }: { host: string; compact?: boolean
   );
 }
 
+/**
+ * LivePreviewThumb — an auto-generated preview of the real site: a desktop
+ * render (1280px wide) scaled down to fill the card, mounted only when the
+ * card nears the viewport so it never costs first-paint. Non-interactive
+ * (pointer-events off, no scroll) — clicking the card opens the full modal.
+ *
+ * Sits on top of the branded placeholder and fades in on load, so a slow or
+ * embed-blocked site simply shows the branded tile instead of a broken box.
+ * Skipped entirely during prerender (navigator.webdriver) so the static HTML
+ * stays clean and fast.
+ */
+function LivePreviewThumb({ url }: { url: string }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [inView, setInView] = useState(false);
+  const [width, setWidth] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const isBot =
+    typeof navigator !== 'undefined' && (navigator as unknown as { webdriver?: boolean }).webdriver;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setWidth(w);
+    });
+    ro.observe(el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    io.observe(el);
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+    };
+  }, []);
+
+  const RENDER_W = 1280;
+  const RENDER_H = Math.round((RENDER_W * 10) / 16); // match card's 16/10
+  const scale = width ? width / RENDER_W : 0;
+
+  return (
+    <div ref={ref} aria-hidden className="absolute inset-0 overflow-hidden">
+      {inView && !isBot && width > 0 && (
+        <iframe
+          src={url}
+          title=""
+          tabIndex={-1}
+          scrolling="no"
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin"
+          onLoad={() => setLoaded(true)}
+          style={{
+            width: RENDER_W,
+            height: RENDER_H,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            border: 0,
+            pointerEvents: 'none',
+            opacity: loaded ? 1 : 0,
+            transition: 'opacity 0.5s ease',
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite) => void }) {
   const host = displayHost(site.url);
   return (
     <div className="group flex flex-col overflow-hidden rounded-[14px] border border-white/[0.08] bg-white/[0.02] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_10px_32px_rgba(0,0,0,0.4)]">
       <BrowserBar host={host} />
 
-      {/* Preview well — screenshot if provided, else a branded placeholder. */}
+      {/* Preview well. Layered: a branded placeholder is always the base (so a
+          card never looks empty), then either a screenshot (if `thumb` is set)
+          or an auto live preview — the real site, scaled, straight from the
+          URL — renders on top. */}
       <button
         type="button"
         onClick={() => onOpen(site)}
         aria-label={`Open live preview of ${site.name}`}
         className="relative block aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-[#101014] to-[#17171b] text-left"
       >
+        {/* Base placeholder (fallback for slow / blocked / no-JS) */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
+          <span aria-hidden className="text-[26px]">🐾</span>
+          <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-[18px] font-bold text-transparent">
+            {site.name}
+          </span>
+          <span className="text-[11px] uppercase tracking-[0.16em] text-[#8A8F98]">{host}</span>
+        </div>
+
         {site.thumb ? (
           <img
             src={site.thumb}
             alt={`${site.name} website preview`}
             loading="lazy"
-            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-5 text-center">
-            <span aria-hidden className="text-[26px]">🐾</span>
-            <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-[18px] font-bold text-transparent">
-              {site.name}
-            </span>
-            <span className="text-[11px] uppercase tracking-[0.16em] text-[#8A8F98]">{host}</span>
-          </div>
+          <LivePreviewThumb url={site.url} />
         )}
+
+        {/* LIVE badge */}
+        <span className="absolute left-2.5 top-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-[#0A0A0B]/70 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-[#D4AF37] backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#28C840]" /> Live
+        </span>
+
         {/* Hover affordance */}
-        <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#0A0A0B]/90 to-transparent py-3 text-[12px] font-bold uppercase tracking-[0.08em] text-[#D4AF37] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          ▶ Live preview
+        <span className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#0A0A0B]/90 to-transparent py-3 text-[12px] font-bold uppercase tracking-[0.08em] text-[#D4AF37] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          ▶ Scroll through it
         </span>
       </button>
 
