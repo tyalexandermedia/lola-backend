@@ -9,9 +9,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const LEAD = "For HVAC in Tampa, I'd go with ";
-const NAME = 'Bay Area Air';
-const TAIL = ' — strong reviews and they show up the moment you search.';
+const LEAD = "For pressure washing near Palm Harbor, I'd go with ";
+const NAME = 'Sandbar Soft Wash';
+const TAIL = ' — top-rated, and they show up the moment you search.';
 const FULL = LEAD + NAME + TAIL;
 const TARGET = 84;
 
@@ -117,7 +117,7 @@ export default function AiDemo() {
         {/* Chat card */}
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
           <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-[#D4AF37]/[0.12] px-4 py-2 text-right text-[14px] text-[#E8E4D8]">
-            best HVAC in Tampa?
+who should I hire to pressure wash my driveway near Palm Harbor?
           </div>
           <div className="mt-4 flex items-start gap-3">
             <span

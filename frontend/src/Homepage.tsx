@@ -16,7 +16,7 @@
  * mount to pre-fill the business_type question.
  */
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import Marquee from './Marquee';
 import RoadmapJourney from './RoadmapJourney';
 import AiDemo from './AiDemo';
@@ -132,6 +132,34 @@ export default function Homepage() {
     }
   };
 
+  // Scroll-reveal: each section below the hero drifts up + fades in as it
+  // enters the viewport. Applied here (not per-section) so it stays a single,
+  // low-touch effect. Reduced-motion / no-IO users just see everything.
+  const mainRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const root = mainRef.current;
+    if (!root || typeof IntersectionObserver === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const sections = Array.from(root.querySelectorAll<HTMLElement>(':scope > section'));
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('reveal-in');
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -6% 0px' },
+    );
+    sections.forEach((s, i) => {
+      if (i === 0) return; // hero shows instantly
+      s.classList.add('reveal');
+      io.observe(s);
+    });
+    return () => io.disconnect();
+  }, []);
+
   const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
   const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
   // Grader is the new lead-magnet (60-second single-page form). The trade
@@ -139,7 +167,7 @@ export default function Homepage() {
   const graderHref = trade ? `/grader?trade=${encodeURIComponent(trade)}` : '/grader';
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main ref={mainRef} className="flex flex-1 flex-col">
       {/* ── 1. HERO ─────────────────────────────────────────────────── */}
       <section className="animate-slide-up relative pt-2 sm:pt-6">
         <div
@@ -152,7 +180,7 @@ export default function Homepage() {
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          The AI Leads Expert · Local Service Businesses
+          The AI Leads Expert
         </p>
 
         {/* Verified-GBP + Sandbar proof pill — visible above the hero on
@@ -177,11 +205,10 @@ export default function Homepage() {
           className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
         >
-          Get found on Google AND AI search —{' '}
+          Get found on Google.{' '}
           <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
-            calls, clicks, form fills
-          </span>{' '}
-          land on autopilot.
+            Get picked by AI.
+          </span>
         </h1>
 
         <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
@@ -193,21 +220,11 @@ export default function Homepage() {
             </>
           ) : (
             <>
-              For home services, cleaning, salons, med spas, auto detailing, lawn care —
-              any local business buyers find on Google or ask AI to recommend. Lola gets
-              you recommended on Google AI, ChatGPT, Perplexity, and Gemini. Done for you,
-              transparent pricing, no long-term contracts.
+              Lola gets local service businesses found on Google — and recommended by{' '}
+              <span className="font-semibold text-white">ChatGPT, Perplexity, and Gemini</span>.
+              Your next customer calls you, not your competitor.
             </>
           )}
-        </p>
-
-        {/* AI-line callout — hidden on mobile so trade picker + CTA stay
-            above the fold at 375x667. Re-appears at sm: where there's room. */}
-        <p className="mt-5 hidden max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[15px] leading-[1.55] text-white sm:block">
-          Lola checks where your business shows up in{' '}
-          <span className="font-semibold text-[#D4AF37]">Google</span> AND in{' '}
-          <span className="font-semibold text-[#D4AF37]">ChatGPT/AI search</span> — because
-          that's where your next customer is searching.
         </p>
 
         {/* Friction-killer single-input form. Replaced the trade dropdown

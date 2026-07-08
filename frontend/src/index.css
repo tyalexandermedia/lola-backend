@@ -105,6 +105,21 @@ textarea::placeholder {
 .animate-aurora {
   animation: aurora 16s ease-in-out infinite alternate;
 }
+/* Scroll-reveal — sections drift up + fade in as they enter the viewport.
+   A scroll effect (Homepage) adds `.reveal` then `.reveal-in` via
+   IntersectionObserver. The pre-reveal state is only applied from JS, so
+   no-JS / reduced-motion users still see everything immediately. */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* Kill every looping / entrance animation for users who ask for reduced
      motion. Each animation's end-state is the visible state, so disabling
@@ -119,6 +134,12 @@ textarea::placeholder {
   .animate-fade-in,
   .animate-slide-up {
     animation: none !important;
+  }
+  /* Reveal content immediately — never gate visibility on motion. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
