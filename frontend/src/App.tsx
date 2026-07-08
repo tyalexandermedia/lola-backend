@@ -433,6 +433,14 @@ function Header() {
 
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
         <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
+          {/* Work — desktop only, so the mobile header stays uncluttered
+              (mobile reaches /work via the footer + homepage section). */}
+          <a
+            href="/work"
+            className="hidden min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:flex sm:px-3"
+          >
+            Work
+          </a>
           <a
             href="/retainer"
             className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
