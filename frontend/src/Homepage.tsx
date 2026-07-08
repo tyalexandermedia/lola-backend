@@ -112,6 +112,10 @@ const PLURAL: Record<string, string> = {
 
 export default function Homepage() {
   const [trade, setTrade] = useState<string>('');
+  // Business name is captured live so the AI-answer demo below can name the
+  // visitor's own business ("…I'd go with <their business>") instead of the
+  // Sandbar default — the site literally shows the AI recommending them.
+  const [bizName, setBizName] = useState<string>('');
 
   // Hydrate from localStorage on mount; persist on change so AuditFlow can use it.
   useEffect(() => {
@@ -212,8 +216,7 @@ export default function Homepage() {
           className="mt-7 max-w-[520px]"
           onSubmit={(e) => {
             e.preventDefault();
-            const fd = new FormData(e.currentTarget);
-            const biz = String(fd.get('biz') || '').trim();
+            const biz = bizName.trim();
             const q = new URLSearchParams();
             if (biz) q.set('biz', biz);
             if (trade) q.set('trade', trade);
@@ -229,6 +232,8 @@ export default function Homepage() {
               name="biz"
               type="text"
               required
+              value={bizName}
+              onChange={(e) => setBizName(e.target.value)}
               autoComplete="organization"
               placeholder="e.g. Sandbar Soft Wash"
               className="h-14 flex-1 rounded-[12px] border border-[#D4AF37]/30 bg-[#0F0F12] px-4 text-[15px] font-medium text-white outline-none transition focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
@@ -283,7 +288,7 @@ export default function Homepage() {
       </section>
 
       {/* ── 1·5. AGENTIC AI DEMO — types an AI answer + counts up a score ── */}
-      <AiDemo />
+      <AiDemo bizName={bizName} trade={trade} />
 
       {/* ── 1a. VISUAL ROADMAP — the signature journey graphic ──────── */}
       <section className="mt-16 sm:mt-20">
@@ -509,11 +514,21 @@ export default function Homepage() {
           Meet Ty &amp; Lola
         </p>
 
-        <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[160px_1fr] sm:items-start sm:gap-10">
-          {/* Photo placeholder — swap to real headshot when ready */}
-          <div className="mx-auto h-[160px] w-[160px] overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] sm:mx-0">
-            <div className="flex h-full w-full items-center justify-center text-[44px]">🐾</div>
-          </div>
+        <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-10">
+          {/* Ty & Lola on the beach at sunset — the whole story in one frame. */}
+          <figure className="mx-auto w-[220px] max-w-full sm:mx-0">
+            <div className="aspect-[3/4] overflow-hidden rounded-2xl border border-[#D4AF37]/30 shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
+              <img
+                src="/images/ty-lola-beach.jpg"
+                alt="Coach Ty and his dog Lola on a Tampa Bay beach at sunset"
+                loading="lazy"
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+            <figcaption className="mt-2 text-center text-[11px] text-[#8A8F98] sm:text-left">
+              Ty &amp; Lola · Tampa Bay
+            </figcaption>
+          </figure>
 
           <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
             <p>
