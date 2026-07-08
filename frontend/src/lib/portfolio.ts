@@ -43,6 +43,19 @@ export const PORTFOLIO: PortfolioSite[] = [
     location: 'Palm Harbor, FL',
     blurb: 'Built and ranked across 20+ Tampa Bay cities — our founding proof story.',
   },
+  {
+    name: 'Tampa Bay Power Clean',
+    url: 'https://www.tampabaypowerclean.com',
+    vertical: 'Pressure Washing',
+    location: 'Dunedin, FL',
+    blurb: 'Roof cleaning, house washing & paver sealing — built with dedicated money pages + local SEO.',
+  },
+  {
+    name: 'Travels by Val',
+    url: 'https://www.travelsbyval.com',
+    vertical: 'Travel & Vacations',
+    blurb: 'Proof Lola works beyond home services — a full travel brand, built and launched.',
+  },
   // ── Add the next build here ──────────────────────────────────────────────
   // { name: 'Business Name', url: 'https://theirsite.com', vertical: 'HVAC', location: 'Tampa, FL', blurb: 'What we did.' },
 ];
