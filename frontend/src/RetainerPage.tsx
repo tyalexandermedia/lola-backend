@@ -23,10 +23,11 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
-import { BUILD, HALF_BACK_GUARANTEE } from './lib/pricing';
+import { BUILD, HALF_BACK_GUARANTEE, BUILD_INCLUDED } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
 import Portfolio from './Portfolio';
+import IncludedAccordion from './IncludedAccordion';
 
 // Single booking destination for the whole app: Google Calendar. One env var
 // (VITE_CALENDAR_URL) so every "book a call" CTA points to the same place —
@@ -323,6 +324,9 @@ export default function RetainerPage() {
             ))}
           </ul>
         </section>
+
+        {/* ── 5·5. WHAT'S INCLUDED, EXPLAINED (clarity accordion) ─────── */}
+        <IncludedAccordion items={BUILD_INCLUDED} />
 
         {/* ── 6. FAQ ──────────────────────────────────────────────────── */}
         <section className="mt-16 sm:mt-20">
