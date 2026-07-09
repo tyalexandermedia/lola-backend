@@ -72,7 +72,10 @@ def _days(name: str, default_days: float) -> float:
 # keeps them ranked. Timed to land as the 30-day build window closes — right
 # when they've felt the win and momentum matters most.
 MANAGED_MONTHLY = os.getenv("FOLLOWUP_MANAGED_PRICE", "$297/mo")
-MANAGED_URL = (os.getenv("FOLLOWUP_MANAGED_URL", "").strip() or CALL_URL)
+# Nurture CTAs point at the /managed landing page by default (it holds the
+# subscribe button + the full pitch). Override with a direct Stripe link if you
+# prefer one-click checkout from the text/email.
+MANAGED_URL = (os.getenv("FOLLOWUP_MANAGED_URL", "").strip() or f"{PUBLIC_APP_URL}/managed")
 BUILD_STEP1_SEC = _days("FOLLOWUP_BUILD_STEP1_DAYS", 25) * 86400
 BUILD_GAP_1_2_SEC = _days("FOLLOWUP_BUILD_GAP12_DAYS", 7) * 86400   # ~day 32
 BUILD_GAP_2_3_SEC = _days("FOLLOWUP_BUILD_GAP23_DAYS", 14) * 86400  # ~day 46
