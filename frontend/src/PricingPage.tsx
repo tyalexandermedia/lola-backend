@@ -18,9 +18,11 @@ import { useReveal } from './lib/useReveal';
 import {
   TIERS,
   GUARANTEES,
+  BUILD_INCLUDED,
   type OfferTier,
 } from './lib/pricing';
 import { useSeo } from './lib/seo';
+import IncludedAccordion from './IncludedAccordion';
 import { checkoutUrl } from './lib/checkout';
 
 // Page-scoped FAQs — each entry powers the visible accordion AND the
@@ -248,6 +250,9 @@ export default function PricingPage() {
           or have us build and rank it for $997.
         </p>
       </section>
+
+      {/* ── 2·5. WHAT'S INCLUDED, EXPLAINED (clarity accordion) ───────── */}
+      <IncludedAccordion items={BUILD_INCLUDED} />
 
       {/* ── 3. GUARANTEE ──────────────────────────────────────────────── */}
       <section ref={promiseRef} className="mt-16 sm:mt-20">

@@ -22,6 +22,7 @@ import RoadmapJourney from './RoadmapJourney';
 import AiDemo from './AiDemo';
 import Portfolio from './Portfolio';
 import StatCounter from './StatCounter';
+import WatchExplainer from './WatchExplainer';
 import { useReveal } from './lib/useReveal';
 import { DIY, BUILD } from './lib/pricing';
 
@@ -230,6 +231,8 @@ export default function Homepage() {
           >
             Or book a free 15-min call →
           </a>
+          {/* Renders only once VITE_EXPLAINER_VIDEO_URL is set. */}
+          <WatchExplainer label="See how Lola works" seconds={90} />
         </div>
 
         {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)

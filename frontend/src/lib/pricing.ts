@@ -99,6 +99,51 @@ export const GROWTH_SCORE_DIMENSIONS: ReadonlyArray<string> = [
   'Revenue Tracking',
 ];
 
+/**
+ * "What's included, explained" — plain-English detail for each Full Build
+ * deliverable. Powers the expandable clarity accordion on /pricing + /retainer.
+ * Contractors buy what they understand; each line answers "what does that
+ * actually mean for me?".
+ */
+export interface PackageDetail {
+  icon: string;
+  title: string;
+  detail: string;
+}
+
+export const BUILD_INCLUDED: ReadonlyArray<PackageDetail> = [
+  {
+    icon: '🌐',
+    title: 'A custom website built to get you calls',
+    detail:
+      'Not a template you have to wrestle with — a fast, clean, mobile-first site built around the jobs you actually want, with click-to-call and quote forms front and center. You review it before it goes live.',
+  },
+  {
+    icon: '🔎',
+    title: '30 days of getting you found — Google + AI',
+    detail:
+      "We don't build and bounce. For 30 days we work to get you found where buyers look now: Google's map pack and search results, and the AI answers people trust when they ask ChatGPT, Perplexity, or Gemini for a company like yours.",
+  },
+  {
+    icon: '📍',
+    title: 'Google Business Profile, dialed in',
+    detail:
+      'Your Google Business Profile is half your local leads. We set the right primary category, services, service areas, hours, photos, and posts so you show up in the map pack when neighbors search for your work.',
+  },
+  {
+    icon: '🤝',
+    title: 'Direct access to Ty during the build',
+    detail:
+      "You're not routed through a support desk or an account manager. You text Ty directly during the build — real answers, real fast, from the person doing the work.",
+  },
+  {
+    icon: '🛡️',
+    title: 'The Half-Back Guarantee',
+    detail:
+      'We pick 5 money keywords for your business together in week 1. If we don’t get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.',
+  },
+];
+
 /** Plain-text price range for schema.org / meta tags. */
 export const PRICE_RANGE = '$197–$997';
 
