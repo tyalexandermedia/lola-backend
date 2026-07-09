@@ -144,3 +144,13 @@ async def stats(slug: str) -> dict:
         (n,) = await cur.fetchone()
         cfg = await get_config(slug)
         return {"slug": slug, "texts_sent": n or 0, "config": cfg}
+
+
+async def stats_all() -> dict:
+    """Global MCTB totals for the owner dashboard."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute("SELECT COUNT(*) FROM mctb_sent")
+        (sent,) = await cur.fetchone()
+        cur2 = await db.execute("SELECT COUNT(*) FROM mctb_config WHERE enabled = 1")
+        (enabled,) = await cur2.fetchone()
+    return {"texts_sent": sent or 0, "clients_enabled": enabled or 0}

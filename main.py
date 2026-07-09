@@ -38,12 +38,14 @@ from db.database import (
     get_percentile,
     get_recent_leads,
     get_audit_by_id,
+    count_audits,
 )
 from db.leads import (
     init_leads_table,
     upsert_lead,
     get_warm_leads,
     classify_temperature,
+    lead_counts,
 )
 from db.followups import (
     init_followups_table,
@@ -155,6 +157,7 @@ from db.mctb import (
     is_missed as mctb_is_missed,
     render_text as mctb_render_text,
     stats as mctb_stats,
+    stats_all as mctb_stats_all,
     mctb_globally_enabled,
 )
 from db.case_studies import (
@@ -1810,6 +1813,41 @@ async def mctb_get_stats(slug: str, x_admin_key: str = Header(..., alias="X-Admi
     """Admin — texts-sent count + current config for a client."""
     _check_admin(x_admin_key)
     return await mctb_stats(slug)
+
+
+@app.get("/admin/hq")
+async def admin_hq(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """
+    Lola HQ — one aggregated snapshot of the whole funnel + automation health
+    for the owner dashboard. Read-only; everything gathered concurrently.
+    """
+    _check_admin(x_admin_key)
+    scores, leads, follow, mctb_all, clients, recent = await asyncio.gather(
+        count_audits(),
+        lead_counts(),
+        followup_stats(),
+        mctb_stats_all(),
+        get_active_clients(),
+        get_recent_leads(10),
+    )
+    client_list = [
+        {"slug": c.get("slug"), "name": c.get("client_name"), "site": c.get("site_url")}
+        for c in (clients or [])
+    ]
+    return {
+        "scores_run": scores,               # top-of-funnel volume
+        "leads": leads,                     # {total,hot,warm,cool,cold}
+        "nurture": follow,                  # {total,active,purchased,done}
+        "mctb": mctb_all,                   # {texts_sent,clients_enabled}
+        "clients": {"active": len(client_list), "list": client_list},
+        "recent_leads": recent,
+        "automation": {
+            "email": bool(RESEND_API_KEY),
+            "sms": twilio_enabled(),
+            "followups_on": followup_enabled(),
+            "mctb_on": mctb_globally_enabled(),
+        },
+    }
 
 
 @app.post("/admin/case-study/{slug}/run")

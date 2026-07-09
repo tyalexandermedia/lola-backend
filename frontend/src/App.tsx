@@ -11,6 +11,7 @@ const SharedReport = lazy(() => import('./SharedReport'));
 const AdminLeads = lazy(() => import('./AdminLeads'));
 const AdminCalls = lazy(() => import('./AdminCalls'));
 const AdminRevenue = lazy(() => import('./AdminRevenue'));
+const OwnerDashboard = lazy(() => import('./OwnerDashboard'));
 const PricingPage = lazy(() => import('./PricingPage'));
 const RetainerPage = lazy(() => import('./RetainerPage'));
 const ApplyPage = lazy(() => import('./ApplyPage'));
@@ -55,6 +56,7 @@ type Route =
   | { name: 'report'; auditId: string }
   | { name: 'client-report'; slug: string }
   | { name: 'admin' }
+  | { name: 'admin-hq' }
   | { name: 'admin-calls'; slug: string }
   | { name: 'admin-revenue'; slug: string }
   | { name: 'unknown' };
@@ -80,6 +82,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
   if (pathname === '/admin/leads') return { name: 'admin' };
+  if (pathname === '/admin/hq' || pathname === '/admin/hq/') return { name: 'admin-hq' };
   const adminCallsMatch = pathname.match(/^\/admin\/calls\/([^/]+)\/?$/);
   if (adminCallsMatch) return { name: 'admin-calls', slug: decodeURIComponent(adminCallsMatch[1]) };
   const adminRevenueMatch = pathname.match(/^\/admin\/revenue\/([^/]+)\/?$/);
@@ -160,7 +163,7 @@ function App() {
   // Tighter top padding on /audit — Step 5 CTA must be above the fold at 375x667.
   // Other routes keep generous breathing room.
   const containerCls =
-    route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls' || route.name === 'admin-revenue'
+    route.name === 'report' || route.name === 'admin' || route.name === 'admin-hq' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
       : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer' || route.name === 'work' || route.name === 'managed'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
@@ -223,6 +226,7 @@ function App() {
           {route.name === 'report' && <SharedReport auditId={route.auditId} />}
           {route.name === 'client-report' && <ClientReport slug={route.slug} />}
           {route.name === 'admin' && <AdminLeads />}
+          {route.name === 'admin-hq' && <OwnerDashboard />}
           {route.name === 'admin-calls' && <AdminCalls slug={route.slug} />}
           {route.name === 'admin-revenue' && <AdminRevenue slug={route.slug} />}
           {route.name === 'unknown' && <NotFound />}
@@ -242,7 +246,7 @@ function App() {
  */
 function BackToTop({ route }: { route: Route }) {
   const [show, setShow] = useState(false);
-  const HIDE = new Set(['audit', 'report', 'admin', 'admin-calls', 'admin-revenue']);
+  const HIDE = new Set(['audit', 'report', 'admin', 'admin-hq', 'admin-calls', 'admin-revenue']);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onScroll = () => setShow(window.scrollY > window.innerHeight);
@@ -294,7 +298,7 @@ function RouteFallback() {
 function SiteFooter({ route }: { route: Route }) {
   // Routes that own their own bottom-of-page footer or shouldn't have a
   // global one (admin / report dashboards / interactive tools).
-  const HIDE = new Set(['admin', 'admin-calls', 'admin-revenue', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
+  const HIDE = new Set(['admin', 'admin-hq', 'admin-calls', 'admin-revenue', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
   if (HIDE.has(route.name)) return null;
 
   return (
