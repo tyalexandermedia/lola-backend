@@ -142,7 +142,17 @@ export default function BuildOnboarding() {
         </p>
       </section>
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      {/* Soft pointer to the continuity option — no pressure, just so it's not
+          a surprise when the 30 days wrap. */}
+      <p className="mx-auto mt-12 max-w-[560px] text-center text-[13px] leading-[1.6] text-[#8A8F98]">
+        After your 30 days, some owners keep us on to hold their spot —{' '}
+        <a href="/managed" className="text-[#D4AF37] underline-offset-2 hover:underline">
+          see Lola Managed
+        </a>
+        . Totally optional, cancel anytime.
+      </p>
+
+      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

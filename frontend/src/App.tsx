@@ -29,6 +29,7 @@ const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
 const BuildOnboarding = lazy(() => import('./BuildOnboarding'));
 const WorkPage = lazy(() => import('./WorkPage'));
+const ManagedPage = lazy(() => import('./ManagedPage'));
 
 type Route =
   | { name: 'home' }
@@ -45,6 +46,7 @@ type Route =
   | { name: 'pricing' }
   | { name: 'retainer' }
   | { name: 'work' }
+  | { name: 'managed' }
   | { name: 'diy' }
   | { name: 'build-onboarding' }
   | { name: 'apply' }
@@ -71,6 +73,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
+  if (pathname === '/managed' || pathname === '/managed/') return { name: 'managed' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
   if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'build-onboarding' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
@@ -101,6 +104,7 @@ function canonicalPathForRoute(route: Route): string | null {
     case 'pricing': return '/pricing';
     case 'retainer': return '/retainer';
     case 'work': return '/work';
+    case 'managed': return '/managed';
     case 'diy': return '/diy';
     case 'build-onboarding': return '/build/start';
     case 'apply': return '/apply';
@@ -158,7 +162,7 @@ function App() {
   const containerCls =
     route.name === 'report' || route.name === 'admin' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
-      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer' || route.name === 'work'
+      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer' || route.name === 'work' || route.name === 'managed'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
@@ -210,6 +214,7 @@ function App() {
           {route.name === 'pricing' && <PricingPage />}
           {route.name === 'retainer' && <RetainerPage />}
           {route.name === 'work' && <WorkPage />}
+          {route.name === 'managed' && <ManagedPage />}
           {route.name === 'diy' && <DiyAccess />}
           {route.name === 'build-onboarding' && <BuildOnboarding />}
           {route.name === 'apply' && <ApplyPage />}
