@@ -45,10 +45,14 @@ async def send_sms(
     to_phone: str,
     body: str,
     *,
+    from_number: Optional[str] = None,
     client: Optional[httpx.AsyncClient] = None,
 ) -> bool:
     """
     Send one SMS. Returns True on a 2xx from Twilio, else False.
+
+    `from_number` overrides the default TWILIO_FROM_NUMBER — used by Missed-Call
+    Text-Back so the reply comes FROM the number the caller just dialed.
 
     No-ops (returns False) when SMS is disabled, credentials are missing, or the
     destination number is empty — callers treat texting as best-effort.
@@ -63,9 +67,10 @@ async def send_sms(
     if not creds:
         print("📵 SMS skipped — Twilio credentials not fully configured.")
         return False
-    sid, token, from_number = creds
+    sid, token, default_from = creds
+    sender = (from_number or "").strip() or default_from
 
-    payload = {"From": from_number, "To": to_phone, "Body": _with_opt_out(body)}
+    payload = {"From": sender, "To": to_phone, "Body": _with_opt_out(body)}
     url = _TWILIO_API.format(sid=sid)
 
     own_client = client is None

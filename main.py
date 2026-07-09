@@ -145,7 +145,18 @@ from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webma
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
-from reviews.sms import send_growth_score_sms, send_sms
+from reviews.sms import send_growth_score_sms, send_sms, twilio_enabled
+from db.mctb import (
+    init_mctb_tables,
+    get_config as mctb_get_config,
+    upsert_config as mctb_upsert_config,
+    already_texted as mctb_already_texted,
+    record_texted as mctb_record_texted,
+    is_missed as mctb_is_missed,
+    render_text as mctb_render_text,
+    stats as mctb_stats,
+    mctb_globally_enabled,
+)
 from db.case_studies import (
     init_case_studies_table,
     get_latest_run,
@@ -238,6 +249,7 @@ async def startup_event():
     await init_enhancements_table()
     await init_swarm_tables()
     await init_followups_table()
+    await init_mctb_tables()
     await cache_purge_expired()
 
     # Growth Score follow-up sequencer. Dormant until an email/SMS provider is
@@ -1773,6 +1785,33 @@ async def followups_run_endpoint(x_admin_key: str = Header(..., alias="X-Admin-K
     return await followup_process_due()
 
 
+class MctbConfigBody(BaseModel):
+    enabled: bool = True
+    template: Optional[str] = None   # supports {business} and {quote} placeholders
+    quote_url: Optional[str] = None  # overrides the client's site_url in the text
+
+
+@app.post("/mctb/config/{slug}")
+async def mctb_set_config(
+    slug: str,
+    body: MctbConfigBody,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Admin — turn Missed-Call Text-Back on/off for a client + set the message."""
+    _check_admin(x_admin_key)
+    await mctb_upsert_config(
+        slug, enabled=body.enabled, template=body.template, quote_url=body.quote_url
+    )
+    return {"ok": True, **(await mctb_stats(slug))}
+
+
+@app.get("/mctb/stats/{slug}")
+async def mctb_get_stats(slug: str, x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Admin — texts-sent count + current config for a client."""
+    _check_admin(x_admin_key)
+    return await mctb_stats(slug)
+
+
 @app.post("/admin/case-study/{slug}/run")
 async def admin_case_study_run(
     slug: str,
@@ -2769,7 +2808,8 @@ async def twilio_voice(slug: str, request: Request, source: str = "gbp"):
 
 @app.post("/twilio/status/{slug}")
 async def twilio_status(slug: str, request: Request):
-    """Call-status + recording callback. Stamps final duration + recording."""
+    """Call-status + recording callback. Stamps final duration + recording,
+    and — if the call was missed — fires Missed-Call Text-Back."""
     form = await request.form()
     call_sid = str(form.get("CallSid") or "")
     status = str(form.get("DialCallStatus") or form.get("CallStatus") or "completed")
@@ -2777,7 +2817,47 @@ async def twilio_status(slug: str, request: Request):
     recording = str(form.get("RecordingUrl") or "") or None
     if call_sid:
         await update_call_status(call_sid, status=status, duration_sec=duration, recording_url=recording)
+
+    caller = str(form.get("From") or "")
+    tracking = str(form.get("To") or form.get("Called") or "")
+    try:
+        await _maybe_text_back(
+            slug, call_sid=call_sid, status=status, duration=duration,
+            caller=caller, tracking=tracking,
+        )
+    except Exception as e:  # never break the call flow on a text-back hiccup
+        print(f"MCTB error: {e}")
     return _twiml("")
+
+
+async def _maybe_text_back(
+    slug: str, *, call_sid: str, status: str, duration: int, caller: str, tracking: str,
+) -> None:
+    """Instantly text a caller back when their forwarded call went unanswered.
+
+    Opt-in per client (needs an mctb_config row with enabled=1) and gated on
+    MCTB_ENABLED + Twilio. Dedup is atomic on call_sid, so Twilio's duplicate
+    status callbacks can't double-text.
+    """
+    if not (mctb_globally_enabled() and twilio_enabled()):
+        return
+    if not caller or not mctb_is_missed(status, duration):
+        return
+    cfg = await mctb_get_config(slug)
+    if not cfg or not cfg.get("enabled"):
+        return  # opt-in only
+    if await mctb_already_texted(call_sid):
+        return
+    rc = await get_reporting_client_by_slug(slug)
+    business = (rc or {}).get("client_name") or slug.replace("-", " ").title()
+    quote_url = cfg.get("quote_url") or (rc or {}).get("site_url")
+    body = mctb_render_text(cfg.get("template"), business=business, quote_url=quote_url)
+    # Reserve the call_sid FIRST — if a duplicate callback already claimed it,
+    # bail without sending a second text.
+    if not await mctb_record_texted(call_sid, slug, caller):
+        return
+    ok = await send_sms(caller, body, from_number=tracking)
+    print(f"📲 MCTB {'sent' if ok else 'attempted'} for {slug} → {caller}")
 
 
 def _xml_escape(s: str) -> str:
