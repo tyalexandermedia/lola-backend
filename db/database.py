@@ -196,3 +196,11 @@ async def get_recent_leads(limit: int = 50) -> List[dict]:
         ) as cur:
             rows = await cur.fetchall()
     return [dict(r) for r in rows]
+
+
+async def count_audits() -> int:
+    """Total Growth Scores / audits ever run (top-of-funnel volume)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT COUNT(*) FROM audits") as cur:
+            row = await cur.fetchone()
+    return (row[0] if row else 0) or 0

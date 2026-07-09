@@ -149,6 +149,23 @@ async def upsert_lead(
         await db.commit()
 
 
+async def lead_counts() -> dict:
+    """Scored-lead counts by temperature, for the owner dashboard."""
+    out = {"total": 0, "hot": 0, "warm": 0, "cool": 0, "cold": 0}
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT temperature, COUNT(*) FROM lead_scores GROUP BY temperature"
+        ) as cur:
+            rows = await cur.fetchall()
+    for temp, c in rows:
+        c = c or 0
+        out["total"] += c
+        t = (temp or "").strip().lower()
+        if t in out:
+            out[t] = c
+    return out
+
+
 async def get_warm_leads(limit: int = 50, only_hot: bool = False) -> List[dict]:
     """
     Return recent warm-or-hotter leads joined with their latest audit row.
