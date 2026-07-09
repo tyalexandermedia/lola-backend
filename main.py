@@ -56,6 +56,7 @@ from followup.runner import (
     stats as followup_stats,
     followup_enabled,
     first_delay_sec as followup_first_delay,
+    build_first_delay_sec as followup_build_first_delay,
 )
 from db.pricing import (
     init_pricing_table,
@@ -3772,8 +3773,25 @@ async def stripe_webhook(request: Request):
     link = f"{PUBLIC_APP_URL}{path}?session_id={sid}"
     print(f"💳 Stripe paid: {tier} · {email or phone or 'no-contact'}")
 
-    # Converted — stop any Growth Score follow-ups for this buyer.
+    # Converted — stop the prospect ('score') follow-up sequence for this buyer.
     asyncio.create_task(mark_followup_purchased(email=email, phone=phone))
+
+    # A Full Build buyer enters the post-build → $297/mo continuity sequence,
+    # timed to land as their 30-day build window closes. Dormant until a
+    # provider is configured; suppressed if they later subscribe.
+    if tier == "build":
+        asyncio.create_task(
+            enroll_followup(
+                audit_id=f"build:{sid}",
+                kind="build",
+                email=email,
+                phone=phone,
+                sms_consent=bool(phone),  # buyer gave their number at checkout
+                business_name=details.get("name") or "",
+                report_url=link,
+                first_delay_sec=followup_build_first_delay(),
+            )
+        )
 
     if email:
         try:

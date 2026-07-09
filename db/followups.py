@@ -21,6 +21,7 @@ DB_PATH = os.getenv("DB_PATH", "lola.db")
 CREATE_TABLE = """
 CREATE TABLE IF NOT EXISTS growth_followups (
     audit_id      TEXT PRIMARY KEY,
+    kind          TEXT NOT NULL DEFAULT 'score',  -- 'score' (prospect) | 'build' (post-build → $297/mo)
     email         TEXT,
     phone         TEXT,
     sms_consent   INTEGER NOT NULL DEFAULT 0,
@@ -45,6 +46,13 @@ async def init_followups_table() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(CREATE_TABLE)
         await db.execute(CREATE_IDX)
+        # Migration: add `kind` to tables created before the build-nurture split.
+        cur = await db.execute("PRAGMA table_info(growth_followups)")
+        cols = {row[1] for row in await cur.fetchall()}
+        if "kind" not in cols:
+            await db.execute(
+                "ALTER TABLE growth_followups ADD COLUMN kind TEXT NOT NULL DEFAULT 'score'"
+            )
         await db.commit()
     print(f"✅ Growth-Score follow-ups table ready at {DB_PATH}")
 
@@ -58,6 +66,7 @@ async def enroll(
     business_name: str,
     report_url: str,
     first_delay_sec: float,
+    kind: str = "score",
 ) -> None:
     """Enroll one lead. No-op if there's no contact channel or it already exists."""
     email = (email or "").strip().lower()
@@ -68,11 +77,12 @@ async def enroll(
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """INSERT OR IGNORE INTO growth_followups
-               (audit_id, email, phone, sms_consent, business_name, report_url,
+               (audit_id, kind, email, phone, sms_consent, business_name, report_url,
                 created_at, step, next_at, purchased, opted_out, done)
-               VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 0, 0, 0)""",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, 0, 0)""",
             (
                 audit_id,
+                kind or "score",
                 email,
                 phone,
                 1 if sms_consent else 0,
@@ -110,8 +120,14 @@ async def advance(audit_id: str, *, step: int, next_at: Optional[float], done: b
         await db.commit()
 
 
-async def mark_purchased(*, email: str = "", phone: str = "") -> None:
-    """Stop the sequence for a converted buyer (matched by email and/or phone)."""
+async def mark_purchased(*, email: str = "", phone: str = "", kind: str = "score") -> None:
+    """
+    Stop a sequence for a converted buyer (matched by email and/or phone).
+
+    Scoped by `kind` so buying the $997 build stops only the prospect ('score')
+    sequence — not the post-build ('build') sequence that pitches the $297/mo
+    continuity. Pass kind='build' when the monthly retainer itself is purchased.
+    """
     email = (email or "").strip().lower()
     phone = (phone or "").strip()
     if not email and not phone:
@@ -119,11 +135,13 @@ async def mark_purchased(*, email: str = "", phone: str = "") -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         if email:
             await db.execute(
-                "UPDATE growth_followups SET purchased = 1 WHERE email = ?", (email,)
+                "UPDATE growth_followups SET purchased = 1 WHERE email = ? AND kind = ?",
+                (email, kind),
             )
         if phone:
             await db.execute(
-                "UPDATE growth_followups SET purchased = 1 WHERE phone = ?", (phone,)
+                "UPDATE growth_followups SET purchased = 1 WHERE phone = ? AND kind = ?",
+                (phone, kind),
             )
         await db.commit()
 
