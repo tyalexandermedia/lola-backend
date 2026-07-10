@@ -1769,8 +1769,12 @@ async def list_applications(
 
 
 def _check_admin(key: str) -> None:
-    expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "")
-    if not expected or key != expected:
+    expected = os.getenv("LOLA_SECRET_ADMIN_KEY", "").strip()
+    if not expected:
+        # No key configured on the server → every request 403s with no clue why.
+        # Return a distinct signal so the UI can say "set LOLA_SECRET_ADMIN_KEY".
+        raise HTTPException(status_code=503, detail="admin_key_unset")
+    if key != expected:
         raise HTTPException(status_code=403, detail="Forbidden")
 
 
@@ -1846,6 +1850,14 @@ async def admin_hq(x_admin_key: str = Header(..., alias="X-Admin-Key")):
             "sms": twilio_enabled(),
             "followups_on": followup_enabled(),
             "mctb_on": mctb_globally_enabled(),
+        },
+        # Live launch-readiness — which integrations are actually configured.
+        "ready": {
+            "stripe": bool(STRIPE_SECRET_KEY),
+            "stripe_webhook": bool(STRIPE_WEBHOOK_SECRET),
+            "email": bool(RESEND_API_KEY),
+            "sms": twilio_enabled(),
+            "ai_visibility": bool(os.getenv("ANTHROPIC_API_KEY", "").strip()),
         },
     }
 

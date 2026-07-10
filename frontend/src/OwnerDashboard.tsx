@@ -22,6 +22,7 @@ interface Hq {
     grade: string; created_at: string;
   }>;
   automation: { email: boolean; sms: boolean; followups_on: boolean; mctb_on: boolean };
+  ready: { stripe: boolean; stripe_webhook: boolean; email: boolean; sms: boolean; ai_visibility: boolean };
 }
 
 function Stat({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
@@ -66,7 +67,8 @@ export default function OwnerDashboard() {
     setError(null);
     try {
       const r = await fetch(`${API_URL}/admin/hq`, { headers: { 'X-Admin-Key': key } });
-      if (r.status === 403) throw new Error('That admin key is no good.');
+      if (r.status === 503) throw new Error('Your server has no admin key set yet. Add LOLA_SECRET_ADMIN_KEY in Railway (see docs/GO-LIVE.md), then reload.');
+      if (r.status === 403) throw new Error('That admin key doesn’t match the one set in Railway.');
       if (!r.ok) throw new Error('Could not load HQ.');
       setData(await r.json());
     } catch (e) {
@@ -134,8 +136,28 @@ export default function OwnerDashboard() {
 
       {data && (
         <>
+          {/* Launch readiness — your live go-live checklist */}
+          <div className="mt-6 rounded-[14px] border border-[#D4AF37]/25 bg-white/[0.02] p-4 sm:p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+              Launch readiness
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Pill on={data.ready.stripe} label="Stripe" />
+              <Pill on={data.ready.stripe_webhook} label="Stripe webhook" />
+              <Pill on={data.ready.email} label="Email (Resend)" />
+              <Pill on={data.ready.sms} label="SMS (Twilio)" />
+              <Pill on={data.ready.ai_visibility} label="AI visibility" />
+            </div>
+            {!data.ready.stripe && (
+              <p className="mt-3 text-[12px] leading-[1.5] text-[#F4D47C]">
+                ⚡ Most important next step: set <span className="font-semibold">Stripe</span> keys +
+                links so you can take payment. See <span className="font-mono">docs/GO-LIVE.md</span>.
+              </p>
+            )}
+          </div>
+
           {/* Automation health */}
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Pill on={data.automation.email} label="Email" />
             <Pill on={data.automation.sms} label="SMS" />
             <Pill on={data.automation.followups_on} label="Nurture" />
