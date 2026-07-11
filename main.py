@@ -144,6 +144,7 @@ from db.reviews import review_counts_for_slug
 from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
 from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webmaster
+from api_clients.ghl import push_growth_score_lead, ghl_enabled
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -1365,6 +1366,23 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 )
             )
 
+            # Bridge the lead into GoHighLevel (contact + "growth-score" tag +
+            # "New Growth Score Lead" stage) and log the attempt to PostHog.
+            # Safe-by-default: no-ops unless GHL_INBOUND_WEBHOOK_URL is set, and
+            # swallows all errors so it never breaks the flow above.
+            asyncio.create_task(
+                push_growth_score_lead(
+                    name=request.business_name,
+                    email=request.email,
+                    phone=request.phone,
+                    city=request.city,
+                    service=business_type,
+                    source="growth-score",
+                    score=total_score,
+                    report_url=f"{PUBLIC_APP_URL}/r/{audit_id}",
+                )
+            )
+
             # Email-only side effects. The Growth Score form makes email optional
             # (phone is the required contact), so only run these when we actually
             # have an email — otherwise we'd key on / send to an empty address.
@@ -1858,6 +1876,7 @@ async def admin_hq(x_admin_key: str = Header(..., alias="X-Admin-Key")):
             "email": bool(RESEND_API_KEY),
             "sms": twilio_enabled(),
             "ai_visibility": bool(os.getenv("ANTHROPIC_API_KEY", "").strip()),
+            "ghl": ghl_enabled(),
         },
     }
 
