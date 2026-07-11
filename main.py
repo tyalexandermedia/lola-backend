@@ -3891,16 +3891,26 @@ async def _send_purchase_email(to_email: str, tier: str, link: str) -> None:
 @app.post("/stripe/webhook")
 async def stripe_webhook(request: Request):
     """
-    Stripe fulfillment. Verifies the signature (when STRIPE_WEBHOOK_SECRET is
-    set); on a paid checkout.session.completed it converts the lead and
-    best-effort texts + emails the buyer their access link. Always returns 200
-    on business-logic hiccups so Stripe doesn't retry forever.
+    Stripe fulfillment. FAILS CLOSED: if STRIPE_WEBHOOK_SECRET is unset the
+    endpoint rejects every request (503) rather than skipping verification —
+    an unauthenticated fulfillment path could otherwise be forged to trigger
+    access-granting side effects. When the secret is set, the Stripe-Signature
+    header is verified with a constant-time HMAC-SHA256 compare. On a paid
+    checkout.session.completed it converts the lead and best-effort texts +
+    emails the buyer their access link. Always returns 200 on business-logic
+    hiccups so Stripe doesn't retry forever.
     """
     body_bytes = await request.body()
-    if STRIPE_WEBHOOK_SECRET:
-        sig = request.headers.get("stripe-signature", "")
-        if not _verify_stripe_sig(STRIPE_WEBHOOK_SECRET, sig, body_bytes):
-            raise HTTPException(status_code=401, detail="Invalid Stripe signature")
+    # Fail closed: without a signing secret we cannot verify authenticity, so
+    # refuse to do any work instead of trusting the payload. (Set
+    # STRIPE_WEBHOOK_SECRET in Railway — it's required to go live anyway.)
+    if not STRIPE_WEBHOOK_SECRET:
+        raise HTTPException(
+            status_code=503, detail="Stripe webhook not configured"
+        )
+    sig = request.headers.get("stripe-signature", "")
+    if not _verify_stripe_sig(STRIPE_WEBHOOK_SECRET, sig, body_bytes):
+        raise HTTPException(status_code=401, detail="Invalid Stripe signature")
     try:
         event = json.loads(body_bytes)
     except json.JSONDecodeError:
