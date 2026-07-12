@@ -87,7 +87,7 @@ While you're answering the phone and quoting jobs, your competitors are ranking 
 
 ### Case study
 
-**{{CASE_STUDY}} (Palm Harbor, FL)** — Started buried. After 3 weeks on the Lola playbook: 5 keywords ranked, and ChatGPT now recommends them by name for "house wash Palm Harbor." (Attributed case study — your results will vary.)
+**{{CASE_STUDY}} (Palm Harbor, FL)** — A 15-year family pressure-washing business running the Lola playbook, with every ranking move tracked on a live public dashboard anyone can open — no login, no screenshots. (Results publish there as they're measured; your results will vary.)
 
 ---
 

@@ -29,7 +29,7 @@ from db.outreach import (
 )
 from outreach.leads import Lead
 from outreach.llm_variants import render_variant
-from outreach.templates import VariantKey
+from outreach.templates import VariantKey, active_variants
 from outreach.warmup import daily_cap_for_today
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
@@ -192,7 +192,8 @@ async def run_batch(leads: List[Lead], dry_run: bool = False) -> dict:
 
     async with httpx.AsyncClient() as client:
         for i, lead in enumerate(eligible):
-            variant: VariantKey = ["A", "B", "C", "D", "E"][i % 5]  # type: ignore[assignment]
+            rotation = active_variants()
+            variant: VariantKey = rotation[i % len(rotation)]
             ok, msg_id, subject, _body, reply_alias = await send_one(
                 client, lead, variant, dry_run=dry_run
             )

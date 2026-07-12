@@ -401,8 +401,8 @@ export default function RetainerPage() {
               </p>
               <p>
                 My first proof story is my dad's business — Sandbar Soft Wash in Palm Harbor —{' '}
-                <a href="/case-studies/sandbar" className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
-                  5 keywords ranked in 3 weeks
+                <a href="/r/client/sandbar" className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
+                  tracked in the open on a live public dashboard
                 </a>
                 . Same system I'll run on yours.
               </p>

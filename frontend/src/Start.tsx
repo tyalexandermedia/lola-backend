@@ -122,8 +122,8 @@ export default function Start() {
         </p>
         <p className="text-[13px] text-[#9CA3AF]">
           Real proof:{' '}
-          <a href="/case-studies/sandbar" className="text-[#D4AF37] underline-offset-2 hover:underline">
-            Sandbar Soft Wash — 5 keywords ranked in 3 weeks →
+          <a href="/r/client/sandbar" className="text-[#D4AF37] underline-offset-2 hover:underline">
+            Sandbar Soft Wash — watch the live ranking dashboard →
           </a>
         </p>
       </section>

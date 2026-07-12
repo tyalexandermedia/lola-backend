@@ -189,7 +189,7 @@ def _content(step: int, row: dict) -> dict:
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
-    # step 3 — final, EMAIL ONLY (introduces the $299/mo option)
+    # step 3 — final, EMAIL ONLY (introduces the $297/mo option)
     subject = "Last note from Lola 🐾"
     html = _email_wrap(
         "One last thing",

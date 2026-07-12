@@ -17,10 +17,10 @@ export default function SharedReport({ auditId }: { auditId: string }) {
       try {
         const resp = await fetch(`${API_URL}/audits/${encodeURIComponent(auditId)}`);
         if (resp.status === 404) {
-          throw new Error('That audit has wandered off. Check the link.');
+          throw new Error('That Growth Score has wandered off. Check the link.');
         }
         if (!resp.ok) {
-          throw new Error('Could not load this audit.');
+          throw new Error('Could not load this Growth Score.');
         }
         const data: AuditResult = await resp.json();
         if (!cancelled) setAudit(data);
@@ -53,12 +53,12 @@ export default function SharedReport({ auditId }: { auditId: string }) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-semibold text-white">Lola lost the scent.</h2>
-        <p className="mt-3 max-w-md text-base text-slate-400">{error ?? 'Audit not available.'}</p>
+        <p className="mt-3 max-w-md text-base text-slate-400">{error ?? 'Growth Score not available.'}</p>
         <a
           href="/"
           className="mt-8 rounded-2xl bg-gradient-to-r from-[#FFD166] via-[#F4B942] to-[#E09E23] px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25"
         >
-          Run your own audit
+          Run your own Growth Score
         </a>
       </main>
     );
@@ -66,7 +66,7 @@ export default function SharedReport({ auditId }: { auditId: string }) {
 
   return (
     <>
-      <ResultsStage audit={audit} cta={{ label: 'Run your own audit', href: '/' }} />
+      <ResultsStage audit={audit} cta={{ label: 'Run your own Growth Score', href: '/' }} />
       <AiVisibility
         business={audit.business_name}
         city={audit.city}

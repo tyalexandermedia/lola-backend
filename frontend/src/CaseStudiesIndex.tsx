@@ -16,6 +16,12 @@ import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
+// D-014: the Sandbar case-study page is held until the ranking tracker has
+// verified day-0 → day-30 receipts. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true
+// to republish the card + page together.
+const SHOW_SANDBAR_CASE_STUDY =
+  (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) === 'true';
+
 export default function CaseStudiesIndex() {
   useReveal();
   useEffect(() => {
@@ -94,37 +100,39 @@ export default function CaseStudiesIndex() {
           Published
         </p>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-          <a
-            href="/case-studies/sandbar"
-            onClick={() => track('case_studies_card_clicked', { slug: 'sandbar' })}
-            className="group relative flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.10)] transition-all hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-[0_0_44px_rgba(212,175,55,0.22)] sm:p-7"
-          >
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-              Pressure Washing · Palm Harbor, FL
-            </p>
-            <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
-              Sandbar Soft Wash
-            </h2>
-            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-              From invisible to 5 ranked keywords in 3 weeks. The original proof story
-              — Coach Ty&apos;s father&apos;s 15+ year master-certified family business, and
-              the reason Lola exists.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
-                5 keywords
-              </span>
-              <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
-                3 weeks
-              </span>
-              <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
-                20+ cities
-              </span>
-            </div>
-            <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition group-hover:translate-x-1">
-              Read the case study →
-            </p>
-          </a>
+          {SHOW_SANDBAR_CASE_STUDY && (
+            <a
+              href="/case-studies/sandbar"
+              onClick={() => track('case_studies_card_clicked', { slug: 'sandbar' })}
+              className="group relative flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.10)] transition-all hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-[0_0_44px_rgba(212,175,55,0.22)] sm:p-7"
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                Pressure Washing · Palm Harbor, FL
+              </p>
+              <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
+                Sandbar Soft Wash
+              </h2>
+              <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+                The original proof story — Coach Ty&apos;s father&apos;s 15+ year
+                master-certified family business, and the reason Lola exists. Every
+                move tracked in the open.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                  Live tracker
+                </span>
+                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                  20+ cities
+                </span>
+                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                  15+ years
+                </span>
+              </div>
+              <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition group-hover:translate-x-1">
+                Read the case study →
+              </p>
+            </a>
+          )}
 
           {/* Live dashboard card — public proof you can hand a prospect. */}
           <a

@@ -51,7 +51,7 @@ Hard rules per variant:
 - Use the Growth Score link placeholder exactly: {{audit_link}}
 - Use the unsubscribe-link placeholder exactly: {{unsub_link}} (on its own line at the end)
 - Sign as "— Ty\\nTampa Bay"
-- One of the three variants (not all three) references the Sandbar Soft Wash result: "5 keywords ranked in 3 weeks"
+- One of the three variants (not all three) may reference Sandbar Soft Wash ONLY as: the 15-year Palm Harbor family business Lola was built for, with rankings tracked on a live public dashboard. NEVER state ranking counts, timeframes, or review numbers as results — no unverified claims.
 
 Style per variant:
 - A: curiosity-led question, conversational opener

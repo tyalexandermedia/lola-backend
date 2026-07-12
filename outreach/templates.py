@@ -6,8 +6,9 @@ Token replacement: {{first_name}}, {{business_name}}, {{city}}, {{audit_link}},
 {{unsub_link}}.
 """
 
+import os
 from dataclasses import dataclass
-from typing import Dict, Literal
+from typing import Dict, List, Literal
 
 VariantKey = Literal["A", "B", "C", "D", "E"]
 
@@ -70,9 +71,9 @@ Founder, Lola SEO · Tampa Bay, FL
         subject_tmpl="How Sandbar Soft Wash got picked by AI agents",
         body_tmpl="""Hey {{first_name}},
 
-Last month Sandbar Soft Wash in Palm Harbor became the contractor AI agents recommend in their service area. 5 keywords ranked in 3 weeks. Real local results.
+Sandbar Soft Wash in Palm Harbor — a 15-year family pressure-washing business — runs on the Lola playbook, with every ranking move tracked on a live public dashboard anyone can open. No login, no screenshots.
 
-I built the system that did it — now I'm offering free Growth Scores to Florida contractors who want the same thing.
+I built that system — now I'm offering free Growth Scores to Florida contractors who want the same thing.
 
 Yours for {{business_name}}:
 
@@ -124,7 +125,7 @@ Free Growth Score for {{business_name}}:
 
 {{audit_link}}
 
-20 seconds, no signup. If the audit's useful, we can talk. If not, no follow-up.
+20 seconds, no signup. If the Growth Score's useful, we can talk. If not, no follow-up.
 
 — Ty
 Founder, Lola SEO · Tampa Bay, FL
@@ -133,6 +134,16 @@ Founder, Lola SEO · Tampa Bay, FL
 """,
     ),
 }
+
+
+# D-014: variants C and E are HELD out of the send rotation until verified
+# Sandbar ranking receipts exist (C is the social-proof variant; E was the
+# "audit"-wording variant). Re-enable with OUTREACH_ACTIVE_VARIANTS=A,B,C,D,E.
+def active_variants() -> List[VariantKey]:
+    raw = os.getenv("OUTREACH_ACTIVE_VARIANTS", "A,B,D")
+    keys = [k.strip().upper() for k in raw.split(",")]
+    picked = [k for k in keys if k in VARIANTS]
+    return picked or ["A", "B", "D"]  # type: ignore[return-value]
 
 
 def render(variant_key: VariantKey, tokens: Dict[str, str]) -> tuple[str, str]:

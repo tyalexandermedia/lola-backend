@@ -72,7 +72,7 @@ Emergency plumbing searches in Tampa happen on phones, mostly at night, mostly d
 
 ### Case study
 
-{{CASE_STUDY}} — a Palm Harbor service contractor — went from buried to 5 ranked keywords in 3 weeks on the Lola playbook; an attributed case study, results vary. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
+{{CASE_STUDY}} — a Palm Harbor service contractor — runs the Lola playbook with rankings tracked on a live public dashboard; results publish there as they're measured, and results vary. Plumbing search volume in Tampa is 3x higher than soft wash — your ROI math should be even better.
 
 ---
 

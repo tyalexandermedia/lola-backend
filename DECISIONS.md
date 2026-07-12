@@ -113,3 +113,34 @@ Bay Power Clean, Travels by Val**. Proof sections auto-hide when empty.
 disqualifying.
 
 **Consequences.** Never invent stats, logos, or reviews. Empty → hidden.
+
+## 2026-07-12 — D-013: Managed price standardized to $297/mo
+
+**Decision.** The optional "Lola Managed" retainer is **$297/month** everywhere:
+`docs/PRICING.md` (canonical), `db/pricing.py::RETAINER_PRICE`, the follow-up
+nurture default (`FOLLOWUP_MANAGED_PRICE`), GO-LIVE, and the Stripe Managed
+subscription link when it's created.
+
+**Why.** Docs and code had drifted ($299 in PRICING.md/db/pricing.py vs $297 in
+every operational doc and the live nurture copy). Customers were about to be
+quoted a price that disagreed with the source of truth.
+
+**Consequences.** $299 is retired. Any surface quoting the monthly uses $297;
+the Stripe subscription link must be created at $297.
+
+## 2026-07-12 — D-014: Unverified proof pulled pending verified 30-day results
+
+**Decision.** All hard-number results claims for Sandbar Soft Wash ("5 keywords
+ranked in 3 weeks", "More 5-star reviews", map-pack claims) are removed from
+customer-facing copy. The Sandbar case-study page (`/case-studies/sandbar`) and
+cold-outreach variants C and E are **held** — page gated behind
+`VITE_SHOW_SANDBAR_CASE_STUDY`, variants held via `OUTREACH_ACTIVE_VARIANTS`
+(default A,B,D) — until the ranking tracker has real day-0 → day-30 receipts.
+
+**Why.** The measurement doc's ranking tables are blank and Sandbar has 0
+Google reviews; publishing results before they're measured violates the
+no-fabricated-proof rule on a real client with the family name on it.
+
+**Consequences.** Proof copy references only verifiable facts (15+ years,
+20+ cities, the live public dashboard). Claims return only with tracker
+receipts, by flipping the two flags above.

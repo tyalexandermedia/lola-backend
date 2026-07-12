@@ -45,7 +45,7 @@ plus the one move that lifts you fastest.
 - Delivered via **text + email within 24 hours** of submission.
 - No pricing mentioned on the opt-in form.
 
-Funnel: **Free Growth Score → (DIY $197) or (Full Build $997) → optional $299/mo retainer (email only).**
+Funnel: **Free Growth Score → (DIY $197) or (Full Build $997) → optional $297/mo retainer (email only).**
 
 ---
 
@@ -75,10 +75,11 @@ Funnel: **Free Growth Score → (DIY $197) or (Full Build $997) → optional $29
 
 ## Optional retainer — EMAIL ONLY (never on any page)
 
-- **$299/month** ongoing management. Totally optional.
+- **$297/month** ongoing management. Totally optional. (D-013: standardized to $297 —
+  matches the nurture default, GO-LIVE, COWORK_BRIEF, and the Stripe Managed link.)
 - Introduced **only in the final follow-up email touch** after a prospect has engaged, framed
   exactly as:
-  > "Once it's live, some clients want us to keep it optimized — that's $299/month, totally optional."
+  > "Once it's live, some clients want us to keep it optimized — that's $297/month, totally optional."
 
 ---
 

@@ -1055,7 +1055,7 @@ const GUIDE_URL =
 
 const CASE_STUDY_URL =
   (import.meta.env.VITE_CASE_STUDY_URL as string | undefined) ||
-  '/case-study/softwash-pro';
+  '/r/client/sandbar';
 
 function withUtm(
   url: string,
@@ -1255,7 +1255,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             onClick={onCaseStudyClick}
             className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
           >
-            → Read how Sandbar Soft Wash ranked 5 keywords in 3 weeks
+            → See the playbook running on Sandbar Soft Wash — live dashboard
           </a>
           {cta.href ? (
             <a
