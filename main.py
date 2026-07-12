@@ -2085,7 +2085,7 @@ async def public_client_dashboard(slug: str):
     avg_job_value = int((rc or {}).get("avg_job_value") or 400)
     attributed = attributed_value(tracking, avg_job_value=avg_job_value)
     # Map any active client → the monthly $ basis for CPL math. Ongoing clients
-    # are on the optional $299/mo management retainer; the one-time DIY guide has
+    # are on the optional $297/mo management retainer; the one-time DIY guide has
     # no recurring spend. Legacy roadmap/tier names still resolve for older records.
     held = await _safe(locks_for_slug(slug, active_only=True), [])
     tier = (held[0]["tier"] if held else "build").lower()

@@ -11,7 +11,7 @@ Model: a simple two-tier offer, both one-time.
 
 Replaces the retired Foundation → Growth → Scale roadmap ($297 / $497 / $697 / $997+).
 The Growth Score stays the free, branded, top-of-funnel lead magnet. The optional
-$299/mo retainer is introduced ONLY in the final follow-up email, never modeled as a tier.
+$297/mo retainer is introduced ONLY in the final follow-up email, never modeled as a tier.
 
 The DB-backed counter is retained (function signatures unchanged for import
 compatibility) as a simple build-signup counter.
@@ -30,7 +30,7 @@ BUILD_PRICE = 997          # one-time — Full Build (site + 30-day visibility +
 
 # Optional, EMAIL-ONLY retainer. Never surfaced on a page; introduced only in the
 # final follow-up email. Modeled here purely so backend copy has one source.
-RETAINER_PRICE = 299       # /mo — totally optional ongoing management
+RETAINER_PRICE = 297       # /mo — totally optional ongoing management (D-013: $297 canonical)
 
 PRICE_RANGE = "$197-$997"
 

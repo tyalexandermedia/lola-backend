@@ -55,7 +55,7 @@ const SCORING_LINES = [
   'Pulling your Google Business Profile…',
   'Sweeping citations across the top 10 directories…',
   'Asking ChatGPT, Perplexity, and Gemini what they say about you…',
-  'Auditing on-page signals + schema…',
+  'Scanning on-page signals + schema…',
   'Scoring your six growth dimensions…',
 ];
 

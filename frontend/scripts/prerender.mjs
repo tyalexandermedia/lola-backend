@@ -52,7 +52,9 @@ const ROUTES = [
   '/diy',
   '/methodology',
   '/case-studies',
-  '/case-studies/sandbar',
+  // D-014: /case-studies/sandbar held until verified ranking receipts exist —
+  // prerendered only when the same flag that publishes the route is set.
+  ...(process.env.VITE_SHOW_SANDBAR_CASE_STUDY === 'true' ? ['/case-studies/sandbar'] : []),
   '/vs',
   '/vs/localiq',
   '/vs/brightlocal',

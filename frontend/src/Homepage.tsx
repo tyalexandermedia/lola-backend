@@ -195,7 +195,7 @@ export default function Homepage() {
             <>
               Lola's built for{' '}
               <span className="font-semibold text-white">{tradePlural} in Florida</span>.
-              Book a free call below — or run the audit first.
+              Book a free call below — or run your free Growth Score first.
             </>
           ) : (
             <>
@@ -399,7 +399,7 @@ export default function Homepage() {
       <section className="mt-14 sm:mt-20">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
-            { value: 20, suffix: ' sec', label: 'Audit completion time' },
+            { value: 20, suffix: ' sec', label: 'Growth Score completion time' },
             { value: 1800, prefix: '$', suffix: '/mo', label: 'Saved vs premium agencies' },
             { value: 20, suffix: '+ cities', label: 'Sandbar Soft Wash service area' },
             { value: 30, suffix: ' days', label: 'Half-Back Guarantee window' },

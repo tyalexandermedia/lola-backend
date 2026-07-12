@@ -72,7 +72,7 @@ Tampa's HVAC market is a 110°F bidding war on Google. Lola gets your business r
 
 ### Case study
 
-{{CASE_STUDY}} — a Tampa Bay soft wash company — went from buried to ranking 5 money keywords in 3 weeks and now shows up in the map pack for their money terms (attributed case study — results vary). HVAC case studies coming as our first HVAC clients ramp — yours could be next.
+{{CASE_STUDY}} — a Tampa Bay soft wash company — runs the Lola playbook with every ranking move tracked on a live public dashboard (results publish there as they're measured; results vary). HVAC case studies coming as our first HVAC clients ramp — yours could be next.
 
 ---
 

@@ -320,18 +320,19 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── 7. TESTIMONIAL ────────────────────────────────────────────── */}
+      {/* ── 7. PROOF (live tracker, not a testimonial — no invented quotes
+             or star ratings; D-014 keeps results claims off until measured) ── */}
       <figure className="mx-auto mt-16 max-w-[600px] rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#15110A] p-7 text-center shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:mt-20 sm:p-9">
-        <div className="flex justify-center gap-1 text-[#D4AF37]" aria-label="5 stars">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <span key={i} aria-hidden className="text-[14px]">★</span>
-          ))}
-        </div>
-        <blockquote className="mt-4 text-[17px] italic leading-[1.5] text-white sm:text-[19px]">
-          “Sandbar Soft Wash: 5 keywords ranked in 3 weeks.”
+        <blockquote className="text-[17px] italic leading-[1.5] text-white sm:text-[19px]">
+          Our first build is family: Sandbar Soft Wash, a 15-year Palm Harbor
+          operation. Every ranking move is tracked on a{' '}
+          <a href="/r/client/sandbar" className="not-italic font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
+            live public dashboard
+          </a>{' '}
+          — no login, no sales screenshot.
         </blockquote>
         <figcaption className="mt-4 text-[13px] font-medium text-[#D4AF37] sm:text-[14px]">
-          — Lola OS Case Study, Palm Harbor FL
+          — Sandbar Soft Wash · Palm Harbor, FL
         </figcaption>
       </figure>
 

@@ -975,7 +975,8 @@ def render_sitemap(slugs):
         ("/lp/industries", "monthly", "0.8"),
         ("/methodology", "monthly", "0.8"),
         ("/case-studies", "monthly", "0.82"),
-        ("/case-studies/sandbar", "monthly", "0.85"),
+        # D-014: /case-studies/sandbar held (gated behind VITE_SHOW_SANDBAR_CASE_STUDY)
+        # until verified ranking receipts exist — re-add here when republished.
         # High-intent comparison pages — keep in sync with COMPETITORS
         # in frontend/src/VsPage.tsx.
         ("/vs", "monthly", "0.88"),

@@ -72,7 +72,7 @@ A single ranked keyword in Florida roofing is worth $20K–$80K/year in real job
 
 ### Case study
 
-{{CASE_STUDY}} (Palm Harbor) went from buried to 5 ranked keywords in 3 weeks on the Lola playbook — an attributed case study; results vary. Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
+{{CASE_STUDY}} (Palm Harbor) runs the Lola playbook with rankings tracked on a live public dashboard — results publish there as they're measured; results vary. Roofing has higher search volume and higher ticket sizes, so the ROI math is even better. Specific roofing case studies coming as we onboard our first roofing clients — be the first.
 
 ---
 

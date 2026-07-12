@@ -25,6 +25,10 @@ const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
+// D-014: Sandbar case-study page held (404) until verified ranking receipts
+// exist. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true in Vercel to republish.
+const SHOW_SANDBAR_CASE_STUDY =
+  (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) === 'true';
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
@@ -210,7 +214,7 @@ function App() {
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
-          {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
+          {route.name === 'case-study' && route.slug === 'sandbar' && (SHOW_SANDBAR_CASE_STUDY ? <SandbarCaseStudy /> : <NotFound />)}
           {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
           {route.name === 'vs' && <VsPage slug={route.slug} />}
           {route.name === 'vs-hub' && <VsHub />}
@@ -326,7 +330,9 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/retainer">The $997 Full Build</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
-          <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
+          {SHOW_SANDBAR_CASE_STUDY && (
+            <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
+          )}
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
         </FooterCol>

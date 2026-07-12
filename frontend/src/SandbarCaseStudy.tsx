@@ -33,7 +33,7 @@ export default function SandbarCaseStudy() {
     if (desc) {
       desc.setAttribute(
         'content',
-        'How Lola moved Sandbar Soft Wash — a 15+ year Palm Harbor pressure-washing business — from invisible to 5 ranked keywords in 3 weeks. The case study that proves the playbook.',
+        'How Lola rebuilt local visibility for Sandbar Soft Wash — a 15+ year Palm Harbor pressure-washing business — with every move tracked on a live public dashboard.',
       );
     }
 
@@ -42,7 +42,7 @@ export default function SandbarCaseStudy() {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: 'Sandbar Soft Wash — Local Visibility Case Study',
-        description: 'How Lola moved Sandbar Soft Wash from invisible to 5 ranked keywords in 3 weeks in Palm Harbor, FL.',
+        description: 'How Lola rebuilt local visibility for Sandbar Soft Wash in Palm Harbor, FL — tracked in the open on a live public dashboard.',
         author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
         publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
         about: 'Sandbar Soft Wash',
@@ -103,9 +103,9 @@ export default function SandbarCaseStudy() {
         >
           Sandbar Soft Wash —{' '}
           <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
-            invisible to ranked
-          </span>{' '}
-          in 3 weeks.
+            the business Lola was built for
+          </span>
+          .
         </h1>
         <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
           The original proof story. Lola was built to fix Sandbar — Coach Ty&apos;s father&apos;s
@@ -115,12 +115,13 @@ export default function SandbarCaseStudy() {
           <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">sandbarsoftwash.com</a>.
         </p>
 
-        {/* Verified-claims stat bar — every number here appears elsewhere
-            on the site in production (Marquee, Homepage stats, /pricing). */}
+        {/* Stat bar — verifiable business facts + the live tracker only.
+            Ranking-result numbers stay OFF this page until the measurement
+            doc has real day-0 → day-30 snapshots to cite (D-014). */}
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
-            { v: '5', l: 'keywords ranked' },
-            { v: '3 wks', l: 'to first wins' },
+            { v: 'Live', l: 'public ranking dashboard' },
+            { v: 'Weekly', l: 'work-delivered feed' },
             { v: '20+', l: 'cities served' },
             { v: '15+', l: 'years in business' },
           ].map((s) => (
@@ -191,9 +192,9 @@ export default function SandbarCaseStudy() {
           {[
             {
               w: 'Week 1',
-              h: 'GBP rebuild + audit',
-              body: 'Ran the full Lola audit. Rebuilt Google Business Profile: primary + secondary categories, full service list, hours, photo cadence, first GBP posts. Pulled the existing citation footprint and identified the NAP-inconsistent listings to fix.',
-              moves: ['Full Lola audit run', 'GBP categories + service list rebuilt', 'Photo cadence started (weekly batches)', 'Citation footprint mapped'],
+              h: 'GBP rebuild + Growth Score',
+              body: 'Ran the full Lola Growth Score. Rebuilt Google Business Profile: primary + secondary categories, full service list, hours, photo cadence, first GBP posts. Pulled the existing citation footprint and identified the NAP-inconsistent listings to fix.',
+              moves: ['Full Lola Growth Score run', 'GBP categories + service list rebuilt', 'Photo cadence started (weekly batches)', 'Citation footprint mapped'],
             },
             {
               w: 'Week 2',
@@ -205,13 +206,13 @@ export default function SandbarCaseStudy() {
               w: 'Week 3',
               h: 'AI search + review velocity',
               body: 'Started tracking what AI agents (Claude in AI Mode) said when asked the high-intent queries — "best pressure washer in Palm Harbor," etc. Stood up the review-request system so post-service text + email asks land within 24 hours of every job.',
-              moves: ['AI Mode tracker running on 6 high-intent prompts', 'Review-request automation live (SMS + email)', 'First measurable ranking movement landed'],
+              moves: ['AI Mode tracker running on 6 high-intent prompts', 'Review-request automation live (SMS + email)', 'Ranking tracker live — every snapshot logged'],
             },
             {
               w: 'Ongoing',
               h: 'Every week, more visible',
               body: 'The same proven checklist runs every week, and you can watch exactly what got done on a live dashboard. We also track whether ChatGPT, Perplexity, and Gemini name Sandbar when people ask for a pressure washer — and who they name instead when they don’t.',
-              moves: ['Fresh Google posts weekly', 'More 5-star reviews', 'Getting named by the AI tools', 'Checked every month'],
+              moves: ['Fresh Google posts weekly', 'Review request after every job', 'AI answers tracked weekly', 'Checked every month'],
             },
           ].map((p) => (
             <div key={p.w} className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-7">
@@ -246,15 +247,16 @@ export default function SandbarCaseStudy() {
           className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
-          5 keywords ranked. 3 weeks. Same playbook every Lola client gets.
+          Same playbook every Lola client gets — tracked in the open.
         </h2>
         <p className="mt-4 max-w-[720px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           What we promised at the start of the engagement: <span className="text-white font-semibold">visibility, clicks, calls,
-          form fills.</span> What landed in the first month: five ranked keywords in
-          Palm Harbor and surrounding markets, a Google Business Profile that finally
-          looked like a 15-year operation, and AI agents starting to name Sandbar when
-          buyers asked. Closing the leads is still on the crew — that&apos;s the craft, and
-          they&apos;re great at it.
+          form fills.</span> What the first month built: a Google Business Profile that
+          finally looks like a 15-year operation, a clean citation footprint, schema AI
+          agents can actually read, and a public ranking tracker logging every snapshot.
+          The results publish themselves on the live dashboard below — we don&apos;t quote
+          numbers here until the tracker has the receipts. Closing the leads is still on
+          the crew — that&apos;s the craft, and they&apos;re great at it.
         </p>
       </section>
 
@@ -302,10 +304,10 @@ export default function SandbarCaseStudy() {
         <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
           Sandbar is Coach Ty&apos;s family business and the reason Lola was built — we
           have a clear conflict of interest in writing about them, so we&apos;re flagging it
-          out loud. The numbers above (5 keywords / 3 weeks / 20+ cities / 15+ years) are
-          claims we already publish on the homepage and in our pricing — nothing fabricated for
-          this page. The live dashboard linked above shows the real tracker as it stands today;
-          its time-series graphs fill in as the weekly snapshots accumulate.
+          out loud. The only numbers on this page (20+ cities / 15+ years) are verifiable
+          facts about the business itself. Ranking and review results are deliberately
+          absent: they publish on the live dashboard linked above as the weekly snapshots
+          accumulate, and we&apos;ll quote them here only once that tracker shows them.
         </p>
       </section>
 

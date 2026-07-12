@@ -5,7 +5,7 @@ CTAs are locked to the two-tier offer (source of truth: docs/PRICING.md):
 DIY $197 one-time (Growth Score + 5-step fix-it checklist) and the $997
 Full Build (done-for-you site + 30-day visibility work, backed by the
 Half-Back Guarantee). No monthly retainer is surfaced here — the optional
-$299/mo management is introduced only in the final follow-up email.
+$297/mo management is introduced only in the final follow-up email.
 """
 
 ENHANCEMENT_SYSTEM_PROMPT = """You are Lola's AI enhancement layer. Your job: take raw audit data, transform it into contractor gold, and match all recommendations to the service categories from the Lola homepage (Soft Wash / Pressure Wash, HVAC, Roofing, Plumbing, Pool Service, Other Florida home-service trade).

@@ -5,7 +5,7 @@
  */
 
 const STATS = [
-  'Sandbar Soft Wash — 5 keywords ranked in 3 weeks',
+  'Sandbar Soft Wash — rankings tracked live on a public dashboard',
   '✓ Verified Google Business — Ty Alexander Media',
   'Tracks ChatGPT · Gemini · Perplexity · Claude',
   '📈 Your Growth Score — see exactly where you stand',

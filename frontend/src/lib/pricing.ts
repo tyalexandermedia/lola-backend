@@ -11,7 +11,7 @@
  * Replaces the retired Foundation → Growth → Scale roadmap ($297 / $497 / $697 / $997+).
  * The Growth Score stays the free, branded, top-of-funnel lead magnet.
  *
- * The $299/mo optional retainer is intentionally NOT modeled here: it is introduced
+ * The $297/mo optional retainer is intentionally NOT modeled here: it is introduced
  * ONLY in the final follow-up email, never on any page.
  */
 
