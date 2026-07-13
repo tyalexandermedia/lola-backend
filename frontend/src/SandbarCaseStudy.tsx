@@ -16,6 +16,8 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
+import BeforeAfterSlider from './BeforeAfterSlider';
+import { SANDBAR_JOBS } from './lib/sandbarJobs';
 
 const CALENDAR_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
@@ -259,6 +261,33 @@ export default function SandbarCaseStudy() {
           the crew — that&apos;s the craft, and they&apos;re great at it.
         </p>
       </section>
+
+      {/* ── REAL JOBS (before/after) ──────────────────────── */}
+      {/* Auto-hides while the manifest is empty — only real Sandbar job
+          photos ever render here (no stock, no third-party watermarks). */}
+      {SANDBAR_JOBS.length > 0 && (
+        <section className="mt-14 sm:mt-20">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+            The craft itself
+          </p>
+          <h2
+            className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+            style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
+          >
+            Real jobs. Drag to see the difference.
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {SANDBAR_JOBS.map((j) => (
+              <figure key={j.before}>
+                <BeforeAfterSlider before={j.before} after={j.after} alt={j.alt} />
+                <figcaption className="mt-2.5 text-[12px] uppercase tracking-[0.14em] text-[#9CA3AF]">
+                  {j.label}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── SEE IT LIVE ───────────────────────────────────── */}
       {/* Turns the proof story into LIVE proof: the same dashboard every
