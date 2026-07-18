@@ -12,3 +12,7 @@ frontend/node_modules/
 # Claude Code local-only settings (per-user)
 .claude/settings.local.json
 .claude/worktrees/
+
+# GHL review-segment: never commit customer PII exports or local secrets
+reports/*.csv
+.env
