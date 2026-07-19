@@ -205,7 +205,8 @@
   --accent:#2C93A6;                                   /* bright blue accent */
   --accent-2:#177687;
   --accent-text:#0e6273;                              /* accent as text on white (AA) */
-  --btn:linear-gradient(135deg,#0e6273,#0c4d5a);      /* primary fill; white text AA-safe */
+  --btn:linear-gradient(135deg,#B85A1C,#9E4114);   /* sunset primary CTA (white text AA-safe) */
+  --sunset:#E07B39;      /* primary fill; white text AA-safe */
   --btn-hover:linear-gradient(135deg,#177687,#0e6273);
   --tint:#eef6f7;                                     /* light hover tint */
   --focus:#177687;                                    /* focus ring (>=3:1 on white) */
@@ -500,15 +501,47 @@ details:hover,details[open]{border-color:var(--accent-2)}
 .service-card.featured .mini{background:rgba(224,123,57,.14);border-color:rgba(224,123,57,.4);color:#8a4514}
 .svc-chip{border-color:#e7e0d2}
 .card::before,.hero{--_x:0}
+
+/* ---- Coastal identity: badge logo, sunset CTAs, hero wave ---- */
+svg.mark{width:46px;height:46px;background:none;border-radius:0;box-shadow:0 4px 10px rgba(11,42,56,.22)}
+.hero::after{background:radial-gradient(58% 55% at 20% 16%,rgba(240,150,70,.30),transparent 60%),radial-gradient(52% 52% at 86% 30%,rgba(44,147,166,.22),transparent 62%)}
+.hero{position:relative;overflow:hidden}
+.hero .shell.hero-grid{padding-bottom:96px}
+.hero-wave{position:absolute;left:0;right:0;bottom:-1px;line-height:0;pointer-events:none;z-index:1}
+.hero-wave svg{display:block;width:100%;height:64px}
+.button:not(.secondary):hover,.money-btn.primary:hover{filter:saturate(1.06) brightness(1.03)}
+.service-card.featured{border-left-color:#E07B39}
+@media(max-width:640px){.hero .shell.hero-grid{padding-bottom:70px}.hero-wave svg{height:40px}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sb-badge" viewBox="0 0 120 120">
+<defs>
+<linearGradient id="sbSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C56B"/><stop offset=".55" stop-color="#EE9A4D"/><stop offset="1" stop-color="#E07B39"/></linearGradient>
+<clipPath id="sbClip"><circle cx="60" cy="60" r="50"/></clipPath>
+</defs>
+<circle cx="60" cy="60" r="58" fill="#0B2A38"/>
+<circle cx="60" cy="60" r="50" fill="url(#sbSky)"/>
+<g clip-path="url(#sbClip)">
+<circle cx="60" cy="49" r="15" fill="#FCE7B0"/>
+<path d="M8 74 q12 -7 25 0 t25 0 t25 0 t25 0 V112 H8 Z" fill="#2A93A6"/>
+<path d="M8 85 q12 -6 25 0 t25 0 t25 0 t25 0 V114 H8 Z" fill="#12626F"/>
+<path d="M63 51 q7 16 4 31" fill="none" stroke="#0B2A38" stroke-width="4.5" stroke-linecap="round"/>
+<g fill="#0B2A38">
+<path d="M63 49 q-21 -10 -31 -1 q17 -4 31 6 Z"/>
+<path d="M63 49 q21 -10 31 -1 q-17 -4 -31 6 Z"/>
+<path d="M63 47 q-14 -16 -29 -12 q14 0 29 17 Z"/>
+<path d="M63 47 q14 -16 29 -12 q-14 0 -29 17 Z"/>
+</g>
+</g>
+<circle cx="60" cy="60" r="50" fill="none" stroke="#FBF6EC" stroke-width="2.5" opacity=".5"/>
+</symbol></svg>
 <a href="#main-content" class="skip-link focus-ring">Skip to main content</a>
 <div class="topbar">Making Florida Homes Shine · Serving Dunedin, Clearwater, Palm Harbor &amp; all of Pinellas County</div>
 <header class="nav">
   <div class="shell nav-inner">
     <a class="brand" href="/" aria-label="Sandbar Exterior Cleaning home">
-      <span class="mark">SB</span>
+      <svg class="mark" viewBox="0 0 120 120" role="img" aria-label="Sandbar Exterior Cleaning logo"><use href="#sb-badge"/></svg>
       <span class="wordmark">Sandbar <span>Exterior Cleaning</span></span>
     </a>
     <nav class="nav-links" aria-label="Primary navigation">
@@ -562,6 +595,7 @@ details:hover,details[open]{border-color:var(--accent-2)}
         </form>
       </aside>
     </div>
+  <div class="hero-wave" aria-hidden="true"><svg viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0 34 C 220 82 430 82 720 50 C 1010 18 1230 22 1440 52 L1440 80 L0 80 Z" fill="#f5efe1"/></svg></div>
   </section>
   <section class="trust-bar" aria-label="Why Dunedin homeowners choose Sandbar Exterior Cleaning">
     <div class="shell trust-bar-grid">
