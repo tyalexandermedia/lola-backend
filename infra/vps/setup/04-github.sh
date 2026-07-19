@@ -54,9 +54,13 @@ Host github.com
     User git
     IdentityFile $KEY
     IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
 EOF
     ok "SSH configured to use this key for github.com."
 fi
+# Pre-trust GitHub's published host keys so the yes/no prompt never blocks the test
+ssh-keyscan -t ed25519 github.com 2>/dev/null >> ~/.ssh/known_hosts
+sort -u ~/.ssh/known_hosts -o ~/.ssh/known_hosts
 
 say "Step 3/4: Add the key to GitHub"
 echo "  1. Copy the PUBLIC key below (safe to share — it is not a secret):"

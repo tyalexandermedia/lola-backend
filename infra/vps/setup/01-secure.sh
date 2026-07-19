@@ -135,7 +135,8 @@ KbdInteractiveAuthentication no
 PubkeyAuthentication yes
 MaxAuthTries 4
 EOF
-        sshd -t || die "sshd config test failed — hardening NOT applied."
+        SSHD_BIN=$(command -v sshd || echo /usr/sbin/sshd)
+        "$SSHD_BIN" -t || die "sshd config test failed — hardening NOT applied."
         systemctl reload ssh 2>/dev/null || systemctl reload sshd
         ok "Root login and password auth disabled. Key-only SSH from now on."
     else

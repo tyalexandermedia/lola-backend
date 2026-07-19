@@ -48,7 +48,11 @@ say "Step 1/5: Creating folder structure at $ROOT"
 #   deployments/     deployment manifests / release notes
 #   reports/         client reports, audits
 #   assets/          shared images, logos, brand files
-mkdir -p "$ROOT"/{infrastructure,templates,blueprints,agents,seo,content,automation,scripts,docs,logs,backups,deployments,reports,assets}
+#   knowledge/       operating knowledge base (playbooks, research, SOPs)
+#   prompt-library/  reusable AI prompts (per task, per client type)
+#   client-intelligence/  per-client research, competitors, GBP data
+#   saas/            future SaaS product workspaces
+mkdir -p "$ROOT"/{infrastructure,templates,blueprints,agents,seo,content,automation,scripts,docs,logs,backups,deployments,reports,assets,knowledge,prompt-library,client-intelligence,saas}
 mkdir -p "$ROOT"/clients/{sandbar-soft-wash,tampa-bay-power-clean,travels-by-val}
 ok "Folders created (existing folders untouched)."
 
