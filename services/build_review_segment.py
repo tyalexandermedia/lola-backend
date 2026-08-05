@@ -24,6 +24,11 @@ Credentials (env only, never hard-coded):
 Usage:
   python3 services/build_review_segment.py            # dry-run
   python3 services/build_review_segment.py --apply    # tag REAL customers
+
+Fallback when transaction/spend custom fields didn't import: pass
+--emails-file PATH (plain list or CSV containing the known-real customer
+emails). A contact is then REAL iff its email is in the file — all
+exclusions still apply, everyone else is DIRECTORY.
 """
 
 import argparse
@@ -145,7 +150,19 @@ def fetch_tagged_contacts(client: httpx.Client, token: str, location_id: str, sl
     return out
 
 
-def classify(contact: dict, fields: dict):
+def load_emails_file(path: str) -> set:
+    """Ground-truth emails: one per line, or any CSV cell that looks like one."""
+    emails = set()
+    with open(path, encoding="utf-8-sig") as fh:
+        for line in fh:
+            for cell in line.strip().split(","):
+                cell = cell.strip().strip('"')
+                if EMAIL_RE.match(cell):
+                    emails.add(cell.lower())
+    return emails
+
+
+def classify(contact: dict, fields: dict, ground_truth: set = None):
     """Return (bucket, reason): eligible | already-tagged | directory | excluded."""
     tags = {t.lower() for t in (contact.get("tags") or [])}
     email = (contact.get("email") or "").strip()
@@ -158,6 +175,13 @@ def classify(contact: dict, fields: dict):
     dnd = ((contact.get("dndSettings") or {}).get("Email") or {}).get("status")
     if contact.get("dnd") is True or (dnd or "").lower() == "active":
         return "excluded", "email-dnd"
+
+    if ground_truth is not None:
+        if email.lower() not in ground_truth:
+            return "directory", "not-in-ground-truth-file"
+        if ELIGIBLE_TAG in tags:
+            return "already-tagged", "ground-truth-file"
+        return "eligible", "ground-truth-file"
 
     reasons = []
     if fields["tx"] and is_positive_number(field_value(contact, fields["tx"])):
@@ -182,6 +206,9 @@ def main() -> int:
     ap.add_argument("--tx-field", default="", help="custom-field ID for transaction count")
     ap.add_argument("--spend-field", default="", help="custom-field ID for lifetime spend")
     ap.add_argument("--service-field", default="", help="custom-field ID for last service date")
+    ap.add_argument("--emails-file", default="",
+                    help="ground-truth file of real-customer emails; REAL iff listed "
+                         "(bypasses the custom-field heuristic, exclusions still apply)")
     args = ap.parse_args()
 
     token = os.getenv("GHL_API_TOKEN", "").strip()
@@ -202,25 +229,40 @@ def main() -> int:
         "Content-Type": "application/json",
     })
 
-    fields = resolve_fields(client, token, location_id, args)
-    missing = [k for k, v in fields.items() if not v]
-    if missing:
-        print(f"WARNING: no custom field matched for: {', '.join(missing)} — "
-              f"that signal can't mark anyone REAL. Pass the field ID explicitly.",
-              file=sys.stderr)
-    if not any(fields.values()):
-        print("ERROR: none of the three real-customer signals resolved to a "
-              "custom field; refusing to classify everyone as directory.", file=sys.stderr)
-        return 2
+    ground_truth = None
+    fields = {"tx": "", "spend": "", "service": ""}
+    if args.emails_file:
+        ground_truth = load_emails_file(args.emails_file)
+        if not ground_truth:
+            print(f"ERROR: no valid emails found in {args.emails_file}.", file=sys.stderr)
+            return 2
+        print(f"ground truth: {len(ground_truth)} emails from {args.emails_file}")
+    else:
+        fields = resolve_fields(client, token, location_id, args)
+        missing = [k for k, v in fields.items() if not v]
+        if missing:
+            print(f"WARNING: no custom field matched for: {', '.join(missing)} — "
+                  f"that signal can't mark anyone REAL. Pass the field ID explicitly.",
+                  file=sys.stderr)
+        if not any(fields.values()):
+            print("ERROR: none of the three real-customer signals resolved to a "
+                  "custom field; refusing to classify everyone as directory. "
+                  "(Or use --emails-file with the known-real customer list.)", file=sys.stderr)
+            return 2
 
     contacts = fetch_tagged_contacts(client, token, location_id, args.sleep)
     print(f"[{mode}] {len(contacts)} contacts tagged {SOURCE_TAG}")
 
     rows, counts = [], {"eligible": 0, "already-tagged": 0, "directory": 0, "excluded": 0}
     tagged = failed = 0
+    matched_emails = set()
     for c in contacts:
-        bucket, reason = classify(c, fields)
+        bucket, reason = classify(c, fields, ground_truth)
         counts[bucket] += 1
+        if ground_truth is not None:
+            em = (c.get("email") or "").strip().lower()
+            if em in ground_truth:
+                matched_emails.add(em)
         name = c.get("contactName") or " ".join(
             p for p in [c.get("firstName") or "", c.get("lastName") or ""] if p) or "(no name)"
         rows.append({"name": name, "email": c.get("email") or "", "bucket": bucket, "reason": reason})
@@ -250,6 +292,11 @@ def main() -> int:
           f"already tagged: {counts['already-tagged']}) | "
           f"directory: {counts['directory']} | excluded: {counts['excluded']}")
     print(f"report: {args.report}")
+    if ground_truth is not None:
+        unfound = sorted(ground_truth - matched_emails)
+        print(f"emails-file: {len(matched_emails)}/{len(ground_truth)} matched a "
+              f"{SOURCE_TAG} contact; {len(unfound)} not found"
+              + (f": {', '.join(unfound)}" if unfound else ""))
     if args.apply:
         print(f"[{mode}] tagged {tagged}, failed {failed}")
     else:

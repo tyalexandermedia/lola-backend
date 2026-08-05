@@ -41,12 +41,36 @@ Custom-field mapping is by name heuristic (transaction / lifetime spend /
 last service). If the dry-run warns a signal didn't resolve, pass the field
 ID explicitly: `--tx-field <id> --spend-field <id> --service-field <id>`.
 
+**Fallback — `--emails-file PATH`:** the Square import only mapped Email /
+Legacy customer ID / Original customer source / Last service date /
+Communication eligibility, so transaction-count and lifetime-spend fields
+likely don't exist in GHL and the heuristic can collapse onto
+last-service-date alone. If the dry-run count is off (see below), rerun with
+the owner-supplied ground-truth list:
+
+```bash
+python3 services/build_review_segment.py --emails-file ground_truth_41.csv           # dry-run
+python3 services/build_review_segment.py --emails-file ground_truth_41.csv --apply
+```
+
+A contact is then REAL iff its email is in the file (plain list or CSV, one
+email per row/cell, case-insensitive). All exclusions still apply
+(invalid/missing email, `exclusion:no-marketing`, `sandbar-optout`, Email
+DND); everyone not in the file is DIRECTORY and never tagged. The run prints
+how many file emails matched a `customer:past` contact and lists any not
+found.
+
 ## Counts
 
 **Not run — no GHL credentials in this container** (env has no
 `GHL_API_TOKEN`/`GHL_LOCATION_ID`, and this environment's network policy
-blocks non-allowlisted egress anyway). The expected segment is ~92 real
-customers per the launch analysis. **Owner: run the dry-run from a machine
+blocks non-allowlisted egress anyway). **Expected: ~41 eligible** — real
+customers with a valid, non-unsubscribed email. (The launch analysis' 92
+counted phone-included; the ~51 phone-only proven customers are the
+post-A2P SMS wave, not this segment.) If the dry-run prints ~92, ~400, or
+0, the transaction/spend custom fields didn't import and the heuristic is
+misclassifying — do **not** `--apply`; use `--emails-file` with the
+41-email ground-truth list instead. **Owner: run the dry-run on Railway
 with the rotated token, eyeball `reports/review_eligible.csv`, then
 `--apply`.**
 
