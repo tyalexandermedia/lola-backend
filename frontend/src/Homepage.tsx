@@ -39,9 +39,14 @@ const PROOF = [
 
 /**
  * Lola (the dog, and the name on the door) was born 16 Feb 2018. Her age is
- * derived rather than hardcoded so the founder's letter never goes stale —
+ * derived rather than hardcoded so the founder's letter ages itself —
  * "turns 9 this February 16" silently becomes "turns 10" on its own.
  * Returns the age she turns on her NEXT birthday.
+ *
+ * Caveat: this is evaluated at module scope, so the prerendered HTML that
+ * crawlers and AI answer engines read carries the BUILD-time value. Visitors
+ * with JS see the current one. Any deploy after 16 Feb refreshes the static
+ * copy; without one it can lag by a year for bots only.
  */
 const LOLA_BORN_YEAR = 2018;
 const LOLA_BORN_MONTH = 1; // 0-indexed → February
@@ -80,7 +85,7 @@ const SAMPLE_DIMENSIONS = GROWTH_SCORE_DIMENSIONS.map((name, i) => ({
 
 export default function Homepage() {
   useSeo({
-    title: 'Did you show up? Get found on Google & AI — Lola, Tampa Bay',
+    title: 'Did you show up? Get found on Google & AI — Lola Leads, Tampa Bay',
     description:
       "Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee.",
   });
@@ -420,25 +425,31 @@ function StorySection() {
   return (
     <section className="mt-16 sm:mt-24">
       <SectionHead index="03" kicker="Who's behind Lola" />
-      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-12">
-        {/* photo + the hybrid parallel */}
-        <div className="order-1">
-          <figure>
-            <div className="overflow-hidden rounded-[6px] border border-[#D4AF37]/25">
-              <img
-                src="/images/ty-lola-beach.jpg"
-                alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
-                loading="lazy"
-                className="aspect-[3/4] h-full w-full object-cover"
-              />
-            </div>
-            <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
-              Ty &amp; Lola · St. Pete, FL
-            </figcaption>
-          </figure>
+      {/* Three grid children so mobile can read photo → letter → résumé.
+          Keeping the résumé glued under the photo pushed the first line of the
+          letter ~660px down the page on a small phone. Desktop is unchanged:
+          explicit row/column placement puts photo and résumé back in the left
+          column with the letter spanning both rows on the right. */}
+      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-x-12 sm:gap-y-5">
+        <figure className="order-1 sm:col-start-1 sm:row-start-1">
+          <div className="overflow-hidden rounded-[6px] border border-[#D4AF37]/25">
+            <img
+              src="/images/ty-lola-beach.jpg"
+              alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
+              loading="lazy"
+              width={600}
+              height={800}
+              className="aspect-[3/4] w-full object-cover"
+            />
+          </div>
+          <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+            Ty &amp; Lola · St. Pete, FL
+          </figcaption>
+        </figure>
 
-          {/* The hybrid throughline, stated as a parallel. */}
-          <dl className="mt-5 divide-y divide-white/10 border-y border-white/10">
+        {/* The hybrid throughline, stated as a parallel. */}
+        <div className="order-3 sm:col-start-1 sm:row-start-2">
+          <dl className="divide-y divide-white/10 border-y border-white/10">
             {HYBRID.map((row) => (
               <div key={row.label} className="flex items-baseline justify-between gap-3 py-2.5">
                 <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A8F98]">
@@ -454,7 +465,7 @@ function StorySection() {
         </div>
 
         {/* the letter */}
-        <div className="order-2">
+        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
@@ -492,7 +503,7 @@ function StorySection() {
             </p>
             <p>
               The real goal? Enough local businesses win with Lola that I can buy the actual Lola{' '}
-              <span className="font-semibold text-white">the backyard she deserves.</span> 🐾 She's
+              <span className="font-semibold text-white">the backyard she deserves.</span> She's
               earned it — and when you win, so do I.
             </p>
             <p className="text-[17px] font-semibold text-white sm:text-[18px]">
@@ -514,7 +525,7 @@ function StorySection() {
               href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1.5 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+              className="mt-3 inline-flex min-h-[48px] items-center gap-1.5 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 font-mono text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
             >
               ✓ Verified Google Business <span aria-hidden>↗</span>
             </a>
@@ -597,10 +608,15 @@ function RoiSection() {
                 <dt className="col-span-2 mb-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
                   {row.label}
                 </dt>
+                {/* The strike-through is the only thing marking the agency
+                    column, and text-decoration isn't exposed to screen
+                    readers — so name each side explicitly. */}
                 <dd className="text-left text-[13px] leading-[1.4] text-[#9AA0A6] line-through decoration-[#E5534B]/50 sm:w-[128px] sm:text-right lg:w-[152px]">
+                  <span className="sr-only">{usd(AGENCY_MONTHLY)}/mo agency: </span>
                   {row.agency}
                 </dd>
                 <dd className="text-right text-[13px] font-semibold leading-[1.4] text-white sm:w-[136px] lg:w-[160px]">
+                  <span className="sr-only">Lola Full Build: </span>
                   {row.lola}
                 </dd>
               </div>
@@ -611,11 +627,18 @@ function RoiSection() {
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]">
               Year-one difference
             </p>
-            <p className="mt-1 font-display text-[32px] font-bold leading-none tracking-[-0.02em] text-white sm:text-[38px]">
+            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[38px]">
               {usd(AGENCY_YEAR_ONE - BUILD_PRICE)}
-              <span className="ml-2 font-mono text-[12px] font-normal uppercase tracking-[0.14em] text-[#C5C5C8]">
-                stays in your business
-              </span>
+            </p>
+            <p className="mt-1 font-mono text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
+              stays in your business
+            </p>
+            {/* The qualifier has to sit WITH the big number — on mobile the
+                disclaimer in the calculator card renders far below it. */}
+            <p className="mt-3 text-[12px] leading-[1.55] text-[#8A8F98]">
+              Versus a {usd(AGENCY_MONTHLY)}/mo retainer over 12 months. Your quote may differ, and
+              this compares <span className="text-[#C5C5C8]">what you pay</span> — not a promise
+              that both get the same result.
             </p>
           </div>
         </div>
@@ -632,8 +655,11 @@ function RoiSection() {
             What's one job worth to you?
           </label>
 
+          {/* aria-hidden: the range reports this same value via aria-valuetext,
+              and a live region here would fight the one on the result below. */}
           <output
             htmlFor="avg-job"
+            aria-hidden="true"
             className="mt-4 block font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#D4AF37]"
           >
             {usd(avgJob)}
@@ -647,6 +673,7 @@ function RoiSection() {
             step={50}
             value={avgJob}
             onChange={(e) => setAvgJob(Number(e.target.value))}
+            aria-valuetext={usd(avgJob)}
             aria-describedby="avg-job-help"
             className="mt-4 h-12 w-full cursor-pointer accent-[#D4AF37]"
           />
@@ -655,13 +682,20 @@ function RoiSection() {
             className="-mt-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
           >
             <span>$100</span>
-            {/* The hint is the first casualty at 375px — the min/max bounds
-                matter more, and the slider is self-evident next to its label. */}
-            <span className="hidden sm:inline">Drag to your average ticket</span>
+            {/* Visually the first casualty at 375px, but `hidden` would drop it
+                from the accessibility tree and gut the aria-describedby — so
+                hide it visually only. */}
+            <span className="sr-only sm:not-sr-only sm:inline">Drag to your average ticket</span>
             <span>$2,500</span>
           </div>
 
-          <div className="mt-6 space-y-2.5 border-t border-white/[0.07] pt-5">
+          {/* The result IS the widget's point — announce it, or a screen-reader
+              user hears "550… 600…" and never learns the answer. */}
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-6 space-y-2.5 border-t border-white/[0.07] pt-5"
+          >
             <BreakEvenRow
               label={`${DIY.name} · ${DIY.price}`}
               jobs={jobsForDiy}
@@ -678,6 +712,15 @@ function RoiSection() {
             make those (see above). It's simply what the build costs, measured in jobs you already
             know the value of.
           </p>
+
+          {/* Peak intent: the number just resolved against their own ticket. */}
+          <a
+            href="/pricing"
+            className="group mt-5 inline-flex h-14 items-center justify-center gap-2 rounded-[4px] bg-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+          >
+            Start my {BUILD.price} Full Build
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
         </div>
       </div>
     </section>
@@ -694,17 +737,15 @@ function BreakEvenRow({
   featured?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
+    // wraps "Full Build · $997" onto four lines.
+    <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
         {label}
       </span>
-      <span
-        className={`shrink-0 font-mono text-[13px] tabular-nums ${
-          featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'
-        }`}
-      >
+      <span className={`text-[13px] tabular-nums ${featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'}`}>
         pays for itself at{' '}
-        <span className="font-bold">
+        <span className="whitespace-nowrap font-bold">
           {jobs} job{jobs === 1 ? '' : 's'}
         </span>
       </span>
@@ -847,6 +888,9 @@ function FaqSection() {
   return (
     <section className="mt-16 sm:mt-24">
       <SectionHead index="06" kicker="Straight answers" />
+      {/* Every other section is labelled by an h2; without this the FAQ is
+          unreachable by screen-reader heading navigation. */}
+      <h2 className="sr-only">Straight answers</h2>
       <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
         {FAQ.map((item, i) => (
           <details key={i} className="group">
