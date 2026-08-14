@@ -323,7 +323,8 @@ function SiteFooter({ route }: { route: Route }) {
           </p>
           <p className="mt-3 text-[11px] leading-[1.6] text-[#5A5F68]">
             Built and run by <span className="text-[#8A8F98]">Ty Alexander Traufield</span> — “Coach Ty.”
-            <br className="hidden sm:block" /> Ty Alexander Media · Tampa Bay, FL
+            <br className="hidden sm:block" /> Founder, Lola Leads · Ty Alexander Media
+            <br className="hidden sm:block" /> St. Pete · serving all of Tampa Bay, FL
           </p>
         </div>
 

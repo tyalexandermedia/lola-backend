@@ -19,6 +19,8 @@
  * index.html JSON-LD, which this page intentionally does not touch.
  */
 
+import { useState } from 'react';
+
 import { DIY, BUILD, HALF_BACK_GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
@@ -33,6 +35,35 @@ const PROOF = [
   { before: '/gallery/driveway-3-before.jpg', after: '/gallery/driveway-3-after.jpg', label: 'Driveway' },
   { before: '/gallery/roof-2-before.jpg', after: '/gallery/roof-2-after.jpg', label: 'Roof' },
   { before: '/gallery/paver-1-before.jpg', after: '/gallery/paver-1-after.jpg', label: 'Pavers' },
+];
+
+/**
+ * Lola (the dog, and the name on the door) was born 16 Feb 2018. Her age is
+ * derived rather than hardcoded so the founder's letter never goes stale —
+ * "turns 9 this February 16" silently becomes "turns 10" on its own.
+ * Returns the age she turns on her NEXT birthday.
+ */
+const LOLA_BORN_YEAR = 2018;
+const LOLA_BORN_MONTH = 1; // 0-indexed → February
+const LOLA_BORN_DAY = 16;
+
+function lolaNextAge(now: Date): number {
+  const year = now.getFullYear();
+  const birthdayThisYear = new Date(year, LOLA_BORN_MONTH, LOLA_BORN_DAY);
+  // Before her birthday she still turns that age this year; after it, next year.
+  const nextBirthdayYear = now.getTime() > birthdayThisYear.getTime() ? year + 1 : year;
+  return nextBirthdayYear - LOLA_BORN_YEAR;
+}
+
+const LOLA_TURNS = lolaNextAge(new Date());
+
+// The hybrid throughline — strength + endurance is the same shape as
+// Google + AI answers. Ty's own framing, shown as a parallel.
+const HYBRID: ReadonlyArray<{ label: string; value: string }> = [
+  { label: 'Day job', value: 'Full-time GM' },
+  { label: 'Coaching', value: 'Group strength & conditioning' },
+  { label: 'Training for', value: 'HYROX' },
+  { label: 'Builds for you', value: 'Google + AI answers' },
 ];
 
 // Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
@@ -62,6 +93,7 @@ export default function Homepage() {
       <FixSection />
       <ProofBand />
       <StorySection />
+      <RoiSection />
       <OfferSection />
       <FaqSection />
       <FinalCta />
@@ -380,60 +412,111 @@ function ProofBand() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   03 — THE STORY. Ty Alexander Traufield. Real photo, asymmetric.
+   03 — THE STORY. A signed, first-person letter from Ty Alexander Traufield
+   ("Coach Ty") — his own words. A named human with a photo and a stated
+   motive outperforms third-person agency boilerplate, and it's the truth.
    ───────────────────────────────────────────────────────────────────────── */
 function StorySection() {
   return (
     <section className="mt-16 sm:mt-24">
       <SectionHead index="03" kicker="Who's behind Lola" />
       <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-12">
-        {/* photo */}
-        <figure className="order-1">
-          <div className="overflow-hidden rounded-[6px] border border-[#D4AF37]/25">
-            <img
-              src="/images/ty-lola-beach.jpg"
-              alt="Ty Alexander Traufield — Coach Ty — with his dog Lola on a Tampa Bay beach at sunset"
-              loading="lazy"
-              className="aspect-[3/4] h-full w-full object-cover"
-            />
-          </div>
-          <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
-            Ty &amp; Lola · Tampa Bay
-          </figcaption>
-        </figure>
+        {/* photo + the hybrid parallel */}
+        <div className="order-1">
+          <figure>
+            <div className="overflow-hidden rounded-[6px] border border-[#D4AF37]/25">
+              <img
+                src="/images/ty-lola-beach.jpg"
+                alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
+                loading="lazy"
+                className="aspect-[3/4] h-full w-full object-cover"
+              />
+            </div>
+            <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+              Ty &amp; Lola · St. Pete, FL
+            </figcaption>
+          </figure>
 
-        {/* story */}
+          {/* The hybrid throughline, stated as a parallel. */}
+          <dl className="mt-5 divide-y divide-white/10 border-y border-white/10">
+            {HYBRID.map((row) => (
+              <div key={row.label} className="flex items-baseline justify-between gap-3 py-2.5">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A8F98]">
+                  {row.label}
+                </dt>
+                <dd className="text-right text-[13px] font-medium text-[#E8E4D8]">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-2 text-right font-mono text-[10px] uppercase tracking-[0.18em] text-[#D4AF37]">
+            Hybrid all the way down
+          </p>
+        </div>
+
+        {/* the letter */}
         <div className="order-2">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
-            One person who lived the problem.<br className="hidden sm:block" /> Not a faceless agency.
+            Hey — I'm Ty.
           </h2>
-          <div className="mt-6 space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+
+          {/* max-w keeps the letter at a readable ~70 characters per line. */}
+          <div className="mt-6 max-w-[64ch] space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
             <p>
-              Lola was built by <span className="font-semibold text-white">Ty Alexander Traufield</span> —
-              known around Tampa Bay as <span className="font-semibold text-white">Coach Ty</span>. He
-              didn't start with a theory.
+              Lola's the name on the door, and yeah — she's exactly who you think:{' '}
+              <span className="font-semibold text-white">my dog.</span> A 2018 girl who turns{' '}
+              {LOLA_TURNS} this February 16. And honestly? She's the whole reason any of this exists.
             </p>
             <p>
-              He fixed this exact problem first for his father's real business,{' '}
-              <span className="font-semibold text-white">Sandbar Soft Wash</span> — then turned what
-              actually worked into a repeatable system he could run for any local service business.
+              I'm a group strength &amp; conditioning coach and a full-time GM, training for{' '}
+              <span className="font-semibold text-white">HYROX</span> on my own time. That makes me a
+              hybrid athlete — strength and endurance, no either/or. Turns out that's how I've built
+              everything: coach and founder, gym and laptop, getting you found on Google{' '}
+              <span className="font-semibold text-white">and</span> in the AI answers.
             </p>
-            <p className="text-white">
-              Ty answers his own phone. You text him directly during the build. No account managers,
-              no 50-page report that dies in your inbox —{' '}
-              <span className="font-bold text-[#D4AF37]">and if he doesn't get you ranking, you get half back.</span>
+            <p>
+              The whole thing started with one crew:{' '}
+              <a
+                href="/case-studies/sandbar"
+                className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
+              >
+                Sandbar Soft Wash
+              </a>
+              , right here in the bay. I got them found and got their phone ringing — Google and AI.
+              It worked. So I'm scaling the system, and that's Lola Leads.
+            </p>
+            <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
+              Here's what I'm not: a $5K-a-month agency hiding behind a dashboard. No 50-page report
+              that dies in your inbox. I answer my own phone. I do the work myself. And if I don't
+              get you ranking, you get half your money back — the{' '}
+              <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
+            </p>
+            <p>
+              The real goal? Enough local businesses win with Lola that I can buy the actual Lola{' '}
+              <span className="font-semibold text-white">the backyard she deserves.</span> 🐾 She's
+              earned it — and when you win, so do I.
+            </p>
+            <p className="text-[17px] font-semibold text-white sm:text-[18px]">
+              Let's get your phone ringing.
             </p>
           </div>
 
-          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <span className="font-display text-[15px] text-[#D4AF37]">— Coach Ty</span>
+          {/* signature block */}
+          <div className="mt-7 border-t border-white/10 pt-5">
+            <p className="font-display text-[20px] text-[#D4AF37]">— Coach Ty</p>
+            <p className="mt-1.5 text-[14px] text-[#C5C5C8]">
+              <span className="font-semibold text-white">Ty Alexander Traufield</span> — Founder,
+              Lola Leads · Ty Alexander Media
+            </p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+              St. Pete · serving all of Tampa Bay, FL
+            </p>
             <a
               href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#8A8F98] underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
             >
-              ✓ Verified Google Business — Ty Alexander Media <span aria-hidden>↗</span>
+              ✓ Verified Google Business <span aria-hidden>↗</span>
             </a>
           </div>
         </div>
@@ -443,14 +526,201 @@ function StorySection() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   04 — THE OFFER. Free score first, then two tiers (DIY / Full Build).
+   04 — THE MATH. The agency-cost contrast plus a break-even calculator.
+
+   Deliberately COST arithmetic, never a return promise: every figure here is
+   either the visitor's own number or a published price. Promising "X leads →
+   Y revenue" would contradict section 02 (the honest fix), which is the most
+   valuable thing on this page — so the section says so out loud.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/** Numeric prices derived from the display strings so lib/pricing stays the
+ *  single source of truth — change the price there and this math follows. */
+const BUILD_PRICE = Number(BUILD.price.replace(/[^0-9.]/g, ''));
+const DIY_PRICE = Number(DIY.price.replace(/[^0-9.]/g, ''));
+/** The comparison Ty gets quoted against — a $5K/mo retainer agency. */
+const AGENCY_MONTHLY = 5000;
+const AGENCY_YEAR_ONE = AGENCY_MONTHLY * 12;
+
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+const COMPARISON: ReadonlyArray<{ label: string; agency: string; lola: string }> = [
+  { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(BUILD_PRICE)} once` },
+  { label: 'Contract', agency: '12 months, locked', lola: 'None' },
+  { label: 'Who does the work', agency: 'An account manager', lola: 'Ty — the one you texted' },
+  { label: 'What you get monthly', agency: 'A 50-page PDF report', lola: 'A live score you can check' },
+  { label: "If you don't rank", agency: 'You keep paying', lola: 'You get half your money back' },
+];
+
+function RoiSection() {
+  // Visitor's own average job value — the only input, and it never leaves the
+  // browser. Default is a plausible mid-range local-services ticket.
+  const [avgJob, setAvgJob] = useState(500);
+  const jobsForBuild = Math.max(1, Math.ceil(BUILD_PRICE / Math.max(avgJob, 1)));
+  const jobsForDiy = Math.max(1, Math.ceil(DIY_PRICE / Math.max(avgJob, 1)));
+
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead index="04" kicker="The math" />
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+        If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
+      </h2>
+      <p className="mt-5 max-w-[720px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+        Same job. Wildly different price. The difference is that an agency has a floor of salaries
+        to cover before your first result — and Ty doesn't.
+      </p>
+
+      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        {/* the comparison */}
+        <div className="overflow-hidden rounded-[6px] border border-white/10 bg-[#0E0E10]">
+          {/* Mobile: label on its own line, then the two values side by side.
+              sm+: a true three-column table. Keeps the label readable at 320px
+              instead of crushing it into a ~70px gutter. */}
+          <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-[#141416] px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98] sm:block">
+              Compare
+            </span>
+            <span className="text-left font-mono text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#8A8F98] sm:w-[128px] sm:text-right lg:w-[152px]">
+              {usd(AGENCY_MONTHLY)}/mo agency
+            </span>
+            <span className="text-right font-mono text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
+              Lola Full Build
+            </span>
+          </div>
+
+          <dl className="divide-y divide-white/[0.07]">
+            {COMPARISON.map((row) => (
+              <div
+                key={row.label}
+                className="grid grid-cols-2 items-start gap-x-3 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5"
+              >
+                <dt className="col-span-2 mb-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
+                  {row.label}
+                </dt>
+                <dd className="text-left text-[13px] leading-[1.4] text-[#9AA0A6] line-through decoration-[#E5534B]/50 sm:w-[128px] sm:text-right lg:w-[152px]">
+                  {row.agency}
+                </dd>
+                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-white sm:w-[136px] lg:w-[160px]">
+                  {row.lola}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="border-t border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-4 py-4 sm:px-5">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]">
+              Year-one difference
+            </p>
+            <p className="mt-1 font-display text-[32px] font-bold leading-none tracking-[-0.02em] text-white sm:text-[38px]">
+              {usd(AGENCY_YEAR_ONE - BUILD_PRICE)}
+              <span className="ml-2 font-mono text-[12px] font-normal uppercase tracking-[0.14em] text-[#C5C5C8]">
+                stays in your business
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* break-even calculator */}
+        <div className="flex flex-col rounded-[6px] border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98]">
+            Break-even
+          </p>
+          <label
+            htmlFor="avg-job"
+            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-white"
+          >
+            What's one job worth to you?
+          </label>
+
+          <output
+            htmlFor="avg-job"
+            className="mt-4 block font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#D4AF37]"
+          >
+            {usd(avgJob)}
+          </output>
+
+          <input
+            id="avg-job"
+            type="range"
+            min={100}
+            max={2500}
+            step={50}
+            value={avgJob}
+            onChange={(e) => setAvgJob(Number(e.target.value))}
+            aria-describedby="avg-job-help"
+            className="mt-4 h-12 w-full cursor-pointer accent-[#D4AF37]"
+          />
+          <div
+            id="avg-job-help"
+            className="-mt-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
+          >
+            <span>$100</span>
+            {/* The hint is the first casualty at 375px — the min/max bounds
+                matter more, and the slider is self-evident next to its label. */}
+            <span className="hidden sm:inline">Drag to your average ticket</span>
+            <span>$2,500</span>
+          </div>
+
+          <div className="mt-6 space-y-2.5 border-t border-white/[0.07] pt-5">
+            <BreakEvenRow
+              label={`${DIY.name} · ${DIY.price}`}
+              jobs={jobsForDiy}
+            />
+            <BreakEvenRow
+              label={`${BUILD.name} · ${BUILD.price}`}
+              jobs={jobsForBuild}
+              featured
+            />
+          </div>
+
+          <p className="mt-5 text-[12px] leading-[1.55] text-[#8A8F98]">
+            That's <span className="text-[#C5C5C8]">cost math, not a lead promise</span> — we don't
+            make those (see above). It's simply what the build costs, measured in jobs you already
+            know the value of.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BreakEvenRow({
+  label,
+  jobs,
+  featured,
+}: {
+  label: string;
+  jobs: number;
+  featured?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
+        {label}
+      </span>
+      <span
+        className={`shrink-0 font-mono text-[13px] tabular-nums ${
+          featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'
+        }`}
+      >
+        pays for itself at{' '}
+        <span className="font-bold">
+          {jobs} job{jobs === 1 ? '' : 's'}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   05 — THE OFFER. Free score first, then two tiers (DIY / Full Build).
    Pricing pulled from lib/pricing; CTAs route to /growth-score and /pricing
    (where the Stripe checkout lives) — no checkout links defined here.
    ───────────────────────────────────────────────────────────────────────── */
 function OfferSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="04" kicker="Start free, then choose" />
+      <SectionHead index="05" kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
       </h2>
@@ -548,6 +818,10 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Two simple options, both one-time. DIY is $197 — your full Growth Score plus a 5-step fix-it checklist, done yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score.',
   },
   {
+    q: 'Is there a guarantee?',
+    a: "Yes — the Half-Back Guarantee on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.",
+  },
+  {
     q: 'Can you actually guarantee leads?',
     a: "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The Half-Back Guarantee is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back.",
   },
@@ -556,15 +830,23 @@ const FAQ: { q: string; a: string }[] = [
     a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews), because that's increasingly where buyers ask for a recommendation.",
   },
   {
+    q: 'Why is it $997 when agencies quote $5,000 a month?',
+    a: "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The Full Build is $997 one-time, no contract, and if we don't get you ranking you get half of that back. Same job, without the overhead you were funding.",
+  },
+  {
     q: 'Who is behind Lola?',
-    a: 'Ty Alexander Traufield — “Coach Ty” — in Tampa Bay. He built Lola to fix the local visibility of his father’s real business, Sandbar Soft Wash, and now runs the same system for other local service businesses. He answers his own phone.',
+    a: 'Ty Alexander Traufield — “Coach Ty” — based in St. Petersburg and serving all of Tampa Bay. He’s a group strength & conditioning coach and a full-time GM who trains for HYROX, and he built Lola to fix the local visibility of his father’s real business, Sandbar Soft Wash. He now runs that same system for other local service businesses, does the work himself, and answers his own phone.',
+  },
+  {
+    q: 'Why is it called Lola?',
+    a: "Lola is Ty's dog — born in 2018, and the reason the whole thing exists. The goal behind the business is simple: help enough local businesses win to buy her the backyard she deserves. When you win, so does she.",
   },
 ];
 
 function FaqSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="05" kicker="Straight answers" />
+      <SectionHead index="06" kicker="Straight answers" />
       <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
         {FAQ.map((item, i) => (
           <details key={i} className="group">
