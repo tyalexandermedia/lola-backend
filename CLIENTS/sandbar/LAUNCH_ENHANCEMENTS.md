@@ -31,9 +31,12 @@ find us: {{review_link}}
 Reply STOP to opt out.
 ```
 
-(~300 chars, 2 segments. `{{review_link}}` = the GBP review short link once the
-profile is claimed — do not send this until the GBP claim is verified, or the
-link 404s and the send is wasted.)
+(~300 chars, 2 segments. `{{review_link}}` = the REAL Sandbar GBP review link —
+the profile is claimed. Use a short link that redirects to:
+`https://search.google.com/local/writereview?placeid=ChIJB8P9dJ7xwogR_spdA8pO63k`
+Gate cleared: the GBP claim is done, so this send is unblocked once the GBP→GHL
+integration is connected (Settings → Integrations → Google Business Profile,
+inside the Sandbar SoftWash sub-account, using the Google login that owns the GBP).)
 
 ### Email (subject + body)
 
