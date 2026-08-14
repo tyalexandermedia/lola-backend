@@ -44,7 +44,7 @@ export default function WorkPage() {
         >
           Real businesses. Real sites.{' '}
           <span className="animate-shimmer bg-gradient-to-r from-[#D4AF37] via-[#FFF0B8] to-[#D4AF37] bg-clip-text text-transparent">
-            Built and ranked.
+            Live right now.
           </span>
         </h1>
         <p className="mt-5 max-w-[660px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">

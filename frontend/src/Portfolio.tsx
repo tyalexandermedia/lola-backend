@@ -208,7 +208,10 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
 export default function Portfolio({
   title = 'Real sites. Real businesses. Built by Lola.',
   eyebrow = 'The work',
-  subhead = 'Not mockups — live sites, ranking for the searches that bring their owners real jobs. Tap any one to take a look.',
+  // D-014: no ranking claims without tracker receipts. "Live" is verifiable
+  // by clicking the link; "ranking for the searches that bring real jobs" is
+  // a results claim the measurement doc can't yet back.
+  subhead = 'Not mockups — real sites, live right now, built to get found on Google and in AI answers. Tap any one to take a look.',
   items = PORTFOLIO,
   showHeader = true,
 }: {
