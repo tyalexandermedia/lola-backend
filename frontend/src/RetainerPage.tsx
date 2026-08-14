@@ -434,8 +434,8 @@ export default function RetainerPage() {
         {/* ── 7·5. PORTFOLIO — real builds, right before the decision ──── */}
         <Portfolio
           eyebrow="The work"
-          title="Sites we've already built and ranked."
-          subhead="Real businesses, live right now. Tap any one to scroll through the real site."
+          title="Sites we've built. Live right now."
+          subhead="Real businesses, not mockups. Tap any one to scroll through the real site."
         />
 
         {/* ── 8. FINAL CTA ────────────────────────────────────────────── */}

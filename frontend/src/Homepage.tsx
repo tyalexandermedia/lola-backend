@@ -249,7 +249,7 @@ function ReportCard() {
    ───────────────────────────────────────────────────────────────────────── */
 function ProblemSection() {
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="What's going wrong" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
@@ -343,7 +343,7 @@ function QueryCard({ engine, query, answer }: { engine: string; query: string; a
    ───────────────────────────────────────────────────────────────────────── */
 function ProofSection() {
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Don't take my word for it" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         Most agencies show you a case study. I'll just give you the login.
@@ -409,7 +409,7 @@ function ProofSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function StorySection() {
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Who you're dealing with" />
       {/* Three grid children so mobile can read photo → letter → résumé.
           Keeping the résumé glued under the photo pushed the first line of the
@@ -557,7 +557,7 @@ function RoiSection() {
   const jobsForDiy = Math.max(1, Math.ceil(DIY_PRICE / Math.max(avgJob, 1)));
 
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="The math" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
@@ -745,7 +745,7 @@ function BreakEvenRow({
    ───────────────────────────────────────────────────────────────────────── */
 function OfferSection() {
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
@@ -871,7 +871,7 @@ const FAQ: { q: string; a: string }[] = [
 
 function FaqSection() {
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Straight answers" />
       {/* Every other section is labelled by an h2; without this the FAQ is
           unreachable by screen-reader heading navigation. */}
@@ -896,7 +896,7 @@ function FaqSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function FinalCta() {
   return (
-    <section className="relative left-1/2 right-1/2 mt-16 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-16 sm:mt-24 sm:py-20">
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-14 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
         <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">Your next customer is searching right now</p>
         <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[48px]">
