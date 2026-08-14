@@ -185,6 +185,59 @@ export default function GrowthScore() {
     if (errors[k as keyof Errors]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
+  /**
+   * ONE QUESTION AT A TIME.
+   *
+   * Six fields stacked on a phone give a contractor six reasons to bail before
+   * he's answered one. Asking them in sequence means each screen is a single
+   * decision with a thumb-sized target, and the progress bar makes the end
+   * visible from the first step.
+   *
+   * The order is deliberate: business name first, because the Google lookup it
+   * triggers pre-fills city AND website — so two of the five steps usually
+   * arrive already answered, and the flow feels faster than the form it
+   * replaced rather than longer.
+   */
+  const STEPS = ['business_name', 'city', 'business_type', 'website', 'phone'] as const;
+  type StepKey = (typeof STEPS)[number];
+  const [step, setStep] = useState(0);
+  const current = STEPS[step];
+  const isLast = step === STEPS.length - 1;
+
+  /** Validate only the field on screen, so errors appear where the eye is. */
+  const validateField = (k: StepKey): string | undefined => {
+    if (k === 'business_name' && form.business_name.trim().length < 2)
+      return 'Real business name, please.';
+    if (k === 'city' && form.city.trim().length < 2) return 'City + state works best.';
+    if (k === 'website') {
+      const w = form.website.trim();
+      if (w.length < 4 || !/\./.test(w)) return "That doesn't look like a URL.";
+    }
+    if (k === 'phone') {
+      if ((form.phone ?? '').replace(/\D/g, '').length < 10) return 'Real phone number, please.';
+      const email = form.email.trim();
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'That email looks off.';
+      if (!consent) return 'Please check the box so we can send your results.';
+    }
+    return undefined;
+  };
+
+  const goNext = () => {
+    const err = validateField(current);
+    if (err) {
+      setErrors((e) => ({ ...e, [current]: err }));
+      return;
+    }
+    if (isLast) {
+      score();
+      return;
+    }
+    track('growth_score_step', { step: step + 1, field: current });
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  };
+
+  const goBack = () => setStep((s) => Math.max(s - 1, 0));
+
   const validate = (): boolean => {
     const e: Errors = {};
     if (form.business_name.trim().length < 2) e.business_name = 'Real business name, please.';
@@ -286,9 +339,12 @@ export default function GrowthScore() {
           Free Tool · 60 Seconds · No Signup
         </p>
 
+        {/* The pitch earns the first answer; after that it's just furniture
+            pushing the live question below the fold on a phone. Shrink it once
+            they're moving. */}
         <h1
           className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
+          style={{ fontSize: step === 0 ? 'clamp(2.25rem, 5vw, 4rem)' : 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           What&apos;s your{' '}
           <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
@@ -297,14 +353,18 @@ export default function GrowthScore() {
           ?
         </h1>
 
-        <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
-          One number, 0–100, across the six things that actually grow a local business —
-          and the one move that lifts it fastest. You&apos;re not behind. You just haven&apos;t
-          seen the map yet.
-        </p>
+        {step === 0 && (
+          <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+            One number, 0–100, across the six things that actually grow a local business —
+            and the one move that lifts it fastest. You&apos;re not behind. You just haven&apos;t
+            seen the map yet.
+          </p>
+        )}
 
+        {/* Enter advances the step rather than submitting the whole form —
+            goNext() calls score() itself once the last question is answered. */}
         <form
-          onSubmit={(e) => { e.preventDefault(); score(); }}
+          onSubmit={(e) => { e.preventDefault(); goNext(); }}
           className="mt-8 rounded-[16px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-7"
         >
           {lookup === 'searching' && (
@@ -325,9 +385,26 @@ export default function GrowthScore() {
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Business name" error={errors.business_name}>
+          {/* Progress — makes the end visible from step one. */}
+          <div className="mb-6">
+            <div className="flex items-baseline justify-between">
+              <p className="text-[12px] font-semibold text-[#D4AF37]">
+                Question {step + 1} of {STEPS.length}
+              </p>
+              <p className="text-[12px] text-[#8A8F98]">about 60 seconds</p>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]">
+              <div
+                className="h-full rounded-full bg-[#D4AF37] transition-[width] duration-300 ease-out"
+                style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {current === 'business_name' && (
+            <StepShell question="What's your business called?" hint="I'll look you up on Google and fill in what I can find.">
               <input
+                autoFocus
                 type="text"
                 value={form.business_name}
                 onChange={(e) => update('business_name', e.target.value)}
@@ -335,10 +412,14 @@ export default function GrowthScore() {
                 autoComplete="organization"
                 className={inputCls(!!errors.business_name)}
               />
-            </Field>
+              {errors.business_name && <StepError msg={errors.business_name} />}
+            </StepShell>
+          )}
 
-            <Field label="City / market" error={errors.city}>
+          {current === 'city' && (
+            <StepShell question="Which city do you work in?" hint="Where your customers actually are — city and state.">
               <input
+                autoFocus
                 type="text"
                 value={form.city}
                 onChange={(e) => update('city', e.target.value)}
@@ -346,41 +427,59 @@ export default function GrowthScore() {
                 autoComplete="address-level2"
                 className={inputCls(!!errors.city)}
               />
-            </Field>
+              {errors.city && <StepError msg={errors.city} />}
+            </StepShell>
+          )}
 
-            <Field label="Business type">
-              <select
-                value={form.business_type}
-                onChange={(e) => update('business_type', e.target.value)}
-                className={`${inputCls(false)} appearance-none pr-10`}
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%23D4AF37' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 14px center',
-                }}
-              >
-                {BUSINESS_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
-              </select>
-            </Field>
+          {/* Tap-to-answer, and it advances itself — the one step that should
+              never need the keyboard. */}
+          {current === 'business_type' && (
+            <StepShell question="What kind of work do you do?" hint="Pick the closest one.">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {BUSINESS_TYPES.map((t) => {
+                  const selected = form.business_type === t.value;
+                  return (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => {
+                        update('business_type', t.value);
+                        setStep((s) => Math.min(s + 1, STEPS.length - 1));
+                      }}
+                      className={`inline-flex min-h-[56px] items-center gap-3 rounded-[12px] border px-4 py-3 text-left text-[15px] font-medium transition ${
+                        selected
+                          ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-white'
+                          : 'border-[#D4AF37]/25 bg-[#0F0F12] text-[#C5C5C8] hover:border-[#D4AF37]/60 hover:text-white'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </StepShell>
+          )}
 
-            <Field label="Website" error={errors.website}>
+          {current === 'website' && (
+            <StepShell question="What's your website?" hint="No site yet? Type “none” — that's part of the score.">
               <input
-                type="url"
+                autoFocus
+                type="text"
+                inputMode="url"
                 value={form.website}
                 onChange={(e) => update('website', e.target.value)}
                 placeholder="https://yourbusiness.com"
                 autoComplete="url"
                 className={inputCls(!!errors.website)}
               />
-            </Field>
-          </div>
+              {errors.website && <StepError msg={errors.website} />}
+            </StepShell>
+          )}
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Phone" error={errors.phone}>
+          {current === 'phone' && (
+            <StepShell question="Where do I send your score?" hint="Your number gets the result. Email is optional.">
               <input
+                autoFocus
                 type="tel"
                 value={form.phone ?? ''}
                 onChange={(e) => update('phone', e.target.value)}
@@ -388,44 +487,63 @@ export default function GrowthScore() {
                 autoComplete="tel"
                 className={inputCls(!!errors.phone)}
               />
-            </Field>
-
-            <Field label="Email (optional)" error={errors.email}>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => update('email', e.target.value)}
-                placeholder="you@business.com"
+                placeholder="you@business.com (optional)"
                 autoComplete="email"
-                className={inputCls(!!errors.email)}
+                className={`mt-3 ${inputCls(!!errors.email)}`}
               />
-            </Field>
-          </div>
+              <label className="mt-4 flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => {
+                    setConsent(e.target.checked);
+                    if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
+                  }}
+                  className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-[#D4AF37]/40 bg-[#0F0F12] accent-[#D4AF37]"
+                />
+                <span className="text-[13px] leading-[1.5] text-[#C5C5C8]">
+                  OK to text and email me about my results.
+                </span>
+              </label>
+              {errors.phone && <StepError msg={errors.phone} />}
 
-          <label className="mt-5 flex cursor-pointer items-start gap-3">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => {
-                setConsent(e.target.checked);
-                if (errors.consent) setErrors((prev) => ({ ...prev, consent: undefined }));
-              }}
-              className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-[#D4AF37]/40 bg-[#0F0F12] accent-[#D4AF37]"
-            />
-            <span className="text-[13px] leading-[1.5] text-[#C5C5C8]">
-              By submitting, you agree to receive texts and emails about your results.
-            </span>
-          </label>
-          {errors.consent && (
-            <p className="mt-2 text-[12px] text-[#E5A95B]">{errors.consent}</p>
+              {/* What they've told me so far — control, and a last chance to fix. */}
+              <dl className="mt-5 space-y-1.5 border-t border-white/10 pt-4">
+                {[
+                  ['Business', form.business_name],
+                  ['City', form.city],
+                  ['Website', form.website],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex items-baseline justify-between gap-3">
+                    <dt className="text-[12px] text-[#8A8F98]">{label}</dt>
+                    <dd className="truncate text-right text-[13px] text-[#C5C5C8]">{value || '—'}</dd>
+                  </div>
+                ))}
+              </dl>
+            </StepShell>
           )}
 
-          <button
-            type="submit"
-            className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
-          >
-            Get my free Growth Score →
-          </button>
+          <div className="mt-6 flex items-center gap-3">
+            {step > 0 && (
+              <button
+                type="button"
+                onClick={goBack}
+                className="inline-flex min-h-[52px] items-center justify-center rounded-[12px] border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/50 hover:text-white"
+              >
+                Back
+              </button>
+            )}
+            <button
+              type="submit"
+              className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 py-3 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right active:scale-[0.98] sm:text-[15px]"
+            >
+              {isLast ? 'Get my free Growth Score →' : 'Next →'}
+            </button>
+          </div>
 
           <p className="mt-4 text-center text-[12px] text-[#7A7F8A]">
             Your score lands by text + email within 24 hours · No spam · Reply STOP to opt out
@@ -544,6 +662,25 @@ export default function GrowthScore() {
       </div>
     </main>
   );
+}
+
+/** One question, asked the way Ty would ask it out loud. */
+function StepShell({
+  question,
+  hint,
+  children,
+}: { question: string; hint: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h2 className="text-[21px] font-bold leading-[1.25] text-white sm:text-[24px]">{question}</h2>
+      <p className="mt-1.5 text-[14px] leading-[1.5] text-[#8A8F98]">{hint}</p>
+      <div className="mt-5">{children}</div>
+    </div>
+  );
+}
+
+function StepError({ msg }: { msg: string }) {
+  return <p className="mt-2 text-[13px] text-[#E5A95B]">{msg}</p>;
 }
 
 function Field({
