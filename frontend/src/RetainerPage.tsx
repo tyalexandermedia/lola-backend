@@ -23,6 +23,7 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
+import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { BUILD, HALF_BACK_GUARANTEE, BUILD_INCLUDED } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
@@ -382,22 +383,23 @@ export default function RetainerPage() {
                 />
               </div>
               <figcaption className="mt-2 text-center text-[11px] text-[#8A8F98] sm:text-left">
-                Ty &amp; Lola · Tampa Bay
+                Ty &amp; Lola · St. Pete, FL
               </figcaption>
             </figure>
 
             <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
               <p>
                 Hey — I'm Ty. Lola's the name on the door, and she's exactly who you think:{' '}
-                <span className="font-semibold text-white">my dog.</span> She turns 9 on February 16
-                (a 2018 girl), and honestly she's the whole reason this exists.
+                <span className="font-semibold text-white">my dog.</span> A 2018 girl who turns{' '}
+                {LOLA_TURNS} this February 16, and honestly she's the whole reason this exists.
               </p>
               <p>
-                By day I'm a personal trainer and a full-time general manager. The dream is to go
-                hybrid — keep coaching people in the gym, and run{' '}
-                <span className="font-semibold text-white">Lola Leads</span> the rest of the time:
-                building local businesses a site that actually gets them found and gets the phone
-                ringing, on Google and on AI.
+                I'm a group strength &amp; conditioning coach and a full-time GM, training for{' '}
+                <span className="font-semibold text-white">HYROX</span> on my own time — a hybrid
+                athlete, strength and endurance, no either/or. That's how I've built everything:
+                coach and founder, gym and laptop, getting you found on Google{' '}
+                <span className="font-semibold text-white">and</span> in the AI answers. That's{' '}
+                <span className="font-semibold text-white">Lola Leads</span>.
               </p>
               <p>
                 My first proof story is my dad's business — Sandbar Soft Wash in Palm Harbor —{' '}
@@ -408,10 +410,23 @@ export default function RetainerPage() {
               </p>
               <p className="text-white">
                 You answer your own phone. So do I. And the real goal? Enough of you win with Lola
-                that I can buy{' '}
-                <span className="font-bold text-[#D4AF37]">the actual Lola her beach house</span> 🐾.
-                She's earned it.
+                that I can buy the actual Lola{' '}
+                <span className="font-bold text-[#D4AF37]">the backyard she deserves</span>. She's
+                earned it — and when you win, so do I.
               </p>
+
+              {/* Signature — the full legal name carries the sign-off; "Coach Ty"
+                  alone reads like a handle, and the company name is not a person. */}
+              <div className="border-t border-white/10 pt-5">
+                <p className="text-[18px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
+                <p className="mt-1.5 text-[14px] text-[#C5C5C8]">
+                  <span className="font-semibold text-white">{FOUNDER.fullName}</span> —{' '}
+                  {FOUNDER.title} · {FOUNDER.company}
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+                  {FOUNDER.location}
+                </p>
+              </div>
             </div>
           </div>
         </section>

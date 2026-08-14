@@ -1641,7 +1641,8 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         <p className="mt-5 text-[13px] text-[#D4AF37]">
           — Coach Ty
           <span className="ml-2 text-[12px] text-[#8A8F98]">
-            Founder, Ty Alexander Media · Tampa Bay, FL · @tyalexandermedia
+            Ty Alexander Traufield · Founder, Lola Leads · Ty Alexander Media · St. Pete, FL ·
+            @tyalexandermedia
           </span>
         </p>
       </section>

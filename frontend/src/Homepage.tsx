@@ -21,6 +21,7 @@
 
 import { useState } from 'react';
 
+import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { DIY, BUILD, HALF_BACK_GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
@@ -28,31 +29,6 @@ import { useReveal } from './lib/useReveal';
 const CALENDAR_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
-
-/**
- * Lola (the dog, and the name on the door) was born 16 Feb 2018. Her age is
- * derived rather than hardcoded so the founder's letter ages itself —
- * "turns 9 this February 16" silently becomes "turns 10" on its own.
- * Returns the age she turns on her NEXT birthday.
- *
- * Caveat: this is evaluated at module scope, so the prerendered HTML that
- * crawlers and AI answer engines read carries the BUILD-time value. Visitors
- * with JS see the current one. Any deploy after 16 Feb refreshes the static
- * copy; without one it can lag by a year for bots only.
- */
-const LOLA_BORN_YEAR = 2018;
-const LOLA_BORN_MONTH = 1; // 0-indexed → February
-const LOLA_BORN_DAY = 16;
-
-function lolaNextAge(now: Date): number {
-  const year = now.getFullYear();
-  const birthdayThisYear = new Date(year, LOLA_BORN_MONTH, LOLA_BORN_DAY);
-  // Before her birthday she still turns that age this year; after it, next year.
-  const nextBirthdayYear = now.getTime() > birthdayThisYear.getTime() ? year + 1 : year;
-  return nextBirthdayYear - LOLA_BORN_YEAR;
-}
-
-const LOLA_TURNS = lolaNextAge(new Date());
 
 // The hybrid throughline — strength + endurance is the same shape as
 // Google + AI answers. Ty's own framing, shown as a parallel.
@@ -512,13 +488,13 @@ function StorySection() {
 
           {/* signature block */}
           <div className="mt-7 border-t border-white/10 pt-5">
-            <p className="font-display text-[20px] text-[#D4AF37]">— Coach Ty</p>
+            <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
             <p className="mt-1.5 text-[14px] text-[#C5C5C8]">
-              <span className="font-semibold text-white">Ty Alexander Traufield</span> — Founder,
-              Lola Leads · Ty Alexander Media
+              <span className="font-semibold text-white">{FOUNDER.fullName}</span> — {FOUNDER.title}{' '}
+              · {FOUNDER.company}
             </p>
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
-              St. Pete · serving all of Tampa Bay, FL
+              {FOUNDER.location}
             </p>
             <a
               href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
