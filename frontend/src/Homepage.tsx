@@ -39,15 +39,6 @@ const CALENDAR_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
-// The hybrid throughline — strength + endurance is the same shape as
-// Google + AI answers. Ty's own framing, shown as a parallel.
-const HYBRID: ReadonlyArray<{ label: string; value: string }> = [
-  { label: 'Day job', value: 'Full-time GM' },
-  { label: 'Coaching', value: 'Group strength & conditioning' },
-  { label: 'Training for', value: 'HYROX' },
-  { label: 'Builds for you', value: 'Google + AI answers' },
-];
-
 // Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
 // not a real client's numbers. The two low bars (AI Visibility, Revenue
 // Tracking) are the leaks Lola is built to close.
@@ -433,25 +424,9 @@ function StorySection() {
           </figcaption>
         </figure>
 
-        {/* The hybrid throughline, stated as a parallel. */}
-        <div className="order-3 sm:col-start-1 sm:row-start-2">
-          <dl className="divide-y divide-white/10 border-y border-white/10">
-            {HYBRID.map((row) => (
-              <div key={row.label} className="flex items-baseline justify-between gap-3 py-2.5">
-                <dt className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
-                  {row.label}
-                </dt>
-                <dd className="text-right text-[13px] font-medium text-[#E8E4D8]">{row.value}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="mt-2 text-right text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
-            Hybrid all the way down
-          </p>
-        </div>
 
         {/* the letter */}
-        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
+        <div className="order-2 sm:col-start-2 sm:row-start-1">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
@@ -459,27 +434,28 @@ function StorySection() {
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
           <div className="mt-6 max-w-[64ch] space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
             <p>
-              Lola's the name on the door, and yeah — she's exactly who you think:{' '}
-              <span className="font-semibold text-white">my dog.</span> A 2018 girl who turns{' '}
-              {LOLA_TURNS} this February 16. And honestly? She's the whole reason any of this exists.
+              Lola's the name on the door. She's my dog —{' '}
+              <span className="font-semibold text-white">half basset hound, half shepherd</span>, a
+              2018 girl who turns {LOLA_TURNS} this February 16. She's the reason any of this
+              exists.
             </p>
             <p>
-              I'm a group strength &amp; conditioning coach and a full-time GM, training for{' '}
-              <span className="font-semibold text-white">HYROX</span> on my own time. That makes me a
-              hybrid athlete — strength and endurance, no either/or. Turns out that's how I've built
-              everything: coach and founder, gym and laptop, getting you found on Google{' '}
-              <span className="font-semibold text-white">and</span> in the AI answers.
+              I coach strength and conditioning, I run a business full time, and I train for{' '}
+              <span className="font-semibold text-white">HYROX</span> before the sun's up. I bring it
+              up for one reason: it's all the same job. Show up, do the work, keep showing up on the
+              days nothing's happening yet. That's exactly what moves you up Google — and it's the
+              part most agencies quietly skip.
             </p>
             <p>
-              The whole thing started with one crew:{' '}
+              This started with one crew:{' '}
               <a
                 href="/case-studies/sandbar"
                 className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
               >
                 Sandbar Soft Wash
               </a>
-              , right here in the bay. I got them found and got their phone ringing — Google and AI.
-              It worked. So I'm scaling the system, and that's Lola Leads.
+              , right here in the bay. I got them found — Google and AI — and the phone started
+              ringing. It worked, so I built the system to do it again.
             </p>
             <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
               Here's what I'm not: a $5K-a-month agency hiding behind a dashboard. No 50-page report
@@ -488,9 +464,10 @@ function StorySection() {
               <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
             </p>
             <p>
-              The real goal? Enough local businesses win with Lola that I can buy the actual Lola{' '}
-              <span className="font-semibold text-white">the backyard she deserves.</span> She's
-              earned it — and when you win, so do I.
+              I'm after something bigger than websites. A local business that finally gets found
+              changes what a family can do — and I want to be the reason that happens, over and over,
+              right here in the bay. Enough of you win,{' '}
+              <span className="font-semibold text-white">and Lola gets the backyard she deserves.</span>
             </p>
             <p className="text-[17px] font-semibold text-white sm:text-[18px]">
               Let's get your phone ringing.

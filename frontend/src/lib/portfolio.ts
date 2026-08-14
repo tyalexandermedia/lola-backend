@@ -46,22 +46,10 @@ export const PORTFOLIO: PortfolioSite[] = [
     // receipts.
     blurb: 'A 15+ year business serving 20+ Tampa Bay cities — the founding proof story, rebuilt in the open on a live public dashboard.',
   },
-  {
-    // Rebranded from "Tampa Bay Power Clean" to the Sandbar brother brand.
-    //
-    // The URL deliberately points at OUR build, not tampabaypowerclean.com:
-    // per ROADMAP.md that domain "is the OLD site" — a Wix build we did not
-    // make, still live because the domain transfer is pending (see
-    // CLIENTS/tampa-bay-power-clean/SEO-CRO-STRATEGY-2026.md, H4 "point
-    // tampabaypowerclean.com at the new build"). Linking it from a portfolio
-    // of our work would credit us with someone else's site. Swap this to the
-    // brand domain at cutover.
-    name: 'Sandbar Exterior Cleaning',
-    url: 'https://lola.tyalexandermedia.com/lp/tampa-bay-power-clean.html',
-    vertical: 'Exterior Cleaning / Pressure Washing',
-    location: 'Dunedin, FL',
-    blurb: 'Roof cleaning, house washing & paver sealing — built with a dedicated money page for each service.',
-  },
+  // NOTE: the Dunedin exterior-cleaning build (formerly listed here as "Tampa
+  // Bay Power Clean") is intentionally NOT a portfolio entry. It isn't a Lola
+  // client — it's a family business Ty edits directly, routing to Sandbar. It
+  // was never on Lola's backend, so it doesn't belong in proof-of-work.
   {
     name: 'Travels by Val',
     url: 'https://www.travelsbyval.com',
