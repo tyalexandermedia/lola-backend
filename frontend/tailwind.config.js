@@ -2,6 +2,11 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        // Sharp, confident display face for headlines (loaded in index.html
+        // with display=swap, so text is never invisible if it's slow/blocked).
+        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         // Brand surfaces — kept distinct from slate so we can tune them without
         // touching every other slate use across the UI.

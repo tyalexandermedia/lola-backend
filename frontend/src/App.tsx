@@ -129,9 +129,11 @@ function canonicalPathForRoute(route: Route): string | null {
   }
 }
 
-function App() {
+function App({ ssrPath }: { ssrPath?: string } = {}) {
+  // `ssrPath` is only passed by the build-time prerender (entry-server.tsx),
+  // where there is no `window`. In the browser we always read the real URL.
   const [route, setRoute] = useState<Route>(() =>
-    parseRoute(typeof window !== 'undefined' ? window.location.pathname : '/')
+    parseRoute(typeof window !== 'undefined' ? window.location.pathname : ssrPath ?? '/')
   );
 
   useEffect(() => {
@@ -312,15 +314,20 @@ function SiteFooter({ route }: { route: Route }) {
           <a href="/" className="inline-flex items-center gap-2">
             <span aria-hidden className="text-[18px]">🐾</span>
             <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent">
-              LOLA — AI LEADS EXPERT
+              LOLA LEADS
             </span>
           </a>
           <p className="mt-3 max-w-[260px] text-[12px] leading-[1.55] text-[#9CA3AF]">
             Done-for-you AI Leads + Local SEO for service businesses. Recommended on
             Google AND ChatGPT, Perplexity, and Gemini.
           </p>
-          <p className="mt-3 text-[11px] text-[#5A5F68]">
-            Ty Alexander Media · Tampa Bay, FL
+          {/* #5A5F68 on #0A0A0B is 3.08:1 — below the 4.5:1 AA minimum for
+              11px text. #8A8F98 is 6.09:1. Breaks are unconditional: hiding
+              them on mobile only ran the three clauses together. */}
+          <p className="mt-3 text-[11px] leading-[1.6] text-[#8A8F98]">
+            Built and run by <span className="text-[#C5C5C8]">Ty Alexander Traufield</span> — “Coach Ty.”
+            <br /> Founder, Lola Leads · Ty Alexander Media
+            <br /> St. Pete · serving all of Tampa Bay, FL
           </p>
         </div>
 
@@ -353,7 +360,7 @@ function SiteFooter({ route }: { route: Route }) {
       </div>
 
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
-        <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
+        <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
           Get found on Google and in AI answers — DIY $197 or Full Build $997. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
         </p>
@@ -437,12 +444,11 @@ function Header() {
           aria-label="Lola — AI Leads Expert — home"
         >
           <span aria-hidden className="text-[16px] leading-none">🐾</span>
-          {/* Mobile: short "LOLA LEADS" (no overlap/wrap). Desktop: full wordmark — unchanged. */}
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text font-bold uppercase tracking-[0.18em] text-transparent">
-            <span className="text-[14px] sm:hidden">LOLA LEADS</span>
-            <span className="hidden text-[14px] sm:inline">
-              LOLA <span aria-hidden className="text-[#D4AF37]/55">—</span> AI LEADS EXPERT
-            </span>
+          {/* One wordmark at every breakpoint — "Lola Leads" is the brand name.
+              (The descriptor "AI Leads Expert" lives in the hero kicker and
+              meta copy, where it works as positioning rather than as a name.) */}
+          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent">
+            LOLA LEADS
           </span>
         </a>
 

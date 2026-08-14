@@ -142,11 +142,11 @@ export default function PricingPage() {
       {
         '@context': 'https://schema.org',
         '@type': 'Service',
-        name: 'LOLA — Local SEO & AI Visibility',
+        name: 'Lola Leads — Local SEO & AI Visibility',
         serviceType: 'Local SEO and AI search visibility for service businesses',
         provider: {
           '@type': 'Organization',
-          name: 'LOLA',
+          name: 'Lola Leads',
           url: 'https://lola.tyalexandermedia.com',
         },
         areaServed: { '@type': 'Country', name: 'United States' },

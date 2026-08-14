@@ -1,780 +1,943 @@
 /**
- * Lola SEO — marketing homepage at `/`.
+ * Lola — marketing homepage at `/`.
  *
- * Sections (top to bottom):
- *   1. Hero — eyebrow, H1, subhead, business-name form, CTAs
- *   2. AI-answer demo (types an answer + count-up score ring)
- *   3. Execution-first framing line
- *   4. Scrolling stats marquee
- *   5. Outcome stats (4 numbers)
- *   6. Coach Ty About (full bio block)
- *   7. 4-step process
- *   8. Why Lola comparison table
- *   9. Final CTA → /audit
+ * Order: hero → Ty's letter → the problem → proof → the math → offer → FAQ.
+ * Ty leads deliberately; he's the differentiator, and a contractor deciding
+ * whether to keep reading is deciding about a person, not an argument.
  *
- * Trade dropdown writes to localStorage.lolaTrade — AuditFlow reads it on
- * mount to pre-fill the business_type question.
+ * Design notes:
+ *   • Editorial and asymmetric — solid black, one branded gold accent, real
+ *     photos over icons. No pastel gradient blobs.
+ *   • Deliberately NOT "developer-looking": no monospace labels outside the
+ *     one column of aligned digits, no "01 / 02" section numbers, no extreme
+ *     letterspacing, rounded rather than hairline-sharp corners. The audience
+ *     is a contractor on a phone; a terminal aesthetic reads as "this is for
+ *     engineers" and costs trust. Charisma comes from the voice and the
+ *     photography, not from a typewriter face.
+ *   • Growth Score is shown as a genuine diagnostic report card, not a
+ *     lead-capture gimmick.
+ *   • Proof is only what's verifiable — a real client's public dashboard and
+ *     the visitor's own score. See ProofSection for why the job photos went.
+ *
+ * SSR-safe by construction: every section's copy is static markup that renders
+ * with react-dom/server (see scripts/prerender.mjs), so the headline, body and
+ * offer are readable in the raw HTML before any JS runs. Nothing here reads
+ * `window`/`document` during render; the only effects (useSeo, useReveal) are
+ * progressive enhancement. Pricing, Stripe links and the Half-Back Guarantee
+ * are NOT defined here — they live in lib/pricing, lib/checkout and the
+ * index.html JSON-LD, which this page intentionally does not touch.
  */
 
-import { useEffect, useState } from 'react';
-import Marquee from './Marquee';
-import RoadmapJourney from './RoadmapJourney';
-import AiDemo from './AiDemo';
-import Portfolio from './Portfolio';
-import StatCounter from './StatCounter';
-import WatchExplainer from './WatchExplainer';
-import { useReveal } from './lib/useReveal';
-import { DIY, BUILD } from './lib/pricing';
+import { useState } from 'react';
 
-// Books a free strategy call. Single source of truth for the whole homepage —
-// every primary CTA points here. Env-overridable so the calendar link can be
-// swapped without a code change.
+import { FOUNDER, LOLA_TURNS } from './lib/lola';
+import { DIY, BUILD, HALF_BACK_GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
+import { useSeo } from './lib/seo';
+import { useReveal } from './lib/useReveal';
+
 const CALENDAR_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
-const TRADES = [
-  'HVAC',
-  'Plumber',
-  'Roofer',
-  'Soft Wash / Pressure Wash',
-  'Electrician',
-  'Landscaper',
-  'Painter',
-  'Pool Services',
-  'General Contractor',
-  'Handyman',
-  'Concrete',
-  'Flooring',
-  'Pest Control',
-  'Carpet Cleaning',
-  'Cleaning Services',
-  'Lawn Care',
-  'Auto Detailing',
-  'Garage Doors',
-  'Moving',
-  'Med Spa',
-  'Salon / Barber',
-  'Locksmith',
-  'Masonry',
-  'Windows',
-  'Gutters',
-  'Duct Cleaning',
-  'Fencing',
-  'Home Remodeling',
-  'Carpenter',
-  'Arborist',
-  'Other',
-] as const;
+// The hybrid throughline — strength + endurance is the same shape as
+// Google + AI answers. Ty's own framing, shown as a parallel.
+const HYBRID: ReadonlyArray<{ label: string; value: string }> = [
+  { label: 'Day job', value: 'Full-time GM' },
+  { label: 'Coaching', value: 'Group strength & conditioning' },
+  { label: 'Training for', value: 'HYROX' },
+  { label: 'Builds for you', value: 'Google + AI answers' },
+];
 
-// Trades that AuditFlow's TRADE_TO_SERVICE can pre-fill on Step 2. Keep
-// strictly in sync with TRADE_TO_SERVICE in AuditFlow.tsx — claiming a trade
-// is "mapped" but failing to pre-fill is a broken promise on step 1.
-const MAPPED_TRADES = new Set<string>([
-  'HVAC',
-  'Plumber',
-  'Roofer',
-  'Soft Wash / Pressure Wash',
-  'Pool Service',
-  'Pool Services',
-]);
-
-const PLURAL: Record<string, string> = {
-  HVAC: 'HVAC techs',
-  Plumber: 'plumbers',
-  Roofer: 'roofers',
-  'Soft Wash / Pressure Wash': 'soft wash + pressure washing crews',
-  Electrician: 'electricians',
-  Landscaper: 'landscapers',
-  Painter: 'painters',
-  'Pool Services': 'pool pros',
-  'General Contractor': 'GCs',
-  Handyman: 'handymen',
-  Concrete: 'concrete crews',
-  Flooring: 'flooring pros',
-  'Pest Control': 'pest control teams',
-  'Carpet Cleaning': 'carpet cleaners',
-  Locksmith: 'locksmiths',
-  Masonry: 'masons',
-  Windows: 'window pros',
-  Gutters: 'gutter crews',
-  'Duct Cleaning': 'duct cleaners',
-  'Cleaning Services': 'cleaning companies',
-  'Lawn Care': 'lawn care crews',
-  'Auto Detailing': 'auto detailers',
-  'Garage Doors': 'garage door pros',
-  Moving: 'moving companies',
-  'Med Spa': 'med spas',
-  'Salon / Barber': 'salons + barbershops',
-  Fencing: 'fencing crews',
-  'Home Remodeling': 'remodelers',
-  Carpenter: 'carpenters',
-  Arborist: 'arborists',
-  Other: 'local service businesses',
-};
+// Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
+// not a real client's numbers. The two low bars (AI Visibility, Revenue
+// Tracking) are the leaks Lola is built to close.
+const SAMPLE_SCORE = 62;
+// Values line up with the six canonical dimensions (single source of truth).
+// The two lows — AI Visibility, Revenue Tracking — are the leaks Lola closes.
+const SAMPLE_VALUES = [74, 58, 46, 21, 66, 18];
+const SAMPLE_DIMENSIONS = GROWTH_SCORE_DIMENSIONS.map((name, i) => ({
+  name,
+  value: SAMPLE_VALUES[i] ?? 50,
+}));
 
 export default function Homepage() {
-  const [trade, setTrade] = useState<string>('');
-
-  // Hydrate from localStorage on mount; persist on change so AuditFlow can use it.
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem('lolaTrade');
-      if (saved && TRADES.includes(saved as typeof TRADES[number])) setTrade(saved);
-    } catch {
-      /* ignore (private-mode / SSR) */
-    }
-  }, []);
-
-  const handleTradeChange = (v: string) => {
-    setTrade(v);
-    try {
-      if (v) window.localStorage.setItem('lolaTrade', v);
-      else window.localStorage.removeItem('lolaTrade');
-    } catch {
-      /* ignore */
-    }
-  };
-
-  // Scroll-reveal every section below the hero (shared across all pages).
+  useSeo({
+    title: 'Did you show up? Get found on Google & AI — Lola Leads, Tampa Bay',
+    description:
+      "Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee.",
+  });
   useReveal();
-
-  const tradePlural = trade ? PLURAL[trade] ?? 'local service businesses' : '';
-  const auditHref = trade ? `/audit?trade=${encodeURIComponent(trade)}` : '/audit';
-  // Grader is the new lead-magnet (60-second single-page form). The trade
-  // param threads through so the business_type pre-selects on submit.
-  const graderHref = trade ? `/grader?trade=${encodeURIComponent(trade)}` : '/grader';
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* ── 1. HERO ─────────────────────────────────────────────────── */}
-      <section className="animate-slide-up relative pt-2 sm:pt-6">
-        <div
-          aria-hidden
-          className="animate-aurora pointer-events-none absolute left-1/2 top-[-10%] -z-10 h-[640px] w-[min(1040px,124vw)] -translate-x-1/2 blur-[64px]"
-          style={{
-            background:
-              'radial-gradient(38% 50% at 22% 12%, rgba(111,155,255,0.13), transparent 70%), radial-gradient(46% 56% at 82% 6%, rgba(212,175,55,0.20), transparent 70%), radial-gradient(42% 46% at 56% 36%, rgba(165,96,231,0.10), transparent 70%)',
-          }}
-        />
-
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          The AI Leads Expert
-        </p>
-
-        {/* Verified-GBP + Sandbar proof pill — visible above the hero on
-            every breakpoint. Two trust signals in one row: 'we have a real
-            verified Google Business' (kills agency-skepticism) + 'we have a
-            real client proof story you can read' (kills no-track-record
-            skepticism). Both link out to verifiable destinations. */}
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] sm:text-[12px]">
-          <a
-            href="/case-studies/sandbar"
-            className="group inline-flex items-center gap-1.5 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1 font-semibold uppercase tracking-[0.08em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
-          >
-            🛡️ Real proof story: Sandbar Soft Wash
-            <span aria-hidden className="transition group-hover:translate-x-0.5">→</span>
-          </a>
-          <span className="hidden items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1 font-semibold uppercase tracking-[0.08em] text-[#9CA3AF] sm:inline-flex">
-            ✓ Verified Google Business · Ty Alexander Media
-          </span>
-        </div>
-
-        <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(2.25rem, 5.5vw, 4.5rem)' }}
-        >
-          Get found on Google.{' '}
-          <span className="animate-shimmer bg-gradient-to-r from-[#D4AF37] via-[#FFF0B8] to-[#D4AF37] bg-clip-text text-transparent">
-            Get picked by AI.
-          </span>
-        </h1>
-
-        <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
-          {trade ? (
-            <>
-              Lola's built for{' '}
-              <span className="font-semibold text-white">{tradePlural} in Florida</span>.
-              Book a free call below — or run your free Growth Score first.
-            </>
-          ) : (
-            <>
-              Lola gets local service businesses found on Google — and recommended by{' '}
-              <span className="font-semibold text-white">ChatGPT, Perplexity, and Gemini</span>.
-              Your next customer calls you, not your competitor.
-            </>
-          )}
-        </p>
-
-        {/* Single-CTA hero. The business name is collected on the Growth Score
-            page itself, so we don't ask for it twice. */}
-        <div className="mt-7 max-w-[520px]">
-          <a
-            href={trade ? `/growth-score?trade=${encodeURIComponent(trade)}` : '/growth-score'}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
-          >
-            Get Your Free Growth Score →
-          </a>
-          <p className="mt-3 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-            60 seconds · no signup · your 0–100 Growth Score across 6 dimensions + your next step
-          </p>
-        </div>
-
-        {/* Secondary links — strategy call + pricing, grouped on one
-            wrapping row so the mobile hero stays tight (less vertical stacking). */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
-          <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C] sm:text-[15px]"
-          >
-            Or book a free 15-min call →
-          </a>
-          {/* Renders only once VITE_EXPLAINER_VIDEO_URL is set. */}
-          <WatchExplainer label="See how Lola works" seconds={90} />
-        </div>
-
-        {/* Trust + pricing-transparency wedge. Competitors (LocalIQ, Scorpion)
-            quote-gate every CTA — Lola's public pricing is the moat, so we
-            surface it the moment the visitor commits to looking. */}
-        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#7A7F8A] sm:text-[13px]">
-          <span><span className="font-semibold text-white">{DIY.price} DIY or {BUILD.price} Full Build</span> · one-time, done-for-you</span>
-          <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>🛡️ Half-Back Guarantee</span>
-          <span aria-hidden className="text-[#3A3F48]">·</span>
-          <span>No contract</span>
-        </p>
-
-        {/* Two-ways-to-win positioning — the core narrative wedge. */}
-        <p className="mt-6 max-w-[680px] rounded-[10px] border-l-2 border-[#D4AF37]/60 bg-[#D4AF37]/[0.04] py-3 pl-4 pr-3 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          <span className="font-semibold text-white">See your score and fix it yourself, or we build it and rank it.</span>{' '}
-          We get you found when people ask ChatGPT or Google for a company like yours.
-        </p>
-
-        {/* Scroll cue — invites the scroll, fades once the visitor starts. */}
-        <ScrollCue />
-      </section>
-
-      {/* ── 1·5. AGENTIC AI DEMO — types an AI answer + counts up a score ── */}
-      <AiDemo trade={trade} />
-
-      {/* ── 1a. VISUAL ROADMAP — the signature journey graphic ──────── */}
-      <section className="mt-16 sm:mt-20">
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          The path
-        </p>
-        <h2
-          className="mx-auto mt-3 max-w-[680px] text-center font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
-        >
-          Start free. Then pick your path.
-        </h2>
-        <p className="mx-auto mt-4 mb-10 max-w-[600px] text-center text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-          Get your free Growth Score, then fix it yourself for $197 or have us build and rank it for $997.
-        </p>
-        <RoadmapJourney />
-        <div className="mt-8 text-center">
-          <a
-            href="/pricing"
-            className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:text-[#F4D47C]"
-          >
-            See pricing →
-          </a>
-        </div>
-      </section>
-
-      {/* ── 1b. AI SEARCH PLATFORMS TRACKED ──────────────────────────
-          Tight visual proof of WHICH AI engines Lola tracks. Otterly
-          publishes the data: ChatGPT = 56% of AI search referrals, Gemini
-          = 18%, Perplexity = 8%. Putting the platforms on the page makes
-          the AI-search claim concrete the moment cold visitors hit the site. */}
-      <section className="mt-10 sm:mt-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
-          AI engines Lola tracks for you
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-          {[
-            { name: 'ChatGPT', share: '56%', sub: 'of AI traffic' },
-            { name: 'Gemini', share: '18%', sub: 'of AI traffic' },
-            { name: 'Perplexity', share: '8%', sub: 'of AI traffic' },
-            { name: 'Claude', share: 'Rising', sub: 'of AI traffic' },
-          ].map((p) => (
-            <div
-              key={p.name}
-              className="flex flex-col rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-3 transition-colors hover:border-[#D4AF37]/30"
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="text-[13px] font-bold text-white sm:text-[14px]">{p.name}</p>
-                <p className="text-[11px] font-bold tabular-nums text-[#D4AF37]">{p.share}</p>
-              </div>
-              <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">{p.sub}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-[11px] leading-[1.5] text-[#7A7F8A] sm:text-[12px]">
-          Source: <span className="text-[#9CA3AF]">Otterly AI 2026 research — 15% of all website traffic now comes from AI agents.</span> Lola gets you found across all four when people ask them for a company like yours.
-        </p>
-      </section>
-
-      {/* ── 2. 3-STEP FLOW GRAPHIC ──────────────────────────────────── */}
-      {/* ── 3. EXECUTION-FIRST FRAMING LINE ─────────────────────────── */}
-      <p className="mt-10 max-w-[820px] text-[15px] leading-[1.6] text-white sm:mt-14 sm:text-[17px]">
-        <span className="font-bold text-[#D4AF37]">SEO tools tell you what's broken.</span>{' '}
-        Premium agencies charge $2,500/mo to fix it.{' '}
-        <span className="font-bold text-[#D4AF37]">$997 gets you a new site built and ranked — with our Half-Back Guarantee.</span>{' '}
-        <span className="font-bold text-white">Real work or you walk.</span>
-      </p>
-
-      {/* Outcome-tracking band — ties the offer to measurable results, the
-          thing that justifies the retainer. Mirrors the live dashboard. */}
-      <div className="mt-8 grid grid-cols-1 gap-3 rounded-2xl border border-[#D4AF37]/20 bg-white/[0.02] p-5 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-6 sm:p-6">
-        <div className="flex gap-3 sm:gap-4">
-          {[['📞', 'Calls'], ['📝', 'Leads'], ['👆', 'Clicks']].map(([e, l]) => (
-            <div key={l} className="flex flex-col items-center rounded-[10px] border border-white/[0.08] bg-[#0F0F12] px-4 py-2.5">
-              <span aria-hidden className="text-[18px]">{e}</span>
-              <span className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">{l}</span>
-            </div>
-          ))}
-        </div>
-        <p className="text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          <span className="font-semibold text-white">You get a live Growth Score dashboard</span> — calls,
-          leads, and clicks tracked where access exists and as integrations are connected. Not vanity rankings:
-          the signals that pay your bills, and exactly where you are on the roadmap.{' '}
-          <span className="text-[#D4AF37]">Evidence you can see, not take on faith.</span>
-        </p>
-      </div>
-
-      {/* ── 3b. VALUE STACK — anchor the Full Build against agency pricing (mirrors /pricing) ─ */}
-      <section className="mt-14 sm:mt-20">
-        <h2
-          className="mx-auto max-w-[760px] text-center font-bold leading-[1.15] tracking-[-0.01em] text-white"
-          style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.4rem)' }}
-        >
-          Everything you&apos;d pay an agency{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">$2,000–$5,000/mo</span> for —
-          for a one-time <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-transparent">{BUILD.price}</span>.
-        </h2>
-        <div className="mx-auto mt-7 max-w-[600px] rounded-[18px] border border-[#D4AF37]/25 bg-white/[0.02] p-6 shadow-[0_0_44px_rgba(212,175,55,0.06)] sm:p-7">
-          <ul className="space-y-2.5 text-[14px] sm:text-[15px]">
-            {[
-              ['🌐 Custom website build', 'included'],
-              ['🤖 30 days of visibility work — Google + AI answers', 'included'],
-              ['📍 Google Business Profile optimization', 'included'],
-              ['🤝 Direct access to Ty during the build', 'included'],
-              ['🛡️ Half-Back Guarantee', 'included'],
-            ].map(([label, val]) => (
-              <li key={label} className="flex items-baseline justify-between gap-4 border-b border-white/[0.05] pb-2.5">
-                <span className="text-[#E8E4D8]">{label}</span>
-                <span className="whitespace-nowrap text-[13px] font-semibold text-[#9CA3AF]">{val}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-5 flex flex-col items-center gap-1 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] py-4 text-center">
-            <p className="text-[12px] uppercase tracking-[0.18em] text-[#9CA3AF]">Agencies charge $2,000–$5,000/mo — the Full Build is done-for-you, one-time</p>
-            <p className="text-[15px] font-bold text-white">Prefer to do it yourself? <span className="text-[#D4AF37]">{DIY.price} DIY</span> · or <span className="text-[#D4AF37]">{BUILD.price} Full Build</span> · $0 setup</p>
-          </div>
-          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <a
-              href={CALENDAR_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right"
-            >
-              Book a free strategy call →
-            </a>
-            <a href="/pricing" className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:text-[#F4D47C]">
-              See full pricing →
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. SCROLLING STATS MARQUEE ──────────────────────────────── */}
-      <div className="relative left-1/2 right-1/2 mt-12 -mx-[50vw] w-screen sm:mt-16">
-        <Marquee />
-      </div>
-
-      {/* ── 5. OUTCOME STATS (honest, defensible) ───────────────────── */}
-      <section className="mt-14 sm:mt-20">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {[
-            { value: 20, suffix: ' sec', label: 'Growth Score completion time' },
-            { value: 1800, prefix: '$', suffix: '/mo', label: 'Saved vs premium agencies' },
-            { value: 20, suffix: '+ cities', label: 'Sandbar Soft Wash service area' },
-            { value: 30, suffix: ' days', label: 'Half-Back Guarantee window' },
-          ].map((s, i) => (
-            <div
-              key={i}
-              className="rounded-[12px] border border-[#D4AF37]/20 bg-white/[0.02] p-5 sm:p-6"
-            >
-              <p className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[28px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[34px]">
-                <StatCounter value={s.value} prefix={s.prefix} suffix={s.suffix} />
-              </p>
-              <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-[#C5C5C8] sm:text-[13px]">
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-5 text-center text-[13px] italic text-[#8A8F98]">
-          Currently working with <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">Sandbar Soft Wash</a> and growing. Your business could be next.
-        </p>
-      </section>
-
-      {/* ── 5a. PORTFOLIO — live sites Lola built (scrollable in-page preview) ── */}
-      <Portfolio />
-
-      {/* ── 5b. INDUSTRIES WE SERVE ──────────────────────────────────
-          8 tiles linking to the programmatic [service]-seo-[city] hubs.
-          Two wins: (1) cold visitors self-identify into the right niche,
-          (2) crawlable internal links into the LP tree boost entity SEO
-          for "[service] local SEO" queries. Pattern lifted from Scorpion
-          + LocalIQ, dialed to Lola's dark/gold aesthetic. */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Industries
-        </p>
-        <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          Built for the businesses your neighborhood searches for.
-        </h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Tuned playbooks for each industry — keywords, schema, and AI-search
-          prompts that match how buyers actually search for your work.
-        </p>
-
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 sm:gap-4">
-          {[
-            { emoji: '🏠', name: 'Home Services', slug: 'pressure-washing-seo-tampa' },
-            { emoji: '🔧', name: 'Plumbing', slug: 'plumber-seo-tampa' },
-            { emoji: '❄️', name: 'HVAC', slug: 'hvac-seo-tampa' },
-            { emoji: '🏠', name: 'Roofing', slug: 'roofing-seo-tampa' },
-            { emoji: '🏊', name: 'Pool Service', slug: 'pool-service-seo-tampa' },
-            { emoji: '🧹', name: 'Cleaning', slug: 'cleaning-seo-tampa' },
-            { emoji: '🌿', name: 'Lawn Care', slug: 'lawn-care-seo-tampa' },
-            { emoji: '⚡', name: 'Electrical', slug: 'electrician-seo-tampa' },
-          ].map((ind) => (
-            <a
-              key={ind.slug}
-              href={`/lp/${ind.slug}`}
-              className="group flex min-h-[88px] flex-col justify-between rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.04] sm:p-5"
-            >
-              <span aria-hidden className="text-[22px] sm:text-[24px]">{ind.emoji}</span>
-              <span className="mt-2 text-[14px] font-semibold text-white group-hover:text-[#D4AF37] sm:text-[15px]">
-                {ind.name}
-              </span>
-            </a>
-          ))}
-        </div>
-
-        <p className="mt-5 text-[13px] text-[#8A8F98]">
-          Not on the list? Lola works for any local service business — salons, med spas,
-          auto detailing, moving, fencing, more.{' '}
-          <a href="/lp/industries" className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline">
-            See all industries →
-          </a>
-        </p>
-
-      </section>
-
-      {/* ── 6. COACH TY ABOUT ────────────────────────────────────────── */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Meet Ty &amp; Lola
-        </p>
-
-        <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-10">
-          {/* Ty & Lola on the beach at sunset — the whole story in one frame. */}
-          <figure className="mx-auto w-[220px] max-w-full sm:mx-0">
-            <div className="aspect-[3/4] overflow-hidden rounded-2xl border border-[#D4AF37]/30 shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
-              <img
-                src="/images/ty-lola-beach.jpg"
-                alt="Coach Ty and his dog Lola on a Tampa Bay beach at sunset"
-                loading="lazy"
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-            <figcaption className="mt-2 text-center text-[11px] text-[#8A8F98] sm:text-left">
-              Ty &amp; Lola · Tampa Bay
-            </figcaption>
-          </figure>
-
-          <div className="space-y-4 text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
-            <p>
-              Hey — I'm Ty. Lola's the name on the door, and she's exactly who you think:{' '}
-              <span className="font-semibold text-white">my dog.</span> She turns 9 on February 16
-              (a 2018 girl), and honestly she's the whole reason this exists.
-            </p>
-            <p>
-              By day I'm a personal trainer and a full-time general manager. The dream is to go
-              hybrid — keep coaching people in the gym, and run{' '}
-              <span className="font-semibold text-white">Lola Leads</span> the rest of the time:
-              building local businesses a site that actually gets them found and gets the phone
-              ringing, on Google and on AI.
-            </p>
-            <p className="text-white">
-              No $5K/mo agency games. No 50-page report that dies in your inbox. I answer my own
-              phone, I do the work, and if I don't get you ranking,{' '}
-              <span className="font-bold text-[#D4AF37]">you get half back — the Half-Back Guarantee.</span>
-            </p>
-            <p>
-              And the real goal? Enough of you win with Lola that I can buy{' '}
-              <span className="font-semibold text-white">the actual Lola her beach house</span> 🐾.
-              She's earned it.
-            </p>
-            <p className="text-[14px] text-[#D4AF37]">
-              — Coach Ty
-              <span className="block text-[12px] text-[#8A8F98] sm:inline sm:before:content-['_·_']">
-                Founder, Lola Leads | Ty Alexander Media | Tampa Bay, FL
-              </span>
-            </p>
-            <p className="mt-3">
-              <a
-                href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]/85 underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
-              >
-                ✓ Verified Google Business — Ty Alexander Media, Tampa Bay, FL
-                <span aria-hidden>↗</span>
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 8. WHY LOLA COMPARISON TABLE ────────────────────────────── */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          The Difference
-        </p>
-        <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          Why Lola, not the others?
-        </h2>
-
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-white/[0.08]">
-          <table className="w-full min-w-[640px] text-left text-[13px] sm:text-[14px]">
-            <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.14em]">
-              <tr>
-                <th className="px-3 py-3 text-[#8A8F98] sm:px-5 sm:py-4"></th>
-                <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.06] px-3 py-3 text-center text-[#D4AF37] sm:px-5 sm:py-4">
-                  Lola
-                </th>
-                <th className="px-3 py-3 text-center text-[#8A8F98] sm:px-5 sm:py-4">SiteSeen</th>
-                <th className="px-3 py-3 text-center text-[#8A8F98] sm:px-5 sm:py-4">SEMrush</th>
-                <th className="px-3 py-3 text-center text-[#8A8F98] sm:px-5 sm:py-4">BrightLocal</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.06]">
-              {[
-                ['Built for local service businesses', '✅', '✅', '❌', '❌'],
-                ['Done-for-you build',          '✅', '❌', '❌', '❌'],
-                ['AI Search Visibility',        '✅', '❌', '❌', '❌'],
-                ['Personal brand backed',       '✅', '❌', '❌', '❌'],
-                ['Florida-focused',             '✅', '❌', '❌', '❌'],
-                ['One-time, under $1,000',      '✅', '✅', '❌', '⚠️'],
-                ['Coach Ty on Slack/text',      '✅', '❌', '❌', '❌'],
-              ].map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td
-                      key={j}
-                      className={`px-3 py-3 leading-[1.45] sm:px-5 sm:py-4 ${
-                        j === 0
-                          ? 'text-[#C5C5C8]'
-                          : j === 1
-                          ? 'border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.04] text-center text-white'
-                          : 'text-center text-[#8A8F98]'
-                      }`}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <p className="mt-6 max-w-[680px] text-[14px] italic leading-[1.6] text-[#9AA0A6] sm:text-[15px]">
-          Other tools tell you what's broken and disappear. Lola finds it AND fixes it weekly.
-          That's the difference.
-        </p>
-      </section>
-
-      {/* ── 8b. FAQ — visible accordion ─────────────────────────────
-          Matches the FAQPage JSON-LD in index.html (search-engine win)
-          and crushes the last-mile objections before the final CTA
-          (conversion win). Pattern from BrightLocal/Scorpion. */}
-      <section className="mt-16 sm:mt-24">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          Common questions
-        </p>
-        <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
-        >
-          The honest answers.
-        </h2>
-
-        <div className="mt-8 flex flex-col gap-3">
-          {[
-            {
-              q: 'What kinds of businesses does Lola work with?',
-              a: 'Local service businesses of all kinds — home services like pressure washing, plumbing, HVAC, roofing, pool care, plus cleaning, salons, med spas, auto detailing, lawn care, and other local trades. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you.',
-            },
-            {
-              q: 'How much does Lola cost?',
-              a: "Two simple options, both one-time. DIY is $197 — you get your full Growth Score plus a simple 5-step fix-it checklist and do the work yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score to see where you stand.",
-            },
-            {
-              q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
-              a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews) because that's increasingly where buyers ask for a recommendation. We track which AI agents recommend you and which competitor they recommend when they don't.",
-            },
-            {
-              q: 'How fast will I see results?',
-              a: "The Full Build backs it with the Half-Back Guarantee: we pick 5 money keywords for your business together in week 1, and if we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print. We build the site fast, then spend 30 days getting you found on Google and in AI answers.",
-            },
-            {
-              q: "Do you only work with Florida businesses?",
-              a: "Tampa Bay is our home network and where our proof story (Sandbar Soft Wash) lives — but the system works anywhere with Google Maps and AI search. Plenty of clients are outside Florida.",
-            },
-            {
-              q: "What's the cancellation policy?",
-              a: "Cancel anytime. No contracts, no minimum commitment. If we're not earning back your investment, you don't owe another dollar.",
-            },
-            {
-              q: "What's actually included in the Full Build?",
-              a: "For a one-time $997: a custom website built for you, 30 days of visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build — all backed by the Half-Back Guarantee. Prefer to do it yourself? The $197 DIY guide gives you your full Growth Score plus a simple 5-step fix-it checklist. See /pricing for the full breakdown.",
-            },
-            {
-              q: 'Who is behind Lola?',
-              a: "Coach Ty in Tampa Bay. He built Lola to fix the local visibility of his father's real business — Sandbar Soft Wash in Palm Harbor — and now runs the same system for other local service businesses. He answers his own phone.",
-            },
-          ].map((item, i) => (
-            <details
-              key={i}
-              className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-white sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
-                <span>{item.q}</span>
-                <span aria-hidden className="shrink-0 text-[18px] text-[#D4AF37] transition group-open:rotate-45">+</span>
-              </summary>
-              <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:px-6 sm:pb-6 sm:text-[15px]">
-                {item.a}
-              </div>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 9. FINAL CTA ─────────────────────────────────────────────── */}
-      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-24 sm:p-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Start Here</p>
-        <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
-          style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
-        >
-          Let's get your phone ringing — from Google and AI.
-        </h2>
-        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          Book a free 15-minute call with Coach Ty. No pressure, no pitch deck — just a
-          straight answer on why you're missing calls and what to fix first.
-        </p>
-
-        {/* Offer snapshot — the Full Build (mirrors /pricing) */}
-        <div className="mx-auto mt-7 max-w-[560px] rounded-[16px] border border-[#D4AF37]/30 bg-[#0A0A0B]/50 p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">🐾 The LOLA Full Build</p>
-          <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-[1.55] text-[#E8E4D8]">
-            <span className="font-semibold text-white">$997 gets you a new site built and ranked</span> — on Google and in AI
-            answers — <span className="font-semibold text-white">with our Half-Back Guarantee</span>.
-          </p>
-          <p className="mt-4 text-[34px] font-black leading-none text-[#D4AF37] sm:text-[40px]">
-            $997<span className="text-[15px] font-bold text-[#9CA3AF]"> one-time · or $197 DIY</span>
-          </p>
-          <p className="mt-2 text-[12px] text-[#8A8F98]">$0 setup · no contract · Half-Back Guarantee on the Full Build</p>
-          <a href="/pricing" className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#D4AF37] hover:text-[#F4D47C]">
-            See pricing →
-          </a>
-        </div>
-
-        <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
-          >
-            Book a free strategy call →
-          </a>
-          <a
-            href={graderHref}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition-all duration-200 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
-          >
-            Or get your free score
-          </a>
-        </div>
-      </section>
-
-      {/* Minimal footer */}
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
-        <p>Ty Alexander Media · Tampa Bay</p>
-        <p className="mt-1">© 2026 · Built with Lola 🐾</p>
-      </div>
+      <Hero />
+      {/* Ty leads. He IS the differentiator, and a contractor deciding whether
+          to keep reading is deciding about a person, not an argument. The
+          analysis follows once they know who's talking. */}
+      <StorySection />
+      <ProblemSection />
+      <ProofSection />
+      <RoiSection />
+      <OfferSection />
+      <FaqSection />
+      <FinalCta />
     </main>
   );
 }
 
-/**
- * ScrollCue — a soft "keep scrolling" nudge under the hero. Fades out the
- * moment the visitor scrolls, and never shows for reduced-motion users. Pure
- * decoration (aria-hidden), absolutely no layout cost once hidden.
- */
-function ScrollCue() {
-  const [hidden, setHidden] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      setHidden(true);
-      return;
-    }
-    const onScroll = () => {
-      if (window.scrollY > 40) setHidden(true);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO — asymmetric split: statement headline (left) + diagnostic report
+   card (right). Solid black, hairline grid texture, one gold rule.
+   ───────────────────────────────────────────────────────────────────────── */
+function Hero() {
+  return (
+    <section className="relative pt-2 sm:pt-4">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-14">
+        {/* LEFT — the statement */}
+        <div className="animate-slide-up">
+          <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
+            AI Leads Expert · Tampa Bay
+          </p>
+
+          {/* text-balance stops the last line orphaning a word ("up?") when the
+              display face falls back to a wider system font. */}
+          <h1 className="mt-6 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[52px] lg:text-[60px]">
+            Your next customer already searched for you.
+            <span className="mt-2 block text-[#D4AF37]">Did you show up?</span>
+          </h1>
+
+          <p className="mt-7 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+            Local service businesses are losing customers every day to Google and AI
+            search results they don't even know exist. Lola makes sure you're the one
+            they find — <span className="font-semibold text-white">and the one they choose.</span>
+          </p>
+
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href="/growth-score"
+              className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            >
+              Run my free Growth Score
+              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+            </a>
+            <a
+              href={CALENDAR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-7 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+            >
+              Book a 15-min call
+            </a>
+          </div>
+
+          <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#8A8F98]">
+            <span>60-sec Growth Score</span>
+            <span aria-hidden className="text-[#3A3F48]">/</span>
+            <span>then {DIY.price} DIY or {BUILD.price} Full Build</span>
+            <span aria-hidden className="text-[#3A3F48]">/</span>
+            <span className="text-[#D4AF37]">Half-Back Guarantee</span>
+          </p>
+        </div>
+
+        {/* RIGHT — the report card */}
+        <div className="animate-slide-up lg:pt-3">
+          <ReportCard />
+        </div>
+      </div>
+
+      {/* Full-bleed hairline under the hero. */}
+      <div aria-hidden className="mt-14 h-px w-full bg-gradient-to-r from-[#D4AF37]/40 via-white/10 to-transparent sm:mt-20" />
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   REPORT CARD — the Growth Score result as a real diagnostic scorecard.
+   Static markup (SSR-safe): grade, six graded dimensions, biggest-leak
+   callout, next move. Reads like a report, not a form.
+   ───────────────────────────────────────────────────────────────────────── */
+function ReportCard() {
+  const grade = SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : SAMPLE_SCORE >= 40 ? 'D' : 'F';
+  return (
+    <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+      {/* header band */}
+      <div className="flex items-center justify-between border-b border-white/10 bg-[#141416] px-5 py-3">
+        <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+          🐾 Lola · Growth Score
+        </span>
+        <span className="rounded-md border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">
+          Sample
+        </span>
+      </div>
+
+      <div className="px-5 py-5 sm:px-6">
+        {/* subject + grade */}
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Subject</p>
+            <p className="mt-1 text-[15px] font-semibold text-white">Local pressure-washing co.</p>
+            <p className="text-[11px] text-[#8A8F98]">Tampa Bay, FL</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Score</p>
+            <p className="font-display text-[44px] font-bold leading-none tracking-[-0.03em] text-[#D4AF37]">
+              {SAMPLE_SCORE}
+              <span className="text-[16px] text-[#8A8F98]">/100</span>
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.08em] text-white">Grade {grade} · Needs work</p>
+          </div>
+        </div>
+
+        {/* dimension bars */}
+        <div className="mt-5 space-y-2.5">
+          {SAMPLE_DIMENSIONS.map((d) => {
+            const low = d.value < 40;
+            return (
+              <div key={d.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-[124px] shrink-0 text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
+                    {d.name}
+                  </span>
+                  <span className="h-[7px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <span
+                      className={`block h-full rounded-full ${low ? 'bg-[#E5534B]' : 'bg-[#D4AF37]'}`}
+                      style={{ width: `${d.value}%` }}
+                    />
+                  </span>
+                </div>
+                <span className={`font-mono text-[11px] tabular-nums ${low ? 'text-[#E5534B]' : 'text-[#C5C5C8]'}`}>
+                  {String(d.value).padStart(2, '0')}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* biggest leak */}
+        <div className="mt-5 border-l-2 border-[#E5534B] bg-[#E5534B]/[0.06] px-4 py-3">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-[#E5534B]">Biggest leak</p>
+          <p className="mt-1 text-[13px] leading-[1.5] text-[#E8E4D8]">
+            <span className="font-semibold text-white">AI Visibility.</span> Ask ChatGPT for a
+            company like yours and it names a competitor — not you.
+          </p>
+        </div>
+
+        {/* next move */}
+        <div className="mt-3 flex items-start gap-2">
+          <span aria-hidden className="mt-0.5 text-[12px] text-[#D4AF37]">→</span>
+          <p className="text-[13px] leading-[1.5] text-[#C5C5C8]">
+            <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">Next move&nbsp;</span>
+            Fix your Google Business Profile + get named in AI answers. That's the $997 Full Build.
+          </p>
+        </div>
+      </div>
+
+      <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+        Your real score · 60 seconds · no signup
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   02 — THE PROBLEM, AND WHAT'S ACTUALLY PROMISED.
+
+   Formerly two sections (problem + honest fix) running ~350 words to make one
+   point. Merged and cut to the one-sentence register the voice guide asks for:
+   the two query cards SHOW the failure, so the prose doesn't need to explain
+   it, and the guarantee/won't-fake split carries the honesty pillar.
+   ───────────────────────────────────────────────────────────────────────── */
+function ProblemSection() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="What's going wrong" />
+      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
+        <div>
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+            Right now, someone near you is asking for exactly what you sell.
+          </h2>
+          <p className="mt-6 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+            If you're not in the answer, they hire someone else. You never find out the
+            sale existed — <span className="font-semibold text-white">and neither do they.</span>
+          </p>
+        </div>
+
+        {/* The cards do the explaining — competitor picked, on Google and in AI. */}
+        <div className="space-y-4">
+          <QueryCard
+            engine="Google"
+            query="best pressure washing company near me"
+            answer="Top 3 map results — your competitor, not you."
+          />
+          <QueryCard
+            engine="ChatGPT"
+            query="who should I hire to soft-wash my house in Tampa?"
+            answer={"“Based on reviews and local presence, I’d recommend…” — and it names someone else."}
+          />
+        </div>
+      </div>
+
+      {/* The honest split — what's guaranteed, what isn't. */}
+      <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2">
+        <div className="bg-[#0E0E10] p-6 sm:p-7">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
+            ✓ What I guarantee
+          </p>
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+            You get found. On Google, and in the AI answers.
+          </p>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            That's the part I control, so I put it in writing.
+          </p>
+          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
+            {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title}
+          </p>
+        </div>
+
+        <div className="bg-[#0E0E10] p-6 sm:p-7">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
+            ✗ What I won't fake
+          </p>
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+            Leads. Anyone promising you those is guessing.
+          </p>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            Whether a click becomes a booked job depends on your pricing and your
+            follow-through too. I get you in front of them. Closing is on both of us.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function QueryCard({ engine, query, answer }: { engine: string; query: string; answer: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-[#0E0E10] p-4 sm:p-5">
+      <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
+        <span aria-hidden className="text-[11px] text-[#D4AF37]">⌕</span>
+        <span className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">{engine}</span>
+      </div>
+      <p className="mt-3 text-[15px] font-medium text-white">"{query}"</p>
+      <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-[#9AA0A6]">
+        <span aria-hidden className="mt-0.5 text-[#E5534B]">✗</span>
+        <span>{answer}</span>
+      </p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   03 — PROOF, THE ONLY KIND WORTH SHOWING.
+
+   This replaced a wall of before/after job photos. Two problems with those:
+   the /gallery set is 40 filenames over 16 unique images (categories padded
+   with byte-identical copies), which nobody can call "real work" under the
+   no-fabricated-proof rule in DECISIONS.md — and clean driveways prove
+   SANDBAR's work, not Lola's. What Lola actually sells is being found.
+
+   So the proof is the two things that are genuinely verifiable: a real
+   client's live public dashboard (no login — anyone can audit it), and the
+   visitor's own score on their own business. Per DECISIONS.md the only
+   Sandbar numbers quoted are the verifiable ones (15+ years, 20+ cities).
+   ───────────────────────────────────────────────────────────────────────── */
+function ProofSection() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="Don't take my word for it" />
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+        Most agencies show you a case study. I'll just give you the login.
+      </h2>
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+        Every move I make for a client is tracked on a dashboard anyone can open. No
+        screenshot I picked, no number I typed in myself.
+      </p>
+
+      <div className="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* the receipts */}
+        <a
+          href="/r/client/sandbar"
+          className="group flex flex-col rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10] p-6 transition-colors hover:border-[#D4AF37]/60 sm:p-7"
+        >
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
+            Live client dashboard
+          </p>
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+            Sandbar Soft Wash — 15 years of great work. Almost zero Google.
+          </p>
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            A real Palm Harbor business serving 20+ cities across Tampa Bay, that nobody
+            could find online. The whole rebuild is in the open — every move, timestamped,
+            for anyone to check.
+          </p>
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#D4AF37]">
+            Open the dashboard
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
+
+        {/* self-proof — better than any case study, because it's about them */}
+        <a
+          href="/growth-score"
+          className="group flex flex-col rounded-xl border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-[#D4AF37]/40 sm:p-7"
+        >
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
+            Or skip my proof entirely
+          </p>
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+            Run it on your own business. Right now, free.
+          </p>
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            Sixty seconds, no signup. You'll see exactly where you stand on Google and in
+            AI answers — and the one fix that moves you most. Whether you hire me is a
+            separate conversation.
+          </p>
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-white">
+            Get my Growth Score
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   03 — THE STORY. A signed, first-person letter from Ty Alexander Traufield
+   ("Coach Ty") — his own words. A named human with a photo and a stated
+   motive outperforms third-person agency boilerplate, and it's the truth.
+   ───────────────────────────────────────────────────────────────────────── */
+function StorySection() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="Who you're dealing with" />
+      {/* Three grid children so mobile can read photo → letter → résumé.
+          Keeping the résumé glued under the photo pushed the first line of the
+          letter ~660px down the page on a small phone. Desktop is unchanged:
+          explicit row/column placement puts photo and résumé back in the left
+          column with the letter spanning both rows on the right. */}
+      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-x-12 sm:gap-y-5">
+        <figure className="order-1 sm:col-start-1 sm:row-start-1">
+          <div className="overflow-hidden rounded-xl border border-[#D4AF37]/25">
+            <img
+              src="/images/ty-lola-beach.jpg"
+              alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
+              loading="lazy"
+              width={600}
+              height={800}
+              className="aspect-[3/4] w-full object-cover"
+            />
+          </div>
+          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+            Ty &amp; Lola · St. Pete, FL
+          </figcaption>
+        </figure>
+
+        {/* The hybrid throughline, stated as a parallel. */}
+        <div className="order-3 sm:col-start-1 sm:row-start-2">
+          <dl className="divide-y divide-white/10 border-y border-white/10">
+            {HYBRID.map((row) => (
+              <div key={row.label} className="flex items-baseline justify-between gap-3 py-2.5">
+                <dt className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+                  {row.label}
+                </dt>
+                <dd className="text-right text-[13px] font-medium text-[#E8E4D8]">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-2 text-right text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+            Hybrid all the way down
+          </p>
+        </div>
+
+        {/* the letter */}
+        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+            Hey — I'm Ty.
+          </h2>
+
+          {/* max-w keeps the letter at a readable ~70 characters per line. */}
+          <div className="mt-6 max-w-[64ch] space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+            <p>
+              Lola's the name on the door, and yeah — she's exactly who you think:{' '}
+              <span className="font-semibold text-white">my dog.</span> A 2018 girl who turns{' '}
+              {LOLA_TURNS} this February 16. And honestly? She's the whole reason any of this exists.
+            </p>
+            <p>
+              I'm a group strength &amp; conditioning coach and a full-time GM, training for{' '}
+              <span className="font-semibold text-white">HYROX</span> on my own time. That makes me a
+              hybrid athlete — strength and endurance, no either/or. Turns out that's how I've built
+              everything: coach and founder, gym and laptop, getting you found on Google{' '}
+              <span className="font-semibold text-white">and</span> in the AI answers.
+            </p>
+            <p>
+              The whole thing started with one crew:{' '}
+              <a
+                href="/case-studies/sandbar"
+                className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
+              >
+                Sandbar Soft Wash
+              </a>
+              , right here in the bay. I got them found and got their phone ringing — Google and AI.
+              It worked. So I'm scaling the system, and that's Lola Leads.
+            </p>
+            <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
+              Here's what I'm not: a $5K-a-month agency hiding behind a dashboard. No 50-page report
+              that dies in your inbox. I answer my own phone. I do the work myself. And if I don't
+              get you ranking, you get half your money back — the{' '}
+              <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
+            </p>
+            <p>
+              The real goal? Enough local businesses win with Lola that I can buy the actual Lola{' '}
+              <span className="font-semibold text-white">the backyard she deserves.</span> She's
+              earned it — and when you win, so do I.
+            </p>
+            <p className="text-[17px] font-semibold text-white sm:text-[18px]">
+              Let's get your phone ringing.
+            </p>
+          </div>
+
+          {/* signature block */}
+          <div className="mt-7 border-t border-white/10 pt-5">
+            <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
+            <p className="mt-1.5 text-[14px] text-[#C5C5C8]">
+              <span className="font-semibold text-white">{FOUNDER.fullName}</span> — {FOUNDER.title}{' '}
+              · {FOUNDER.company}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+              {FOUNDER.location}
+            </p>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+            >
+              ✓ Verified Google Business <span aria-hidden>↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   04 — THE MATH. The agency-cost contrast plus a break-even calculator.
+
+   Deliberately COST arithmetic, never a return promise: every figure here is
+   either the visitor's own number or a published price. Promising "X leads →
+   Y revenue" would contradict section 02 (the honest fix), which is the most
+   valuable thing on this page — so the section says so out loud.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/** Numeric prices derived from the display strings so lib/pricing stays the
+ *  single source of truth — change the price there and this math follows. */
+const BUILD_PRICE = Number(BUILD.price.replace(/[^0-9.]/g, ''));
+const DIY_PRICE = Number(DIY.price.replace(/[^0-9.]/g, ''));
+/** The comparison Ty gets quoted against — a $5K/mo retainer agency. */
+const AGENCY_MONTHLY = 5000;
+const AGENCY_YEAR_ONE = AGENCY_MONTHLY * 12;
+
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+const COMPARISON: ReadonlyArray<{ label: string; agency: string; lola: string }> = [
+  { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(BUILD_PRICE)} once` },
+  { label: 'Contract', agency: '12 months, locked', lola: 'None' },
+  { label: 'Who does the work', agency: 'An account manager', lola: 'Ty — the one you texted' },
+  { label: 'What you get monthly', agency: 'A 50-page PDF report', lola: 'A live score you can check' },
+  { label: "If you don't rank", agency: 'You keep paying', lola: 'You get half your money back' },
+];
+
+function RoiSection() {
+  // Visitor's own average job value — the only input, and it never leaves the
+  // browser. Default is a plausible mid-range local-services ticket.
+  const [avgJob, setAvgJob] = useState(500);
+  const jobsForBuild = Math.max(1, Math.ceil(BUILD_PRICE / Math.max(avgJob, 1)));
+  const jobsForDiy = Math.max(1, Math.ceil(DIY_PRICE / Math.max(avgJob, 1)));
 
   return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="The math" />
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+        If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
+      </h2>
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+        Same job. An agency just has salaries to cover before your first result. I don't.
+      </p>
+
+      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        {/* the comparison */}
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0E0E10]">
+          {/* Mobile: label on its own line, then the two values side by side.
+              sm+: a true three-column table. Keeps the label readable at 320px
+              instead of crushing it into a ~70px gutter. */}
+          <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-[#141416] px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
+            <span className="hidden text-[10px] uppercase tracking-[0.08em] text-[#8A8F98] sm:block">
+              Compare
+            </span>
+            <span className="text-left text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#8A8F98] sm:w-[128px] sm:text-right lg:w-[152px]">
+              {usd(AGENCY_MONTHLY)}/mo agency
+            </span>
+            <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
+              Lola Full Build
+            </span>
+          </div>
+
+          <dl className="divide-y divide-white/[0.07]">
+            {COMPARISON.map((row) => (
+              <div
+                key={row.label}
+                className="grid grid-cols-2 items-start gap-x-3 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5"
+              >
+                <dt className="col-span-2 mb-1.5 text-[10px] uppercase tracking-[0.06em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
+                  {row.label}
+                </dt>
+                {/* The strike-through is the only thing marking the agency
+                    column, and text-decoration isn't exposed to screen
+                    readers — so name each side explicitly. */}
+                <dd className="text-left text-[13px] leading-[1.4] text-[#9AA0A6] line-through decoration-[#E5534B]/50 sm:w-[128px] sm:text-right lg:w-[152px]">
+                  <span className="sr-only">{usd(AGENCY_MONTHLY)}/mo agency: </span>
+                  {row.agency}
+                </dd>
+                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-white sm:w-[136px] lg:w-[160px]">
+                  <span className="sr-only">Lola Full Build: </span>
+                  {row.lola}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="border-t border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-4 py-4 sm:px-5">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+              Year-one difference
+            </p>
+            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[38px]">
+              {usd(AGENCY_YEAR_ONE - BUILD_PRICE)}
+            </p>
+            <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
+              stays in your business
+            </p>
+            {/* The qualifier has to sit WITH the big number — on mobile the
+                disclaimer in the calculator card renders far below it. */}
+            <p className="mt-3 text-[12px] leading-[1.55] text-[#8A8F98]">
+              Versus a {usd(AGENCY_MONTHLY)}/mo retainer over 12 months. Your quote may differ, and
+              this compares <span className="text-[#C5C5C8]">what you pay</span> — not a promise
+              that both get the same result.
+            </p>
+          </div>
+        </div>
+
+        {/* break-even calculator */}
+        <div className="flex flex-col rounded-xl border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+            Break-even
+          </p>
+          <label
+            htmlFor="avg-job"
+            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-white"
+          >
+            What's one job worth to you?
+          </label>
+
+          {/* aria-hidden: the range reports this same value via aria-valuetext,
+              and a live region here would fight the one on the result below. */}
+          <output
+            htmlFor="avg-job"
+            aria-hidden="true"
+            className="mt-4 block font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#D4AF37]"
+          >
+            {usd(avgJob)}
+          </output>
+
+          <input
+            id="avg-job"
+            type="range"
+            min={100}
+            max={2500}
+            step={50}
+            value={avgJob}
+            onChange={(e) => setAvgJob(Number(e.target.value))}
+            aria-valuetext={usd(avgJob)}
+            aria-describedby="avg-job-help"
+            className="mt-4 h-12 w-full cursor-pointer accent-[#D4AF37]"
+          />
+          <div
+            id="avg-job-help"
+            className="-mt-1 flex justify-between text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
+          >
+            <span>$100</span>
+            {/* Visually the first casualty at 375px, but `hidden` would drop it
+                from the accessibility tree and gut the aria-describedby — so
+                hide it visually only. */}
+            <span className="sr-only sm:not-sr-only sm:inline">Drag to your average ticket</span>
+            <span>$2,500</span>
+          </div>
+
+          {/* The result IS the widget's point — announce it, or a screen-reader
+              user hears "550… 600…" and never learns the answer. */}
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-6 space-y-2.5 border-t border-white/[0.07] pt-5"
+          >
+            <BreakEvenRow
+              label={`${DIY.name} · ${DIY.price}`}
+              jobs={jobsForDiy}
+            />
+            <BreakEvenRow
+              label={`${BUILD.name} · ${BUILD.price}`}
+              jobs={jobsForBuild}
+              featured
+            />
+          </div>
+
+          <p className="mt-5 text-[12px] leading-[1.55] text-[#8A8F98]">
+            That's <span className="text-[#C5C5C8]">cost math, not a lead promise</span> — we don't
+            make those (see above). It's simply what the build costs, measured in jobs you already
+            know the value of.
+          </p>
+
+          {/* Peak intent: the number just resolved against their own ticket. */}
+          <a
+            href="/pricing"
+            className="group mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+          >
+            Start my {BUILD.price} Full Build
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BreakEvenRow({
+  label,
+  jobs,
+  featured,
+}: {
+  label: string;
+  jobs: number;
+  featured?: boolean;
+}) {
+  return (
+    // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
+    // wraps "Full Build · $997" onto four lines.
+    <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
+        {label}
+      </span>
+      <span className={`text-[13px] tabular-nums ${featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'}`}>
+        pays for itself at{' '}
+        <span className="whitespace-nowrap font-bold">
+          {jobs} job{jobs === 1 ? '' : 's'}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   05 — THE OFFER. Free score first, then two tiers (DIY / Full Build).
+   Pricing pulled from lib/pricing; CTAs route to /growth-score and /pricing
+   (where the Stripe checkout lives) — no checkout links defined here.
+   ───────────────────────────────────────────────────────────────────────── */
+function OfferSection() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="Start free, then choose" />
+      <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+        See exactly where you stand — free — then pick your path.
+      </h2>
+
+      {/* free step */}
+      <a
+        href="/growth-score"
+        className="group mt-8 flex flex-col gap-3 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] p-5 transition-colors hover:bg-[#D4AF37]/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+      >
+        <div className="flex items-center gap-4">
+          <span className="font-display text-[26px] font-bold text-[#D4AF37]">00</span>
+          <div>
+            <p className="text-[17px] font-semibold text-white">Free 60-second Growth Score</p>
+            <p className="mt-0.5 text-[14px] text-[#C5C5C8]">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
+          </div>
+        </div>
+        <span className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.1em] text-[#D4AF37]">
+          Start free <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+        </span>
+      </a>
+
+      {/* two tiers */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <TierCard tier={DIY} href="/pricing" />
+        <TierCard tier={BUILD} href="/pricing" featured />
+      </div>
+
+      <p className="mt-5 text-[12px] leading-[1.6] text-[#8A8F98]">
+        Both one-time · $0 setup · no contract · {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title} on the Full Build.
+      </p>
+    </section>
+  );
+}
+
+function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; featured?: boolean }) {
+  return (
     <div
-      aria-hidden
-      className={`mt-10 flex flex-col items-center gap-1.5 transition-opacity duration-500 sm:mt-12 ${
-        hidden ? 'pointer-events-none opacity-0' : 'opacity-100'
+      className={`flex flex-col rounded-xl border p-6 sm:p-7 ${
+        featured ? 'border-[#D4AF37]/50 bg-[#0E0E10]' : 'border-white/12 bg-[#0B0B0D]'
       }`}
     >
-      <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#7A7F8A]">
-        Scroll
-      </span>
-      <svg
-        className="animate-scroll-cue text-[#D4AF37]"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-[12px] uppercase tracking-[0.08em] text-white">{tier.name}</p>
+        {featured && (
+          <span className="rounded-md bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B]">
+            {tier.badge}
+          </span>
+        )}
+      </div>
+      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-white">
+        {tier.price}
+        <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-[#8A8F98]">{tier.period}</span>
+      </p>
+      <p className="mt-3 text-[15px] font-medium leading-[1.45] text-[#E8E4D8]">{tier.tagline}</p>
+
+      <ul className="mt-5 flex-1 space-y-2.5 border-t border-white/[0.07] pt-5">
+        {tier.includes.map((line) => (
+          <li key={line} className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-[#C5C5C8]">
+            <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
+            <span>{line}</span>
+          </li>
+        ))}
+        {tier.guaranteed && (
+          <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-white">
+            <span aria-hidden className="mt-0.5">{HALF_BACK_GUARANTEE.emoji}</span>
+            <span className="font-semibold">{HALF_BACK_GUARANTEE.title}</span>
+          </li>
+        )}
+      </ul>
+
+      <a
+        href={href}
+        className={`mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
+          featured
+            ? 'bg-[#D4AF37] text-[#0A0A0B] hover:bg-[#F4D47C]'
+            : 'border border-white/15 text-white hover:border-[#D4AF37]/60 hover:text-[#D4AF37]'
+        }`}
       >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
+        {tier.cta} <span aria-hidden>→</span>
+      </a>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FAQ — mirrors the FAQPage JSON-LD in index.html. Pure <details>, SSR-safe.
+   ───────────────────────────────────────────────────────────────────────── */
+const FAQ: { q: string; a: string }[] = [
+  {
+    q: 'What kinds of businesses does Lola work with?',
+    a: 'Local service businesses of all kinds — pressure washing, plumbing, HVAC, roofing, pool care, cleaning, and other local trades. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you.',
+  },
+  {
+    q: 'How much does Lola cost?',
+    a: 'Two simple options, both one-time. DIY is $197 — your full Growth Score plus a 5-step fix-it checklist, done yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score.',
+  },
+  {
+    q: 'Is there a guarantee?',
+    a: "Yes — the Half-Back Guarantee on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.",
+  },
+  {
+    q: 'Can you actually guarantee leads?',
+    a: "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The Half-Back Guarantee is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back.",
+  },
+  {
+    q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
+    a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews), because that's increasingly where buyers ask for a recommendation.",
+  },
+  {
+    q: 'Why is it $997 when agencies quote $5,000 a month?',
+    a: "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The Full Build is $997 one-time, no contract, and if we don't get you ranking you get half of that back. Same job, without the overhead you were funding.",
+  },
+  {
+    q: 'Who is behind Lola?',
+    a: 'Ty Alexander Traufield — “Coach Ty” — based in St. Petersburg and serving all of Tampa Bay. He’s a group strength & conditioning coach and a full-time GM who trains for HYROX, and he built Lola to fix the local visibility of his father’s real business, Sandbar Soft Wash. He now runs that same system for other local service businesses, does the work himself, and answers his own phone.',
+  },
+  {
+    q: 'Why is it called Lola?',
+    a: "Lola is Ty's dog — born in 2018, and the reason the whole thing exists. The goal behind the business is simple: help enough local businesses win to buy her the backyard she deserves. When you win, so does she.",
+  },
+];
+
+function FaqSection() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <SectionHead kicker="Straight answers" />
+      {/* Every other section is labelled by an h2; without this the FAQ is
+          unreachable by screen-reader heading navigation. */}
+      <h2 className="sr-only">Straight answers</h2>
+      <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
+        {FAQ.map((item, i) => (
+          <details key={i} className="group">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[16px] font-semibold text-white [&::-webkit-details-marker]:hidden">
+              <span>{item.q}</span>
+              <span aria-hidden className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-[#C5C5C8]">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FINAL CTA — the searcher is live right now.
+   ───────────────────────────────────────────────────────────────────────── */
+function FinalCta() {
+  return (
+    <section className="relative left-1/2 right-1/2 mt-16 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-16 sm:mt-24 sm:py-20">
+      <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
+        <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">Your next customer is searching right now</p>
+        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[48px]">
+          Make sure the answer is you.
+        </h2>
+        <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8]">
+          Run the free 60-second Growth Score, or book a straight-talk 15-minute call with Ty. No pitch deck — just where you stand and what to fix first.
+        </p>
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a
+            href="/growth-score"
+            className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-8 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+          >
+            Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
+          <a
+            href={CALENDAR_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+          >
+            Book a 15-min call
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── shared: section header with hanging index number ────────────────────── */
+/**
+ * Section label. Deliberately NOT numbered: "01 —— THE PROBLEM" in a
+ * letterspaced mono face reads like a source file, and the audience is a
+ * contractor on a phone, not a developer. A gold dot and a plainly readable
+ * label carry the same structure without the terminal costume.
+ */
+function SectionHead({ kicker }: { kicker: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-[#D4AF37]" />
+      <span className="text-[14px] font-semibold text-[#D4AF37] sm:text-[15px]">{kicker}</span>
     </div>
   );
 }
