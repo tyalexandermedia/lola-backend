@@ -29,14 +29,6 @@ const CALENDAR_URL =
   (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
   'https://calendar.app.google/J7idjUDitd2Hziuc7';
 
-// Real before/after work — ties the proof band to the Sandbar Soft Wash story.
-const PROOF = [
-  { before: '/gallery/house-5-before.jpg', after: '/gallery/house-5-after.jpg', label: 'House wash' },
-  { before: '/gallery/driveway-3-before.jpg', after: '/gallery/driveway-3-after.jpg', label: 'Driveway' },
-  { before: '/gallery/roof-2-before.jpg', after: '/gallery/roof-2-after.jpg', label: 'Roof' },
-  { before: '/gallery/paver-1-before.jpg', after: '/gallery/paver-1-after.jpg', label: 'Pavers' },
-];
-
 /**
  * Lola (the dog, and the name on the door) was born 16 Feb 2018. Her age is
  * derived rather than hardcoded so the founder's letter ages itself —
@@ -94,10 +86,12 @@ export default function Homepage() {
   return (
     <main className="flex flex-1 flex-col">
       <Hero />
-      <ProblemSection />
-      <FixSection />
-      <ProofBand />
+      {/* Ty leads. He IS the differentiator, and a contractor deciding whether
+          to keep reading is deciding about a person, not an argument. The
+          analysis follows once they know who's talking. */}
       <StorySection />
+      <ProblemSection />
+      <ProofSection />
       <RoiSection />
       <OfferSection />
       <FaqSection />
@@ -259,34 +253,29 @@ function ReportCard() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   01 — THE PROBLEM. The Tampa Bay searcher scenario + the silent lost sale.
+   02 — THE PROBLEM, AND WHAT'S ACTUALLY PROMISED.
+
+   Formerly two sections (problem + honest fix) running ~350 words to make one
+   point. Merged and cut to the one-sentence register the voice guide asks for:
+   the two query cards SHOW the failure, so the prose doesn't need to explain
+   it, and the guarantee/won't-fake split carries the honesty pillar.
    ───────────────────────────────────────────────────────────────────────── */
 function ProblemSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="01" kicker="The problem" />
+      <SectionHead index="02" kicker="What's going wrong" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
             Right now, someone near you is asking for exactly what you sell.
           </h2>
-          <div className="mt-6 space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
-            <p>
-              Somewhere in Tampa Bay, someone is asking Google — or ChatGPT — for the
-              <span className="font-semibold text-white"> best pressure washing company, plumber, or roofer near them.</span>
-            </p>
-            <p>
-              If your business isn't built to show up in those answers, that customer
-              becomes <span className="font-semibold text-white">someone else's customer.</span>
-            </p>
-            <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
-              And here's the part that stings: they never even know the sale existed —
-              and neither do you.
-            </p>
-          </div>
+          <p className="mt-6 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+            If you're not in the answer, they hire someone else. You never find out the
+            sale existed — <span className="font-semibold text-white">and neither do they.</span>
+          </p>
         </div>
 
-        {/* Two "answer" cards: the competitor getting picked, on Google and in AI. */}
+        {/* The cards do the explaining — competitor picked, on Google and in AI. */}
         <div className="space-y-4">
           <QueryCard
             engine="Google"
@@ -298,6 +287,37 @@ function ProblemSection() {
             query="who should I hire to soft-wash my house in Tampa?"
             answer={"“Based on reviews and local presence, I’d recommend…” — and it names someone else."}
           />
+        </div>
+      </div>
+
+      {/* The honest split — what's guaranteed, what isn't. */}
+      <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-[6px] border border-white/10 bg-white/10 sm:grid-cols-2">
+        <div className="bg-[#0E0E10] p-6 sm:p-7">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AF37]">
+            ✓ What I guarantee
+          </p>
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+            You get found. On Google, and in the AI answers.
+          </p>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            That's the part I control, so I put it in writing.
+          </p>
+          <p className="mt-4 inline-flex items-center gap-2 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
+            {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title}
+          </p>
+        </div>
+
+        <div className="bg-[#0E0E10] p-6 sm:p-7">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#8A8F98]">
+            ✗ What I won't fake
+          </p>
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+            Leads. Anyone promising you those is guessing.
+          </p>
+          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            Whether a click becomes a booked job depends on your pricing and your
+            follow-through too. I get you in front of them. Closing is on both of us.
+          </p>
         </div>
       </div>
     </section>
@@ -321,96 +341,75 @@ function QueryCard({ engine, query, answer }: { engine: string; query: string; a
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   02 — THE HONEST FIX. Visibility is guaranteed; leads are not.
+   03 — PROOF, THE ONLY KIND WORTH SHOWING.
+
+   This replaced a wall of before/after job photos. Two problems with those:
+   the /gallery set is 40 filenames over 16 unique images (categories padded
+   with byte-identical copies), which nobody can call "real work" under the
+   no-fabricated-proof rule in DECISIONS.md — and clean driveways prove
+   SANDBAR's work, not Lola's. What Lola actually sells is being found.
+
+   So the proof is the two things that are genuinely verifiable: a real
+   client's live public dashboard (no login — anyone can audit it), and the
+   visitor's own score on their own business. Per DECISIONS.md the only
+   Sandbar numbers quoted are the verifiable ones (15+ years, 20+ cities).
    ───────────────────────────────────────────────────────────────────────── */
-function FixSection() {
+function ProofSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="02" kicker="The honest fix" />
+      <SectionHead index="03" kicker="Don't take my word for it" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
-        We'll be straight with you about what can be guaranteed — and what can't.
+        Most agencies show you a case study. I'll just give you the login.
       </h2>
-      <p className="mt-5 max-w-[720px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
-        Anyone promising you a flood of leads is guessing. We promise the thing that
-        actually has to happen first: when your next customer searches, you show up.
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+        Every move I make for a client is tracked on a dashboard anyone can open. No
+        screenshot I picked, no number I typed in myself.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-[6px] border border-white/10 bg-white/10 sm:grid-cols-2">
-        {/* guaranteed */}
-        <div className="bg-[#0E0E10] p-6 sm:p-7">
+      <div className="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* the receipts */}
+        <a
+          href="/r/client/sandbar"
+          className="group flex flex-col rounded-[6px] border border-[#D4AF37]/30 bg-[#0E0E10] p-6 transition-colors hover:border-[#D4AF37]/60 sm:p-7"
+        >
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AF37]">
-            ✓ What we guarantee
+            Live client dashboard
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
-            Visibility. That you're found, and that you're clickable.
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+            Sandbar Soft Wash — 15 years of great work. Almost zero Google.
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
-            Found on Google's map pack and search, and named in AI answers when people ask
-            ChatGPT, Perplexity, or Gemini for a company like yours. That's the part we
-            control — so we put it in writing.
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            A real Palm Harbor business serving 20+ cities across Tampa Bay, that nobody
+            could find online. The whole rebuild is in the open — every move, timestamped,
+            for anyone to check.
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
-            {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title}
-          </p>
-        </div>
+          <span className="mt-5 inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.12em] text-[#D4AF37]">
+            Open the dashboard
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
 
-        {/* not guaranteed */}
-        <div className="bg-[#0E0E10] p-6 sm:p-7">
+        {/* self-proof — better than any case study, because it's about them */}
+        <a
+          href="/growth-score"
+          className="group flex flex-col rounded-[6px] border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-[#D4AF37]/40 sm:p-7"
+        >
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#8A8F98]">
-            ✗ What we won't fake
+            Or skip my proof entirely
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
-            Leads. We can't guarantee those — and we won't pretend to.
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+            Run it on your own business. Right now, free.
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
-            Whether a click becomes a booked job depends on your pricing and your
-            follow-through too. We get you in front of the customer. Closing them is a
-            partnership — and we'll tell you the truth about that from day one.
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+            Sixty seconds, no signup. You'll see exactly where you stand on Google and in
+            AI answers — and the one fix that moves you most. Whether you hire me is a
+            separate conversation.
           </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────
-   PROOF BAND — real Tampa Bay before/afters. Real photos, real texture.
-   Full-bleed black band breaking out of the constrained container.
-   ───────────────────────────────────────────────────────────────────────── */
-function ProofBand() {
-  return (
-    <section className="relative left-1/2 right-1/2 mt-16 -mx-[50vw] w-screen border-y border-white/10 bg-black py-12 sm:mt-24 sm:py-16">
-      <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="font-display text-[24px] font-bold leading-[1.1] tracking-[-0.02em] text-white sm:text-[30px]">
-            Real work. Real Tampa Bay homes.
-          </h2>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#8A8F98]">
-            Drag the slider on any before/after
-          </p>
-        </div>
-
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {PROOF.map((p) => (
-            <figure key={p.label} className="overflow-hidden rounded-[4px] border border-white/10 bg-[#0E0E10]">
-              <div className="grid grid-cols-2">
-                <img src={p.before} alt={`${p.label} before`} loading="lazy" className="aspect-[4/3] h-full w-full object-cover grayscale-[0.15]" />
-                <img src={p.after} alt={`${p.label} after`} loading="lazy" className="aspect-[4/3] h-full w-full object-cover" />
-              </div>
-              <figcaption className="flex items-center justify-between px-3 py-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#C5C5C8]">{p.label}</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#8A8F98]">before / after</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-        <p className="mt-5 text-[13px] leading-[1.6] text-[#8A8F98]">
-          The same work Lola was built to get found — for{' '}
-          <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">
-            Sandbar Soft Wash
-          </a>
-          , the business that started it all.
-        </p>
+          <span className="mt-5 inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.12em] text-white">
+            Get my Growth Score
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
       </div>
     </section>
   );
@@ -424,7 +423,7 @@ function ProofBand() {
 function StorySection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="03" kicker="Who's behind Lola" />
+      <SectionHead index="01" kicker="Who you're dealing with" />
       {/* Three grid children so mobile can read photo → letter → résumé.
           Keeping the résumé glued under the photo pushed the first line of the
           letter ~660px down the page on a small phone. Desktop is unchanged:
@@ -576,9 +575,8 @@ function RoiSection() {
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
       </h2>
-      <p className="mt-5 max-w-[720px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
-        Same job. Wildly different price. The difference is that an agency has a floor of salaries
-        to cover before your first result — and Ty doesn't.
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+        Same job. An agency just has salaries to cover before your first result. I don't.
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
