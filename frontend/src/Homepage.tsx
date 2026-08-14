@@ -1,14 +1,23 @@
 /**
  * Lola — marketing homepage at `/`.
  *
- * Rebuilt to the 2026 brief:
- *   • Copy — the "did you show up?" narrative (hero → problem → honest fix →
- *     story → offer). Exact approved wording.
- *   • Design — editorial, asymmetric, solid black + hairlines, one branded
- *     gold accent (no pastel gradient blobs, minimal rounding). Real photos
- *     over icons (Ty & Lola; real Tampa Bay before/afters).
+ * Order: hero → Ty's letter → the problem → proof → the math → offer → FAQ.
+ * Ty leads deliberately; he's the differentiator, and a contractor deciding
+ * whether to keep reading is deciding about a person, not an argument.
+ *
+ * Design notes:
+ *   • Editorial and asymmetric — solid black, one branded gold accent, real
+ *     photos over icons. No pastel gradient blobs.
+ *   • Deliberately NOT "developer-looking": no monospace labels outside the
+ *     one column of aligned digits, no "01 / 02" section numbers, no extreme
+ *     letterspacing, rounded rather than hairline-sharp corners. The audience
+ *     is a contractor on a phone; a terminal aesthetic reads as "this is for
+ *     engineers" and costs trust. Charisma comes from the voice and the
+ *     photography, not from a typewriter face.
  *   • Growth Score is shown as a genuine diagnostic report card, not a
  *     lead-capture gimmick.
+ *   • Proof is only what's verifiable — a real client's public dashboard and
+ *     the visitor's own score. See ProofSection for why the job photos went.
  *
  * SSR-safe by construction: every section's copy is static markup that renders
  * with react-dom/server (see scripts/prerender.mjs), so the headline, body and
@@ -86,12 +95,14 @@ function Hero() {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-14">
         {/* LEFT — the statement */}
         <div className="animate-slide-up">
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#D4AF37]">
+          <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
             AI Leads Expert · Tampa Bay
           </p>
 
-          <h1 className="mt-6 font-display text-[40px] font-bold leading-[0.98] tracking-[-0.03em] text-white sm:text-[58px] lg:text-[64px]">
-            Your next customer<br className="hidden sm:block" /> already searched for you.
+          {/* text-balance stops the last line orphaning a word ("up?") when the
+              display face falls back to a wider system font. */}
+          <h1 className="mt-6 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[52px] lg:text-[60px]">
+            Your next customer already searched for you.
             <span className="mt-2 block text-[#D4AF37]">Did you show up?</span>
           </h1>
 
@@ -104,7 +115,7 @@ function Hero() {
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a
               href="/growth-score"
-              className="group inline-flex h-14 items-center justify-center gap-2 rounded-[4px] bg-[#D4AF37] px-7 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C] sm:h-16"
+              className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
             >
               Run my free Growth Score
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -113,13 +124,13 @@ function Hero() {
               href={CALENDAR_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-14 items-center justify-center rounded-[4px] border border-white/15 px-7 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37] sm:h-16"
+              className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-7 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
             >
               Book a 15-min call
             </a>
           </div>
 
-          <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] text-[#8A8F98]">
+          <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#8A8F98]">
             <span>60-sec Growth Score</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span>then {DIY.price} DIY or {BUILD.price} Full Build</span>
@@ -148,13 +159,13 @@ function Hero() {
 function ReportCard() {
   const grade = SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : SAMPLE_SCORE >= 40 ? 'D' : 'F';
   return (
-    <figure className="relative overflow-hidden rounded-[6px] border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+    <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
       {/* header band */}
       <div className="flex items-center justify-between border-b border-white/10 bg-[#141416] px-5 py-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#D4AF37]">
+        <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
           🐾 Lola · Growth Score
         </span>
-        <span className="rounded-[3px] border border-white/15 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.2em] text-[#8A8F98]">
+        <span className="rounded-md border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">
           Sample
         </span>
       </div>
@@ -163,17 +174,17 @@ function ReportCard() {
         {/* subject + grade */}
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#8A8F98]">Subject</p>
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Subject</p>
             <p className="mt-1 text-[15px] font-semibold text-white">Local pressure-washing co.</p>
-            <p className="font-mono text-[11px] text-[#8A8F98]">Tampa Bay, FL</p>
+            <p className="text-[11px] text-[#8A8F98]">Tampa Bay, FL</p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#8A8F98]">Score</p>
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Score</p>
             <p className="font-display text-[44px] font-bold leading-none tracking-[-0.03em] text-[#D4AF37]">
               {SAMPLE_SCORE}
               <span className="text-[16px] text-[#8A8F98]">/100</span>
             </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white">Grade {grade} · Needs work</p>
+            <p className="text-[11px] uppercase tracking-[0.08em] text-white">Grade {grade} · Needs work</p>
           </div>
         </div>
 
@@ -184,7 +195,7 @@ function ReportCard() {
             return (
               <div key={d.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-[112px] shrink-0 truncate font-mono text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
+                  <span className="w-[124px] shrink-0 text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
                     {d.name}
                   </span>
                   <span className="h-[7px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
@@ -204,7 +215,7 @@ function ReportCard() {
 
         {/* biggest leak */}
         <div className="mt-5 border-l-2 border-[#E5534B] bg-[#E5534B]/[0.06] px-4 py-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#E5534B]">Biggest leak</p>
+          <p className="text-[10px] uppercase tracking-[0.08em] text-[#E5534B]">Biggest leak</p>
           <p className="mt-1 text-[13px] leading-[1.5] text-[#E8E4D8]">
             <span className="font-semibold text-white">AI Visibility.</span> Ask ChatGPT for a
             company like yours and it names a competitor — not you.
@@ -213,15 +224,15 @@ function ReportCard() {
 
         {/* next move */}
         <div className="mt-3 flex items-start gap-2">
-          <span aria-hidden className="mt-0.5 font-mono text-[12px] text-[#D4AF37]">→</span>
+          <span aria-hidden className="mt-0.5 text-[12px] text-[#D4AF37]">→</span>
           <p className="text-[13px] leading-[1.5] text-[#C5C5C8]">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]">Next move&nbsp;</span>
+            <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">Next move&nbsp;</span>
             Fix your Google Business Profile + get named in AI answers. That's the $997 Full Build.
           </p>
         </div>
       </div>
 
-      <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98]">
+      <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
         Your real score · 60 seconds · no signup
       </figcaption>
     </figure>
@@ -239,7 +250,7 @@ function ReportCard() {
 function ProblemSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="02" kicker="What's going wrong" />
+      <SectionHead kicker="What's going wrong" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
@@ -267,9 +278,9 @@ function ProblemSection() {
       </div>
 
       {/* The honest split — what's guaranteed, what isn't. */}
-      <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-[6px] border border-white/10 bg-white/10 sm:grid-cols-2">
+      <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2">
         <div className="bg-[#0E0E10] p-6 sm:p-7">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AF37]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
             ✓ What I guarantee
           </p>
           <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
@@ -278,13 +289,13 @@ function ProblemSection() {
           <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
             That's the part I control, so I put it in writing.
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
+          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
             {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title}
           </p>
         </div>
 
         <div className="bg-[#0E0E10] p-6 sm:p-7">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#8A8F98]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
             ✗ What I won't fake
           </p>
           <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
@@ -302,10 +313,10 @@ function ProblemSection() {
 
 function QueryCard({ engine, query, answer }: { engine: string; query: string; answer: string }) {
   return (
-    <div className="rounded-[6px] border border-white/10 bg-[#0E0E10] p-4 sm:p-5">
+    <div className="rounded-xl border border-white/10 bg-[#0E0E10] p-4 sm:p-5">
       <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
-        <span aria-hidden className="font-mono text-[11px] text-[#D4AF37]">⌕</span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98]">{engine}</span>
+        <span aria-hidden className="text-[11px] text-[#D4AF37]">⌕</span>
+        <span className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">{engine}</span>
       </div>
       <p className="mt-3 text-[15px] font-medium text-white">"{query}"</p>
       <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-[#9AA0A6]">
@@ -333,7 +344,7 @@ function QueryCard({ engine, query, answer }: { engine: string; query: string; a
 function ProofSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="03" kicker="Don't take my word for it" />
+      <SectionHead kicker="Don't take my word for it" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         Most agencies show you a case study. I'll just give you the login.
       </h2>
@@ -346,9 +357,9 @@ function ProofSection() {
         {/* the receipts */}
         <a
           href="/r/client/sandbar"
-          className="group flex flex-col rounded-[6px] border border-[#D4AF37]/30 bg-[#0E0E10] p-6 transition-colors hover:border-[#D4AF37]/60 sm:p-7"
+          className="group flex flex-col rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10] p-6 transition-colors hover:border-[#D4AF37]/60 sm:p-7"
         >
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AF37]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
             Live client dashboard
           </p>
           <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
@@ -359,7 +370,7 @@ function ProofSection() {
             could find online. The whole rebuild is in the open — every move, timestamped,
             for anyone to check.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.12em] text-[#D4AF37]">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#D4AF37]">
             Open the dashboard
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
@@ -368,9 +379,9 @@ function ProofSection() {
         {/* self-proof — better than any case study, because it's about them */}
         <a
           href="/growth-score"
-          className="group flex flex-col rounded-[6px] border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-[#D4AF37]/40 sm:p-7"
+          className="group flex flex-col rounded-xl border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-[#D4AF37]/40 sm:p-7"
         >
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#8A8F98]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
             Or skip my proof entirely
           </p>
           <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
@@ -381,7 +392,7 @@ function ProofSection() {
             AI answers — and the one fix that moves you most. Whether you hire me is a
             separate conversation.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.12em] text-white">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-white">
             Get my Growth Score
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
@@ -399,7 +410,7 @@ function ProofSection() {
 function StorySection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="01" kicker="Who you're dealing with" />
+      <SectionHead kicker="Who you're dealing with" />
       {/* Three grid children so mobile can read photo → letter → résumé.
           Keeping the résumé glued under the photo pushed the first line of the
           letter ~660px down the page on a small phone. Desktop is unchanged:
@@ -407,7 +418,7 @@ function StorySection() {
           column with the letter spanning both rows on the right. */}
       <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-x-12 sm:gap-y-5">
         <figure className="order-1 sm:col-start-1 sm:row-start-1">
-          <div className="overflow-hidden rounded-[6px] border border-[#D4AF37]/25">
+          <div className="overflow-hidden rounded-xl border border-[#D4AF37]/25">
             <img
               src="/images/ty-lola-beach.jpg"
               alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
@@ -417,7 +428,7 @@ function StorySection() {
               className="aspect-[3/4] w-full object-cover"
             />
           </div>
-          <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
             Ty &amp; Lola · St. Pete, FL
           </figcaption>
         </figure>
@@ -427,14 +438,14 @@ function StorySection() {
           <dl className="divide-y divide-white/10 border-y border-white/10">
             {HYBRID.map((row) => (
               <div key={row.label} className="flex items-baseline justify-between gap-3 py-2.5">
-                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A8F98]">
+                <dt className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
                   {row.label}
                 </dt>
                 <dd className="text-right text-[13px] font-medium text-[#E8E4D8]">{row.value}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-2 text-right font-mono text-[10px] uppercase tracking-[0.18em] text-[#D4AF37]">
+          <p className="mt-2 text-right text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
             Hybrid all the way down
           </p>
         </div>
@@ -493,14 +504,14 @@ function StorySection() {
               <span className="font-semibold text-white">{FOUNDER.fullName}</span> — {FOUNDER.title}{' '}
               · {FOUNDER.company}
             </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+            <p className="text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
               {FOUNDER.location}
             </p>
             <a
               href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex min-h-[48px] items-center gap-1.5 rounded-[4px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 font-mono text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+              className="mt-3 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
             >
               ✓ Verified Google Business <span aria-hidden>↗</span>
             </a>
@@ -547,7 +558,7 @@ function RoiSection() {
 
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="04" kicker="The math" />
+      <SectionHead kicker="The math" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
       </h2>
@@ -557,18 +568,18 @@ function RoiSection() {
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         {/* the comparison */}
-        <div className="overflow-hidden rounded-[6px] border border-white/10 bg-[#0E0E10]">
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0E0E10]">
           {/* Mobile: label on its own line, then the two values side by side.
               sm+: a true three-column table. Keeps the label readable at 320px
               instead of crushing it into a ~70px gutter. */}
           <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-[#141416] px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98] sm:block">
+            <span className="hidden text-[10px] uppercase tracking-[0.08em] text-[#8A8F98] sm:block">
               Compare
             </span>
-            <span className="text-left font-mono text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#8A8F98] sm:w-[128px] sm:text-right lg:w-[152px]">
+            <span className="text-left text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#8A8F98] sm:w-[128px] sm:text-right lg:w-[152px]">
               {usd(AGENCY_MONTHLY)}/mo agency
             </span>
-            <span className="text-right font-mono text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
+            <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
               Lola Full Build
             </span>
           </div>
@@ -579,7 +590,7 @@ function RoiSection() {
                 key={row.label}
                 className="grid grid-cols-2 items-start gap-x-3 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5"
               >
-                <dt className="col-span-2 mb-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
+                <dt className="col-span-2 mb-1.5 text-[10px] uppercase tracking-[0.06em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
                   {row.label}
                 </dt>
                 {/* The strike-through is the only thing marking the agency
@@ -598,13 +609,13 @@ function RoiSection() {
           </dl>
 
           <div className="border-t border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-4 py-4 sm:px-5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
               Year-one difference
             </p>
             <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[38px]">
               {usd(AGENCY_YEAR_ONE - BUILD_PRICE)}
             </p>
-            <p className="mt-1 font-mono text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
+            <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
               stays in your business
             </p>
             {/* The qualifier has to sit WITH the big number — on mobile the
@@ -618,8 +629,8 @@ function RoiSection() {
         </div>
 
         {/* break-even calculator */}
-        <div className="flex flex-col rounded-[6px] border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A8F98]">
+        <div className="flex flex-col rounded-xl border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
             Break-even
           </p>
           <label
@@ -653,7 +664,7 @@ function RoiSection() {
           />
           <div
             id="avg-job-help"
-            className="-mt-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
+            className="-mt-1 flex justify-between text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
           >
             <span>$100</span>
             {/* Visually the first casualty at 375px, but `hidden` would drop it
@@ -690,7 +701,7 @@ function RoiSection() {
           {/* Peak intent: the number just resolved against their own ticket. */}
           <a
             href="/pricing"
-            className="group mt-5 inline-flex h-14 items-center justify-center gap-2 rounded-[4px] bg-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            className="group mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
           >
             Start my {BUILD.price} Full Build
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -735,7 +746,7 @@ function BreakEvenRow({
 function OfferSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="05" kicker="Start free, then choose" />
+      <SectionHead kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
       </h2>
@@ -743,7 +754,7 @@ function OfferSection() {
       {/* free step */}
       <a
         href="/growth-score"
-        className="group mt-8 flex flex-col gap-3 rounded-[6px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] p-5 transition-colors hover:bg-[#D4AF37]/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        className="group mt-8 flex flex-col gap-3 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] p-5 transition-colors hover:bg-[#D4AF37]/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
       >
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-[#D4AF37]">00</span>
@@ -752,7 +763,7 @@ function OfferSection() {
             <p className="mt-0.5 text-[14px] text-[#C5C5C8]">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.1em] text-[#D4AF37]">
+        <span className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.1em] text-[#D4AF37]">
           Start free <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
         </span>
       </a>
@@ -763,7 +774,7 @@ function OfferSection() {
         <TierCard tier={BUILD} href="/pricing" featured />
       </div>
 
-      <p className="mt-5 font-mono text-[12px] leading-[1.6] text-[#8A8F98]">
+      <p className="mt-5 text-[12px] leading-[1.6] text-[#8A8F98]">
         Both one-time · $0 setup · no contract · {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title} on the Full Build.
       </p>
     </section>
@@ -773,21 +784,21 @@ function OfferSection() {
 function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; featured?: boolean }) {
   return (
     <div
-      className={`flex flex-col rounded-[6px] border p-6 sm:p-7 ${
+      className={`flex flex-col rounded-xl border p-6 sm:p-7 ${
         featured ? 'border-[#D4AF37]/50 bg-[#0E0E10]' : 'border-white/12 bg-[#0B0B0D]'
       }`}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="font-mono text-[12px] uppercase tracking-[0.2em] text-white">{tier.name}</p>
+        <p className="text-[12px] uppercase tracking-[0.08em] text-white">{tier.name}</p>
         {featured && (
-          <span className="rounded-[3px] bg-[#D4AF37] px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#0A0A0B]">
+          <span className="rounded-md bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B]">
             {tier.badge}
           </span>
         )}
       </div>
       <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-white">
         {tier.price}
-        <span className="ml-2 font-mono text-[12px] font-normal uppercase tracking-[0.14em] text-[#8A8F98]">{tier.period}</span>
+        <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-[#8A8F98]">{tier.period}</span>
       </p>
       <p className="mt-3 text-[15px] font-medium leading-[1.45] text-[#E8E4D8]">{tier.tagline}</p>
 
@@ -808,7 +819,7 @@ function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; fe
 
       <a
         href={href}
-        className={`mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-[4px] px-6 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
+        className={`mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
           featured
             ? 'bg-[#D4AF37] text-[#0A0A0B] hover:bg-[#F4D47C]'
             : 'border border-white/15 text-white hover:border-[#D4AF37]/60 hover:text-[#D4AF37]'
@@ -861,7 +872,7 @@ const FAQ: { q: string; a: string }[] = [
 function FaqSection() {
   return (
     <section className="mt-16 sm:mt-24">
-      <SectionHead index="06" kicker="Straight answers" />
+      <SectionHead kicker="Straight answers" />
       {/* Every other section is labelled by an h2; without this the FAQ is
           unreachable by screen-reader heading navigation. */}
       <h2 className="sr-only">Straight answers</h2>
@@ -870,7 +881,7 @@ function FaqSection() {
           <details key={i} className="group">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[16px] font-semibold text-white [&::-webkit-details-marker]:hidden">
               <span>{item.q}</span>
-              <span aria-hidden className="shrink-0 font-mono text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45">+</span>
+              <span aria-hidden className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45">+</span>
             </summary>
             <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-[#C5C5C8]">{item.a}</p>
           </details>
@@ -887,7 +898,7 @@ function FinalCta() {
   return (
     <section className="relative left-1/2 right-1/2 mt-16 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-16 sm:mt-24 sm:py-20">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#D4AF37]">Your next customer is searching right now</p>
+        <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">Your next customer is searching right now</p>
         <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[48px]">
           Make sure the answer is you.
         </h2>
@@ -897,7 +908,7 @@ function FinalCta() {
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
             href="/growth-score"
-            className="group inline-flex h-14 items-center justify-center gap-2 rounded-[4px] bg-[#D4AF37] px-8 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-8 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
           >
             Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
@@ -905,7 +916,7 @@ function FinalCta() {
             href={CALENDAR_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-14 items-center justify-center rounded-[4px] border border-white/15 px-8 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
           >
             Book a 15-min call
           </a>
@@ -916,12 +927,17 @@ function FinalCta() {
 }
 
 /* ── shared: section header with hanging index number ────────────────────── */
-function SectionHead({ index, kicker }: { index: string; kicker: string }) {
+/**
+ * Section label. Deliberately NOT numbered: "01 —— THE PROBLEM" in a
+ * letterspaced mono face reads like a source file, and the audience is a
+ * contractor on a phone, not a developer. A gold dot and a plainly readable
+ * label carry the same structure without the terminal costume.
+ */
+function SectionHead({ kicker }: { kicker: string }) {
   return (
-    <div className="flex items-center gap-4">
-      <span className="font-display text-[13px] font-bold text-[#D4AF37]">{index}</span>
-      <span aria-hidden className="h-px w-8 bg-[#D4AF37]/50" />
-      <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#8A8F98]">{kicker}</span>
+    <div className="flex items-center gap-2.5">
+      <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-[#D4AF37]" />
+      <span className="text-[14px] font-semibold text-[#D4AF37] sm:text-[15px]">{kicker}</span>
     </div>
   );
 }
