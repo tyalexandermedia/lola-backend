@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+
+import { FOUNDER } from './lib/lola';
 import { API_URL } from './api';
 
 type RankPoint = { position: number | null; mentioned: boolean; competitors?: string[]; run_at: string };
@@ -142,6 +144,9 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
+      {/* Value, work, what's next and how to reach Ty — before any metric.
+          The numbers below prove the work happened; this says what it was for. */}
+      <OwnerBriefing data={data} />
       <OwnerOverview data={data} />
       <TopWinsCard
         google={data.google}
@@ -184,6 +189,8 @@ export default function ClientReport({ slug }: { slug: string }) {
 
       {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
 
+      {/* The itemised work feed. The briefing at the top already names the most
+          recent items; this is the full ledger plus the category breakdown. */}
       {anyWork && <WorkDelivered impl={data.implementation!} />}
 
       {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
@@ -199,6 +206,137 @@ export default function ClientReport({ slug }: { slug: string }) {
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
       </p>
     </main>
+  );
+}
+
+/**
+ * OWNER BRIEFING — the first thing the owner reads, and the only card that
+ * answers the four questions that actually decide whether a retainer renews:
+ *
+ *   1. What did I get?      → work finished, counted and named
+ *   2. What's happening?    → in progress right now
+ *   3. What's next?         → the queue, so it reads as ongoing, not finished
+ *   4. How do I reach Ty?   → his actual phone number, not a support desk
+ *
+ * Everything below this card is metrics. Metrics prove the work happened;
+ * they don't tell the owner what it was FOR, and an owner who can't answer
+ * "what am I paying for" cancels — no matter how good the numbers are.
+ *
+ * Written for a contractor reading on a phone between jobs: plain words,
+ * counts before percentages, and no term he'd have to look up.
+ */
+function OwnerBriefing({ data }: { data: DashboardPayload }) {
+  const impl = data.implementation;
+  const done = impl?.done ?? [];
+  const inProgress = impl?.in_progress ?? [];
+  const nextUp = impl?.next_up ?? [];
+  const totalDone = impl?.total_done ?? done.length;
+
+  return (
+    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#11121A]">
+      <div className="border-b border-white/10 px-6 py-4 sm:px-8">
+        <h2 className="text-[17px] font-bold text-white sm:text-[19px]">
+          Where things stand
+        </h2>
+        <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+          Everything on this page is live and yours to check any time — nothing here is
+          waiting on a report from me.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {/* 1. What you got — the count is the retainer's receipt. */}
+        <div className="px-6 py-5 sm:px-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+            Work finished
+          </p>
+          <p className="mt-2 text-[34px] font-bold leading-none text-white">{totalDone}</p>
+          <p className="mt-1 text-[12px] text-[#9AA0A6]">
+            {totalDone === 1 ? 'job completed' : 'jobs completed'} on your account
+          </p>
+          {done.length > 0 && (
+            <ul className="mt-3 space-y-1.5">
+              {done.slice(0, 3).map((t, i) => (
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#C5C5C8]">
+                  <span aria-hidden className="mt-[2px] text-[#4ADE80]">✓</span>
+                  <span>{t.title}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* 2 + 3. Happening now / next — proves this is ongoing, not a one-off. */}
+        <div className="px-6 py-5">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+            Happening now
+          </p>
+          {inProgress.length > 0 ? (
+            <ul className="mt-2 space-y-1.5">
+              {inProgress.slice(0, 2).map((t, i) => (
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-white">
+                  <span aria-hidden className="mt-[2px] text-[#D4AF37]">◈</span>
+                  <span>{t.title}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-[12.5px] text-[#9AA0A6]">
+              Nothing mid-flight — the queue below is what's coming.
+            </p>
+          )}
+
+          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#8A8F98]">
+            Up next
+          </p>
+          {nextUp.length > 0 ? (
+            <ul className="mt-2 space-y-1.5">
+              {nextUp.slice(0, 3).map((t, i) => (
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#C5C5C8]">
+                  <span aria-hidden className="mt-[2px] text-[#8A8F98]">→</span>
+                  <span>{t.title}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-[12.5px] text-[#9AA0A6]">
+              Ask me what's next — I'll queue it this week.
+            </p>
+          )}
+        </div>
+
+        {/* 4. Access. "You text Ty directly" is the whole offer; the number
+            belongs where he'd reach for it, not on a contact page. */}
+        <div className="px-6 py-5">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+            Your direct line
+          </p>
+          <p className="mt-2 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+            You're not routed through anyone. This is {FOUNDER.knownAs}'s phone.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            <a
+              href={`sms:${FOUNDER.phone}`}
+              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#D4AF37] px-4 text-[13px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C]"
+            >
+              Text {FOUNDER.phoneDisplay}
+            </a>
+            <a
+              href={`tel:${FOUNDER.phone}`}
+              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-4 text-[13px] font-semibold text-white transition hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+            >
+              Call
+            </a>
+            <a
+              href={`mailto:${FOUNDER.email}`}
+              className="text-center text-[12px] text-[#9AA0A6] underline-offset-2 hover:text-[#D4AF37] hover:underline"
+            >
+              {FOUNDER.email}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1509,12 +1647,15 @@ function MiniSparkline({ history }: { history: RankPoint[] }) {
 
 function WorkDelivered({ impl }: { impl: Implementation }) {
   const c = impl.counts || {};
+  // Zero-value tiles read as "nothing happened here" and undercut the very
+  // thing this section exists to show. Only surface categories with work in
+  // them; if none qualify, the task columns below still tell the story.
   const stats = [
     { label: 'Content shipped', value: c.content || 0 },
     { label: 'Citations built', value: c.citation || 0 },
     { label: 'Reviews requested', value: c.review || 0 },
     { label: 'Fixes + GBP', value: (c.fix || 0) + (c.gbp || 0) + (c.other || 0) },
-  ];
+  ].filter((s) => s.value > 0);
   const nothingYet =
     impl.done.length === 0 && impl.in_progress.length === 0 && impl.next_up.length === 0;
 

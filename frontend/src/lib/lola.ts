@@ -35,4 +35,11 @@ export const FOUNDER = {
   title: 'Founder, Lola Leads',
   company: 'Ty Alexander Media',
   location: 'St. Pete · serving all of Tampa Bay, FL',
+  /** Direct line. Mirrors the telephone/email in index.html's JSON-LD —
+   *  "you text Ty directly" is the offer, so the number has to be on the
+   *  surfaces where a client would reach for it. */
+  phone: '+1-727-300-6573',
+  phoneDisplay: '(727) 300-6573',
+  email: 'ty@tyalexandermedia.com',
+  calendar: 'https://calendar.app.google/J7idjUDitd2Hziuc7',
 } as const;

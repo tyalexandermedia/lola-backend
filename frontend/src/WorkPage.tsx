@@ -21,7 +21,7 @@ export default function WorkPage() {
   useSeo({
     title: 'Our Work — Real Sites Lola Built & Ranked | Lola',
     description:
-      'Real local-business websites Lola built and got found on Google and AI — Sandbar Soft Wash, Tampa Bay Power Clean, Travels by Val, and more. Scroll through the live sites.',
+      'Real local-business websites built by Lola — Sandbar Soft Wash, Travels by Val, and more. Scroll through the live sites.',
   });
 
   const count = PORTFOLIO.length;
