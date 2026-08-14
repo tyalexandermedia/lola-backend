@@ -129,9 +129,11 @@ function canonicalPathForRoute(route: Route): string | null {
   }
 }
 
-function App() {
+function App({ ssrPath }: { ssrPath?: string } = {}) {
+  // `ssrPath` is only passed by the build-time prerender (entry-server.tsx),
+  // where there is no `window`. In the browser we always read the real URL.
   const [route, setRoute] = useState<Route>(() =>
-    parseRoute(typeof window !== 'undefined' ? window.location.pathname : '/')
+    parseRoute(typeof window !== 'undefined' ? window.location.pathname : ssrPath ?? '/')
   );
 
   useEffect(() => {
@@ -319,8 +321,9 @@ function SiteFooter({ route }: { route: Route }) {
             Done-for-you AI Leads + Local SEO for service businesses. Recommended on
             Google AND ChatGPT, Perplexity, and Gemini.
           </p>
-          <p className="mt-3 text-[11px] text-[#5A5F68]">
-            Ty Alexander Media · Tampa Bay, FL
+          <p className="mt-3 text-[11px] leading-[1.6] text-[#5A5F68]">
+            Built and run by <span className="text-[#8A8F98]">Ty Alexander Traufield</span> — “Coach Ty.”
+            <br className="hidden sm:block" /> Ty Alexander Media · Tampa Bay, FL
           </p>
         </div>
 
@@ -353,7 +356,7 @@ function SiteFooter({ route }: { route: Route }) {
       </div>
 
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
-        <p>© 2026 Ty Alexander Media · Built with Lola 🐾</p>
+        <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
           Get found on Google and in AI answers — DIY $197 or Full Build $997. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
         </p>
