@@ -102,12 +102,20 @@ function Hero() {
           </h1>
 
           <p className="mt-7 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
-            Local service businesses are losing customers every day to Google and AI
-            search results they don't even know exist. Lola makes sure you're the one
-            they find — <span className="font-semibold text-white">and the one they choose.</span>
+            Every day, customers pick a competitor from a Google or AI result you
+            never knew existed. Lola makes sure you're the one they find —{' '}
+            <span className="font-semibold text-white">and the one they choose.</span>
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <p className="mt-6 text-[16px] leading-[1.5] text-[#E8E4D8] sm:text-[17px]">
+            <span className="font-semibold text-white">Your website design included free</span>
+            {' '}— then {PLAN.price}{PLAN.period}.
+            <span className="block text-[14px] text-[#9AA0A6] sm:inline sm:text-[15px]">
+              {' '}Most shops charge $3,000+ just to build it.
+            </span>
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a
               href="/growth-score"
               className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
@@ -125,14 +133,6 @@ function Hero() {
             </a>
           </div>
 
-          {/* The strongest thing on the page was the smallest text on it. A
-              contractor already knows a site costs thousands, so "included free"
-              is the fastest way to make $397 read as cheap — it belongs at
-              reading size, not in the fine print. */}
-          <p className="mt-6 text-[15px] leading-[1.55] text-[#E8E4D8] sm:text-[16px]">
-            <span className="font-semibold text-white">Your website design included free</span>
-            {' '}— then {PLAN.price}{PLAN.period}. Most shops charge $3,000+ just to build it.
-          </p>
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#8A8F98]">
             <span>Free 60-second Growth Score</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
