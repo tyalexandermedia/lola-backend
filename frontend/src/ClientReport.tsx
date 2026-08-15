@@ -143,12 +143,25 @@ export default function ClientReport({ slug }: { slug: string }) {
   const anyTracking = !!data.tracking && Object.values(data.tracking).some(
     (t) => (t?.month || 0) + (t?.last_30d || 0) + (t?.lifetime || 0) > 0
   );
-  const anyRankings = data.google.length > 0;
-  const anyAi = data.ai_mode.length > 0;
+  // A series counts as MEASURED only once it has an actual reading. These used
+  // to test `.length > 0`, which is "keywords are configured" — not the same
+  // thing at all. The day a client is set up, their tracker is populated with
+  // every target keyword and zero snapshots, so `.length > 0` was true and the
+  // dashboard rendered the rankings table, competitor watchlist, coverage map
+  // and momentum charts as pages of empty null rows — while suppressing the
+  // day-one card that explains what's being tracked and what happens next.
+  // Exactly backwards for the one client who most needs the explanation.
+  const measured = (s: Series) =>
+    (s.run_count ?? 0) > 0 || s.current?.position != null || (s.history?.length ?? 0) > 0;
+  const anyRankings = data.google.some(measured);
+  const anyAi = data.ai_mode.some(measured);
   const anyWork = !!data.implementation && (
     data.implementation.done.length + data.implementation.in_progress.length + data.implementation.next_up.length > 0
   );
-  const totallyEmpty = !anyTracking && !anyRankings && !anyAi && !anyWork;
+  // "Nothing measured yet" — the day-one state. Deliberately excludes anyWork:
+  // work delivered is what day one looks like, not a reason to hide the
+  // what-happens-next panel. See the WhatWeWatchCard gate below.
+  const nothingMeasured = !anyTracking && !anyRankings && !anyAi;
 
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
@@ -172,14 +185,18 @@ export default function ClientReport({ slug }: { slug: string }) {
         <RevenueAgentCard revenue={data.revenue_agent} />
       )}
 
-      {/* No live data yet → show the "what we're watching" value card so the
-          dashboard demonstrates the retainer's work even before the first
-          snapshot completes. Disappears the instant any real data arrives. */}
-      {totallyEmpty && (
+      {/* Gated on "nothing MEASURED yet", not "nothing at all". It used to
+          require totallyEmpty, which includes work delivered — so the moment Ty
+          shipped the first task (day one, every time) the card vanished and a
+          brand-new client lost the only panel explaining what was being tracked
+          and what happens next. Work delivered is the day-one state, not a
+          reason to hide the expectations. Disappears once real data arrives. */}
+      {nothingMeasured && (
         <WhatWeWatchCard
           clientName={data.client_name}
+          google={data.google}
+          aiMode={data.ai_mode}
           verifiedWins={data.verified_wins}
-          integrations={data.integrations}
         />
       )}
 
@@ -540,19 +557,19 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
 
   if (contacts === 0) {
     return (
-      <section className="mb-6 rounded-2xl border border-[#D4AF37]/15 bg-gradient-to-br from-[#11121A] to-[#0E0F16] p-6 sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-          Lola is set up and watching
-        </p>
-        <h2 className="mt-2 text-[22px] font-bold leading-snug text-white sm:text-[26px]">
-          Tracking goes live the moment your first call or quote request lands.
-        </h2>
-        <p className="mt-3 max-w-[640px] text-[14px] leading-[1.6] text-[#C8C0B0]">
-          Every call from your tracking number, every quote form on {siteHost},
-          and every Google Business Profile interaction shows up here automatically.
-          Rankings, AI search visibility, and Google Search Console data populate
-          below as snapshots come in.
-        </p>
+      // Deliberately a one-line strip, not a panel. SystemStatus below already
+      // lists what's connected and WhatWeWatchCard already explains what's being
+      // tracked and when it lands — this used to repeat both at full height, so
+      // a new client read the same reassurance three times before reaching a
+      // single number. All this needs to own is "no calls or forms yet".
+      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-[#D4AF37]/15 bg-[#11121A] px-6 py-4 sm:px-8">
+        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          {monthLabel} so far
+        </span>
+        <span className="text-[14px] text-[#C8C0B0]">
+          No calls or quote requests yet this month — the moment one lands on{' '}
+          {siteHost}, it appears here.
+        </span>
         {/* The chip strip that used to sit here moved into SystemStatus, which
             renders on every dashboard rather than vanishing the moment the
             first call lands. Repeating it here would say the same thing twice
@@ -633,100 +650,132 @@ function MiniMetric({ label, value }: { label: string; value: number | string })
  * over. The point: replace the demoralizing wall of zeros with proof that
  * the retainer is actively doing real, measurable work in the background.
  */
+/**
+ * DAY ONE — what a client sees before a single snapshot has run.
+ *
+ * This is the hardest screen on the dashboard to get right: someone has just
+ * paid, nothing has been measured yet, and an empty page reads as "nothing is
+ * happening". It has to show real work without inventing results.
+ *
+ * It previously invented them. The keyword count was the literal string "19",
+ * the AI-prompt count "6", and the copy said "across 6 cities" — hardcoded, so
+ * every client saw the same three numbers no matter what was actually being
+ * tracked for them. A client who asked "which 19?" would have caught it. Now
+ * every figure is counted off the payload, and anything that would render as
+ * zero is hidden rather than shown as a zero.
+ *
+ * The integration list that used to sit at the bottom moved to SystemStatus,
+ * which renders on every dashboard rather than only this one.
+ */
 function WhatWeWatchCard({
   clientName,
+  google,
+  aiMode,
   verifiedWins,
-  integrations,
 }: {
   clientName: string;
+  google: Series[];
+  aiMode: Series[];
   verifiedWins?: { organic: string[]; map_pack: string[] };
-  integrations?: DashboardPayload['integrations'];
 }) {
   const wins = (verifiedWins?.organic?.length || 0) + (verifiedWins?.map_pack?.length || 0);
-  // Cities extracted from the verified-wins labels — Lola maps which cities
-  // are confirmed map-pack/organic strongholds so the client sees concrete
-  // geographic coverage, not abstract "we track Florida."
-  const cities = Array.from(new Set(
-    [...(verifiedWins?.organic ?? []), ...(verifiedWins?.map_pack ?? [])]
-      .map(s => s.split(/\s*[—–-]\s*/)[0].trim())
-      .filter(Boolean)
-  ));
-  const integLine = (label: string, on?: boolean) => ({
-    label,
-    on: !!on,
-  });
-  const pollSources = [
-    integLine('Google Search Console', true),  // service-account flow, server-side
-    integLine('Google Analytics 4', integrations?.ga4_measurement_protocol),
-    integLine('Google Business Profile', integrations?.gbp),
-    integLine('Bing / Copilot index', integrations?.bing),
-    integLine('CallRail (every inbound call)', integrations?.callrail),
-    integLine('Claude AI Search', true),  // tracker always runs Claude
-    integLine('ChatGPT AI Search', true), // tracker always runs ChatGPT
-  ];
+  const keywords = google.length;
+  const prompts = aiMode.length;
+
+  // Cities come from the tracked queries themselves, falling back to the
+  // verified-win labels. Both are real; neither is a guess.
+  const fromQueries = google.map((s) => extractCity(s.query)).filter(Boolean);
+  const fromWins = [...(verifiedWins?.organic ?? []), ...(verifiedWins?.map_pack ?? [])]
+    .map((s) => s.split(/\s*[—–-]\s*/)[0].trim())
+    .filter(Boolean);
+  const cities = Array.from(new Set(fromQueries.length ? fromQueries : fromWins));
+
+  const firstName = clientName.split(' ')[0];
+
+  // Only tiles backed by a real non-zero count are rendered. A "0 keywords
+  // tracked" tile is worse than no tile.
+  const tiles = [
+    keywords > 0 && {
+      label: 'Keywords tracked for you',
+      value: keywords,
+      tone: 'text-[#F4D47C]',
+      ring: 'border-white/10 bg-[#0F0F12]',
+      blurb: `Every search a paying customer types to find you${cities.length ? ` — across ${cities.length} ${cities.length === 1 ? 'city' : 'cities'}` : ''}. Re-checked on a schedule, not when someone remembers.`,
+      foot: cities.length ? cities.slice(0, 6).join(' · ') : null,
+    },
+    prompts > 0 && {
+      label: 'AI questions tested',
+      value: prompts,
+      tone: 'text-[#C4B5FD]',
+      ring: 'border-white/10 bg-[#0F0F12]',
+      blurb:
+        'The questions people actually ask ChatGPT and Claude when they want someone like you. We check whether you get named.',
+      foot: null,
+    },
+    wins > 0 && {
+      label: 'Confirmed #1 placements',
+      value: wins,
+      tone: 'text-emerald-300',
+      ring: 'border-emerald-500/20 bg-emerald-500/[0.04]',
+      blurb: 'Top spot already held in organic search or the Google map pack.',
+      foot: null,
+    },
+  ].filter(Boolean) as Array<{
+    label: string; value: number; tone: string; ring: string; blurb: string; foot: string | null;
+  }>;
 
   return (
-    <section className="mt-6 rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-        What Lola is watching for {clientName.split(' ')[0]} · live
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
-          first weekly snapshot is being built right now
-        </span>
-      </p>
-
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {/* Tracked keywords */}
-        <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Keywords ranked weekly</p>
-          <p className="mt-1 text-[34px] font-extrabold leading-none text-[#F4D47C]">19</p>
-          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-            Every Google search a paying customer types to find you — checked weekly across 6 cities.
-          </p>
-          {cities.length > 0 && (
-            <p className="mt-2 text-[10px] text-[#9CA3AF]">
-              {cities.slice(0, 6).join(' · ')}
-            </p>
-          )}
-        </div>
-
-        {/* AI search prompts */}
-        <div className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">AI search prompts tested</p>
-          <p className="mt-1 text-[34px] font-extrabold leading-none text-[#C4B5FD]">6</p>
-          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-            Recommendation queries asked of <span className="text-purple-300">Claude</span> + <span className="text-emerald-300">ChatGPT</span> — proof you're being named when AI gives advice.
-          </p>
-        </div>
-
-        {/* Verified wins (live snapshot from config) */}
-        <div className="rounded-[12px] border border-emerald-500/20 bg-emerald-500/[0.04] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-300">Confirmed #1 placements</p>
-          <p className="mt-1 text-[34px] font-extrabold leading-none text-emerald-300">{wins}</p>
-          <p className="mt-2 text-[11px] leading-[1.5] text-[#C8C0B0]">
-            Already owning the top spot for organic search + Google Map Pack across multiple service-city combos.
-          </p>
-        </div>
+    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A]">
+      <div className="border-b border-white/10 px-6 py-4 sm:px-8">
+        <h2 className="text-[17px] font-bold text-white sm:text-[19px]">
+          What Lola is watching for {firstName}
+        </h2>
+        <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+          This runs whether or not anything has happened yet. The numbers below fill in as
+          snapshots land — you don&apos;t have to ask for a report.
+        </p>
       </div>
 
-      {/* Live integration polling */}
-      <div className="mt-5 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">Data streams Lola polls for you</p>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {pollSources.map(s => (
-            <div key={s.label} className="flex items-center gap-2 text-[12px]">
-              <span className={`inline-block h-2 w-2 rounded-full ${s.on ? 'bg-emerald-400 shadow-[0_0_6px_rgba(110,231,183,0.6)]' : 'bg-amber-400/60'}`} />
-              <span className={s.on ? 'text-[#E5E7EB]' : 'text-[#9CA3AF]'}>{s.label}</span>
-              <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.1em] ${s.on ? 'text-emerald-300' : 'text-amber-300'}`}>
-                {s.on ? 'live' : 'pending'}
-              </span>
+      {tiles.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-3 sm:px-8">
+          {tiles.map((t) => (
+            <div key={t.label} className={`rounded-[12px] border p-4 ${t.ring}`}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">
+                {t.label}
+              </p>
+              <p className={`mt-1 text-[34px] font-extrabold leading-none ${t.tone}`}>{t.value}</p>
+              <p className="mt-2 text-[11.5px] leading-[1.5] text-[#C8C0B0]">{t.blurb}</p>
+              {t.foot && <p className="mt-2 text-[10px] text-[#9CA3AF]">{t.foot}</p>}
             </div>
           ))}
         </div>
-      </div>
+      )}
 
-      <p className="mt-4 text-[11px] leading-[1.55] text-[#9CA3AF]">
-        Real-time rankings + call data populates the cards below as the first snapshot completes (typically within an hour of deploy). Everything you see here is being actively monitored — not waiting for a manual report.
-      </p>
+      {/* What to expect, and when. Silence is what makes a new client anxious in
+          month one, so the timeline is stated up front. Deliberately describes
+          WORK on a schedule, never results on a schedule — the only dated
+          outcome promise Lola makes is the 90-Day Promise. */}
+      <div className="border-t border-white/10 px-6 py-5 sm:px-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#D4AF37]">
+          What happens from here
+        </p>
+        <ol className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            { when: 'Week 1', what: 'We pick your money keywords together, and the first fixes go live.' },
+            { when: 'Weeks 2–4', what: 'First snapshots land. Positions and calls start appearing on this page.' },
+            { when: 'Every month after', what: 'Posts, reviews and new pages keep shipping. The ledger below grows.' },
+          ].map((s) => (
+            <li key={s.when} className="rounded-[12px] border border-white/[0.08] bg-[#0F0F12] p-4">
+              <p className="text-[12px] font-bold text-[#F4D47C]">{s.when}</p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#C8C0B0]">{s.what}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-[11.5px] leading-[1.55] text-[#9AA0A6]">
+          Nothing here waits on a manual report. If you want to know something before it shows
+          up, text {FOUNDER.knownAs} — that&apos;s what the number at the top is for.
+        </p>
+      </div>
     </section>
   );
 }
