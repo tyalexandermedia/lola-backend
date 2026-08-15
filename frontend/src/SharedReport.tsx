@@ -2,11 +2,34 @@ import { useEffect, useState } from 'react';
 import type { AuditResult } from './types';
 import { API_URL } from './api';
 import { ResultsStage } from './AuditFlow';
+import { useSeo } from './lib/seo';
 
 export default function SharedReport({ auditId }: { auditId: string }) {
   const [audit, setAudit] = useState<AuditResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  /**
+   * These are private deliverables, not marketing pages, and they were fully
+   * indexable: robots.txt allows everything and this route set no SEO at all,
+   * so every report inherited the homepage's title and description.
+   *
+   * Two problems that fixes. Search quality: one thin, near-identical page per
+   * audit, all sharing a title, competing with the pages we actually want
+   * ranked. And privacy: each one names a real business alongside its phone,
+   * its weak spots and an estimate of the money it's losing — a competitor
+   * could have searched that up.
+   *
+   * The title still reads properly when someone pastes the link into a text
+   * or a DM; noindex only governs search engines.
+   */
+  useSeo({
+    title: audit ? `Growth Score — ${audit.business_name}` : 'Growth Score report',
+    description: audit
+      ? `Google and AI search visibility report for ${audit.business_name}.`
+      : 'A Lola Growth Score report.',
+    robots: 'noindex',
+  });
 
   useEffect(() => {
     let cancelled = false;

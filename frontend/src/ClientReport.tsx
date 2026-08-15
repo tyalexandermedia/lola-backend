@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { FOUNDER } from './lib/lola';
+import { useSeo } from './lib/seo';
 import { API_URL } from './api';
 
 type RankPoint = { position: number | null; mentioned: boolean; competitors?: string[]; run_at: string };
@@ -95,6 +96,14 @@ export default function ClientReport({ slug }: { slug: string }) {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // A client's private retainer dashboard — their rankings, call volume and
+  // revenue. Same reasoning as the audit reports: never a search result.
+  useSeo({
+    title: data ? `${data.client_name} — Lola dashboard` : 'Client dashboard',
+    description: 'Private client reporting dashboard.',
+    robots: 'noindex',
+  });
 
   useEffect(() => {
     let cancelled = false;
