@@ -33,6 +33,7 @@ import { useState } from 'react';
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from './lib/pricing';
 import { startHref } from './lib/checkout';
+import Vsl from './Vsl';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -68,6 +69,10 @@ export default function Homepage() {
   return (
     <main className="flex flex-1 flex-col">
       <Hero />
+      {/* The VSL sits directly under the hero — highest-intent real estate on a
+          sales funnel, and it renders nothing until VITE_VSL_URL is set, so it
+          costs nothing while the video is still being recorded. */}
+      <Vsl />
       {/* Ty leads. He IS the differentiator, and a contractor deciding whether
           to keep reading is deciding about a person, not an argument. The
           analysis follows once they know who's talking. */}
@@ -573,58 +578,58 @@ function StorySection() {
             {/* The two halves of the dog ARE the two halves of the product, and
                 saying so is the cleanest way to explain what's software and
                 what's a person without using either word. Matches the hero
-                chip — "Lola watches 24/7. Ty does the work." */}
+                chip — "Lola watches 24/7. Ty does the work."
+
+                Cut from ~235 words to ~150. Every paragraph that survived got
+                its setup removed: this is a founder letter on a sales page, not
+                an essay, and the reader is deciding about a person in about
+                fifteen seconds. Short sentences ARE the charisma here — the
+                voice reads as someone talking, not writing. */}
             <p>
-              Lola's the name on the door — my dog,{' '}
+              Lola's my dog —{' '}
               <span className="font-semibold text-white">half basset hound, half shepherd</span>,{' '}
-              {LOLA_TURNS} this February. That split turned out to be the whole job. The basset
-              half never loses a scent. The shepherd half never leaves the flock.
+              {LOLA_TURNS} this February. The basset never loses a scent. The shepherd never
+              leaves the flock. Turns out that's the whole job.
             </p>
             <p>
-              So that's how we work. Lola watches — your rankings, your reviews, your calls,
-              around the clock, never bored, never off.{' '}
+              So that's how we work. Lola watches — your rankings, your reviews, your calls.
+              Around the clock, never bored, never off.{' '}
               <span className="font-semibold text-white">I do the work she turns up.</span>
             </p>
             <p>
-              I coach strength and conditioning and run this full time. It's the same job either
-              way: show up, do the work, keep showing up on the days nothing's happening yet.
-              That's what moves you up Google — and it's the part most agencies quietly skip.
+              I coach strength and conditioning. Same job either way: show up, do the work, keep
+              showing up on the days nothing's happening yet. That's what moves you up Google.
+              It's the part most agencies quietly skip.
             </p>
             <p>
-              It started with one crew:{' '}
+              It started with one crew —{' '}
               {/* Points at the LIVE dashboard, not /case-studies/sandbar. That
                   page is held by D-014 until the ranking tracker has real
                   receipts, and the route 404s while the flag is off — so this
                   link, in the one paragraph where the reader decides whether to
-                  believe any of it, silently dropped them back on the homepage.
-                  The dashboard is the proof that actually exists: public, no
-                  login, and already cited as proof further down the page. */}
+                  believe any of it, silently dropped them back on the homepage. */}
               <a
                 href="/r/client/sandbar"
                 className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
               >
                 Sandbar Soft Wash
               </a>
-              , right here in the bay. I got them found on Google and in the AI answers, and the
-              phone started ringing. So I built the system to do it again.
+              , right here in the bay. Got them found on Google and in the AI answers. The phone
+              started ringing. So I built the system to do it again.
             </p>
-            {/* Quoted from GUARANTEE, never retyped. This paragraph used to read
-                "if I don't get you ranking, you get half your money back — the
-                90-Day Promise", which is the RETIRED Half-Back Guarantee wearing
-                the new name: half a refund is meaningless against a monthly
-                plan, and the live promise pays in work, not a partial refund.
-                Two different published guarantees for one product is the kind of
-                thing you only find out about in an argument. */}
+            {/* GUARANTEE.short, not GUARANTEE.body. The full version opens with
+                "We pick your money keywords together in week 1" — true, and the
+                right level of detail on /pricing, but it turns the hardest-
+                hitting line in the letter into a procedure. The terms live one
+                click away; this paragraph only has to land the promise. */}
             <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
-              I do the work myself. {GUARANTEE.body}{' '}
-              {/* No article — GUARANTEE.title already reads "The 90-Day Promise",
-                  so "That's the {title}" renders "That's the The 90-Day Promise". */}
-              <span className="font-bold text-[#D4AF37]">That's {GUARANTEE.title}. In writing.</span>
+              I do the work myself.{' '}
+              <span className="font-bold text-[#D4AF37]">{GUARANTEE.short}</span> In writing.
             </p>
             <p>
-              A local business that finally gets found changes what a family can do — what they
-              can say yes to. That's the whole point. Enough of you win,{' '}
+              A local business that finally gets found changes what a family can say yes to.
+              That's the whole point. Enough of you win,{' '}
               <span className="font-semibold text-white">and Lola gets the backyard she deserves.</span>
             </p>
             <p className="text-[17px] font-semibold text-white sm:text-[18px]">
