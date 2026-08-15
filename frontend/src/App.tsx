@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { useEffect, useState, lazy, Suspense } from 'react';
+import { checkoutUrl } from './lib/checkout';
 import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
@@ -404,12 +405,13 @@ function MobileStickyCTA({ route }: { route: Route }) {
   const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
-  const calendar =
-    (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-    'https://calendar.app.google/J7idjUDitd2Hziuc7';
-  const utm = `utm_source=sticky&utm_medium=mobile_bar&utm_campaign=${route.name}`;
-  const callHref = `${calendar}${calendar.includes('?') ? '&' : '?'}${utm}`;
-  const primaryLabel = route.name === 'pricing' ? 'Lock my market →' : 'Book Free Call →';
+  // Self-serve, not scheduled. The gold button used to open a calendar — the
+  // most-tapped element on a phone pointing away from the sale. It now goes to
+  // checkout when the Stripe link exists, and to /pricing until it does, so the
+  // path is always toward buying rather than booking.
+  const pay = checkoutUrl();
+  const buyHref = pay || '/pricing';
+  const external = Boolean(pay);
 
   return (
     <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
@@ -421,12 +423,11 @@ function MobileStickyCTA({ route }: { route: Route }) {
           Free Score
         </a>
         <a
-          href={callHref}
-          target="_blank"
-          rel="noreferrer"
+          href={buyHref}
+          {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
           className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
         >
-          {primaryLabel}
+          Start — $397/mo →
         </a>
       </div>
     </div>

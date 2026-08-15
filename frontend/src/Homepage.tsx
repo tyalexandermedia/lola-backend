@@ -35,10 +35,6 @@ import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
-const CALENDAR_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
-
 // Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
 // not a real client's numbers. The two low bars (AI Visibility, Revenue
 // Tracking) are the leaks Lola is built to close.
@@ -124,12 +120,10 @@ function Hero() {
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
             <a
-              href={CALENDAR_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-[56px] items-center justify-center px-2 py-3 text-[14px] font-semibold text-[#9AA0A6] underline decoration-white/20 underline-offset-4 transition-colors hover:text-[#D4AF37] hover:decoration-[#D4AF37]"
+              href="/pricing"
+              className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-[#D4AF37]/35 px-6 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
             >
-              or book a 15-min call
+              Start now — {PLAN.price}{PLAN.period}
             </a>
           </div>
 
@@ -930,7 +924,7 @@ function FinalCta() {
           Make sure the answer is you.
         </h2>
         <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8]">
-          Run the free 60-second Growth Score, or book a straight-talk 15-minute call with Ty. No pitch deck — just where you stand and what to fix first.
+          See where you stand in 60 seconds — free, no card. Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
@@ -940,12 +934,10 @@ function FinalCta() {
             Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
           <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+            href="/pricing"
+            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-[#D4AF37]/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
           >
-            Book a 15-min call
+            Start now — {PLAN.price}{PLAN.period}
           </a>
         </div>
       </div>

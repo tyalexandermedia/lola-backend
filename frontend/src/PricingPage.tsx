@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 
 import IncludedAccordion from './IncludedAccordion';
 import { checkoutUrl } from './lib/checkout';
+import { FOUNDER } from './lib/lola';
 import { AFTER_YOU_START, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
@@ -46,8 +47,8 @@ const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
     a: 'A 2-minute intake after checkout, and pick your money keywords with me in week 1. After that you run your business — everything else is mine.',
   },
   {
-    q: 'Do I need to talk to someone first?',
-    a: "Only if you want to. You can start from this page in one tap, or book a 15-minute call and ask me anything first. Same price either way.",
+    q: 'Do I have to get on a call?',
+    a: "No. Start from this page in one tap — no call, no sales pitch, no waiting on my calendar. If you want to ask something first, text me and I'll answer myself.",
   },
 ];
 
@@ -112,11 +113,17 @@ export default function PricingPage() {
     return () => tags.forEach((t) => t.parentNode?.removeChild(t));
   }, []);
 
-  // One-tap Stripe when the monthly link exists; booking a call until it does,
-  // so the page never dead-ends before the link is configured.
+  // Self-serve. Ty doesn't want to sell on calls, so the fallback can't be a
+  // calendar — that would make "book a call" the only route to buying, which is
+  // the exact thing being removed.
+  //
+  // With the Stripe link set: one tap to checkout.
+  // Without it: a text straight to Ty, which still starts the sale in one tap
+  // and never leaves the visitor on a page with no way forward. Set
+  // VITE_STRIPE_MONTHLY_URL and this becomes real checkout with no other edit.
   const pay = checkoutUrl();
-  const primaryHref = pay || BOOKING_URL;
-  const primaryLabel = pay ? PLAN.cta : 'Book a 15-min call';
+  const primaryHref = pay || `sms:${FOUNDER.phone}?&body=${encodeURIComponent("Hi Ty — I want to start the $397/month plan.")}`;
+  const primaryLabel = pay ? PLAN.cta : `Text me to start — ${FOUNDER.phoneDisplay}`;
 
   return (
     <main className="flex flex-1 flex-col">
