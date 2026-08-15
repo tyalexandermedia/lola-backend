@@ -32,6 +32,7 @@ import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from './lib/pricing';
+import { startHref } from './lib/checkout';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -42,6 +43,11 @@ import { useReveal } from './lib/useReveal';
 // was an accurate picture of an unoptimised business, and it read like being told
 // you're sick before you've said hello. This is where the work takes you —
 // labelled as the target so it never reads as a client's result or a promise.
+// Every "Start" on this page resolves through one rule: straight to Stripe
+// checkout once the Payment Link exists, /pricing until it does. Reader is
+// still inside the pitch here, so atOffer stays false. See lib/checkout.
+const START = startHref();
+
 const SAMPLE_SCORE = 99;
 // Values line up with the six canonical dimensions (single source of truth).
 // The two lows — AI Visibility, Revenue Tracking — are the leaks Lola closes.
@@ -146,7 +152,7 @@ function Hero() {
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
             <a
-              href="/pricing"
+              href={START}
               className="inline-flex min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
             >
               Start — {PLAN.price}{PLAN.period}
@@ -814,7 +820,7 @@ function RoiSection() {
 
           {/* Peak intent: the number just resolved against their own ticket. */}
           <a
-            href="/pricing"
+            href={START}
             className="group mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
           >
             Start my {PLAN.price}{PLAN.period}
@@ -885,7 +891,7 @@ function OfferSection() {
       {/* One plan. A two-up grid of the same card was what the sweep left
           behind once DIY and BUILD both aliased PLAN. */}
       <div className="mt-4 mx-auto max-w-[520px]">
-        <TierCard tier={PLAN} href="/pricing" featured />
+        <TierCard tier={PLAN} href={START} featured />
       </div>
 
       <p className="mt-5 text-[12px] leading-[1.6] text-[#8A8F98]">
@@ -1028,7 +1034,7 @@ function FinalCta() {
             Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
           <a
-            href="/pricing"
+            href={START}
             className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-[#D4AF37]/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
           >
             Start now — {PLAN.price}{PLAN.period}

@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { useEffect, useState, lazy, Suspense } from 'react';
-import { checkoutUrl } from './lib/checkout';
+import { startHref } from './lib/checkout';
 import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
@@ -78,9 +78,20 @@ function parseRoute(pathname: string): Route {
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
-  if (pathname === '/pricing' || pathname === '/retainer/') return { name: 'retainer' };
+  // /retainer and /managed both resolve to the pricing page, mirroring the 301s
+  // already published in vercel.json — production redirects before the SPA ever
+  // loads, so these arms only fire on client-side navigation and local dev.
+  //
+  // They deliberately do NOT render RetainerPage / ManagedPage. Both are
+  // survivors of the retired model: RetainerPage still sells "The Full Build"
+  // behind calendar CTAs, and ManagedPage publishes a $297/mo price that no
+  // longer exists anywhere in docs/PRICING.md. Rendering either would contradict
+  // the live offer. (The pricing sweep also mangled this test into
+  // `pathname === '/pricing' || pathname === '/retainer/'`, so bare '/retainer'
+  // matched nothing and fell through to the 404.)
+  if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'pricing' };
+  if (pathname === '/managed' || pathname === '/managed/') return { name: 'pricing' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
-  if (pathname === '/managed' || pathname === '/managed/') return { name: 'managed' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
   if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'build-onboarding' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
@@ -406,12 +417,14 @@ function MobileStickyCTA({ route }: { route: Route }) {
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   // Self-serve, not scheduled. The gold button used to open a calendar — the
-  // most-tapped element on a phone pointing away from the sale. It now goes to
-  // checkout when the Stripe link exists, and to /pricing until it does, so the
-  // path is always toward buying rather than booking.
-  const pay = checkoutUrl();
-  const buyHref = pay || '/pricing';
-  const external = Boolean(pay);
+  // most-tapped element on a phone pointing away from the sale.
+  //
+  // It used to fall back to '/pricing' unconditionally, which made the biggest
+  // button on the screen link to the page you were already standing on: on
+  // /pricing, the primary buy control did nothing. startHref(atOffer) sends
+  // readers still in the pitch to /pricing and readers already on the offer to
+  // the pre-filled text, so the button always advances the sale.
+  const buyHref = startHref(route.name === 'pricing');
 
   return (
     <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
@@ -424,7 +437,6 @@ function MobileStickyCTA({ route }: { route: Route }) {
         </a>
         <a
           href={buyHref}
-          {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
           className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
         >
           Start — $397/mo →
