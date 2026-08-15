@@ -152,21 +152,21 @@ def _content(step: int, row: dict) -> dict:
     pricing = f"{PUBLIC_APP_URL}/pricing"
 
     if step == 1:
-        subject = f"{name}: your Growth Score + the #1 fix"
+        subject = f"{name}: fix #1 is done — three left"
         html = _email_wrap(
             "Did you catch your Growth Score?",
-            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Hey {name}, it's Ty. Your free Growth Score shows exactly where you show up on Google <em>and</em> in AI answers (ChatGPT, Perplexity, Gemini) — plus the single biggest fix to climb.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;"><a href="{report}" style="color:#B8860B;">👉 Re-open your score</a>. Want to fix it yourself? The $197 DIY guide walks you through it. Want us to just build it and rank it? That's the $997 Full Build.</p>
+            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Hey {name}, it's Ty. Your Growth Score came with your first fix already written — the title tag for your page. Paste it in and it works; that one's yours free.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">Three left: your Google Business Profile description, your first GBP post, and the schema that decides whether AI can read your business at all. <a href="{report}" style="color:#B8860B;">👉 Re-open your score</a> — the $197 kit unlocks all three, written for you. Or the $997 Full Build and I do the whole thing myself.</p>
 <p style="margin:0 0 22px;">{_btn(pricing, "See my two options →")}</p>""",
         )
         text = (
-            f"Hey {name}, it's Ty. Your free Growth Score shows where you show up on Google "
-            f"and in AI answers, plus the #1 fix. Re-open it: {report} — "
-            f"DIY $197 or we build+rank it for $997: {pricing}"
+            f"Hey {name}, it's Ty. Your Growth Score came with your first fix written and ready "
+            f"to paste — that one's free. Three left: GBP description, first post, and your "
+            f"schema. Re-open it: {report} — $197 unlocks all three, or $997 and I do it: {pricing}"
         )
         sms = (
-            f"Hey {name}, it's Lola 🐾 Did you catch your Growth Score? Your #1 fix is inside: "
-            f"{report} — or we build + rank it for you: {pricing}"
+            f"Hey {name}, it's Lola 🐾 Your first fix is written and waiting in your score: "
+            f"{report} — three more in the $197 kit, or we do all of it: {pricing}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
@@ -194,11 +194,12 @@ def _content(step: int, row: dict) -> dict:
     html = _email_wrap(
         "One last thing",
         f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I won't keep bugging you, {name} — but you ran your Growth Score for a reason, and every week you're not found is jobs going to the competitor above you.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Two ways to fix it: the <strong>$197 DIY</strong> guide, or the <strong>$997 Full Build</strong> (done-for-you, Half-Back Guarantee). And if you want us to keep working your visibility every month after the build, there's an optional <strong>{MANAGED_MONTHLY}</strong> to keep you climbing and keep the reviews and rankings coming.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Two ways to fix it: the <strong>$197 DIY kit</strong> — your remaining three fixes written for your business — or the <strong>$997 Full Build</strong> (done-for-you, Half-Back Guarantee). And if you want us to keep working your visibility every month after the build, there's an optional <strong>{MANAGED_MONTHLY}</strong> to keep you climbing and keep the reviews and rankings coming.</p>
 <p style="margin:0 0 22px;">{_btn(CALL_URL, "Let's talk — free call →")} &nbsp; <a href="{PUBLIC_APP_URL}/pricing" style="color:#B8860B;font-weight:700;">or see pricing</a></p>""",
     )
     text = (
-        f"Last note, {name}. Fix your visibility: $197 DIY or the $997 Full Build "
+        f"Last note, {name}. Fix your visibility: the $197 DIY kit (your three remaining "
+        f"fixes, written for you) or the $997 Full Build "
         f"(Half-Back Guarantee). Optional {MANAGED_MONTHLY} after the build keeps you climbing. "
         f"Book: {CALL_URL} · Pricing: {PUBLIC_APP_URL}/pricing"
     )
