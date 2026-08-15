@@ -92,14 +92,19 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          <h1 className="mt-6 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[52px] lg:text-[60px]">
+          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[52px] lg:text-[60px]">
             Your next customer already searched for you.
             <span className="mt-2 block text-[#D4AF37]">Did you show up?</span>
           </h1>
 
-          <p className="mt-7 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
-            Every day, customers pick a competitor from a Google or AI result you
-            never knew existed. Lola makes sure you're the one they find —{' '}
+          {/* ONE line, not four.
+              This used to open with "Every day, customers pick a competitor from
+              a Google or AI result you never knew existed" — four lines of setup
+              that pushed the button off a phone screen, and that ProblemSection
+              already makes better two scrolls down. The headline is the punch;
+              this only has to land the promise and get out of the way. */}
+          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+            Lola makes sure you're the one they find —{' '}
             <span className="font-semibold text-white">and the one they choose.</span>
           </p>
 
@@ -108,7 +113,7 @@ function Hero() {
               reader do the arithmetic themselves, and most won't. Struck price
               beside "Included" does it for them in one glance — the $397 lands
               against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-6 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10]">
+          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10]">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="text-[14.5px] font-semibold text-white">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
@@ -123,30 +128,35 @@ function Hero() {
               </span>
             </div>
           </div>
+          {/* One line. The struck $3,000+ above already makes the comparison —
+              spelling it out again in two more lines was the reader doing the
+              same arithmetic twice. */}
           <p className="mt-2.5 text-[13px] leading-[1.5] text-[#8A8F98]">
-            No setup fee. Most shops bill the build up front, then charge you monthly on top.
+            No setup fee. Most shops charge that up front.
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+          {/* flex-wrap guards the shrink-0 buttons: at narrow desktop widths the
+              second one drops to its own row instead of overflowing the column. */}
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="/growth-score"
-              className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+              className="group inline-flex min-h-[56px] shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#D4AF37] px-6 py-3 text-[14px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
             >
               Run my free Growth Score
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
             <a
               href="/pricing"
-              className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-[#D4AF37]/35 px-6 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
+              className="inline-flex min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
             >
-              Start now — {PLAN.price}{PLAN.period}
+              Start — {PLAN.price}{PLAN.period}
             </a>
           </div>
 
+          {/* "No setup fee" was here too — it now sits directly above the
+              buttons, and saying it twice in 60px of screen reads as filler. */}
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#8A8F98]">
             <span>Free 60-second Growth Score</span>
-            <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span>No setup fee</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span className="text-[#D4AF37]">Ranking in 90 days or 2 months free</span>
           </p>
@@ -234,7 +244,9 @@ function ReportCard() {
             return (
               <div key={d.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-[124px] shrink-0 text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
+                  {/* 132px, not 124px — "Revenue Tracking" wrapped to two lines
+                      at the old width and knocked the bar rows out of rhythm. */}
+                  <span className="w-[132px] shrink-0 text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
                     {d.name}
                   </span>
                   <span className="h-[7px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
@@ -258,7 +270,7 @@ function ReportCard() {
           <p className="text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">What that gets you</p>
           <p className="mt-1 text-[13px] leading-[1.5] text-[#E8E4D8]">
             <span className="font-semibold text-white">Ask ChatGPT for a company like yours</span>{' '}
-            and it names you. Same on Google, same in the map pack.
+            — it names you.
           </p>
         </div>
 
