@@ -49,6 +49,24 @@ import { useReveal } from './lib/useReveal';
 // still inside the pitch here, so atOffer stays false. See lib/checkout.
 const START = startHref();
 
+/**
+ * One gold treatment for every primary CTA on the page.
+ *
+ * The mobile sticky bar already used a gradient with an outer glow while the
+ * in-page buttons were a flat #D4AF37 — so on any given screen the most
+ * important control looked cheaper than the persistent one following you
+ * around. Same face everywhere now: the gradient slides on hover, the glow
+ * deepens, and the button dips a hair on press so a tap feels answered.
+ */
+const GOLD_CTA =
+  'group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg ' +
+  'bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left ' +
+  'text-[14px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] ' +
+  'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_20px_rgba(212,175,55,0.28)] ' +
+  'transition-all duration-200 hover:bg-right ' +
+  'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_10px_30px_rgba(212,175,55,0.44)] ' +
+  'active:scale-[0.99]';
+
 const SAMPLE_SCORE = 99;
 // Values line up with the six canonical dimensions (single source of truth).
 // The two lows — AI Visibility, Revenue Tracking — are the leaks Lola closes.
@@ -151,7 +169,7 @@ function Hero() {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="/growth-score"
-              className="group inline-flex min-h-[56px] shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#D4AF37] px-6 py-3 text-[14px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+              className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}
             >
               Run my free Growth Score
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -393,10 +411,22 @@ function ReportCard() {
           </p>
         </div>
 
-        {/* NEXT MOVE — a real link, 44px min height. */}
+        {/* BUY, right here. The card spends its whole height explaining what
+            $397 gets you and then offered no way to take it — the reader who
+            was convinced by it had to go hunting. Primary is the purchase;
+            the free score stays underneath for anyone not ready. */}
+        <a href={START} className={`${GOLD_CTA} mt-5 w-full px-6 py-3`}>
+          Start — {PLAN.price}{PLAN.period}
+          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+        </a>
+        <p className="mt-2 text-center text-[11.5px] leading-[1.45] text-[#8A8F98]">
+          No setup fee · cancel anytime after the first 3 months
+        </p>
+
+        {/* Softer second path, 44px min height. */}
         <a
           href="/growth-score"
-          className="group mt-4 flex min-h-[44px] items-center gap-2 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+          className="group mt-3 flex min-h-[44px] items-center gap-2 rounded-lg border border-white/[0.12] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.08]"
         >
           <p className="flex-1 text-[13px] leading-[1.45] text-[#C5C5C8]">
             <span className="font-semibold text-white">See your own score first</span> — free, 60
@@ -895,7 +925,7 @@ function RoiSection() {
           {/* Peak intent: the number just resolved against their own ticket. */}
           <a
             href={START}
-            className="group mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            className={`${GOLD_CTA} mt-5 px-6 py-3`}
           >
             Start my {PLAN.price}{PLAN.period}
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -1103,7 +1133,7 @@ function FinalCta() {
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
             href="/growth-score"
-            className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-8 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            className={`${GOLD_CTA} px-8 py-3`}
           >
             Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>

@@ -173,9 +173,10 @@ export default function PricingPage() {
 
           <a
             href={primaryHref}
-            className="mt-7 inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-6 py-3 text-[15px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C] active:scale-[0.99]"
+            className="group mt-7 inline-flex min-h-[60px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 py-3 text-[16px] font-bold text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_26px_rgba(212,175,55,0.32)] transition-all duration-200 hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_12px_36px_rgba(212,175,55,0.5)] active:scale-[0.99]"
           >
-            {primaryLabel} →
+            {primaryLabel}
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
 
           {/* Second way forward. When checkout is live this catches the reader
