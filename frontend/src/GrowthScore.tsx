@@ -87,6 +87,8 @@ export default function GrowthScore() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [scoringLine, setScoringLine] = useState(SCORING_LINES[0]);
   const [lookup, setLookup] = useState<LookupState>('idle');
+  /** Fields the Google lookup answered for them — safe to skip past. */
+  const [autofilled, setAutofilled] = useState<Set<string>>(new Set());
 
   // Pre-fill from URL (?biz=, ?trade=) + localStorage, mirroring /grader so
   // deep-links from the homepage land mid-form with lower drop-off.
@@ -107,27 +109,37 @@ export default function GrowthScore() {
     } catch { /* ignore */ }
   }, []);
 
-  const runLookup = async (bizName: string) => {
-    if (lookup === 'searching') return;
+  const runLookup = async (bizName: string): Promise<Set<string>> => {
+    if (lookup === 'searching') return new Set<string>();
     setLookup('searching');
     try {
       const r = await fetch(`${API_URL}/grader/lookup?name=${encodeURIComponent(bizName)}`);
-      if (!r.ok) { setLookup('no_match'); return; }
+      if (!r.ok) { setLookup('no_match'); return new Set<string>(); }
       const data = await r.json();
       if (data?.ok && data?.matched) {
-        setForm((p) => ({
-          ...p,
-          website: p.website.trim() ? p.website : (data.website || p.website),
-          city: p.city.trim() ? p.city : extractCity(data.address || ''),
-        }));
+        // Compute synchronously from the CURRENT form and return the result.
+        // Building this inside a setForm updater looked equivalent but isn't:
+        // React runs the updater later, so the set was still empty by the time
+        // the caller read it — and the caller's `autofilled` closure would have
+        // been a render behind regardless. Returning the value sidesteps both.
+        const website = form.website.trim() ? form.website : (data.website || '').trim();
+        const city = form.city.trim() ? form.city : extractCity(data.address || '');
+        const filled = new Set<string>();
+        // Only claim a field is answered if the value would actually pass the
+        // same check the step applies — otherwise we'd skip past a bad value.
+        if (!form.city.trim() && city.trim().length >= 2) filled.add('city');
+        if (!form.website.trim() && website.length >= 4 && /\./.test(website)) filled.add('website');
+        setForm((p) => ({ ...p, website: website || p.website, city: city || p.city }));
+        setAutofilled(filled);
         setLookup('found');
-        track('growth_score_autofill_hit');
-      } else {
-        setLookup('no_match');
+        track('growth_score_autofill_hit', { filled: [...filled].join(',') });
+        return filled;
       }
+      setLookup('no_match');
     } catch {
       setLookup('no_match');
     }
+    return new Set<string>();
   };
 
   // SoftwareApplication + HowTo JSON-LD — free-tool rich result + AI-quotable
@@ -214,15 +226,38 @@ export default function GrowthScore() {
       if (w.length < 4 || !/\./.test(w)) return "That doesn't look like a URL.";
     }
     if (k === 'phone') {
-      if ((form.phone ?? '').replace(/\D/g, '').length < 10) return 'Real phone number, please.';
+      const phone = (form.phone ?? '').trim();
       const email = form.email.trim();
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'That email looks off.';
-      if (!consent) return 'Please check the box so we can send your results.';
+      const phoneOk = phone.replace(/\D/g, '').length >= 10;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      // Either contact method is enough. The backend already treats both as
+      // optional ("keep both so a phone-only lead isn't dropped"), so demanding
+      // a phone number for a free tool was UI-only friction — and a phone is
+      // the single highest-refusal field on a form like this. One of the two
+      // still guarantees every completed score is a reachable lead.
+      if (!phoneOk && !emailOk) return 'Add a phone or an email so I can send your score.';
+      if (phone && !phoneOk) return 'That phone number looks short.';
+      if (email && !emailOk) return 'That email looks off.';
+      if (!consent) return 'Please check the box so I can send your results.';
     }
     return undefined;
   };
 
-  const goNext = () => {
+  /**
+   * Skip forward over anything the Google lookup already answered correctly.
+   * Re-asking a contractor to confirm a city Lola just found is a screen that
+   * costs completions and buys nothing — the summary on the final step still
+   * shows every value, and Back still reaches them, so nothing is hidden.
+   */
+  const nextStepIndex = (from: number, filled: Set<string>): number => {
+    let i = from + 1;
+    // Only ever skips fields the lookup itself answered, and the last step is
+    // never skippable — contact details are always asked for explicitly.
+    while (i < STEPS.length - 1 && filled.has(STEPS[i])) i += 1;
+    return Math.min(i, STEPS.length - 1);
+  };
+
+  const goNext = async () => {
     const err = validateField(current);
     if (err) {
       setErrors((e) => ({ ...e, [current]: err }));
@@ -232,8 +267,25 @@ export default function GrowthScore() {
       score();
       return;
     }
-    track('growth_score_step', { step: step + 1, field: current });
-    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+
+    // Fire the Google lookup when they finish the name. It previously ran ONLY
+    // for ?biz= deep links, so a visitor who typed their own name never got the
+    // autofill this page advertises. Awaiting it here is what lets the next two
+    // steps be skipped — capped so a slow API can't stall the flow.
+    let filled = autofilled;
+    if (current === 'business_name' && lookup === 'idle') {
+      const found = await Promise.race([
+        runLookup(form.business_name.trim()),
+        new Promise<Set<string>>((res) => setTimeout(() => res(new Set<string>()), 3500)),
+      ]);
+      filled = found;
+    }
+
+    const target = nextStepIndex(step, filled);
+    // Step-level events are how "did this convert better" becomes answerable
+    // instead of a hunch — each one fires with the furthest step reached.
+    track('growth_score_step', { step: target + 1, field: STEPS[target], skipped: target - step - 1 });
+    setStep(target);
   };
 
   const goBack = () => setStep((s) => Math.max(s - 1, 0));
@@ -444,7 +496,10 @@ export default function GrowthScore() {
                       type="button"
                       onClick={() => {
                         update('business_type', t.value);
-                        setStep((s) => Math.min(s + 1, STEPS.length - 1));
+                        // Route through the same skip-aware advance as the Next
+                        // button; a bare s+1 here landed people back on the
+                        // website step the lookup had already answered.
+                        setStep(nextStepIndex(step, autofilled));
                       }}
                       className={`inline-flex min-h-[56px] items-center gap-3 rounded-[12px] border px-4 py-3 text-left text-[15px] font-medium transition ${
                         selected
