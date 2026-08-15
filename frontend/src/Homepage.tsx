@@ -227,120 +227,151 @@ function Hero() {
     </section>
   );
 }
-
 /* ─────────────────────────────────────────────────────────────────────────
-   REPORT CARD — the Growth Score result as a real diagnostic scorecard.
-   Static markup (SSR-safe): grade, six graded dimensions, biggest-leak
-   callout, next move. Reads like a report, not a form.
+   THE OFFER CARD — what you get, then the proof you can watch it working.
+
+   Was a diagnostic scorecard: it opened on a 99/100 and six graded
+   dimensions. That order asked a contractor to learn what a "Growth Score"
+   is before he could tell what he was buying, and a number he doesn't have
+   context for reads as homework, not as value.
+
+   Now it opens on the single most legible thing in the plan — you miss a
+   call, the caller gets a text back, you keep the job — shown as an actual
+   text bubble rather than described. Everything a contractor already
+   understands goes first; the score and the dashboard follow as proof that
+   the work is visible, which is what a report is FOR.
+
+   Static markup (SSR-safe) so all of it is in the prerendered HTML.
    ───────────────────────────────────────────────────────────────────────── */
 function ReportCard() {
   const grade = SAMPLE_SCORE >= 95 ? 'A+' : SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : 'D';
+  // The featured item leads; the rest follow as a checklist. Sliced from the
+  // canonical list so the card can't drift from /pricing.
+  const [featured, ...rest] = MONTHLY_AT_A_GLANCE;
+
   return (
     <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
-      {/* header band */}
+      {/* header band — names the offer and the price, not a product feature */}
       <div className="flex items-center justify-between border-b border-white/10 bg-[#141416] px-5 py-3">
         <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
-          🐾 Lola · Growth Score
+          🐾 Lola · What you get
         </span>
-        <span className="rounded-md border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">
-          Where this takes you
+        <span className="text-[11px] font-bold text-white">
+          {PLAN.price}
+          <span className="text-[10px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
         </span>
       </div>
 
       <div className="px-5 py-5 sm:px-6">
-        {/* subject + grade */}
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Subject</p>
-            <p className="mt-1 text-[15px] font-semibold text-white">Local pressure-washing co.</p>
-            <p className="text-[11px] text-[#8A8F98]">Tampa Bay, FL</p>
+        {/* ── THE HOOK: missed-call text-back, shown rather than described ──
+            Every contractor has lost a job to a call he couldn't take. This is
+            the one line in the plan that needs no explaining, so it leads and
+            it gets the only illustration on the card. */}
+        <div className="rounded-lg border border-[#4ADE80]/25 bg-[#4ADE80]/[0.05] p-4">
+          <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">
+            <span aria-hidden>📲</span> {featured}
+          </p>
+          <p className="mt-2 text-[14px] font-semibold leading-[1.45] text-white">
+            You&apos;re up a ladder. The phone rings. You can&apos;t answer it.
+          </p>
+
+          {/* The text your customer gets, as a message bubble. Showing it beats
+              describing it — the reader recognises the shape before reading. */}
+          <div className="mt-3 flex justify-end">
+            <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#2C6BED] px-3.5 py-2.5">
+              {/* "[Your Company]" rather than a real client's name. Putting
+                  Sandbar in a mock message would manufacture an artifact that
+                  never existed, and the bracket makes it obvious this is the
+                  template that goes out as YOU — which is the point anyway. */}
+              <p className="text-[12.5px] leading-[1.45] text-white">
+                Sorry we missed your call — this is [Your Company]. What can we quote for you?
+              </p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">Score</p>
-            <p className="font-display text-[44px] font-bold leading-none tracking-[-0.03em] text-[#D4AF37]">
-              {SAMPLE_SCORE}
-              <span className="text-[16px] text-[#8A8F98]">/100</span>
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.08em] text-[#4ADE80]">Grade {grade} · Found everywhere</p>
-            <p className="mt-1 text-[11px] text-[#8A8F98]">Most start near 60</p>
-          </div>
+          <p className="mt-1.5 text-right text-[10px] text-[#8A8F98]">
+            Sent from your number, seconds later
+          </p>
+
+          <p className="mt-3 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+            That job doesn&apos;t go to whoever answers next.{' '}
+            <span className="font-semibold text-white">This one alone can cover the month.</span>
+          </p>
         </div>
 
-        {/* dimension bars */}
-        <div className="mt-5 space-y-2.5">
-          {SAMPLE_DIMENSIONS.map((d) => {
-            const low = d.value < 40;
-            return (
+        {/* ── the rest of the monthly, as a plain checklist ── */}
+        <p className="mt-5 text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+          And every month, also
+        </p>
+        <ul className="mt-2.5 grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
+          {rest.map((item) => (
+            <li
+              key={item}
+              className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-[#C5C5C8]"
+            >
+              <span aria-hidden className="mt-[2px] shrink-0 text-[10px] text-[#4ADE80]">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] px-3 py-2.5">
+          <span aria-hidden className="mt-[1px] text-[12px]">🌐</span>
+          <p className="text-[12px] leading-[1.45] text-[#C5C5C8]">
+            Your website — designed, built and kept updated.{' '}
+            <span className="font-semibold text-[#4ADE80]">Included free.</span>
+          </p>
+        </div>
+
+        {/* ── THE PROOF: the score, demoted to where it belongs ──
+            Same 99 and the same six dimensions, but after the offer instead of
+            in front of it, and compressed. Its job here is "you can check my
+            work", not "here is a number to interpret". */}
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+                And you can watch it work
+              </p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+                Your Growth Score, re-checked every month on your own dashboard.
+              </p>
+            </div>
+            <div className="shrink-0 text-right">
+              <p className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] text-[#4ADE80]">
+                {SAMPLE_SCORE}
+                <span className="text-[13px] text-[#8A8F98]">/100</span>
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">Grade {grade}</p>
+            </div>
+          </div>
+
+          {/* Compact bars — 5px rather than 7px, tighter rhythm. Same data. */}
+          <div className="mt-3 space-y-1.5">
+            {SAMPLE_DIMENSIONS.map((d) => (
               <div key={d.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3">
                 <div className="flex items-center gap-2">
-                  {/* 132px, not 124px — "Revenue Tracking" wrapped to two lines
-                      at the old width and knocked the bar rows out of rhythm. */}
-                  <span className="w-[132px] shrink-0 text-[11px] uppercase tracking-[0.1em] text-[#C5C5C8]">
+                  <span className="w-[132px] shrink-0 text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
                     {d.name}
                   </span>
-                  <span className="h-[7px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                  <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                     <span
-                      className={`block h-full rounded-full ${low ? 'bg-[#E5534B]' : 'bg-[#4ADE80]'}`}
+                      className="block h-full rounded-full bg-[#4ADE80]"
                       style={{ width: `${d.value}%` }}
                     />
                   </span>
                 </div>
-                <span className={`font-mono text-[11px] tabular-nums ${low ? 'text-[#E5534B]' : 'text-[#4ADE80]'}`}>
+                <span className="font-mono text-[10px] tabular-nums text-[#4ADE80]">
                   {String(d.value).padStart(2, '0')}
                 </span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* the win — this used to be a red "biggest leak" panel. Same fact,
-            told forwards: what it looks like when it's working. */}
-        <div className="mt-5 border-l-2 border-[#4ADE80] bg-[#4ADE80]/[0.06] px-4 py-3">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">What that gets you</p>
-          <p className="mt-1 text-[13px] leading-[1.5] text-[#E8E4D8]">
-            <span className="font-semibold text-white">Ask ChatGPT for a company like yours</span>{' '}
-            — it names you.
-          </p>
-        </div>
-
-        {/* WHAT LANDS EVERY MONTH.
-            The score answered "where does this take me". This answers the
-            question that actually stops a contractor from clicking: "what am I
-            paying for every month?" Labels only, in the words an owner would
-            use — the "why" behind each one lives on /pricing, and repeating it
-            here would turn the card into a spec sheet. */}
-        <div className="mt-5 border-t border-white/10 pt-4">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
-              Working for you every month
-            </p>
-            <p className="text-[10px] font-semibold text-[#8A8F98]">
-              {PLAN.price}
-              {PLAN.period}
-            </p>
-          </div>
-          <ul className="mt-2.5 grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
-            {MONTHLY_AT_A_GLANCE.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-[#C5C5C8]"
-              >
-                <span aria-hidden className="mt-[2px] shrink-0 text-[10px] text-[#4ADE80]">
-                  ✓
-                </span>
-                {item}
-              </li>
             ))}
-          </ul>
-          <p className="mt-2.5 text-[11.5px] leading-[1.45] text-[#8A8F98]">
-            Plus your website — designed, built and kept updated.{' '}
-            <span className="text-[#4ADE80]">Included free.</span>
+          </div>
+          <p className="mt-2.5 text-[11px] text-[#8A8F98]">
+            Most start near 60. Sample shown — yours takes 60 seconds.
           </p>
         </div>
 
-        {/* NEXT MOVE — an actual link, not a caption. The card names the next
-            step; making the reader scroll back up to act on it is friction for
-            no reason. 44px min height so it's a real touch target. */}
+        {/* NEXT MOVE — a real link, 44px min height. */}
         <a
           href="/growth-score"
           className="group mt-4 flex min-h-[44px] items-center gap-2 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
@@ -358,9 +389,6 @@ function ReportCard() {
         </a>
       </div>
 
-      {/* The caption used to repeat "60 seconds · no signup", which the next-move
-          link now says in plainer words. Closing on the guarantee instead is the
-          last thing read before the eye leaves the card. */}
       <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
         🛡️ {GUARANTEE.short}
       </figcaption>
