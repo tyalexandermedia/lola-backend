@@ -15,6 +15,13 @@ import { useEffect, useState } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 import { API_URL } from './api';
+import {
+  generateGbpDescription,
+  generateGbpPost,
+  generateSchemaFallback,
+  generateTitleTag,
+} from './AuditFlow';
+import type { AuditResult } from './types';
 import { useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
 import { DIY, BUILD } from './lib/pricing';
@@ -61,7 +68,7 @@ export default function DiyAccess() {
   useSeo({
     title: 'Your DIY Fix-It Guide | Lola',
     description:
-      'The $197 DIY guide: your Growth Score plus a simple 5-step fix-it checklist to get found on Google and in AI answers — fix it yourself, on your own time.',
+      'The $197 DIY kit: all four fixes written for your business — title tag, Google Business Profile description, first GBP post, and LocalBusiness schema — plus the checklist and the order to ship them in.',
   });
 
   // Product + $197 Offer JSON-LD → eligible for a rich pricing result.
@@ -73,7 +80,7 @@ export default function DiyAccess() {
       '@type': 'Product',
       name: 'Lola DIY Fix-It Guide',
       description:
-        'Your Growth Score plus a simple 5-step fix-it checklist to get found on Google and in AI answers — self-service.',
+        'All four fixes written for your business, plus the checklist and the order to ship them in — self-service.',
       brand: { '@type': 'Brand', name: 'Lola' },
       offers: {
         '@type': 'Offer',
@@ -127,6 +134,36 @@ export default function DiyAccess() {
   }, []);
 
   const unlocked = gate === 'unlocked';
+
+  /**
+   * The four fixes this tier actually sells, rebuilt for the buyer's own
+   * business. The free report shows fix #1 finished and names the other three;
+   * this is where those three are delivered. Without it a buyer would pay $197
+   * and receive generic advice — worse than the free page they came from.
+   *
+   * The audit id is remembered when they click unlock on their report. If it's
+   * missing (different device, cleared storage), the checklist below still
+   * stands on its own, so nobody is left with nothing.
+   */
+  const [paidAudit, setPaidAudit] = useState<AuditResult | null>(null);
+  useEffect(() => {
+    if (!unlocked || typeof window === 'undefined') return;
+    let auditId = '';
+    try {
+      auditId = window.localStorage.getItem('lolaLastAuditId') || '';
+    } catch { /* ignore */ }
+    if (!auditId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${API_URL}/audits/${encodeURIComponent(auditId)}`);
+        if (!r.ok) return;
+        const data: AuditResult = await r.json();
+        if (!cancelled) setPaidAudit(data);
+      } catch { /* fall back to the checklist */ }
+    })();
+    return () => { cancelled = true; };
+  }, [unlocked]);
   const buyHref = checkoutUrl('diy') || '/pricing';
 
   if (gate === 'checking') {
@@ -165,7 +202,7 @@ export default function DiyAccess() {
           style={{ fontSize: 'clamp(1.9rem, 4.2vw, 3rem)' }}
         >
           {unlocked ? (
-            <>Your 5-step fix-it checklist.</>
+            <>Your fix kit is ready.</>
           ) : (
             <>See your score. Fix it yourself.</>
           )}
@@ -179,6 +216,35 @@ export default function DiyAccess() {
 
       {unlocked ? (
         <>
+          {paidAudit && (
+            <section className="mx-auto mt-12 w-full max-w-[760px] sm:mt-16">
+              <h2 className="text-[20px] font-bold text-white sm:text-[24px]">
+                Your four fixes, written for {paidAudit.business_name}.
+              </h2>
+              <p className="mt-2 text-[14px] leading-[1.6] text-[#9CA3AF]">
+                Paste each one where it says. Nothing to rewrite.
+              </p>
+              <div className="mt-6 flex flex-col gap-4">
+                {[
+                  { n: '1', label: 'Title tag', where: 'Page Settings → SEO → Title', body: generateTitleTag(paidAudit) },
+                  { n: '2', label: 'Google Business Profile description', where: 'GBP → Edit profile → Business description', body: generateGbpDescription(paidAudit) },
+                  { n: '3', label: 'Your first GBP post', where: 'GBP → Add update → Post', body: generateGbpPost(paidAudit) },
+                  { n: '4', label: 'LocalBusiness schema', where: 'Site <head> → Structured Data', body: generateSchemaFallback(paidAudit) },
+                ].map((d) => (
+                  <div key={d.n} className="rounded-[14px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-6">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                      {d.n} · {d.label}
+                    </p>
+                    <p className="mt-1 text-[12.5px] text-[#9CA3AF]">Paste into: {d.where}</p>
+                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-[10px] bg-[#0A0A0B] p-4 text-[13px] leading-[1.55] text-[#E8E4D8]">
+{d.body}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className="mx-auto mt-12 flex w-full max-w-[760px] flex-col gap-4 sm:mt-16">
             {STEPS.map((s) => (
               <div
@@ -219,7 +285,7 @@ export default function DiyAccess() {
       ) : (
         <section className="mx-auto mt-12 w-full max-w-[560px] rounded-2xl border border-[#D4AF37]/30 bg-white/[0.02] p-7 text-center sm:mt-16 sm:p-9">
           <ul className="flex flex-col gap-3 text-left">
-            {['Your full Growth Score', 'A simple 5-step fix-it checklist', 'Do it on your own time — no calls, no contract'].map(
+            {DIY.includes.map(
               (b) => (
                 <li key={b} className="flex items-start gap-3 text-[15px] text-white">
                   <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>

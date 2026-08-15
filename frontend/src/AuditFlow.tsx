@@ -10,6 +10,7 @@ import { track } from './analytics';
 
 import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
+import { BUILD, DIY } from './lib/pricing';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
 export { API_URL };
@@ -1173,7 +1174,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             onClick={onGuideClick}
             className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
           >
-            → Get the 5-step fix-it guide
+            → Get the full fix kit
           </a>
           <a
             href={CASE_STUDY_URL}
@@ -1311,12 +1312,12 @@ function _titleCase(s: string): string {
   return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function generateTitleTag(audit: AuditResult): string {
+export function generateTitleTag(audit: AuditResult): string {
   const service = _titleCase(audit.business_type || 'Local Service');
   return `${service} in ${audit.city || 'Florida'} | ${audit.business_name || 'Your Business'}`.slice(0, 60);
 }
 
-function generateGbpDescription(audit: AuditResult): string {
+export function generateGbpDescription(audit: AuditResult): string {
   const service = audit.business_type || 'local services';
   const city = (audit.city || 'Florida').split(',')[0] || 'Florida';
   const name = audit.business_name || 'We';
@@ -1331,7 +1332,7 @@ function generateGbpDescription(audit: AuditResult): string {
   ).slice(0, 750);
 }
 
-function generateGbpPost(audit: AuditResult): string {
+export function generateGbpPost(audit: AuditResult): string {
   const service = _titleCase(audit.business_type || 'Service');
   const city = (audit.city || 'Florida').split(',')[0];
   return (
@@ -1346,7 +1347,7 @@ function generateGbpPost(audit: AuditResult): string {
   );
 }
 
-function generateSchemaFallback(audit: AuditResult): string {
+export function generateSchemaFallback(audit: AuditResult): string {
   // Pull verified business_info fields when available — they're populated by
   // the backend's Google Places lookup during the audit. Only emit keys with
   // non-empty values to avoid Rich Results warnings for empty required-ish
@@ -1477,48 +1478,93 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
   return (
     <>
       <section className="mt-5 rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] p-6 sm:p-7">
+        {/* THE FREE / PAID LINE.
+            All four of these used to be free, pre-filled with the owner's own
+            business details. That is the DIY product, given away — which left
+            $197 buying "your full Growth Score", something the free tool had
+            already handed over. There was no honest reason to pay.
+
+            So: the diagnosis stays free — score, leak, weak spots, who's
+            outranking you, and what needs doing. The EXECUTION is the product.
+            One deliverable ships free and finished, because a locked box no one
+            can see inside doesn't sell; you have to taste the cooking. The
+            other three are what $197 buys. */}
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-          4 ready-to-deploy fixes
+          Your fix kit
         </p>
         <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
-          Paste these in. Move up the rankings.
+          Here's the first one. Free, finished, yours.
         </h3>
         <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-          Every line below is generated from {audit.business_name}'s actual audit data. Tap copy,
-          paste it where it belongs (page title, GBP description, GBP post, site &lt;head&gt;).
-          Most owners can ship all four in under 30 minutes.
+          Generated from {audit.business_name}'s actual audit — not a template. Paste it in and
+          it works. The other three fixes are written the same way, and they're what the{' '}
+          {DIY.price} DIY kit is.
         </p>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-6">
           <CopyCard
-            eyebrow="1 · Title tag"
+            eyebrow="1 · Title tag — included free"
             title="Optimized <title> for this page"
             hint="Paste into Wix → Page Settings → SEO → Title (or your CMS equivalent)."
             body={titleTag}
             trackProp="title_tag"
           />
-          <CopyCard
-            eyebrow="2 · GBP description"
-            title="Optimized Google Business Profile description"
-            hint="Paste into Google Business Profile → Edit profile → Business description."
-            body={gbpDescription}
-            trackProp="gbp_description"
-          />
-          <CopyCard
-            eyebrow="3 · GBP post draft"
-            title="Your first GBP post (publish today)"
-            hint="Paste into GBP → Add update → Post. Repeat weekly with seasonal variations."
-            body={gbpPost}
-            trackProp="gbp_post"
-          />
-          <CopyCard
-            eyebrow="4 · LocalBusiness schema"
-            title="Pre-filled structured data"
-            hint="Paste into the <head> of your site — Wix → Advanced SEO → Structured Data."
-            body={schema}
-            trackProp="schema"
-          />
         </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            {
+              n: '2',
+              label: 'Google Business Profile description',
+              why: '~150 words, written for your services and service area.',
+            },
+            {
+              n: '3',
+              label: 'Your first GBP post',
+              why: 'Ready to publish today, then repeat weekly.',
+            },
+            {
+              n: '4',
+              label: 'LocalBusiness schema',
+              why: "Pre-filled with your real details — this is what AI reads.",
+            },
+          ].map((d) => (
+            <div
+              key={d.n}
+              className="rounded-[14px] border border-[#D4AF37]/20 bg-[#0A0A0B]/60 p-4"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A8F98]">
+                {d.n} · Locked
+              </p>
+              <p className="mt-1.5 text-[14px] font-semibold leading-[1.35] text-white">
+                {d.label}
+              </p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.45] text-[#9AA0A6]">{d.why}</p>
+            </div>
+          ))}
+        </div>
+
+        <a
+          href="/pricing"
+          onClick={() => {
+            trackClick('diy_unlock_click', { score: audit.total_score });
+            // Remember whose report this is: /diy regenerates the paid assets
+            // from it after Stripe confirms payment. Without this the buyer
+            // would land on a generic checklist instead of the four fixes
+            // written for their business — i.e. paying for something the free
+            // page had already shown them the shape of.
+            try {
+              window.localStorage.setItem('lolaLastAuditId', audit.audit_id || '');
+            } catch { /* private mode — /diy falls back to the checklist */ }
+          }}
+          className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#D4AF37] px-6 py-3 text-[14px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C] sm:w-auto"
+        >
+          Unlock all four — {DIY.price} one-time →
+        </a>
+        <p className="mt-2.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">
+          Or skip the work entirely: the {BUILD.price} Full Build has me do all of it, backed by
+          the Half-Back Guarantee.
+        </p>
       </section>
 
       {/* Lola's Take — signed closing block */}

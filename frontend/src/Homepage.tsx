@@ -830,7 +830,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'How much does Lola cost?',
-    a: 'Two simple options, both one-time. DIY is $197 — your full Growth Score plus a 5-step fix-it checklist, done yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score.',
+    a: 'Two simple options, both one-time. Your Growth Score is free and includes the first fix finished. DIY is $197 — the other three fixes written for your business, plus the order to ship them in, done yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score.',
   },
   {
     q: 'Is there a guarantee?',
