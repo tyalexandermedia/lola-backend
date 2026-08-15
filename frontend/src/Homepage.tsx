@@ -570,15 +570,25 @@ function StorySection() {
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
           <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-[#C5C5C8] sm:text-[17px]">
+            {/* The two halves of the dog ARE the two halves of the product, and
+                saying so is the cleanest way to explain what's software and
+                what's a person without using either word. Matches the hero
+                chip — "Lola watches 24/7. Ty does the work." */}
             <p>
               Lola's the name on the door — my dog,{' '}
               <span className="font-semibold text-white">half basset hound, half shepherd</span>,{' '}
-              {LOLA_TURNS} this February. She's the reason any of this exists.
+              {LOLA_TURNS} this February. That split turned out to be the whole job. The basset
+              half never loses a scent. The shepherd half never leaves the flock.
             </p>
             <p>
-              I coach strength and conditioning and run a business full time. It's the same job
-              either way: show up, do the work, keep showing up on the days nothing's happening
-              yet. That's what moves you up Google — and it's the part most agencies quietly skip.
+              So that's how we work. Lola watches — your rankings, your reviews, your calls,
+              around the clock, never bored, never off.{' '}
+              <span className="font-semibold text-white">I do the work she turns up.</span>
+            </p>
+            <p>
+              I coach strength and conditioning and run this full time. It's the same job either
+              way: show up, do the work, keep showing up on the days nothing's happening yet.
+              That's what moves you up Google — and it's the part most agencies quietly skip.
             </p>
             <p>
               It started with one crew:{' '}
@@ -598,14 +608,23 @@ function StorySection() {
               , right here in the bay. I got them found on Google and in the AI answers, and the
               phone started ringing. So I built the system to do it again.
             </p>
+            {/* Quoted from GUARANTEE, never retyped. This paragraph used to read
+                "if I don't get you ranking, you get half your money back — the
+                90-Day Promise", which is the RETIRED Half-Back Guarantee wearing
+                the new name: half a refund is meaningless against a monthly
+                plan, and the live promise pays in work, not a partial refund.
+                Two different published guarantees for one product is the kind of
+                thing you only find out about in an argument. */}
             <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
-              I do the work myself. And if I don't get you ranking, you get half your money back —
-              the <span className="font-bold text-[#D4AF37]">90-Day Promise. In writing.</span>
+              I do the work myself. {GUARANTEE.body}{' '}
+              {/* No article — GUARANTEE.title already reads "The 90-Day Promise",
+                  so "That's the {title}" renders "That's the The 90-Day Promise". */}
+              <span className="font-bold text-[#D4AF37]">That's {GUARANTEE.title}. In writing.</span>
             </p>
             <p>
-              A local business that finally gets found changes what a family can do. That's the
-              whole point. Enough of you win,{' '}
+              A local business that finally gets found changes what a family can do — what they
+              can say yes to. That's the whole point. Enough of you win,{' '}
               <span className="font-semibold text-white">and Lola gets the backyard she deserves.</span>
             </p>
             <p className="text-[17px] font-semibold text-white sm:text-[18px]">

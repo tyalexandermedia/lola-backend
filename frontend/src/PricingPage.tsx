@@ -16,7 +16,7 @@
 import { useEffect } from 'react';
 
 import IncludedAccordion from './IncludedAccordion';
-import { checkoutUrl } from './lib/checkout';
+import { checkoutUrl, startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
 import { AFTER_YOU_START, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED } from './lib/pricing';
 import { useSeo } from './lib/seo';
@@ -121,9 +121,18 @@ export default function PricingPage() {
   // Without it: a text straight to Ty, which still starts the sale in one tap
   // and never leaves the visitor on a page with no way forward. Set
   // VITE_STRIPE_MONTHLY_URL and this becomes real checkout with no other edit.
+  // Two ways forward, always. The primary buys; the secondary captures.
+  //
+  // The fallback used to be a bare sms: link, which meant an unconfigured
+  // Payment Link turned every interested reader into an anonymous text — no
+  // business name, no trade, no website, nothing to follow up on. /apply posts
+  // to the backend, writes the applications row and emails Ty the details, so
+  // the lead arrives with its information attached. The text stays as an
+  // explicit third option for people who just want to ask something.
   const pay = checkoutUrl();
-  const primaryHref = pay || `sms:${FOUNDER.phone}?&body=${encodeURIComponent("Hi Ty — I want to start the $397/month plan.")}`;
-  const primaryLabel = pay ? PLAN.cta : `Text me to start — ${FOUNDER.phoneDisplay}`;
+  const primaryHref = pay || '/apply';
+  const primaryLabel = pay ? PLAN.cta : 'Start — send me your details';
+  const smsHref = startSmsHref("Hi Ty — I want to start the $397/month plan.");
 
   return (
     <main className="flex flex-1 flex-col">
@@ -164,10 +173,23 @@ export default function PricingPage() {
 
           <a
             href={primaryHref}
-            {...(pay ? {} : { target: '_blank', rel: 'noreferrer' })}
             className="mt-7 inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-6 py-3 text-[15px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C] active:scale-[0.99]"
           >
             {primaryLabel} →
+          </a>
+
+          {/* Second way forward. When checkout is live this catches the reader
+              who isn't ready to pay today but IS a lead — they land on the form
+              rather than closing the tab. When it isn't, the form IS the
+              primary and this drops to the text. Either way nobody leaves
+              without a path that ends in Ty's inbox. */}
+          <a
+            href={pay ? '/apply' : smsHref}
+            className="mt-2.5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl border border-[#D4AF37]/30 px-6 py-3 text-[14px] font-semibold text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.08]"
+          >
+            {pay
+              ? 'Not ready today? Send me your details'
+              : `Or just text me — ${FOUNDER.phoneDisplay}`}
           </a>
 
           {/* Guarantee and terms sit AT the button, where the hesitation is. */}

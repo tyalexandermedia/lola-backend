@@ -53,9 +53,16 @@ export function startSmsHref(
  *
  *   • Somewhere in the pitch (home, /vs, a case study) → `/pricing`. They
  *     haven't seen the offer laid out yet, so the page is the right next step.
- *   • Already ON the offer (/pricing, /start) → the pre-filled text. Sending
- *     them to /pricing from /pricing is a dead button on the money page, which
- *     is exactly what the mobile sticky bar was doing.
+ *   • Already ON the offer (/pricing, /start) → `/apply`, the intake form.
+ *     Sending them to /pricing from /pricing is a dead button on the money
+ *     page, which is exactly what the mobile sticky bar was doing.
+ *
+ * The offer-page fallback is the FORM, not a text. A text arrives with no
+ * business name, no trade, no site — Ty has to run the whole qualification by
+ * hand. /apply posts to the backend, writes the applications row and emails
+ * him the details, so an unconfigured Payment Link still produces a real lead
+ * record instead of a stranger's phone number. The pre-filled text stays
+ * available as an explicit secondary ("or just text me").
  *
  * Pass `atOffer` when the caller is already showing the full offer.
  *
@@ -64,5 +71,5 @@ export function startSmsHref(
  * tab — and target on an `sms:` href is meaningless anyway.
  */
 export function startHref(atOffer = false): string {
-  return checkoutUrl() || (atOffer ? startSmsHref() : '/pricing');
+  return checkoutUrl() || (atOffer ? '/apply' : '/pricing');
 }

@@ -157,6 +157,8 @@ export default function ClientReport({ slug }: { slug: string }) {
           The numbers below prove the work happened; this says what it was for. */}
       <OwnerBriefing data={data} />
       <OwnerOverview data={data} />
+      {/* Renders on every dashboard, not just the empty state — see SystemStatus. */}
+      <SystemStatus integrations={data.integrations} />
       <TopWinsCard
         google={data.google}
         aiMode={data.ai_mode}
@@ -406,23 +408,106 @@ function Header({ data }: { data: DashboardPayload }) {
 }
 
 /**
- * Live integration chip — green when the backend confirms the integration
- * is wired (env vars set, credentials stored), amber when it isn't. Stops
- * the empty state from lying about "✓ connected" before Railway env vars
- * land on the right service.
+ * What's live right now — the system's own status, in plain English.
+ *
+ * This used to exist only inside OwnerOverview's zero-contacts empty state, so
+ * the moment a client's first call landed the whole strip disappeared and they
+ * could never again see what was connected and what wasn't. A client asking
+ * "is my Google Business Profile actually hooked up?" had no way to answer it.
+ * It now renders on every dashboard, always.
+ *
+ * Each row says what the feed GIVES you rather than what it is — "the map pin
+ * people tap", not "GBP API". A pending row says what it's waiting on, because
+ * an amber chip with no explanation reads as broken rather than as in-progress.
+ * That distinction is the whole difference between a client feeling out of
+ * control and a client feeling informed.
  */
-function StatusChip({ label, on }: { label: string; on: boolean }) {
-  if (on) {
-    return (
-      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
-        ✓ {label} connected
-      </span>
-    );
-  }
+function SystemStatus({ integrations }: { integrations?: DashboardPayload['integrations'] }) {
+  // The quote form is wired in the page itself rather than an integration, so
+  // it is always on. Everything else reflects what the backend reports.
+  const feeds: ReadonlyArray<{ label: string; on: boolean; live: string; pending: string }> = [
+    {
+      label: 'Quote form',
+      on: true,
+      live: 'Every quote request on your site lands here and texts Ty.',
+      pending: '',
+    },
+    {
+      label: 'Call tracking',
+      on: integrations?.callrail ?? false,
+      live: 'Every call to your tracking number is logged, timed and recorded.',
+      pending: 'Waiting on the CallRail webhook. Calls land here the day it connects.',
+    },
+    {
+      label: 'Google Business Profile',
+      on: integrations?.gbp ?? false,
+      live: 'Views, searches, calls and direction taps from your map pin.',
+      pending:
+        'Waiting on Google to approve profile access. Ty is still posting and optimising it — this feed only controls whether the numbers show up here.',
+    },
+    {
+      label: 'Rank tracking',
+      on: integrations?.rankings_tracker ?? false,
+      live: 'Your position for every money keyword, re-checked on a schedule.',
+      pending: 'First snapshot is still being taken. Positions appear after it runs.',
+    },
+    {
+      label: 'Bing / Copilot',
+      on: integrations?.bing ?? false,
+      live: 'Clicks and impressions from Bing, which is what Copilot answers from.',
+      pending: 'Bing Webmaster verification pending — a smaller feed than Google.',
+    },
+  ];
+
+  const liveCount = feeds.filter((f) => f.on).length;
+
   return (
-    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-amber-300">
-      … {label} pending
-    </span>
+    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#11121A]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
+        <div>
+          <h2 className="text-[17px] font-bold text-white sm:text-[19px]">What&apos;s live right now</h2>
+          <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+            Every data feed on this page, and what it&apos;s doing for you.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#F4D47C]">
+          {liveCount} of {feeds.length} connected
+        </span>
+      </div>
+
+      <ul className="grid grid-cols-1 divide-y divide-white/[0.07] sm:grid-cols-2 sm:divide-y-0">
+        {feeds.map((f, i) => (
+          <li
+            key={f.label}
+            className={`flex items-start gap-3 px-6 py-4 sm:px-8 ${
+              i % 2 === 0 ? 'sm:border-r sm:border-white/[0.07]' : ''
+            } ${i >= 2 ? 'sm:border-t sm:border-white/[0.07]' : ''}`}
+          >
+            <span
+              aria-hidden
+              className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${
+                f.on ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-amber-400'
+              }`}
+            />
+            <div className="min-w-0">
+              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-white">
+                {f.label}
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-[0.1em] ${
+                    f.on ? 'text-emerald-300' : 'text-amber-300'
+                  }`}
+                >
+                  {f.on ? 'Live' : 'Pending'}
+                </span>
+              </p>
+              <p className="mt-1 text-[12.5px] leading-[1.5] text-[#9AA0A6]">
+                {f.on ? f.live : f.pending}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -468,17 +553,10 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
           Rankings, AI search visibility, and Google Search Console data populate
           below as snapshots come in.
         </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <StatusChip label="CallRail webhook" on={data.integrations?.callrail ?? false} />
-          <StatusChip label="Quote form" on={true} />
-          <StatusChip label="Rankings tracker" on={data.integrations?.rankings_tracker ?? false} />
-          {data.integrations?.gbp !== undefined && (
-            <StatusChip label="Google Business Profile" on={data.integrations.gbp} />
-          )}
-          {data.integrations?.bing !== undefined && (
-            <StatusChip label="Bing Webmaster" on={data.integrations.bing} />
-          )}
-        </div>
+        {/* The chip strip that used to sit here moved into SystemStatus, which
+            renders on every dashboard rather than vanishing the moment the
+            first call lands. Repeating it here would say the same thing twice
+            in two panels. */}
       </section>
     );
   }
