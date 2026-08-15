@@ -34,6 +34,7 @@ import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
+import FeatureShowcase from './FeatureShowcase';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -96,6 +97,11 @@ export default function Homepage() {
           analysis follows once they know who's talking. */}
       <StorySection />
       <ProblemSection />
+      {/* Problem, then exactly what lands about it — each feature as a picture
+          rather than a ticked label. Sits before the proof and the math so the
+          reader knows WHAT they're buying before being shown that it works and
+          what it's worth. */}
+      <FeatureShowcase />
       <ProofSection />
       <RoiSection />
       <OfferSection />
