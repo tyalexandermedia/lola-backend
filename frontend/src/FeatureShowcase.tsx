@@ -30,8 +30,10 @@ interface Feature {
   id: string;
   tab: string;
   icon: string;
-  title: string;
-  blurb: string;
+  /** The payoff, in one short line. Never a description of the mechanism. */
+  headline: string;
+  /** Two-to-four words naming what it's worth. Sits in a gold pill. */
+  worth: string;
   demo: ReactNode;
 }
 
@@ -69,9 +71,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'website',
     tab: 'Your website',
     icon: '🌐',
-    title: 'A website built to be read — by people and by machines',
-    blurb:
-      "Most shops charge $3,000+ to build it and bill you monthly on top. Yours is included, and it's written so Google and ChatGPT can actually read it.",
+    headline: 'A $3,000 website. Included.',
+    worth: 'No setup fee',
     demo: (
       <div className="overflow-hidden rounded-lg border border-white/[0.1] bg-[#0B0B0D]">
         {/* browser chrome */}
@@ -114,9 +115,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'ai',
     tab: 'AI answers',
     icon: '✦',
-    title: 'Named when someone asks an AI for a company like yours',
-    blurb:
-      "Your customer stopped scrolling ten blue links. They ask, and they take the answer. We check whether you're in it — across ChatGPT, Claude and Google's AI.",
+    headline: 'Named when they ask ChatGPT.',
+    worth: 'Nobody else does this',
     demo: (
       <div className="space-y-2.5">
         {[
@@ -151,9 +151,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'gbp',
     tab: 'Google Business',
     icon: '📍',
-    title: 'The map pin people actually tap',
-    blurb:
-      'Half your local leads come through the map pack, not your website. Right categories, services, service areas, hours, photos and regular posts — handled every month.',
+    headline: 'First in the map pack.',
+    worth: 'Half your local leads',
     demo: (
       <div className="overflow-hidden rounded-lg border border-white/[0.1] bg-[#0B0B0D]">
         <p className="border-b border-white/[0.08] bg-[#17181C] px-3.5 py-2 text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
@@ -197,9 +196,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'missed-call',
     tab: 'Missed-call text-back',
     icon: '📲',
-    title: "You're up a ladder. The phone rings. You can't answer it.",
-    blurb:
-      "The caller gets an instant text from your number, so the job doesn't go to whoever picks up next. This one alone can cover the month.",
+    headline: "You can't answer. It answers.",
+    worth: 'Covers the month',
     demo: (
       <div className="space-y-2.5">
         <div className="flex items-center gap-2 rounded-lg border border-[#E5534B]/25 bg-[#E5534B]/[0.07] px-3.5 py-2.5">
@@ -221,9 +219,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'reviews',
     tab: 'Review requests',
     icon: '⭐',
-    title: 'Your happy customers get asked — without you remembering',
-    blurb:
-      'Review count is the biggest lever in the map pack and the thing that closes quotes. The ask goes out on its own, every time.',
+    headline: 'Reviews, without you asking.',
+    worth: 'What closes quotes',
     demo: (
       <div className="space-y-2.5">
         <Bubble side="you">
@@ -250,9 +247,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'follow-up',
     tab: 'Lead follow-up',
     icon: '🔁',
-    title: 'Nothing goes cold while you’re in the field',
-    blurb:
-      'Every new lead gets followed up by text and email on a schedule. Most jobs are lost to silence, not to price.',
+    headline: 'No lead goes cold.',
+    worth: 'Most jobs die in silence',
     demo: (
       <ol className="space-y-2.5">
         {[
@@ -289,9 +285,8 @@ const FEATURES: ReadonlyArray<Feature> = [
     id: 'dashboard',
     tab: 'Your dashboard',
     icon: '📊',
-    title: 'Check my work whenever you like',
-    blurb:
-      'Calls, forms, rankings and what I shipped this month — one page, no login, no waiting on a report. You should check it.',
+    headline: 'Check my work any time.',
+    worth: 'No report to wait for',
     demo: (
       <div className="overflow-hidden rounded-lg border border-white/[0.1] bg-[#0B0B0D]">
         <div className="grid grid-cols-3 divide-x divide-white/[0.07] border-b border-white/[0.07]">
@@ -349,9 +344,7 @@ export default function FeatureShowcase() {
       <h2 className="mt-3 max-w-[720px] text-balance font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
         Not a list of features. Here&apos;s what actually lands.
       </h2>
-      <p className="mt-4 max-w-[560px] text-[15.5px] leading-[1.6] text-[#C5C5C8]">
-        Tap any one to see it.
-      </p>
+      <p className="mt-3 text-[14px] text-[#8A8F98]">Tap any one to see it.</p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr] lg:gap-10">
         {/* TABS — vertical list on desktop, horizontal scroller on a phone. */}
@@ -376,10 +369,10 @@ export default function FeatureShowcase() {
                 aria-controls={`feat-panel-${f.id}`}
                 tabIndex={on ? 0 : -1}
                 onClick={() => setActive(i)}
-                className={`flex min-h-[48px] shrink-0 snap-start items-center gap-2.5 whitespace-nowrap rounded-lg border px-4 py-3 text-left text-[13.5px] font-semibold transition-colors lg:w-full lg:whitespace-normal ${
+                className={`relative flex min-h-[48px] shrink-0 snap-start items-center gap-2.5 overflow-hidden whitespace-nowrap rounded-lg px-4 py-3 text-left text-[13.5px] font-semibold transition-all duration-200 lg:w-full lg:whitespace-normal ${
                   on
-                    ? 'border-[#D4AF37]/50 bg-[#D4AF37]/[0.10] text-white'
-                    : 'border-white/[0.09] text-[#9AA0A6] hover:border-white/20 hover:text-white'
+                    ? 'bg-gradient-to-r from-[#D4AF37]/[0.14] to-transparent text-white shadow-[inset_2px_0_0_#D4AF37] lg:translate-x-0.5'
+                    : 'text-[#8A8F98] hover:bg-white/[0.03] hover:text-white'
                 }`}
               >
                 <span aria-hidden className="text-[14px]">
@@ -401,25 +394,29 @@ export default function FeatureShowcase() {
               id={`feat-panel-${f.id}`}
               aria-labelledby={`feat-tab-${f.id}`}
               hidden={i !== active}
-              className="rounded-xl border border-[#D4AF37]/20 bg-[#0E0E10] p-5 sm:p-6"
+              className="overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-gradient-to-b from-[#131316] to-[#0B0B0D] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9)]"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-[17px] font-bold leading-[1.3] text-white sm:text-[19px]">
-                    {f.title}
+              {/* The payoff, then what it's worth. No explanatory paragraph —
+                  the demo underneath explains it better than a sentence can,
+                  and a paragraph here just delayed reaching the picture. */}
+              <div className="flex items-start justify-between gap-4 border-b border-white/[0.07] px-5 py-5 sm:px-6">
+                <div className="min-w-0">
+                  <h3 className="text-balance font-display text-[22px] font-bold leading-[1.15] tracking-[-0.02em] text-white sm:text-[27px]">
+                    {f.headline}
                   </h3>
-                  <p className="mt-2 max-w-[460px] text-[13.5px] leading-[1.6] text-[#C5C5C8]">
-                    {f.blurb}
-                  </p>
+                  <span className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#F4D47C]">
+                    {f.worth}
+                  </span>
                 </div>
-                {/* These are illustrations of what the feature produces, not a
+                {/* These illustrate what the feature produces — they are not a
                     client's screenshots. The badge stops any of them being
                     mistaken for a testimonial or a real result. */}
-                <span className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-[#8A8F98]">
+                <span className="shrink-0 rounded-full border border-white/12 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">
                   Example
                 </span>
               </div>
-              <div className="mt-5">{f.demo}</div>
+              {/* The demo is the point, so it gets the room and the light. */}
+              <div className="bg-[#08080A]/60 px-5 py-6 sm:px-6">{f.demo}</div>
             </div>
           ))}
         </div>
