@@ -774,72 +774,14 @@ export function ResultsStage({
           both link there. No in-results UpsellCta block anymore — keeps the
           results page focused on the diagnostic + playbook + strategy CTA. */}
 
-      {/* ── AGENT READINESS SCORE (new metric — surfaces how prepared this
-          business is for AI agent recommendations: ChatGPT, Perplexity,
-          Google AI Overviews, Gemini) ─────────────────────────────────── */}
-      {/* Guard on categories, not just on agent_readiness. The type says the
-          array is required, but TypeScript doesn't validate what the API
-          actually sends — and this is the page a buying decision happens on.
-          A payload missing this field used to take the ENTIRE report down with
-          "Cannot read properties of undefined (reading 'map')": white screen,
-          no score, no offer. Better to drop one panel than the whole page. */}
-      {audit.agent_readiness && audit.agent_readiness.categories?.length ? (
-        <section className="mt-10 rounded-3xl border border-[#D4AF37]/25 bg-[#0F0F12] p-6 sm:p-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-                Agent Readiness Score
-              </p>
-              <p className="mt-2 text-[13px] text-[#A0A5AE] sm:max-w-[420px]">
-                How prepared your business is to be recommended by AI search
-                agents (ChatGPT, Perplexity, Google AI, Gemini) for local
-                "<em>{audit.business_type}</em> in {audit.city}" queries.
-              </p>
-            </div>
-            <div className="flex shrink-0 items-baseline gap-3">
-              <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]">
-                {audit.agent_readiness.score}
-              </span>
-              <span className="text-[14px] font-medium text-[#D4AF37]">
-                {audit.agent_readiness.grade} — {audit.agent_readiness.grade_label}
-              </span>
-            </div>
-          </div>
+      {/* Agent Readiness Score removed. It was a SECOND 0-100 score sitting a
+          few hundred pixels under the Growth Score, and two competing numbers
+          split the one decision this page exists to produce. The underlying
+          idea — can AI actually read your business — is now carried by the AI
+          visibility section, which shows real answers rather than another
+          index. The API still returns agent_readiness; nothing upstream
+          changed, so it can come back as a sub-metric if it earns its place. */}
 
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {audit.agent_readiness.categories.map((c) => {
-              const pct = c.available ? c.score : 0;
-              const color =
-                pct >= 75 ? 'bg-emerald-400' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-400';
-              return (
-                <div key={c.name} className="rounded-xl bg-white/[0.02] p-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-[13px] font-medium text-white">{c.name}</span>
-                    <span className="text-[14px] font-bold tabular-nums text-[#D4AF37]">
-                      {c.available ? c.score : '—'}
-                    </span>
-                  </div>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
-                    <div
-                      className={`h-full rounded-full ${color} transition-all duration-500`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {audit.agent_readiness.score < 70 && (
-            <p className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.55] text-[#C5C5C8] sm:text-[14px]">
-              AI agents can't fully understand your business yet. That means when
-              ChatGPT, Perplexity, or Google AI recommends a business for
-              "{audit.city} {audit.business_type}," you're getting skipped — even
-              if you rank in traditional search.
-            </p>
-          )}
-        </section>
-      ) : null}
 
       {/* REAL AI visibility, not a promise of one.
           This slot used to hold a "Beta — Tracking ships Q3" placeholder: three
