@@ -119,12 +119,47 @@ export default function Homepage() {
 function Hero() {
   return (
     <section className="relative pt-2 sm:pt-4">
+      {/* Soft bloom behind the headline. The hero was flat black — correct as a
+          palette, but with no imagery on a phone it read as a document rather
+          than a designed page. Clipped by overflow so it can't widen the
+          viewport, and purely decorative. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.13)_0%,transparent_62%)] blur-2xl sm:left-1/3"
+      />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-14">
         {/* LEFT — the statement */}
         <div className="animate-slide-up">
-          <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
-            AI Leads Expert · Tampa Bay
-          </p>
+          {/* A byline, not a label. Every competitor's hero opens with a
+              category tag; this opens with a face and a name, which is the one
+              thing none of them can copy. Doubles as the photography the design
+              notes ask for, on the screen that had none. */}
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/ty-lola-beach.jpg"
+              alt="Ty Alexander Traufield with his dog Lola"
+              width={96}
+              height={96}
+              // eager + high priority: it sits above the fold and is the first
+              // thing a visitor sees, so it must not lazy-load into place.
+              loading="eager"
+              // object-position tuned to the figures, not the frame. This is a
+              // wide beach photo where Ty and Lola sit around 52% down; the
+              // default centre crop filled the circle with sky. It reads as a
+              // man and a dog at sunset rather than a face — the right warm
+              // signal from the only photo that exists, but a real headshot
+              // would be materially better here.
+              className="h-12 w-12 shrink-0 rounded-full border border-[#D4AF37]/40 object-cover [object-position:center_52%]"
+            />
+            <span className="min-w-0">
+              <span className="block text-[13.5px] font-semibold leading-tight text-white">
+                {FOUNDER.knownAs} — I do the work myself
+              </span>
+              <span className="block text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
+                AI Leads Expert · Tampa Bay
+              </span>
+            </span>
+          </div>
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
@@ -149,12 +184,14 @@ function Hero() {
               reader do the arithmetic themselves, and most won't. Struck price
               beside "Included" does it for them in one glance — the $397 lands
               against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10]">
+          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
               <span className="text-[14.5px] font-semibold text-white">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-[#7A7F8A] line-through">$3,000+</span>
-                <span className="text-[13px] font-bold uppercase tracking-[0.04em] text-[#4ADE80]">Included</span>
+                <span className="rounded-full border border-[#4ADE80]/35 bg-[#4ADE80]/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#4ADE80]">
+                  Included
+                </span>
               </span>
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -183,7 +220,11 @@ function Hero() {
             </a>
             <a
               href={START}
-              className="inline-flex min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
+              // Hidden on mobile: the sticky bar carries "START — $397/MO"
+              // permanently at the bottom of the screen, so this rendered the
+              // same ask twice within one thumb-reach — and the lower copy was
+              // clipped by the bar duplicating it.
+              className="hidden min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08] sm:inline-flex"
             >
               Start — {PLAN.price}{PLAN.period}
             </a>
