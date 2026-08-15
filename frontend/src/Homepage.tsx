@@ -140,6 +140,31 @@ function Hero() {
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span className="text-[#D4AF37]">Ranking in 90 days or 2 months free</span>
           </p>
+
+          {/* PROOF ABOVE THE FOLD.
+              The hero had none — nothing said anyone else trusts this. Every
+              line here is checkable, which is the only kind worth putting in a
+              hero: the dashboard opens with no login, the Google listing is
+              real, and "Ty does the work" is the offer itself. Deliberately no
+              star rating or client count — D-014 holds those until there are
+              receipts, and an invented one would undo the rest of the page. */}
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.07] pt-5 text-[12.5px] text-[#9AA0A6]">
+            <a
+              href="/r/client/sandbar"
+              className="inline-flex items-center gap-1.5 underline decoration-white/20 underline-offset-4 transition hover:text-[#D4AF37] hover:decoration-[#D4AF37]"
+            >
+              <span aria-hidden className="text-[#4ADE80]">●</span>
+              See a real client's dashboard — no login
+            </a>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden className="text-[#4ADE80]">✓</span>
+              Verified Google Business
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden className="text-[#4ADE80]">✓</span>
+              Ty does the work — you text him directly
+            </span>
+          </div>
         </div>
 
         {/* RIGHT — the report card */}
