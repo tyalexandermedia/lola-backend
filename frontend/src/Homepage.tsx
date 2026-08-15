@@ -245,9 +245,10 @@ function Hero() {
    ───────────────────────────────────────────────────────────────────────── */
 function ReportCard() {
   const grade = SAMPLE_SCORE >= 95 ? 'A+' : SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : 'D';
-  // The featured item leads; the rest follow as a checklist. Sliced from the
-  // canonical list so the card can't drift from /pricing.
-  const [featured, ...rest] = MONTHLY_AT_A_GLANCE;
+  // The whole list runs as the checklist. It used to be sliced — the first
+  // entry was promoted into the hook and `rest` filled the list — but the hook
+  // is AI visibility now, which is not one of these lines. Slicing here would
+  // silently drop missed-call text-back off the card entirely.
 
   return (
     <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
@@ -263,47 +264,68 @@ function ReportCard() {
       </div>
 
       <div className="px-5 py-5 sm:px-6">
-        {/* ── THE HOOK: missed-call text-back, shown rather than described ──
-            Every contractor has lost a job to a call he couldn't take. This is
-            the one line in the plan that needs no explaining, so it leads and
-            it gets the only illustration on the card. */}
+        {/* ── THE HOOK: the AI answer, shown rather than described ──
+            This led with missed-call text-back, which is the most visceral
+            line in the plan but the wrong one to headline. Two reasons it
+            moved down to the checklist:
+
+              1. It is dormant until Twilio is configured, so the first thing
+                 a visitor read was the one promise the backend could not yet
+                 keep.
+              2. It is Podium's core product. Leading on it puts Lola on a
+                 competitor's ground, and every /vs page argues the opposite.
+
+            AI visibility is the inverse on both counts: the tracker runs
+            Claude and ChatGPT today with nothing left to configure, and none
+            of the six competitors in /vs offer it at all. It is also what the
+            h1 already asks — "your next customer already searched for you,
+            did you show up?" — so the card now answers the headline instead
+            of changing the subject.
+
+            Rendered as a chat exchange for the same reason the SMS was a
+            bubble: the reader recognises the shape before reading a word. */}
         <div className="rounded-lg border border-[#4ADE80]/25 bg-[#4ADE80]/[0.05] p-4">
           <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">
-            <span aria-hidden>📲</span> {featured}
+            <span aria-hidden>✦</span> Get named in AI answers
           </p>
           <p className="mt-2 text-[14px] font-semibold leading-[1.45] text-white">
-            You&apos;re up a ladder. The phone rings. You can&apos;t answer it.
+            Your customer stopped scrolling ten blue links. They just ask.
           </p>
 
-          {/* The text your customer gets, as a message bubble. Showing it beats
-              describing it — the reader recognises the shape before reading. */}
-          <div className="mt-3 flex justify-end">
-            <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#2C6BED] px-3.5 py-2.5">
-              {/* "[Your Company]" rather than a real client's name. Putting
-                  Sandbar in a mock message would manufacture an artifact that
-                  never existed, and the bracket makes it obvious this is the
-                  template that goes out as YOU — which is the point anyway. */}
-              <p className="text-[12.5px] leading-[1.45] text-white">
-                Sorry we missed your call — this is [Your Company]. What can we quote for you?
-              </p>
+          <div className="mt-3 space-y-2">
+            {/* what they type */}
+            <div className="flex justify-end">
+              <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#2C6BED] px-3.5 py-2.5">
+                <p className="text-[12.5px] leading-[1.45] text-white">
+                  who&apos;s the best soft wash company in Dunedin?
+                </p>
+              </div>
+            </div>
+            {/* what comes back */}
+            <div className="flex justify-start">
+              <div className="max-w-[92%] rounded-2xl rounded-bl-sm border border-white/[0.09] bg-[#17181C] px-3.5 py-2.5">
+                <p className="text-[12.5px] leading-[1.5] text-[#E8E4D8]">
+                  <span aria-hidden className="mr-1.5 text-[#4ADE80]">✦</span>
+                  I&apos;d start with{' '}
+                  <span className="font-semibold text-white">[Your Company]</span> — strong
+                  reviews and they cover Dunedin.
+                </p>
+              </div>
             </div>
           </div>
-          <p className="mt-1.5 text-right text-[10px] text-[#8A8F98]">
-            Sent from your number, seconds later
-          </p>
 
           <p className="mt-3 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
-            That job doesn&apos;t go to whoever answers next.{' '}
-            <span className="font-semibold text-white">This one alone can cover the month.</span>
+            There&apos;s no page two on an answer like that. Most shops are invisible here —{' '}
+            <span className="font-semibold text-white">getting you named is the job.</span>
           </p>
         </div>
 
         {/* ── the rest of the monthly, as a plain checklist ── */}
         <p className="mt-5 text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
-          And every month, also
+          Every month, you also get
         </p>
         <ul className="mt-2.5 grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
-          {rest.map((item) => (
+          {MONTHLY_AT_A_GLANCE.map((item) => (
             <li
               key={item}
               className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-[#C5C5C8]"
