@@ -461,6 +461,87 @@ const HIBU: Competitor = {
   ],
 };
 
+/**
+ * Google Local Service Ads / Google Guaranteed.
+ *
+ * The odd one out on this page, and deliberately so. Every other entry is a
+ * vendor you'd pick INSTEAD of Lola. LSA is Google's own pay-per-lead product,
+ * and it is the single thing local contractors ask about most — so the honest
+ * answer is "run both", and this page says that plainly rather than pretending
+ * an organic product beats paid placement for speed.
+ *
+ * Saying so costs nothing and earns the search: "are Local Service Ads worth
+ * it" and "LSA vs SEO" are high-intent queries from exactly our buyer, and
+ * every result ranking for them is written by someone selling one side.
+ */
+const LSA: Competitor = {
+  slug: 'local-service-ads',
+  name: 'Google Local Service Ads',
+  url: 'https://www.google.com/localservices/',
+  category: "Google's pay-per-lead ads + Google Guaranteed badge",
+  oneLine:
+    "Google's own pay-per-lead placement above the map pack, with the green Google Guaranteed badge after a background and license check.",
+  priceRange: 'Pay per lead — varies by trade and market',
+  metaTitle: 'Local Service Ads vs SEO — Do You Need Both? | Lola Leads',
+  metaDescription:
+    "Straight answer on Google Local Service Ads and the Google Guaranteed badge vs organic local SEO: what each one actually buys you, what happens when you stop paying, and why most local contractors should run both. From Lola Leads, Tampa Bay.",
+  tldr: {
+    pickThemIf: [
+      'You need the phone to ring this week, not this quarter',
+      'You can carry an ongoing per-lead budget every month',
+      'You can pass the background check and hold current license + insurance',
+    ],
+    pickLolaIf: [
+      "You're tired of renting your leads and want visibility you keep",
+      'You want to show up in ChatGPT and Google AI answers, where LSA does not appear',
+      'You want a one-time cost instead of a permanent line item',
+    ],
+  },
+  whereTheyWin: [
+    'Speed — leads can start within days of approval, where SEO takes weeks to compound',
+    'The Google Guaranteed badge is real trust, backed by Google, and organic cannot replicate it',
+    'Placement sits above the map pack, at the very top of the results page',
+    'You only pay for leads, not clicks, so the cost maps cleanly to jobs',
+  ],
+  whereLolaWins: [
+    'The moment you stop paying LSA, the leads stop that day. Organic ranking keeps working',
+    'LSA does not put you in ChatGPT, Perplexity, or Google AI Overviews — that is the whole point of Lola',
+    'One-time cost instead of a permanent monthly spend that rises with competition',
+    'Your website, reviews, and content are assets you own; ad placement is rented',
+  ],
+  table: [
+    { label: 'Cost model', lola: 'One-time $197 or $997', them: 'Per lead, ongoing, forever', lolaWin: true },
+    { label: 'Speed to first lead', lola: 'Weeks — compounds', them: 'Days once approved', lolaWin: false },
+    { label: 'Stops when you stop paying', lola: 'No — ranking persists', them: 'Yes, immediately', lolaWin: true },
+    { label: 'Trust badge', lola: 'Reviews + real site', them: 'Google Guaranteed ✓', lolaWin: false },
+    { label: 'Shows up in AI answers', lola: 'Yes — the core product', them: 'No', lolaWin: true },
+    { label: 'Screening required', lola: 'None', them: 'Background check + license + insurance', lolaWin: false },
+    { label: 'Best for', lola: 'Building visibility you keep', them: 'Filling the calendar right now', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Are Google Local Service Ads worth it for a local contractor?',
+      a: "Usually yes, if you can carry the budget — LSA puts you above the map pack and the Google Guaranteed badge genuinely converts. The catch is that it is rented: the day you stop paying, the leads stop. It is the fastest way to fill a slow week, and the most expensive way to stay visible for years.",
+    },
+    {
+      q: 'Should I run Local Service Ads or SEO?',
+      a: "Both, in that order, if cash allows. LSA buys you leads this week while organic is still compounding; organic is what stops you needing LSA forever. Anyone who tells you to pick one is selling the one they happen to offer — we sell the organic side and we still tell contractors to run LSA when they need work now.",
+    },
+    {
+      q: 'Do Local Service Ads help me show up in ChatGPT or Google AI answers?',
+      a: 'No. LSA is ad placement inside Google Search. When someone asks ChatGPT, Perplexity, or Gemini for a pressure washer in their town, the answer is built from what those models can read about your business — your site, your profile, your reviews. Paid placement does not enter into it. That gap is the reason Lola exists.',
+    },
+    {
+      q: 'What does Google Guaranteed actually require?',
+      a: 'Google verifies your business license and insurance and runs background checks before the badge appears. Requirements vary by trade and state, and the screening is genuinely worth passing — it is one of the few trust signals a customer recognises on sight.',
+    },
+    {
+      q: 'What does an LSA lead cost?',
+      a: 'It varies a lot by trade and market, and Google adjusts it with competition — which is why we will not quote you a number we cannot stand behind. Check the current rate for your trade and ZIP in the Local Services dashboard before you budget. The number that matters is cost per lead against your average job value; run your Growth Score and the break-even math on our pricing page uses your real ticket size.',
+    },
+  ],
+};
+
 const COMPETITORS: Record<string, Competitor> = {
   localiq: LOCALIQ,
   brightlocal: BRIGHTLOCAL,
@@ -468,6 +549,7 @@ const COMPETITORS: Record<string, Competitor> = {
   podium: PODIUM,
   yext: YEXT,
   hibu: HIBU,
+  'local-service-ads': LSA,
 };
 
 export function getCompetitorSlugs(): string[] {

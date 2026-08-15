@@ -449,8 +449,15 @@ function StorySection() {
             </p>
             <p>
               It started with one crew:{' '}
+              {/* Points at the LIVE dashboard, not /case-studies/sandbar. That
+                  page is held by D-014 until the ranking tracker has real
+                  receipts, and the route 404s while the flag is off — so this
+                  link, in the one paragraph where the reader decides whether to
+                  believe any of it, silently dropped them back on the homepage.
+                  The dashboard is the proof that actually exists: public, no
+                  login, and already cited as proof further down the page. */}
               <a
-                href="/case-studies/sandbar"
+                href="/r/client/sandbar"
                 className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
               >
                 Sandbar Soft Wash

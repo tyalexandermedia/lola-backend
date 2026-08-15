@@ -338,7 +338,7 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           {SHOW_SANDBAR_CASE_STUDY && (
-            <FooterLink href="/case-studies/sandbar">Sandbar Soft Wash case study</FooterLink>
+            <FooterLink href="/r/client/sandbar">Sandbar Soft Wash — live dashboard</FooterLink>
           )}
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
           <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
