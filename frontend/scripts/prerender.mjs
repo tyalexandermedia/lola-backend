@@ -24,9 +24,16 @@
  * on top (createRoot REPLACES the prerendered markup — no hydration contract).
  * The linked stylesheet means the prerendered HTML is fully styled before JS.
  *
- * Only `/` is prerendered here: every other route is lazy-loaded, so a Node
- * string-render would capture only a Suspense fallback, not real copy. The
- * homepage component is eager, so it renders in full.
+ * Every marketing route is prerendered, not just `/`. That matters more than
+ * it sounds: Vercel's catch-all rewrite (`/(.*) -> /index.html`) means a
+ * crawler asking for /pricing was served the HOMEPAGE's prerendered markup —
+ * so the pricing page could never rank for a pricing question, and every route
+ * looked like duplicate content. Writing dist/<route>/index.html fixes that,
+ * because Vercel serves a matching static file before it consults rewrites.
+ *
+ * Lazy routes are handled by entry-server's streaming render (see the note
+ * there); a route that fails or times out is skipped individually and leaves
+ * the SPA shell in place.
  *
  * ── Zero-regression contract ─────────────────────────────────────────────
  * This script NEVER fails the build. Any error → warn + exit 0, leaving the
@@ -34,7 +41,7 @@
  * today's behavior; best case is prerendered HTML. There is no downside.
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -44,6 +51,22 @@ const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const INDEX = path.join(DIST, 'index.html');
 const ROOT_DIV = '<div id="root"></div>';
+
+/**
+ * Marketing routes worth making crawlable. Deliberately excludes anything
+ * private or per-user — /r/<id> reports, /r/client/<slug> dashboards and the
+ * admin screens are noindex by design and have no business in a static build.
+ */
+const ROUTES = [
+  '/',
+  '/pricing',
+  '/work',
+  '/growth-score',
+  '/retainer',
+  '/methodology',
+  '/vs',
+  '/apply',
+];
 
 async function main() {
   if (!existsSync(INDEX)) {
@@ -68,23 +91,46 @@ async function main() {
     server: { middlewareMode: true },
   });
 
-  let appHtml;
+  let ok = 0;
+  let skipped = 0;
   try {
     const { render } = await vite.ssrLoadModule('/src/entry-server.tsx');
-    appHtml = render('/');
+
+    for (const route of ROUTES) {
+      let appHtml;
+      try {
+        appHtml = await render(route);
+      } catch (err) {
+        console.warn(`[prerender] ${route} — render failed (${err?.message || err}); leaving SPA shell.`);
+        skipped += 1;
+        continue;
+      }
+
+      // A Suspense fallback or an error boundary renders as a sliver of markup.
+      // Refuse to write it: shipping a spinner as the crawlable copy is worse
+      // than shipping the shell, because it looks like real content.
+      if (!appHtml || appHtml.trim().length < 300) {
+        console.warn(`[prerender] ${route} — markup suspiciously small (${(appHtml || '').length} chars); skipping.`);
+        skipped += 1;
+        continue;
+      }
+
+      const html = template.replace(ROOT_DIV, `<div id="root">${appHtml}</div>`);
+      const outFile =
+        route === '/' ? INDEX : path.join(DIST, route.replace(/^\//, ''), 'index.html');
+      await mkdir(path.dirname(outFile), { recursive: true });
+      await writeFile(outFile, html, 'utf8');
+
+      const rel = path.relative(DIST, outFile);
+      const kb = (appHtml.length / 1024).toFixed(0);
+      console.log(`[prerender] ✓ ${route} → dist/${rel} (${kb} KB of rendered content)`);
+      ok += 1;
+    }
   } finally {
     await vite.close();
   }
 
-  if (!appHtml || appHtml.trim().length < 300) {
-    console.warn(`[prerender] rendered markup suspiciously small (${(appHtml || '').length} chars) — skipping.`);
-    return;
-  }
-
-  const html = template.replace(ROOT_DIV, `<div id="root">${appHtml}</div>`);
-  await writeFile(INDEX, html, 'utf8');
-  const kb = (Buffer.byteLength(html) / 1024).toFixed(0);
-  console.log(`[prerender] ✓ / → dist/index.html (${kb} KB, ${(appHtml.length / 1024).toFixed(0)} KB of rendered content)`);
+  console.log(`[prerender] ${ok} route(s) prerendered${skipped ? `, ${skipped} skipped` : ''}.`);
 }
 
 main().catch((err) => {
