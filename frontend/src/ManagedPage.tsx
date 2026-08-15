@@ -1,7 +1,7 @@
 /**
  * /managed — "Lola Managed" $297/mo continuity page.
  *
- * NOT a public cold-traffic tier (that stays a clean two-tier $197/$997 on
+ * NOT a public cold-traffic tier (that stays the single public $397/month plan on
  * /pricing). This is the LANDING PAGE the post-build nurture emails/texts point
  * to — "keep winning after your build". It's the place to actually convert the
  * monthly: what it does, cancel-anytime/no-contract trust, and a subscribe CTA.

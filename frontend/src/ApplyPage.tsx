@@ -17,7 +17,7 @@ import { track } from './analytics';
 import { useSeo } from './lib/seo';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
-type TierInterest = 'diy' | 'build' | 'both';
+type TierInterest = 'monthly';
 
 const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
@@ -39,9 +39,7 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
 // Two-tier offer (DIY / Full Build) from docs/PRICING.md; the applicant picks
 // which they want and Coach Ty confirms the fit on the call.
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'diy', label: 'DIY — $197 one-time' },
-  { value: 'build', label: 'Full Build — $997 one-time' },
-  { value: 'both', label: 'Help me pick the right one' },
+  { value: 'monthly', label: 'The monthly — $397/month' },
 ];
 
 export default function ApplyPage() {
@@ -113,7 +111,7 @@ export default function ApplyPage() {
         const body = await resp.json().catch(() => null);
         throw new Error(body?.detail || 'Submission failed — please try again or email ty@tyalexandermedia.com directly.');
       }
-      track(tier === 'build' ? 'build_application_completed' : 'application_completed', { tier });
+      track('application_completed', { tier });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something broke.');

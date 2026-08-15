@@ -6,8 +6,10 @@
 > - `db/pricing.py` (backend constant — `/pricing` API + email reports)
 > - `frontend/scripts/gen_lp.py` (landing-page generator constants — regenerate after)
 >
-> Last updated: 2026-07-07 — final offer reconciliation: simplified two-tier model
-> (replaces the retired Foundation → Growth → Scale roadmap).
+> Last updated: 2026-08-15 — **collapsed to a single paid offer.** The free Growth
+> Score now leads to ONE all-inclusive monthly plan. The two-tier one-time model
+> (DIY $197, Full Build $997) and the Half-Back Guarantee are retired: that
+> guarantee was written against a one-time build that no longer exists.
 
 ---
 
@@ -29,7 +31,7 @@ Core narrative:
 
 - **Never** call the free lead magnet an "audit." It is always the **Growth Score**.
 - **Never** fabricate rankings, revenue, leads, or performance claims beyond the guarantee below.
-- Only two paid options are ever shown on a page. No tier tables with more than two options.
+- **One** paid option is ever shown. No tier tables, no comparison grid — a single price and a single button. Choice is friction when there is only one right answer.
 
 ---
 
@@ -45,59 +47,57 @@ plus the one move that lifts you fastest.
 - Delivered via **text + email within 24 hours** of submission.
 - No pricing mentioned on the opt-in form.
 
-Funnel: **Free Growth Score → (DIY $197) or (Full Build $997) → optional $297/mo retainer (email only).**
+Funnel: **Free Growth Score → the monthly plan.** One free thing, one paid thing, nothing in between.
 
 ---
 
-## The two-tier offer
+## The offer — one all-inclusive monthly
 
-### Tier 1 — DIY
-- **Price:** `$197` one-time
-- **Positioning line:** *"See your score. Fix it yourself."*
-- **Includes:** your full Growth Score · a simple 5-step fix-it checklist
-- **Support:** self-service, no ongoing support included.
-- **CTA:** "Get the DIY guide"
-- One line up to the build: *"Prefer we just handle it? See the full build."*
+> **MONTHLY_PRICE = `$397/month`** — change it HERE and nowhere else, then sync the
+> three mirrors listed at the top of this file. Every surface reads from those.
 
-### Tier 2 — Full Build
-- **Price:** `$997` one-time
-- **Positioning line:** *"We build it. We rank it — everywhere people search now."*
+- **Price:** `$397`/month, all-inclusive. No setup fee. No one-time build charge.
+- **Positioning line:** *"Website design included free. Then I get you found."*
+- **Day framing (use under the price):** *"About $13/day — one new client covers months."*
 - **Includes (4–5 bullets max):**
-  - Custom website build
-  - 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini)
-  - Google Business Profile optimization
-  - Direct access to Ty during the build
-- **Guarantee:** Half-Back Guarantee (below) — attached to this tier specifically.
-- **Onboarding line:** *"We'll choose your 5 target keywords together in week 1."*
-- **CTA:** "Book a Call" or "Start My Build" (one CTA per surface).
+  - Your website designed and built — **included free**, no setup fee
+  - Written so AI can read it, so ChatGPT and Google name *you* when someone asks
+  - Google Business Profile managed and posted to — the map pin people actually tap
+  - Every fix written for your business, not pulled off a template
+  - A direct line to Ty, not an account manager
+
+**Why the website line matters:** an owner already knows a site costs thousands, so
+"included free" is the most legible value in the offer. Say what it *does* — brings
+work in, gets read by AI — never how it's built. No schema/backlink lectures.
+- **Terms:** cancel anytime after the first 3 months. The first 90 days are the work;
+  anything shorter cannot be judged fairly, in either direction.
+- **CTA:** "Start my monthly" (one CTA per surface).
+
+### What happens after you start
+
+1. **Checkout** — one tap, Apple Pay or card.
+2. **A 2-minute intake** — no call required unless you want one.
+3. **First wins inside 7 days** — they appear on your dashboard as they land.
 
 ---
 
-## Optional retainer — EMAIL ONLY (never on any page)
+## Guarantee (exact language — use on every paid surface)
 
-- **$297/month** ongoing management. Totally optional. (D-013: standardized to $297 —
-  matches the nurture default, GO-LIVE, COWORK_BRIEF, and the Stripe Managed link.)
-- Introduced **only in the final follow-up email touch** after a prospect has engaged, framed
-  exactly as:
-  > "Once it's live, some clients want us to keep it optimized — that's $297/month, totally optional."
+> **The 90-Day Promise**
+> We pick your money keywords together in week 1. If I don't get you ranking on page
+> one or in the map pack within 90 days, your next 2 months are free.
 
----
-
-## Guarantee (exact language — use on $997 build surfaces)
-
-> **Half-Back Guarantee**
-> We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of
-> them ranking on page 1 or in the map pack within 30 days, you get half your investment back.
-> No fine print.
-
-The old **First Win Promise** is retired. Half-Back is the only guarantee.
+The **Half-Back Guarantee** is retired along with the $997 build it was attached to;
+the **First Win Promise** was retired before it. The 90-Day Promise is the only
+guarantee — 90 days because that is how long the work honestly takes, and the remedy
+is more work rather than a partial refund.
 
 ---
 
-## FAQ addition (on $997 build surfaces)
+## FAQ addition (on paid surfaces)
 
 > **What if you don't rank me?**
-> You get half back, no argument. We only succeed if you do.
+> Your next 2 months are free. I only make money if the work lands.
 
 ---
 

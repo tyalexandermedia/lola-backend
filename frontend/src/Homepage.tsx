@@ -23,7 +23,7 @@
  * with react-dom/server (see scripts/prerender.mjs), so the headline, body and
  * offer are readable in the raw HTML before any JS runs. Nothing here reads
  * `window`/`document` during render; the only effects (useSeo, useReveal) are
- * progressive enhancement. Pricing, Stripe links and the Half-Back Guarantee
+ * progressive enhancement. Pricing, Stripe links and the 90-Day Promise
  * are NOT defined here — they live in lib/pricing, lib/checkout and the
  * index.html JSON-LD, which this page intentionally does not touch.
  */
@@ -42,10 +42,14 @@ const CALENDAR_URL =
 // Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
 // not a real client's numbers. The two low bars (AI Visibility, Revenue
 // Tracking) are the leaks Lola is built to close.
-const SAMPLE_SCORE = 62;
+// The hero card shows the GOAL, not a diagnosis. A red 62 with two failing bars
+// was an accurate picture of an unoptimised business, and it read like being told
+// you're sick before you've said hello. This is where the work takes you —
+// labelled as the target so it never reads as a client's result or a promise.
+const SAMPLE_SCORE = 99;
 // Values line up with the six canonical dimensions (single source of truth).
 // The two lows — AI Visibility, Revenue Tracking — are the leaks Lola closes.
-const SAMPLE_VALUES = [74, 58, 46, 21, 66, 18];
+const SAMPLE_VALUES = [99, 98, 97, 99, 100, 98];
 const SAMPLE_DIMENSIONS = GROWTH_SCORE_DIMENSIONS.map((name, i) => ({
   name,
   value: SAMPLE_VALUES[i] ?? 50,
@@ -55,7 +59,7 @@ export default function Homepage() {
   useSeo({
     title: 'Did you show up? Get found on Google & AI — Lola Leads, Tampa Bay',
     description:
-      "Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee.",
+      "Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then the $397/month plan, backed by the 90-Day Promise.",
   });
   useReveal();
 
@@ -126,7 +130,7 @@ function Hero() {
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span>then {DIY.price} DIY or {BUILD.price} Full Build</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span className="text-[#D4AF37]">Half-Back Guarantee</span>
+            <span className="text-[#D4AF37]">90-Day Promise</span>
           </p>
         </div>
 
@@ -148,7 +152,7 @@ function Hero() {
    callout, next move. Reads like a report, not a form.
    ───────────────────────────────────────────────────────────────────────── */
 function ReportCard() {
-  const grade = SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : SAMPLE_SCORE >= 40 ? 'D' : 'F';
+  const grade = SAMPLE_SCORE >= 95 ? 'A+' : SAMPLE_SCORE >= 80 ? 'B' : SAMPLE_SCORE >= 60 ? 'C+' : 'D';
   return (
     <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
       {/* header band */}
@@ -157,7 +161,7 @@ function ReportCard() {
           🐾 Lola · Growth Score
         </span>
         <span className="rounded-md border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">
-          Sample
+          The goal
         </span>
       </div>
 
@@ -175,7 +179,7 @@ function ReportCard() {
               {SAMPLE_SCORE}
               <span className="text-[16px] text-[#8A8F98]">/100</span>
             </p>
-            <p className="text-[11px] uppercase tracking-[0.08em] text-white">Grade {grade} · Needs work</p>
+            <p className="text-[11px] uppercase tracking-[0.08em] text-[#4ADE80]">Grade {grade} · Found everywhere</p>
           </div>
         </div>
 
@@ -191,12 +195,12 @@ function ReportCard() {
                   </span>
                   <span className="h-[7px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                     <span
-                      className={`block h-full rounded-full ${low ? 'bg-[#E5534B]' : 'bg-[#D4AF37]'}`}
+                      className={`block h-full rounded-full ${low ? 'bg-[#E5534B]' : 'bg-[#4ADE80]'}`}
                       style={{ width: `${d.value}%` }}
                     />
                   </span>
                 </div>
-                <span className={`font-mono text-[11px] tabular-nums ${low ? 'text-[#E5534B]' : 'text-[#C5C5C8]'}`}>
+                <span className={`font-mono text-[11px] tabular-nums ${low ? 'text-[#E5534B]' : 'text-[#4ADE80]'}`}>
                   {String(d.value).padStart(2, '0')}
                 </span>
               </div>
@@ -204,12 +208,13 @@ function ReportCard() {
           })}
         </div>
 
-        {/* biggest leak */}
-        <div className="mt-5 border-l-2 border-[#E5534B] bg-[#E5534B]/[0.06] px-4 py-3">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-[#E5534B]">Biggest leak</p>
+        {/* the win — this used to be a red "biggest leak" panel. Same fact,
+            told forwards: what it looks like when it's working. */}
+        <div className="mt-5 border-l-2 border-[#4ADE80] bg-[#4ADE80]/[0.06] px-4 py-3">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">What that gets you</p>
           <p className="mt-1 text-[13px] leading-[1.5] text-[#E8E4D8]">
-            <span className="font-semibold text-white">AI Visibility.</span> Ask ChatGPT for a
-            company like yours and it names a competitor — not you.
+            <span className="font-semibold text-white">Ask ChatGPT for a company like yours</span>{' '}
+            and it names you. Same on Google, same in the map pack.
           </p>
         </div>
 
@@ -218,7 +223,7 @@ function ReportCard() {
           <span aria-hidden className="mt-0.5 text-[12px] text-[#D4AF37]">→</span>
           <p className="text-[13px] leading-[1.5] text-[#C5C5C8]">
             <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">Next move&nbsp;</span>
-            Fix your Google Business Profile + get named in AI answers. That's the $997 Full Build.
+            Run your free Growth Score to see where you are today — then this is the $397/month plan.
           </p>
         </div>
       </div>
@@ -468,7 +473,7 @@ function StorySection() {
             <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
               I do the work myself. And if I don't get you ranking, you get half your money back —
-              the <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
+              the <span className="font-bold text-[#D4AF37]">90-Day Promise. In writing.</span>
             </p>
             <p>
               A local business that finally gets found changes what a family can do. That's the
@@ -712,7 +717,7 @@ function BreakEvenRow({
 }) {
   return (
     // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
-    // wraps "Full Build · $997" onto four lines.
+    // wraps "Full Build · $397/month" onto four lines.
     <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
         {label}
@@ -781,7 +786,7 @@ function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; fe
         <p className="text-[12px] uppercase tracking-[0.08em] text-white">{tier.name}</p>
         {featured && (
           <span className="rounded-md bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B]">
-            {tier.badge}
+            {undefined}
           </span>
         )}
       </div>
@@ -798,7 +803,7 @@ function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; fe
             <span>{line}</span>
           </li>
         ))}
-        {tier.guaranteed && (
+        {true && (
           <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-white">
             <span aria-hidden className="mt-0.5">{HALF_BACK_GUARANTEE.emoji}</span>
             <span className="font-semibold">{HALF_BACK_GUARANTEE.title}</span>
@@ -830,23 +835,23 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'How much does Lola cost?',
-    a: 'Two simple options, both one-time. Your Growth Score is free and includes the first fix finished. DIY is $197 — the other three fixes written for your business, plus the order to ship them in, done yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score.',
+    a: 'One plan: $397/month, all-inclusive. Your website design is included — no setup fee, no build charge — then I manage your Google Business Profile and keep you visible on Google and in AI answers. Cancel anytime after the first 3 months. Backed by the 90-Day Promise. Start with the free Growth Score.',
   },
   {
     q: 'Is there a guarantee?',
-    a: "Yes — the Half-Back Guarantee on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.",
+    a: "Yes — the 90-Day Promise on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.",
   },
   {
     q: 'Can you actually guarantee leads?',
-    a: "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The Half-Back Guarantee is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back.",
+    a: "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The 90-Day Promise is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back.",
   },
   {
     q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
     a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews), because that's increasingly where buyers ask for a recommendation.",
   },
   {
-    q: 'Why is it $997 when agencies quote $5,000 a month?',
-    a: "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The Full Build is $997 one-time, no contract, and if we don't get you ranking you get half of that back. Same job, without the overhead you were funding.",
+    q: 'Why is it $397/month when agencies quote $5,000 a month?',
+    a: "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The monthly is $397/month, no contract, and if I don't get you ranking in 90 days, your next 2 months are free. Same job, without the overhead you were funding.",
   },
   {
     q: 'Who is behind Lola?',

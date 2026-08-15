@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 /**
- * /build/start — instant onboarding after paying for the $997 Full Build.
+ * /build/start — instant onboarding after paying for the $397/month plan.
  *
  * The Full Build Stripe Payment Link redirects here with ?session_id=... after
  * payment. There's no digital deliverable to gate (the build is done-for-you),
@@ -28,7 +28,7 @@ const STEPS: ReadonlyArray<{ n: string; title: string; body: string }> = [
   {
     n: '02',
     title: 'We pick your 5 money keywords together',
-    body: 'On the call we choose the 5 searches most likely to bring you real jobs. These are what the Half-Back Guarantee is measured against.',
+    body: 'On the call we choose the 5 searches most likely to bring you real jobs. These are what the 90-Day Promise is measured against.',
   },
   {
     n: '03',
@@ -49,7 +49,7 @@ export default function BuildOnboarding() {
   useSeo({
     title: 'Your Full Build — Start Here | Lola',
     description:
-      'Welcome to your $997 Full Build. Book your kickoff call, pick your 5 money keywords with Ty, and we build and rank it — backed by the Half-Back Guarantee.',
+      'Welcome to your $397/month plan. Book your kickoff call, pick your 5 money keywords with Ty, and we build and rank it — backed by the 90-Day Promise.',
   });
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function BuildOnboarding() {
           }}
         />
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          {paid ? '✓ Payment confirmed · Full Build' : 'The Full Build · $997'}
+          {paid ? '✓ Payment confirmed · Full Build' : 'The Full Build · $397/month'}
         </p>
         <h1
           className="mx-auto mt-4 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
@@ -89,7 +89,7 @@ export default function BuildOnboarding() {
         </p>
 
         <a
-          href={paid ? bookHref : checkoutUrl('build') || '/retainer'}
+          href={paid ? bookHref : checkoutUrl() || '/pricing'}
           target={paid ? '_blank' : undefined}
           rel={paid ? 'noreferrer' : undefined}
           onClick={() => track(paid ? 'build_kickoff_cta' : 'build_buy_cta')}
@@ -146,7 +146,7 @@ export default function BuildOnboarding() {
           a surprise when the 30 days wrap. */}
       <p className="mx-auto mt-12 max-w-[560px] text-center text-[13px] leading-[1.6] text-[#8A8F98]">
         After your 30 days, some owners keep us on to hold their spot —{' '}
-        <a href="/managed" className="text-[#D4AF37] underline-offset-2 hover:underline">
+        <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">
           see Lola Managed
         </a>
         . Totally optional, cancel anytime.

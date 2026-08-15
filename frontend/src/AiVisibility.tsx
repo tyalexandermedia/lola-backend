@@ -128,7 +128,7 @@ export default function AiVisibility({
               </p>
               <p className="mx-auto mt-2 max-w-[460px] text-[13px] leading-[1.6] text-[#C5C5C8]">
                 Now let&apos;s make sure you&apos;re the <em>top</em> pick — and that Google agrees.
-                The $997 Full Build locks it in.
+                The $397/month plan locks it in.
               </p>
             </>
           ) : (
@@ -138,14 +138,14 @@ export default function AiVisibility({
               </p>
               <p className="mx-auto mt-2 max-w-[480px] text-[13px] leading-[1.6] text-[#C5C5C8]">
                 When your next customer asks AI for a {trade || 'business'} in {city}, you want to be
-                the name it gives. The <span className="font-semibold text-[#D4AF37]">$997 Full
-                Build</span> gets you found — on Google and in AI answers — backed by our Half-Back
+                the name it gives. The <span className="font-semibold text-[#D4AF37]">$397/month Full
+                Build</span> gets you found — on Google and in AI answers — backed by our 90-Day Promise
                 Guarantee.
               </p>
             </>
           )}
           <a
-            href="/retainer"
+            href="/pricing"
             className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
           >
             See the Full Build →

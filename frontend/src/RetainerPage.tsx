@@ -1,18 +1,18 @@
 /// <reference types="vite/client" />
 /**
- * Lola — /retainer close page, repurposed as the $997 Full Build sales page.
+ * Lola — /retainer close page, repurposed as the $397/month plan sales page.
  *
  * Single-CTA scrollable funnel optimized for hot leads from cold outreach and
- * Growth Score completers ready to buy. The Full Build ($997, one-time) is the
+ * Growth Score completers ready to buy. The monthly ($397/month) is the
  * done-for-you offer: we build the site and get you ranked on Google and in AI
- * answers, backed by the Half-Back Guarantee. Price is shown once.
+ * answers, backed by the 90-Day Promise. Price is shown once.
  *
  * Sticky mobile CTA bar at bottom. Desktop hides the sticky bar.
  *
  * Sections:
  *   1. Hero — single primary CTA
  *   2. What you get (the Full Build inclusions + price, shown once)
- *   3. Half-Back Guarantee (exact approved copy, near the price)
+ *   3. 90-Day Promise (exact approved copy, near the price)
  *   4. How it works (onboarding — 5 keywords in week 1)
  *   5. Who this is for
  *   6. FAQ accordion (incl. guarantee Q&A)
@@ -49,10 +49,10 @@ const BUILD_FAQS: ReadonlyArray<{ q: string; a: string }> = [
     q: 'Do you get me found in ChatGPT and AI search, not just Google?',
     a: 'Yes — that’s the whole point. We get you found when people ask ChatGPT, Perplexity, or Gemini for a company like yours, on top of ranking you in Google and the map pack.',
   },
-  { q: 'How does the Half-Back Guarantee work?', a: HALF_BACK_GUARANTEE.body },
+  { q: 'How does the 90-Day Promise work?', a: HALF_BACK_GUARANTEE.body },
   {
     q: "What if I'm already working with an SEO agency?",
-    a: 'Fire them, or run us in parallel and compare. Most agencies charge $2K–$5K/mo and drag it out. The Full Build is one-time and backed by the Half-Back Guarantee.',
+    a: 'Fire them, or run us in parallel and compare. Most agencies charge $2K–$5K/mo and drag it out. The Full Build is one-time and backed by the 90-Day Promise.',
   },
   {
     q: "What if I'm not in Florida — or not a contractor?",
@@ -73,16 +73,16 @@ function withUtm(url: string, content: string) {
 export default function RetainerPage() {
   useReveal();
   useSeo({
-    title: 'The Full Build — We Build It. We Rank It. $997 | Lola',
+    title: 'The Full Build — We Build It. We Rank It. $397/month | Lola',
     description:
-      'The $997 Full Build for local service businesses: a custom website built for you, 30 days of visibility work across Google and AI answer engines, Google Business Profile optimization, and direct access to Ty — backed by the Half-Back Guarantee.',
+      'The $397/month plan for local service businesses: a custom website built for you, 30 days of visibility work across Google and AI answer engines, Google Business Profile optimization, and direct access to Ty — backed by the 90-Day Promise.',
   });
 
   useEffect(() => {
     track('retainer_page_viewed');
   }, []);
 
-  // Route-specific JSON-LD: Service + $997 Offer (rich pricing result) and a
+  // Route-specific JSON-LD: Service + $397/month Offer (rich pricing result) and a
   // FAQPage built from the same BUILD_FAQS the accordion renders. Cleaned on unmount.
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -94,7 +94,7 @@ export default function RetainerPage() {
         name: 'Lola Full Build',
         serviceType: 'Local SEO + AI search visibility website build',
         description:
-          'A custom website built for you, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty — backed by the Half-Back Guarantee.',
+          'A custom website built for you, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty — backed by the 90-Day Promise.',
         provider: { '@type': 'Organization', name: 'Lola — Ty Alexander Media', url: 'https://lola.tyalexandermedia.com' },
         areaServed: { '@type': 'Country', name: 'United States' },
         offers: {
@@ -129,7 +129,7 @@ export default function RetainerPage() {
 
   // Pay-now → instant onboarding when the Stripe Payment Link is configured;
   // otherwise fall back to booking a call (nothing breaks before the link exists).
-  const buildPay = checkoutUrl('build');
+  const buildPay = checkoutUrl();
   const retainerHref = buildPay || withUtm(BOOKING_URL, 'sticky_cta');
   const heroHref = buildPay || withUtm(BOOKING_URL, 'hero_cta');
   const finalHref = buildPay || withUtm(BOOKING_URL, 'final_cta');
@@ -164,7 +164,7 @@ export default function RetainerPage() {
             Stop reading SEO audits. We build your site and get you found — on Google and when
             people ask ChatGPT, Perplexity, or Gemini for a company like yours.{' '}
             <span className="font-semibold text-white">
-              One-time {BUILD.price}, backed by the Half-Back Guarantee.
+              One-time {BUILD.price}, backed by the 90-Day Promise.
             </span>
           </p>
 
@@ -246,7 +246,7 @@ export default function RetainerPage() {
               >
                 Start my build →
               </a>
-              <p className="mt-3 text-[11px] text-[#8A8F98]">{buildPay ? '🔒 Secure checkout · one-time $997 · Half-Back Guarantee' : '🔒 No payment to book a call'}</p>
+              <p className="mt-3 text-[11px] text-[#8A8F98]">{buildPay ? '🔒 Secure checkout · one-time $397/month · 90-Day Promise' : '🔒 No payment to book a call'}</p>
             </div>
           </div>
         </section>
@@ -475,7 +475,7 @@ export default function RetainerPage() {
             <span aria-hidden>·</span>
             <span>One-time {BUILD.price}</span>
             <span aria-hidden>·</span>
-            <span>🛡️ Half-Back Guarantee</span>
+            <span>🛡️ 90-Day Promise</span>
           </p>
         </section>
 

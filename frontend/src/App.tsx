@@ -77,7 +77,7 @@ function parseRoute(pathname: string): Route {
   const caseMatch = pathname.match(/^\/case-studies\/([^/]+)\/?$/);
   if (caseMatch) return { name: 'case-study', slug: decodeURIComponent(caseMatch[1]) };
   if (pathname === '/pricing' || pathname === '/pricing/') return { name: 'pricing' };
-  if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'retainer' };
+  if (pathname === '/pricing' || pathname === '/retainer/') return { name: 'retainer' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
   if (pathname === '/managed' || pathname === '/managed/') return { name: 'managed' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
@@ -109,7 +109,7 @@ function canonicalPathForRoute(route: Route): string | null {
   switch (route.name) {
     case 'home': return '/';
     case 'pricing': return '/pricing';
-    case 'retainer': return '/retainer';
+    case 'retainer': return '/pricing';
     case 'work': return '/work';
     case 'managed': return '/managed';
     case 'diy': return '/diy';
@@ -334,7 +334,7 @@ function SiteFooter({ route }: { route: Route }) {
         <FooterCol title="Get found">
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
-          <FooterLink href="/retainer">The $997 Full Build</FooterLink>
+          <FooterLink href="/pricing">The $397/month plan</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           {SHOW_SANDBAR_CASE_STUDY && (
@@ -362,7 +362,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          Get found on Google and in AI answers — DIY $197 or Full Build $997. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
+          Get found on Google and in AI answers — DIY $397/month or Full Build $397/month. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
         </p>
       </div>
     </footer>
@@ -463,7 +463,7 @@ function Header() {
             Work
           </a>
           <a
-            href="/retainer"
+            href="/pricing"
             className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
           >
             Full Build

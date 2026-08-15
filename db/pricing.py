@@ -6,12 +6,12 @@ then this file, then frontend/src/lib/pricing.ts and frontend/scripts/gen_lp.py.
 
 Model: a simple two-tier offer, both one-time.
 
-  - DIY         $197 one-time   "See your score. Fix it yourself."
-  - Full Build  $997 one-time   "We build it. We rank it — everywhere people search now."
+  - The monthly  $397/month  "Everything it takes to get you found. One monthly price."
 
-Replaces the retired Foundation → Growth → Scale roadmap ($297 / $497 / $697 / $997+).
+Replaces the retired two-tier one-time model (DIY $197, Full Build $997), which
+replaced the Foundation → Growth → Scale roadmap before it.
 The Growth Score stays the free, branded, top-of-funnel lead magnet. The optional
-$297/mo retainer is introduced ONLY in the final follow-up email, never modeled as a tier.
+There is no separate retainer any more: the monthly IS the offer, and it is public.
 
 The DB-backed counter is retained (function signatures unchanged for import
 compatibility) as a simple build-signup counter.
@@ -25,21 +25,23 @@ import aiosqlite
 DB_PATH = os.getenv("DB_PATH", "lola.db")
 
 # ── Offer prices (source of truth) ────────────────────────────────
-DIY_PRICE = 197            # one-time — Growth Score + 5-step fix-it checklist
-BUILD_PRICE = 997          # one-time — Full Build (site + 30-day visibility + GBP + Ty access)
+MONTHLY_PRICE = 397        # /month — all-inclusive; the only paid offer
+# Back-compat aliases so older imports keep resolving to the live price rather
+# than a retired one. Remove once nothing references them.
+DIY_PRICE = MONTHLY_PRICE
+BUILD_PRICE = MONTHLY_PRICE
 
 # Optional, EMAIL-ONLY retainer. Never surfaced on a page; introduced only in the
 # final follow-up email. Modeled here purely so backend copy has one source.
-RETAINER_PRICE = 297       # /mo — totally optional ongoing management (D-013: $297 canonical)
+RETAINER_PRICE = MONTHLY_PRICE  # the monthly IS the offer now — no separate retainer
 
-PRICE_RANGE = "$197-$997"
+PRICE_RANGE = "$397/month"
 
 # ── Signup counter ────────────────────────────────────────────────
-# Retained for import compatibility with main.py. No longer drives a monthly
-# founding rate (the two-tier offer is one-time), but kept as a simple counter.
+# Retained for import compatibility with main.py. Kept as a simple counter.
 FOUNDING_CAP = 10
-FOUNDING_STANDARD_PRICE = BUILD_PRICE
-REGULAR_STANDARD_PRICE = BUILD_PRICE
+FOUNDING_STANDARD_PRICE = MONTHLY_PRICE
+REGULAR_STANDARD_PRICE = MONTHLY_PRICE
 
 CREATE_FOUNDING = """
 CREATE TABLE IF NOT EXISTS founding_signups (
@@ -81,11 +83,10 @@ async def record_founding_signup(email: str, tier: str = "build") -> int:
 
 def growth_price_for_count(count: int) -> Tuple[int, bool]:
     """
-    Returns (price, founding_active). The two-tier offer is one-time, so this
-    always returns the Full Build price and False (no monthly founding rate).
-    Kept for import compatibility.
+    Returns (price, founding_active). One published monthly price for everyone,
+    so this always returns it with False. Kept for import compatibility.
     """
-    return BUILD_PRICE, False
+    return MONTHLY_PRICE, False
 
 
 # Back-compat alias — older callers used `standard_price_for_count`.

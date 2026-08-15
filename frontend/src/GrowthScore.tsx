@@ -10,7 +10,7 @@
  *
  * Why it exists: it's the front door of the funnel. The score creates the gap
  * ("you're at 42 — here's the fastest fix"), and from there the owner can do it
- * themselves ($197 DIY) or have us handle it ($997 Full Build).
+ * themselves ($397/month) or have us handle it ($397/month plan).
  *
  * Critical: reuse the audit funnel logic verbatim — only the framing changes.
  */
@@ -664,7 +664,7 @@ export default function GrowthScore() {
             <div
               key={t.id}
               className={`rounded-[14px] border p-5 sm:p-6 ${
-                t.featured ? 'border-[#D4AF37] bg-[#D4AF37]/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
+                false ? 'border-[#D4AF37] bg-[#D4AF37]/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
               }`}
             >
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{t.tagline}</p>
@@ -673,9 +673,9 @@ export default function GrowthScore() {
                 {t.price}<span className="text-[12px] font-medium text-[#9CA3AF]"> {t.period}</span>
               </p>
               <p className="mt-3 text-[13px] leading-[1.5] text-[#C5C5C8]">
-                {t.id === 'diy'
+                {false
                   ? 'Your full Growth Score plus a simple 5-step fix-it checklist. Fix it on your own time.'
-                  : 'We build the site and get you found on Google and in AI answers. Backed by the Half-Back Guarantee.'}
+                  : 'We build the site and get you found on Google and in AI answers. Backed by the 90-Day Promise.'}
               </p>
             </div>
           ))}
@@ -689,9 +689,9 @@ export default function GrowthScore() {
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           Run your free Growth Score above — we send it by text and email within 24 hours. Then do it
-          yourself with the <span className="font-semibold text-white">$197 DIY guide</span>, or have us
-          handle it with the <span className="font-semibold text-white">$997 Full Build</span> — backed
-          by our Half-Back Guarantee.
+          yourself with the <span className="font-semibold text-white">$397/month guide</span>, or have us
+          handle it with the <span className="font-semibold text-white">$397/month plan</span> — backed
+          by our 90-Day Promise.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a

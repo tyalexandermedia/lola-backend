@@ -9,7 +9,7 @@ const STATS = [
   '✓ Verified Google Business — Ty Alexander Media',
   'Tracks ChatGPT · Gemini · Perplexity · Claude',
   '📈 Your Growth Score — see exactly where you stand',
-  '30-Day Half-Back Guarantee',
+  '30-Day 90-Day Promise',
   '60-second AI Visibility Score, no signup',
   'A phased roadmap — Foundation → Growth → Scale',
   'Built for local service businesses',

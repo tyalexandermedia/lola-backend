@@ -20,8 +20,8 @@ Design notes
   (local-seo-plumbers-tampa.html) so every page shares the dark-gold aesthetic.
 * Copy is varied per SERVICE (H1, intent framing, "what we do" bullets, FAQ)
   and per CITY (neighborhoods, nearby cities) so pages are not thin duplicates.
-* Pricing is a two-tier one-time model: DIY $197 (see your score, fix it yourself)
-  and Full Build $997 (we build it and rank it, backed by the Half-Back Guarantee).
+* Pricing is ONE all-inclusive monthly at $397/mo — website design included,
+  backed by the 90-Day Promise. Mirror of docs/PRICING.md; change it there first.
 * Every primary CTA books a call at the Google Calendar link.
 """
 
@@ -39,16 +39,14 @@ PHONE = "+1-727-300-6573"
 EMAIL = "ty@tyalexandermedia.com"
 
 # Two-tier one-time model (source of truth: docs/PRICING.md). Pick your lane:
-# DIY $197 to see your score and fix it yourself, or Full Build $997 where we
-# build it and rank it for you — backed by the Half-Back Guarantee. The old
+# One monthly plan at $397 — website design included, then ongoing visibility
+# work, backed by the 90-Day Promise. The old
 # Foundation/Growth/Scale roadmap tiers are retired.
 TIERS = [
-    {"name": "DIY", "price": "$197 one-time", "featured": False,
-     "blurb": "See your score. Fix it yourself. Your Growth Score plus a simple 5-step fix-it checklist you run on your own time — no ongoing support."},
-    {"name": "Full Build", "price": "$997 one-time", "featured": True,
-     "blurb": "We build it. We rank it — everywhere people search now. Custom website build, 30 days of visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build. Backed by the Half-Back Guarantee."},
+    {"name": "The monthly", "price": "$397/month", "featured": True,
+     "blurb": "Website design included free — no setup fee, no build charge. Then your Google Business Profile managed, every fix written for your business, and ongoing visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini) so you get named when someone asks for a company like yours. Direct line to Ty. Backed by the 90-Day Promise: ranking on page one or in the map pack within 90 days, or your next 2 months are free."},
 ]
-PRICE_RANGE = "$197-$997"
+PRICE_RANGE = "$397/month"
 LOW_PRICE = "197"
 HIGH_PRICE = "997"
 
@@ -189,7 +187,7 @@ SERVICES = {
             'Map Pack rankings you keep for good',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Soft-wash + house-wash keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Service-keyword optimization", f'"soft wash {c["name"]}," "roof cleaning {c["name"]}," "driveway pressure washing near me"'),
@@ -204,7 +202,7 @@ SERVICES = {
             (f'Will this help me rank for "roof cleaning {c["name"]}"?',
              "Yes — soft-wash and roof-cleaning keywords are exactly the high-intent local terms we target across Map Pack, organic, and AI search."),
             ("How fast will I see new bookings?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most washers see new GBP calls within 6-8 weeks."),
+             "90-Day Promise on the $397/mo plan: we pick your money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most washers see new GBP calls within 6-8 weeks."),
             ("Do you understand soft wash vs pressure wash?",
              "Yes. Coach Ty's dad runs Sandbar Soft Wash in Palm Harbor — 15+ years, master certified. We know the difference and we optimize for both."),
             ("Is there a contract?",
@@ -228,7 +226,7 @@ SERVICES = {
             'Organic Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Emergency-keyword targeting baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Emergency-keyword optimization", f'"emergency plumber {c["name"]}," "water heater repair {c["name"]}," "drain cleaning near me"'),
@@ -267,7 +265,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Emergency AC-repair keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Emergency-keyword optimization", f'"AC repair {c["name"]}," "emergency HVAC {c["name"]}," "AC not cooling near me"'),
@@ -306,7 +304,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Storm + insurance-claim keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Storm-intent optimization", f'"roof repair {c["name"]}," "storm damage roof {c["name"]}," "roof leak near me"'),
@@ -345,7 +343,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Weekly-service + green-pool keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Service-keyword optimization", f'"pool service {c["name"]}," "green pool cleanup {c["name"]}," "weekly pool cleaning near me"'),
@@ -384,7 +382,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Weekly-service + lawn-treatment keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Service-keyword optimization", f'"lawn care {c["name"]}," "lawn mowing service {c["name"]}," "lawn fertilization near me"'),
@@ -423,7 +421,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Emergency + panel-upgrade keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Emergency-keyword optimization", f'"emergency electrician {c["name"]}," "panel upgrade {c["name"]}," "electrician near me"'),
@@ -462,7 +460,7 @@ SERVICES = {
             'Map Pack rankings you own forever',
             '$197 DIY fix-it plan or a $997 full build — no setup fee',
             'Recurring + deep-clean keywords baked in',
-            'Half-Back Guarantee on the $997 build',
+            '90-Day Promise on the $397/mo plan',
         ],
         do=lambda c: [
             ("Service-keyword optimization", f'"house cleaning {c["name"]}," "move-out cleaning {c["name"]}," "maid service near me"'),
