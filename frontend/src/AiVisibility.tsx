@@ -148,7 +148,7 @@ export default function AiVisibility({
             href="/pricing"
             className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
           >
-            See the Full Build →
+            See the monthly →
           </a>
         </div>
       )}

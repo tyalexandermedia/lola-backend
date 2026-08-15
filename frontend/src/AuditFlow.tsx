@@ -10,7 +10,7 @@ import { track } from './analytics';
 
 import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
-import { BUILD, DIY } from './lib/pricing';
+import { PLAN } from './lib/pricing';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
 export { API_URL };
@@ -1497,8 +1497,8 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         </h3>
         <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
           Generated from {audit.business_name}'s actual audit — not a template. Paste it in and
-          it works. The other three fixes are written the same way, and they're what the{' '}
-          {DIY.price} DIY kit is.
+          it works. The other three fixes are written the same way, and they're part of what the{' '}
+          {PLAN.price}{PLAN.period} plan covers.
         </p>
 
         <div className="mt-6">
@@ -1559,10 +1559,10 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           }}
           className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#D4AF37] px-6 py-3 text-[14px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C] sm:w-auto"
         >
-          Unlock all four — {DIY.price} one-time →
+          Get all four done for you — {PLAN.price}{PLAN.period} →
         </a>
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">
-          Or skip the work entirely: the {BUILD.price} Full Build has me do all of it, backed by
+          Website design is included too, and I do all of it — backed by
           the 90-Day Promise.
         </p>
       </section>

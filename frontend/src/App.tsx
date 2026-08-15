@@ -333,7 +333,7 @@ function SiteFooter({ route }: { route: Route }) {
 
         <FooterCol title="Get found">
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
-          <FooterLink href="/pricing">Pricing — DIY or Full Build</FooterLink>
+          <FooterLink href="/pricing">Pricing — $397/month</FooterLink>
           <FooterLink href="/pricing">The $397/month plan</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
@@ -362,7 +362,7 @@ function SiteFooter({ route }: { route: Route }) {
       <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
         <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          Get found on Google and in AI answers — DIY $397/month or Full Build $397/month. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
+          Get found on Google and in AI answers — $397/month, website design included. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
         </p>
       </div>
     </footer>
@@ -461,12 +461,6 @@ function Header() {
             className="hidden min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:flex sm:px-3"
           >
             Work
-          </a>
-          <a
-            href="/pricing"
-            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
-          >
-            Full Build
           </a>
           <a
             href="/growth-score"

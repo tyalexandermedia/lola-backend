@@ -14,7 +14,7 @@ import WatchExplainer from './WatchExplainer';
 export default function IncludedAccordion({
   items,
   eyebrow = "What's included",
-  title = 'Everything in the Full Build — in plain English',
+  title = 'Everything included — in plain English',
 }: {
   items: ReadonlyArray<PackageDetail & { video?: string }>;
   eyebrow?: string;

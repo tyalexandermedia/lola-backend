@@ -203,13 +203,10 @@ export default function PricingPage() {
 
       {/* ── WHAT'S INCLUDED, IN FULL ──────────────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
-          What you actually get
-        </h2>
-        <p className="mx-auto mt-3 max-w-[620px] text-center text-[15px] leading-[1.6] text-[#9AA0A6]">
-          Every line here is work I do, not a feature name. Open any one.
-        </p>
-        <div className="mx-auto mt-8 max-w-[820px]">
+        {/* IncludedAccordion renders its own eyebrow + title, so wrapping it in
+            another heading stacked two headings on top of each other. Let it own
+            the section header. */}
+        <div className="mx-auto max-w-[820px]">
           <IncludedAccordion items={PLAN_INCLUDED} />
         </div>
       </section>

@@ -31,7 +31,7 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
-import { DIY, BUILD, HALF_BACK_GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
+import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -128,7 +128,7 @@ function Hero() {
           <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#8A8F98]">
             <span>60-sec Growth Score</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span>then {DIY.price} DIY or {BUILD.price} Full Build</span>
+            <span>then {PLAN.price}{PLAN.period} — website included</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span className="text-[#D4AF37]">90-Day Promise</span>
           </p>
@@ -286,7 +286,7 @@ function ProblemSection() {
             That's the part I control, so I put it in writing.
           </p>
           <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
-            {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title}
+            {GUARANTEE.emoji} {GUARANTEE.title}
           </p>
         </div>
 
@@ -527,8 +527,8 @@ function StorySection() {
 
 /** Numeric prices derived from the display strings so lib/pricing stays the
  *  single source of truth — change the price there and this math follows. */
-const BUILD_PRICE = Number(BUILD.price.replace(/[^0-9.]/g, ''));
-const DIY_PRICE = Number(DIY.price.replace(/[^0-9.]/g, ''));
+const MONTHLY_PRICE = Number(PLAN.price.replace(/[^0-9.]/g, ''));
+const LOLA_YEAR_ONE = MONTHLY_PRICE * 12;
 /** The comparison Ty gets quoted against — a $5K/mo retainer agency. */
 const AGENCY_MONTHLY = 5000;
 const AGENCY_YEAR_ONE = AGENCY_MONTHLY * 12;
@@ -536,19 +536,21 @@ const AGENCY_YEAR_ONE = AGENCY_MONTHLY * 12;
 const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 const COMPARISON: ReadonlyArray<{ label: string; agency: string; lola: string }> = [
-  { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(BUILD_PRICE)} once` },
-  { label: 'Contract', agency: '12 months, locked', lola: 'None' },
+  { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(LOLA_YEAR_ONE)} — $${MONTHLY_PRICE}/mo` },
+  { label: 'Website build', agency: '$3,000+ extra, up front', lola: 'Included, no setup fee' },
+  { label: 'Contract', agency: '12 months, locked', lola: 'Cancel after 3 months' },
   { label: 'Who does the work', agency: 'An account manager', lola: 'Ty — the one you texted' },
   { label: 'What you get monthly', agency: 'A 50-page PDF report', lola: 'A live score you can check' },
-  { label: "If you don't rank", agency: 'You keep paying', lola: 'You get half your money back' },
+  { label: "If you don't rank", agency: 'You keep paying', lola: 'Your next 2 months are free' },
 ];
 
 function RoiSection() {
   // Visitor's own average job value — the only input, and it never leaves the
   // browser. Default is a plausible mid-range local-services ticket.
   const [avgJob, setAvgJob] = useState(500);
-  const jobsForBuild = Math.max(1, Math.ceil(BUILD_PRICE / Math.max(avgJob, 1)));
-  const jobsForDiy = Math.max(1, Math.ceil(DIY_PRICE / Math.max(avgJob, 1)));
+  // One plan, so one row. Two rows rendered identical text once DIY and BUILD
+  // both aliased to PLAN — the sweep made it a literal duplicate.
+  const jobsForMonthly = Math.max(1, Math.ceil(MONTHLY_PRICE / Math.max(avgJob, 1)));
 
   return (
     <section className="mt-14 sm:mt-20">
@@ -574,7 +576,7 @@ function RoiSection() {
               {usd(AGENCY_MONTHLY)}/mo agency
             </span>
             <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
-              Lola Full Build
+              Lola — $397/mo
             </span>
           </div>
 
@@ -595,7 +597,7 @@ function RoiSection() {
                   {row.agency}
                 </dd>
                 <dd className="text-right text-[13px] font-semibold leading-[1.4] text-white sm:w-[136px] lg:w-[160px]">
-                  <span className="sr-only">Lola Full Build: </span>
+                  <span className="sr-only">Lola — $397/mo: </span>
                   {row.lola}
                 </dd>
               </div>
@@ -607,7 +609,7 @@ function RoiSection() {
               Year-one difference
             </p>
             <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[38px]">
-              {usd(AGENCY_YEAR_ONE - BUILD_PRICE)}
+              {usd(AGENCY_YEAR_ONE - LOLA_YEAR_ONE)}
             </p>
             <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
               stays in your business
@@ -676,20 +678,16 @@ function RoiSection() {
             className="mt-6 space-y-2.5 border-t border-white/[0.07] pt-5"
           >
             <BreakEvenRow
-              label={`${DIY.name} · ${DIY.price}`}
-              jobs={jobsForDiy}
-            />
-            <BreakEvenRow
-              label={`${BUILD.name} · ${BUILD.price}`}
-              jobs={jobsForBuild}
+              label={`${PLAN.price}${PLAN.period}`}
+              jobs={jobsForMonthly}
               featured
             />
           </div>
 
           <p className="mt-5 text-[12px] leading-[1.55] text-[#8A8F98]">
             That's <span className="text-[#C5C5C8]">cost math, not a lead promise</span> — we don't
-            make those (see above). It's simply what the build costs, measured in jobs you already
-            know the value of.
+            make those (see above). It's simply what the monthly costs, measured in jobs you
+            already know the value of — and it's the same job every month, not a one-off.
           </p>
 
           {/* Peak intent: the number just resolved against their own ticket. */}
@@ -697,7 +695,7 @@ function RoiSection() {
             href="/pricing"
             className="group mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
           >
-            Start my {BUILD.price} Full Build
+            Start my {PLAN.price}{PLAN.period}
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
@@ -717,7 +715,7 @@ function BreakEvenRow({
 }) {
   return (
     // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
-    // wraps "Full Build · $397/month" onto four lines.
+    // wraps the plan label onto four lines.
     <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
         {label}
@@ -762,20 +760,21 @@ function OfferSection() {
         </span>
       </a>
 
-      {/* two tiers */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <TierCard tier={DIY} href="/pricing" />
-        <TierCard tier={BUILD} href="/pricing" featured />
+      {/* One plan. A two-up grid of the same card was what the sweep left
+          behind once DIY and BUILD both aliased PLAN. */}
+      <div className="mt-4 mx-auto max-w-[520px]">
+        <TierCard tier={PLAN} href="/pricing" featured />
       </div>
 
       <p className="mt-5 text-[12px] leading-[1.6] text-[#8A8F98]">
-        Both one-time · $0 setup · no contract · {HALF_BACK_GUARANTEE.emoji} {HALF_BACK_GUARANTEE.title} on the Full Build.
+        Website design included · $0 setup · cancel after 3 months · {GUARANTEE.emoji}{' '}
+        {GUARANTEE.title}.
       </p>
     </section>
   );
 }
 
-function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; featured?: boolean }) {
+function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; featured?: boolean }) {
   return (
     <div
       className={`flex flex-col rounded-xl border p-6 sm:p-7 ${
@@ -805,8 +804,8 @@ function TierCard({ tier, href, featured }: { tier: typeof DIY; href: string; fe
         ))}
         {true && (
           <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-white">
-            <span aria-hidden className="mt-0.5">{HALF_BACK_GUARANTEE.emoji}</span>
-            <span className="font-semibold">{HALF_BACK_GUARANTEE.title}</span>
+            <span aria-hidden className="mt-0.5">{GUARANTEE.emoji}</span>
+            <span className="font-semibold">{GUARANTEE.title}</span>
           </li>
         )}
       </ul>

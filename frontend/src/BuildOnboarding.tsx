@@ -47,7 +47,7 @@ export default function BuildOnboarding() {
   const [paid, setPaid] = useState(false);
 
   useSeo({
-    title: 'Your Full Build — Start Here | Lola',
+    title: 'Start here — Lola',
     description:
       'Welcome to your $397/month plan. Book your kickoff call, pick your 5 money keywords with Ty, and we build and rank it — backed by the 90-Day Promise.',
   });
@@ -74,7 +74,7 @@ export default function BuildOnboarding() {
           }}
         />
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          {paid ? '✓ Payment confirmed · Full Build' : 'The Full Build · $397/month'}
+          {paid ? '✓ Payment confirmed' : 'The monthly · $397/month'}
         </p>
         <h1
           className="mx-auto mt-4 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
@@ -85,7 +85,7 @@ export default function BuildOnboarding() {
         <p className="mx-auto mt-5 max-w-[620px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           {paid
             ? 'One thing to do right now: book your kickoff call. Everything else, we drive.'
-            : 'The Full Build is done-for-you — a new site, 30 days of visibility work, and your keywords picked with Ty. Start below.'}
+            : 'The monthly is done-for-you — your site built and kept current, your profile managed, and your keywords picked with Ty. Start below.'}
         </p>
 
         <a
