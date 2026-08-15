@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { AuditResult } from './types';
 import { API_URL } from './api';
 import { ResultsStage } from './AuditFlow';
-import AiVisibility from './AiVisibility';
 
 export default function SharedReport({ auditId }: { auditId: string }) {
   const [audit, setAudit] = useState<AuditResult | null>(null);
@@ -64,14 +63,29 @@ export default function SharedReport({ auditId }: { auditId: string }) {
     );
   }
 
+  // This page has two very different readers, and they need different asks.
+  //
+  //   • The owner, arriving straight from the tool (?from=growth-score). Telling
+  //     them to "Run your own Growth Score" is a dead end — they just ran it.
+  //     Their next step is fixing what it found.
+  //   • Someone the report was shared with, who hasn't been scored yet. For
+  //     them "run your own" is exactly right.
+  //
+  // AiVisibility is no longer rendered here: it now lives inside ResultsStage,
+  // so the /audit results get the real thing too instead of a "coming soon"
+  // card. Rendering it here as well would show it twice.
+  const justScored =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('from') === 'growth-score';
+
   return (
-    <>
-      <ResultsStage audit={audit} cta={{ label: 'Run your own Growth Score', href: '/' }} />
-      <AiVisibility
-        business={audit.business_name}
-        city={audit.city}
-        trade={audit.business_type}
-      />
-    </>
+    <ResultsStage
+      audit={audit}
+      cta={
+        justScored
+          ? { label: 'Fix this for me — see the Full Build', href: '/pricing' }
+          : { label: 'Run your own Growth Score', href: '/growth-score' }
+      }
+    />
   );
 }
