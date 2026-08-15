@@ -9,6 +9,7 @@
  */
 
 import type { PackageDetail } from './lib/pricing';
+import { demoFor } from './lib/featureDemos';
 import WatchExplainer from './WatchExplainer';
 
 export default function IncludedAccordion({
@@ -30,7 +31,7 @@ export default function IncludedAccordion({
         {title}
       </h2>
       <p className="mt-4 max-w-[620px] text-[14px] leading-[1.6] text-[#9CA3AF] sm:text-[15px]">
-        Tap any line to see exactly what you get. No jargon, no surprises.
+        Tap any line to see it — not a description of it.
       </p>
 
       <div className="mt-8 flex flex-col gap-3">
@@ -49,8 +50,24 @@ export default function IncludedAccordion({
                 +
               </span>
             </summary>
-            <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:px-6 sm:pb-6 sm:text-[15px]">
-              {item.detail}
+            <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
+              {/* The picture first. Every one of these lines used to open into a
+                  paragraph, on the page where a buyer decides — and a paragraph
+                  about "missed-call text-back" is indistinguishable from every
+                  other agency's feature list. The demo is the same node the
+                  homepage renders (lib/featureDemos), so the two surfaces can't
+                  show a buyer different products one click apart. */}
+              {demoFor(item.demo) && (
+                <div className="mb-4 rounded-lg border border-white/[0.07] bg-[#08080A]/60 p-4">
+                  <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.1em] text-[#4B5563]">
+                    Example
+                  </p>
+                  {demoFor(item.demo)}
+                </div>
+              )}
+              <p className="text-[14px] leading-[1.65] text-[#C5C5C8] sm:text-[15px]">
+                {item.detail}
+              </p>
               {item.video && (
                 <div className="mt-4">
                   <WatchExplainer videoUrl={item.video} label="See a 60-sec demo" seconds={60} />

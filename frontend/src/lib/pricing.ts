@@ -96,6 +96,12 @@ export interface PackageDetail {
   icon: string;
   title: string;
   detail: string;
+  /**
+   * Which visual demo illustrates this line — see lib/featureDemos.
+   * Typed loosely on purpose: pricing.ts is the canonical offer and must not
+   * depend on a presentation module. demoFor() ignores anything unrecognised.
+   */
+  demo?: string;
 }
 
 /**
@@ -110,60 +116,70 @@ export interface PackageDetail {
 export const PLAN_INCLUDED: ReadonlyArray<PackageDetail> = [
   {
     icon: '🌐',
+    demo: 'website',
     title: 'Your website — designed and built, included free',
     detail:
       'Most shops charge $3,000 or more just to build it, then bill you monthly on top. Yours is included: a fast, mobile-first site built around the jobs you actually want, with click-to-call and quote forms front and centre. You review it before it goes live, and it keeps getting updated — it never goes stale.',
   },
   {
     icon: '🤖',
+    demo: 'ai',
     title: "Built so AI can read it — that's the part nobody else does",
     detail:
       "Your customers have stopped scrolling ten blue links. They ask ChatGPT, Gemini or Google's AI for a company like yours and take the answer. Those tools can only recommend a business they can actually read — most sites are invisible to them. Yours is written so they can read it, and name you.",
   },
   {
     icon: '📍',
+    demo: 'gbp',
     title: 'Google Business Profile, managed every month',
     detail:
       'Your profile is half your local leads and the pin people actually tap. Right primary category, services, service areas, hours, photos, and regular posts — so you turn up in the map pack when a neighbour searches for your work, not three pages down.',
   },
   {
     icon: '✍️',
+    demo: 'copy',
     title: 'Every fix written for your business',
     detail:
       "Not a checklist you have to interpret. The actual words — your page titles, your profile description, your posts — written for your trade, your town, and the jobs you want more of, then put live for you.",
   },
   {
     icon: '📲',
+    demo: 'missed-call',
     title: 'Missed-Call Text-Back',
     detail:
       "Miss a call while you're on a roof? The caller gets an instant text from your number, so the lead doesn't just ring out and go to whoever answers next. This one alone can cover the month.",
   },
   {
     icon: '⭐',
+    demo: 'reviews',
     title: 'Review engine, running on its own',
     detail:
       'Your happy customers keep getting asked for a Google review without you remembering to do it. Review count is the biggest lever in the map pack and the thing that closes quotes.',
   },
   {
     icon: '🔁',
+    demo: 'follow-up',
     title: 'Automated lead follow-up',
     detail:
       "Every new lead gets followed up by text and email so nothing goes cold while you're in the field. Most jobs are lost to silence, not to price.",
   },
   {
     icon: '📊',
+    demo: 'dashboard',
     title: 'A dashboard you can open any time',
     detail:
       "Calls, forms, rankings, and what I shipped this month — on one page, no login gymnastics, no waiting for a report. You can check my work whenever you like, and you should.",
   },
   {
     icon: '🤝',
+    demo: 'direct',
     title: 'A direct line to Ty',
     detail:
       "You're not routed through a support desk or an account manager. You text Ty directly — real answers, fast, from the person doing the work.",
   },
   {
     icon: '🛡️',
+    demo: 'promise',
     title: 'The 90-Day Promise',
     detail:
       "We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. I only make money if the work lands.",
