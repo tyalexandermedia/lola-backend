@@ -31,7 +31,7 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
-import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS } from './lib/pricing';
+import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -262,18 +262,66 @@ function ReportCard() {
           </p>
         </div>
 
-        {/* next move */}
-        <div className="mt-3 flex items-start gap-2">
-          <span aria-hidden className="mt-0.5 text-[12px] text-[#D4AF37]">→</span>
-          <p className="text-[13px] leading-[1.5] text-[#C5C5C8]">
-            <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">Next move&nbsp;</span>
-            Run your free Growth Score to see where you are today — then this is the $397/month plan.
+        {/* WHAT LANDS EVERY MONTH.
+            The score answered "where does this take me". This answers the
+            question that actually stops a contractor from clicking: "what am I
+            paying for every month?" Labels only, in the words an owner would
+            use — the "why" behind each one lives on /pricing, and repeating it
+            here would turn the card into a spec sheet. */}
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+              Working for you every month
+            </p>
+            <p className="text-[10px] font-semibold text-[#8A8F98]">
+              {PLAN.price}
+              {PLAN.period}
+            </p>
+          </div>
+          <ul className="mt-2.5 grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
+            {MONTHLY_AT_A_GLANCE.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-[#C5C5C8]"
+              >
+                <span aria-hidden className="mt-[2px] shrink-0 text-[10px] text-[#4ADE80]">
+                  ✓
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2.5 text-[11.5px] leading-[1.45] text-[#8A8F98]">
+            Plus your website — designed, built and kept updated.{' '}
+            <span className="text-[#4ADE80]">Included free.</span>
           </p>
         </div>
+
+        {/* NEXT MOVE — an actual link, not a caption. The card names the next
+            step; making the reader scroll back up to act on it is friction for
+            no reason. 44px min height so it's a real touch target. */}
+        <a
+          href="/growth-score"
+          className="group mt-4 flex min-h-[44px] items-center gap-2 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+        >
+          <p className="flex-1 text-[13px] leading-[1.45] text-[#C5C5C8]">
+            <span className="font-semibold text-white">See your own score first</span> — free, 60
+            seconds, no signup.
+          </p>
+          <span
+            aria-hidden
+            className="shrink-0 text-[13px] text-[#D4AF37] transition-transform group-hover:translate-x-0.5"
+          >
+            →
+          </span>
+        </a>
       </div>
 
+      {/* The caption used to repeat "60 seconds · no signup", which the next-move
+          link now says in plainer words. Closing on the guarantee instead is the
+          last thing read before the eye leaves the card. */}
       <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
-        Your real score · 60 seconds · no signup
+        🛡️ {GUARANTEE.short}
       </figcaption>
     </figure>
   );

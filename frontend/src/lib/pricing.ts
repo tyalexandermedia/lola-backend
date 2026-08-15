@@ -133,6 +133,24 @@ export const PLAN_INCLUDED: ReadonlyArray<PackageDetail> = [
       "Not a checklist you have to interpret. The actual words — your page titles, your profile description, your posts — written for your trade, your town, and the jobs you want more of, then put live for you.",
   },
   {
+    icon: '📲',
+    title: 'Missed-Call Text-Back',
+    detail:
+      "Miss a call while you're on a roof? The caller gets an instant text from your number, so the lead doesn't just ring out and go to whoever answers next. This one alone can cover the month.",
+  },
+  {
+    icon: '⭐',
+    title: 'Review engine, running on its own',
+    detail:
+      'Your happy customers keep getting asked for a Google review without you remembering to do it. Review count is the biggest lever in the map pack and the thing that closes quotes.',
+  },
+  {
+    icon: '🔁',
+    title: 'Automated lead follow-up',
+    detail:
+      "Every new lead gets followed up by text and email so nothing goes cold while you're in the field. Most jobs are lost to silence, not to price.",
+  },
+  {
     icon: '📊',
     title: 'A dashboard you can open any time',
     detail:
@@ -150,6 +168,24 @@ export const PLAN_INCLUDED: ReadonlyArray<PackageDetail> = [
     detail:
       "We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. I only make money if the work lands.",
   },
+];
+
+/**
+ * Short labels for the hero card — what lands every month, at a glance. The
+ * expanded version with the "why" lives in PLAN_INCLUDED; this is the version
+ * that has to survive a 4-second scan on a phone.
+ *
+ * Named the way an owner would say it out loud, not the way the product is
+ * built: "missed-call text-back", not "SMS automation". Six is deliberate — it
+ * fills a 2×3 grid and stops before the card turns into a feature dump.
+ */
+export const MONTHLY_AT_A_GLANCE: ReadonlyArray<string> = [
+  'Missed-call text-back',
+  'Automatic review requests',
+  'Text + email follow-up',
+  'Google Business managed',
+  'AI visibility tracked',
+  'Your live dashboard',
 ];
 
 /** Back-compat alias — older surfaces import BUILD_INCLUDED. */
