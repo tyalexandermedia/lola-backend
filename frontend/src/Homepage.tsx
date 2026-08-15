@@ -119,18 +119,26 @@ function Hero() {
               href={CALENDAR_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-white/15 px-7 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-white transition-colors hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+              className="inline-flex min-h-[56px] items-center justify-center px-2 py-3 text-[14px] font-semibold text-[#9AA0A6] underline decoration-white/20 underline-offset-4 transition-colors hover:text-[#D4AF37] hover:decoration-[#D4AF37]"
             >
-              Book a 15-min call
+              or book a 15-min call
             </a>
           </div>
 
-          <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#8A8F98]">
-            <span>60-sec Growth Score</span>
+          {/* The strongest thing on the page was the smallest text on it. A
+              contractor already knows a site costs thousands, so "included free"
+              is the fastest way to make $397 read as cheap — it belongs at
+              reading size, not in the fine print. */}
+          <p className="mt-6 text-[15px] leading-[1.55] text-[#E8E4D8] sm:text-[16px]">
+            <span className="font-semibold text-white">Your website design included free</span>
+            {' '}— then {PLAN.price}{PLAN.period}. Most shops charge $3,000+ just to build it.
+          </p>
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#8A8F98]">
+            <span>Free 60-second Growth Score</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span>then {PLAN.price}{PLAN.period} — website included</span>
+            <span>No setup fee</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span className="text-[#D4AF37]">90-Day Promise</span>
+            <span className="text-[#D4AF37]">Ranking in 90 days or 2 months free</span>
           </p>
         </div>
 
@@ -161,7 +169,7 @@ function ReportCard() {
           🐾 Lola · Growth Score
         </span>
         <span className="rounded-md border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">
-          The goal
+          Where this takes you
         </span>
       </div>
 
@@ -180,6 +188,7 @@ function ReportCard() {
               <span className="text-[16px] text-[#8A8F98]">/100</span>
             </p>
             <p className="text-[11px] uppercase tracking-[0.08em] text-[#4ADE80]">Grade {grade} · Found everywhere</p>
+            <p className="mt-1 text-[11px] text-[#8A8F98]">Most start near 60</p>
           </div>
         </div>
 
