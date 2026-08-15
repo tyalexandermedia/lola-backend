@@ -180,10 +180,28 @@ function Hero() {
               <span aria-hidden className="text-[#4ADE80]">✓</span>
               Verified Google Business
             </span>
-            <span className="inline-flex items-center gap-1.5">
+            {/* The split the rest of the app already uses — ClientReport says
+                "Lola is set up and watching", AuditFlow says "Lola is on it" —
+                said once where a stranger can see it. Three beats: the system
+                never stops, the founder does the work, and you can reach him.
+                Ty is named SECOND on purpose. Leading with the software reads
+                as "a bot does your SEO", which is the exact fear this line
+                exists to kill; leading with the watching and landing on the
+                human inverts it.
+
+                It's an sms: link, so the claim is its own proof — tapping it
+                opens a text to Ty rather than asking you to trust the sentence.
+                Only the tail is underlined; the whole chip is the target. */}
+            <a
+              href={`sms:${FOUNDER.phone}?&body=${encodeURIComponent('Hi Ty — quick question about Lola.')}`}
+              className="group inline-flex items-center gap-1.5 py-0.5 transition hover:text-[#D4AF37]"
+            >
               <span aria-hidden className="text-[#4ADE80]">✓</span>
-              Ty does the work — you text him directly
-            </span>
+              Lola watches 24/7. Ty does the work.{' '}
+              <span className="underline decoration-white/25 underline-offset-4 group-hover:decoration-[#D4AF37]">
+                You text him.
+              </span>
+            </a>
           </div>
         </div>
 
