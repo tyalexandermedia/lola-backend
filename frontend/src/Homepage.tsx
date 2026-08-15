@@ -407,7 +407,11 @@ function StorySection() {
           letter ~660px down the page on a small phone. Desktop is unchanged:
           explicit row/column placement puts photo and résumé back in the left
           column with the letter spanning both rows on the right. */}
-      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[300px_1fr] sm:items-start sm:gap-x-12 sm:gap-y-5">
+      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[minmax(260px,340px)_1fr] sm:items-start sm:gap-x-14 sm:gap-y-5">
+        {/* Sticky on desktop. The letter is taller than the photo no matter how
+            tight the copy gets, and a fixed photo left ~490px of dead black
+            column beside the text — which is what read as "choppy". Sticking it
+            means the portrait travels with the letter instead of abandoning it. */}
         <figure className="order-1 sm:col-start-1 sm:row-start-1">
           <div className="overflow-hidden rounded-xl border border-[#D4AF37]/25">
             <img
@@ -416,7 +420,7 @@ function StorySection() {
               loading="lazy"
               width={600}
               height={800}
-              className="aspect-[3/4] w-full object-cover"
+              className="aspect-[4/5] w-full object-cover"
             />
           </div>
           <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
@@ -426,47 +430,42 @@ function StorySection() {
 
 
         {/* the letter */}
-        <div className="order-2 sm:col-start-2 sm:row-start-1">
+        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
-          <div className="mt-6 max-w-[64ch] space-y-4 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+          <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-[#C5C5C8] sm:text-[17px]">
             <p>
-              Lola's the name on the door. She's my dog —{' '}
-              <span className="font-semibold text-white">half basset hound, half shepherd</span>, a
-              2018 girl who turns {LOLA_TURNS} this February 16. She's the reason any of this
-              exists.
+              Lola's the name on the door — my dog,{' '}
+              <span className="font-semibold text-white">half basset hound, half shepherd</span>,{' '}
+              {LOLA_TURNS} this February. She's the reason any of this exists.
             </p>
             <p>
-              I coach strength and conditioning, I run a business full time, and I train for{' '}
-              <span className="font-semibold text-white">HYROX</span> before the sun's up. I bring it
-              up for one reason: it's all the same job. Show up, do the work, keep showing up on the
-              days nothing's happening yet. That's exactly what moves you up Google — and it's the
-              part most agencies quietly skip.
+              I coach strength and conditioning and run a business full time. It's the same job
+              either way: show up, do the work, keep showing up on the days nothing's happening
+              yet. That's what moves you up Google — and it's the part most agencies quietly skip.
             </p>
             <p>
-              This started with one crew:{' '}
+              It started with one crew:{' '}
               <a
                 href="/case-studies/sandbar"
                 className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
               >
                 Sandbar Soft Wash
               </a>
-              , right here in the bay. I got them found — Google and AI — and the phone started
-              ringing. It worked, so I built the system to do it again.
+              , right here in the bay. I got them found on Google and in the AI answers, and the
+              phone started ringing. So I built the system to do it again.
             </p>
             <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
-              Here's what I'm not: a $5K-a-month agency hiding behind a dashboard. No 50-page report
-              that dies in your inbox. I answer my own phone. I do the work myself. And if I don't
-              get you ranking, you get half your money back — the{' '}
-              <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
+              What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
+              I do the work myself. And if I don't get you ranking, you get half your money back —
+              the <span className="font-bold text-[#D4AF37]">Half-Back Guarantee. In writing.</span>
             </p>
             <p>
-              I'm after something bigger than websites. A local business that finally gets found
-              changes what a family can do — and I want to be the reason that happens, over and over,
-              right here in the bay. Enough of you win,{' '}
+              A local business that finally gets found changes what a family can do. That's the
+              whole point. Enough of you win,{' '}
               <span className="font-semibold text-white">and Lola gets the backyard she deserves.</span>
             </p>
             <p className="text-[17px] font-semibold text-white sm:text-[18px]">
@@ -474,25 +473,31 @@ function StorySection() {
             </p>
           </div>
 
-          {/* signature block */}
-          <div className="mt-7 border-t border-white/10 pt-5">
-            <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
-            <p className="mt-1.5 text-[14px] text-[#C5C5C8]">
-              <span className="font-semibold text-white">{FOUNDER.fullName}</span> — {FOUNDER.title}{' '}
-              · {FOUNDER.company}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
-              {FOUNDER.location}
-            </p>
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
-            >
-              ✓ Verified Google Business <span aria-hidden>↗</span>
-            </a>
-          </div>
+        </div>
+
+        {/* Signature sits UNDER THE PORTRAIT on desktop, not at the end of the
+            letter. Two reasons: it's where a signed letter puts it, next to the
+            face; and it fills the column the photo used to leave empty, which
+            is what made this section read as choppy. On mobile the explicit
+            order keeps the human sequence — photo, letter, then who signed it. */}
+        <div className="order-3 sm:col-start-1 sm:row-start-2 sm:-mt-1">
+          <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
+          <p className="mt-1.5 text-[14px] leading-[1.5] text-[#C5C5C8]">
+            <span className="font-semibold text-white">{FOUNDER.fullName}</span>
+            <br />
+            {FOUNDER.title} · {FOUNDER.company}
+          </p>
+          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+            {FOUNDER.location}
+          </p>
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+          >
+            ✓ Verified Google Business <span aria-hidden>↗</span>
+          </a>
         </div>
       </div>
     </section>

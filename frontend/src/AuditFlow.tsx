@@ -8,6 +8,7 @@ import type {
 } from './types';
 import { track } from './analytics';
 
+import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
@@ -776,7 +777,13 @@ export function ResultsStage({
       {/* ── AGENT READINESS SCORE (new metric — surfaces how prepared this
           business is for AI agent recommendations: ChatGPT, Perplexity,
           Google AI Overviews, Gemini) ─────────────────────────────────── */}
-      {audit.agent_readiness && (
+      {/* Guard on categories, not just on agent_readiness. The type says the
+          array is required, but TypeScript doesn't validate what the API
+          actually sends — and this is the page a buying decision happens on.
+          A payload missing this field used to take the ENTIRE report down with
+          "Cannot read properties of undefined (reading 'map')": white screen,
+          no score, no offer. Better to drop one panel than the whole page. */}
+      {audit.agent_readiness && audit.agent_readiness.categories?.length ? (
         <section className="mt-10 rounded-3xl border border-[#D4AF37]/25 bg-[#0F0F12] p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -832,71 +839,22 @@ export function ResultsStage({
             </p>
           )}
         </section>
-      )}
+      ) : null}
 
-      {/* AI Search Visibility — v1 placeholder section. Frames the upcoming
-          metric (where you actually show up across ChatGPT/Perplexity/Gemini)
-          and tells the reader honestly that live tracking is part of the Full Build. */}
-      <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
-        <div className="flex items-center gap-2">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-            AI Search Visibility
-          </p>
-          <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
-            Beta
-          </span>
-        </div>
-        <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
-          Where you show up when buyers ask AI
-        </h3>
-        <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-          Your Agent Readiness Score above predicts <em>how well</em> AI agents can
-          understand your business. The next layer — live tracking of <strong className="text-white">where you actually appear</strong> in
-          ChatGPT, Perplexity, Gemini, and Google AI Overviews for the queries
-          buyers run in {audit.city} — is part of the done-for-you Full Build.
-        </p>
+      {/* REAL AI visibility, not a promise of one.
+          This slot used to hold a "Beta — Tracking ships Q3" placeholder: three
+          cards telling the owner the feature wasn't ready. On the shared report
+          the working <AiVisibility> then rendered directly beneath it, so the
+          page said "coming soon" immediately above the thing itself — and the
+          /audit results never showed the real one at all. Now both surfaces
+          render the component that actually queries AI answers. It self-hides
+          when it has nothing to report, so no empty promise ships either. */}
+      <AiVisibility
+        business={audit.business_name}
+        city={audit.city}
+        trade={audit.business_type}
+      />
 
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {[
-            { label: 'ChatGPT', status: 'Tracking — ships Q3' },
-            { label: 'Perplexity', status: 'Tracking — ships Q3' },
-            { label: 'Google AI Overviews', status: 'Tracking — ships Q3' },
-          ].map((row) => (
-            <div
-              key={row.label}
-              className="rounded-[12px] border border-white/[0.06] bg-[#0A0A0B]/40 p-4"
-            >
-              <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-white">
-                {row.label}
-              </p>
-              <p className="mt-1.5 text-[11px] text-[#8A8F98]">{row.status}</p>
-            </div>
-          ))}
-        </div>
-
-        <p className="mt-5 text-[12px] leading-[1.5] text-[#7A7F8A]">
-          Honest note: this section is a placeholder for what&apos;s coming. Today&apos;s score reflects
-          AI-readability signals (entities, reviews, schema, site speed). Live citation
-          tracking is part of the{' '}
-          <a
-            href="/pricing"
-            onClick={() => trackClick('build_cta_clicked', { from: 'ai_search_visibility_note' })}
-            className="font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
-          >
-            $997 Full Build
-          </a>.
-        </p>
-
-        <a
-          href={withUtm(STRATEGY_CALL_URL, 'ai_search_visibility', { campaign: 'full_build' })}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => trackClick('book_call_clicked', { from: 'ai_search_visibility_button' })}
-          className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition-all hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
-        >
-          Book a call about the Full Build →
-        </a>
-      </section>
 
       {/* Copy-paste deliverables + Lola's Take + Share — P11 Phase C */}
       <DeliverablesBlock audit={audit} />
@@ -982,50 +940,75 @@ export function ResultsStage({
         </section>
       )}
 
-      <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category signals</p>
-          <p className="text-xs text-slate-500">
-            {categoryRows.filter((r) => r.available).length}/{categoryRows.length} signals available
-          </p>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {categoryRows.map((row) => (
-            <div
-              key={row.title}
-              className={`rounded-2xl bg-slate-950/70 p-4 ring-1 ${
-                row.available ? 'ring-slate-800' : 'ring-slate-900 opacity-60'
-              }`}
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{row.title}</p>
-              <p className="mt-1 text-2xl font-semibold text-white">
-                {row.available ? row.score : '—'}
-              </p>
-              {!row.available && <p className="mt-1 text-xs text-slate-500">No data</p>}
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* THE RECEIPTS, FOLDED AWAY.
+          Category signals, business profile and the raw leak inputs used to sit
+          open on the page — about 1,300px, a screen and a half of diagnostics
+          between the owner and the offer. None of it is a decision he makes:
+          it's the evidence behind decisions already stated above.
 
-      <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-        <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Business profile</p>
-        <div className="mt-4 grid gap-2 text-sm">
-          <ProfileRow label="Website" value={audit.website} />
-          <ProfileRow label="Phone" value={stringOf(businessInfo.phone, 'Not on Google')} />
-          <ProfileRow label="Address" value={stringOf(businessInfo.address, 'Not on Google')} />
-          <ProfileRow label="Rating" value={stringOf(businessInfo.rating, 'Unknown')} />
-          <ProfileRow label="Reviews" value={stringOf(businessInfo.review_count, 'Unknown')} />
-        </div>
-      </section>
+          So it stays (hiding your workings looks evasive, and an owner who
+          wants proof should find it) but it's collapsed by default. Native
+          <details> — no JS, works before hydration, and prints expanded in the
+          saved PDF. */}
+      <details className="group mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 open:pb-2 print:open">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-6 text-left">
+          <span>
+            <span className="text-[13px] font-semibold text-white">See the full diagnostic</span>
+            <span className="mt-0.5 block text-[12px] text-slate-400">
+              Every signal behind your score — the receipts
+            </span>
+          </span>
+          <span
+            aria-hidden
+            className="shrink-0 text-[#D4AF37] transition-transform group-open:rotate-180"
+          >
+            ▾
+          </span>
+        </summary>
 
-      <section className="mt-5 grid gap-3 sm:grid-cols-3">
-        <Stat label="Missed calls / mo" value={`${audit.revenue_leak.missed_calls_per_month}`} />
-        <Stat label="Avg job value" value={`$${formatNumber(audit.revenue_leak.avg_job_value)}`} />
-        <Stat
-          label="Recovery potential"
-          value={`$${formatNumber(audit.revenue_leak.recovery_potential)}`}
-        />
-      </section>
+        <div className="px-6 pb-2">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category signals</p>
+            <p className="text-xs text-slate-500">
+              {categoryRows.filter((r) => r.available).length}/{categoryRows.length} signals available
+            </p>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {categoryRows.map((row) => (
+              <div
+                key={row.title}
+                className={`rounded-2xl bg-slate-950/70 p-4 ring-1 ${
+                  row.available ? 'ring-slate-800' : 'ring-slate-900 opacity-60'
+                }`}
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{row.title}</p>
+                <p className="mt-1 text-2xl font-semibold text-white">
+                  {row.available ? row.score : '—'}
+                </p>
+                {!row.available && <p className="mt-1 text-xs text-slate-500">No data</p>}
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs uppercase tracking-[0.24em] text-slate-400">Business profile</p>
+          <div className="mt-4 grid gap-2 text-sm">
+            <ProfileRow label="Website" value={audit.website} />
+            <ProfileRow label="Phone" value={stringOf(businessInfo.phone, 'Not on Google')} />
+            <ProfileRow label="Address" value={stringOf(businessInfo.address, 'Not on Google')} />
+            <ProfileRow label="Rating" value={stringOf(businessInfo.rating, 'Unknown')} />
+            <ProfileRow label="Reviews" value={stringOf(businessInfo.review_count, 'Unknown')} />
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <Stat label="Missed calls / mo" value={`${audit.revenue_leak.missed_calls_per_month}`} />
+            <Stat label="Avg job value" value={`$${formatNumber(audit.revenue_leak.avg_job_value)}`} />
+            <Stat
+              label="Recovery potential"
+              value={`$${formatNumber(audit.revenue_leak.recovery_potential)}`}
+            />
+          </div>
+        </div>
+      </details>
 
       <ResultsFooter audit={audit} cta={cta} />
 
