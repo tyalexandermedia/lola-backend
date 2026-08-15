@@ -219,7 +219,10 @@
     }
     </script>
   </head>
-  <body class="bg-slate-950 text-slate-100">
+  <!-- Ground and ink come from index.css, not utilities here. These two classes
+       are class selectors and so outrank the `body { background; color }` rule,
+       which is why lifting the page off pure black silently did nothing. -->
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

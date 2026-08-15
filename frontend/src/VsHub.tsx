@@ -109,7 +109,7 @@ export default function VsHub() {
         </p>
 
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Lola vs{' '}
@@ -145,7 +145,7 @@ export default function VsHub() {
                 </p>
               </div>
 
-              <h2 className="mt-3 text-[22px] font-bold tracking-[-0.01em] text-white sm:text-[26px]">
+              <h2 className="mt-3 text-[22px] font-bold tracking-[-0.01em] text-[#ECECEF] sm:text-[26px]">
                 Lola vs <span className="text-[#D4AF37]">{c.name}</span>
               </h2>
 
@@ -167,7 +167,7 @@ export default function VsHub() {
           Why we publish these
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           Coach Ty&apos;s rule: tell the truth, even when it costs us the close.
@@ -186,7 +186,7 @@ export default function VsHub() {
           Faster than reading comparison pages
         </p>
         <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
           Get your AI Visibility Score in 60 seconds.

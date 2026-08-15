@@ -131,7 +131,7 @@ export default function ClientReport({ slug }: { slug: string }) {
   if (error || !data) {
     return (
       <main className="mx-auto w-full max-w-4xl py-12 text-center">
-        <h1 className="text-2xl font-bold text-white">Dashboard not found</h1>
+        <h1 className="text-2xl font-bold text-[#ECECEF]">Dashboard not found</h1>
         <p className="mt-3 text-[14px] text-[#9AA0A6]">{error}</p>
       </main>
     );
@@ -263,7 +263,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
   return (
     <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#11121A]">
       <div className="border-b border-white/10 px-6 py-4 sm:px-8">
-        <h2 className="text-[17px] font-bold text-white sm:text-[19px]">
+        <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">
           Where things stand
         </h2>
         <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
@@ -278,7 +278,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
             Work finished
           </p>
-          <p className="mt-2 text-[34px] font-bold leading-none text-white">{totalDone}</p>
+          <p className="mt-2 text-[34px] font-bold leading-none text-[#ECECEF]">{totalDone}</p>
           <p className="mt-1 text-[12px] text-[#9AA0A6]">
             {totalDone === 1 ? 'job completed' : 'jobs completed'} on your account
           </p>
@@ -302,7 +302,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           {inProgress.length > 0 ? (
             <ul className="mt-2 space-y-1.5">
               {inProgress.slice(0, 2).map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-white">
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#ECECEF]">
                   <span aria-hidden className="mt-[2px] text-[#D4AF37]">◈</span>
                   <span>{t.title}</span>
                 </li>
@@ -351,7 +351,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
             </a>
             <a
               href={`tel:${FOUNDER.phone}`}
-              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-4 text-[13px] font-semibold text-white transition hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-4 text-[13px] font-semibold text-[#ECECEF] transition hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
             >
               Call
             </a>
@@ -409,7 +409,7 @@ function Header({ data }: { data: DashboardPayload }) {
           </button>
         </div>
       </div>
-      <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{data.client_name}</h1>
+      <h1 className="mt-2 text-3xl font-bold text-[#ECECEF] sm:text-4xl">{data.client_name}</h1>
       {data.target_url && (
         <a
           href={data.target_url}
@@ -482,7 +482,7 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
     <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#11121A]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
         <div>
-          <h2 className="text-[17px] font-bold text-white sm:text-[19px]">What&apos;s live right now</h2>
+          <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">What&apos;s live right now</h2>
           <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
             Every data feed on this page, and what it&apos;s doing for you.
           </p>
@@ -507,7 +507,7 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
               }`}
             />
             <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-white">
+              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-[#ECECEF]">
                 {f.label}
                 <span
                   className={`text-[10px] font-bold uppercase tracking-[0.1em] ${
@@ -589,15 +589,15 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
         {monthLabel} so far
       </p>
-      <h2 className="mt-3 text-[24px] font-bold leading-snug text-white sm:text-[30px]">
+      <h2 className="mt-3 text-[24px] font-bold leading-snug text-[#ECECEF] sm:text-[30px]">
         <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
           {contacts} new contact{contacts === 1 ? '' : 's'}
         </span>{' '}
         — <span className={deltaTone}>{deltaText}</span>.
       </h2>
       <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-[#C8C0B0]">
-        <strong className="text-white">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
-        and <strong className="text-white">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
+        <strong className="text-[#ECECEF]">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
+        and <strong className="text-[#ECECEF]">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
         landed this month.
         {wonMonth > 0 && (
           <> You&apos;ve confirmed <strong className="text-emerald-300">{wonMonth} won job{wonMonth === 1 ? '' : 's'}</strong> totaling{' '}
@@ -619,7 +619,7 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
         Revenue Agent
       </p>
-      <h2 className="mt-2 text-[22px] font-bold text-white">
+      <h2 className="mt-2 text-[22px] font-bold text-[#ECECEF]">
         {money(revenue.pipeline_value)} open pipeline · {money(revenue.won_revenue)} confirmed won
       </h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-4">
@@ -636,7 +636,7 @@ function MiniMetric({ label, value }: { label: string; value: number | string })
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3">
       <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
-      <p className="mt-1 text-xl font-bold text-white">{value}</p>
+      <p className="mt-1 text-xl font-bold text-[#ECECEF]">{value}</p>
     </div>
   );
 }
@@ -727,7 +727,7 @@ function WhatWeWatchCard({
   return (
     <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A]">
       <div className="border-b border-white/10 px-6 py-4 sm:px-8">
-        <h2 className="text-[17px] font-bold text-white sm:text-[19px]">
+        <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">
           What Lola is watching for {firstName}
         </h2>
         <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
@@ -831,7 +831,7 @@ function TopWinsCard({
 
       {num1Count > 0 && (
         <>
-          <h2 className="mt-3 text-[24px] font-bold leading-snug text-white sm:text-[30px]">
+          <h2 className="mt-3 text-[24px] font-bold leading-snug text-[#ECECEF] sm:text-[30px]">
             <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
               {num1Count} #1 placement{num1Count === 1 ? '' : 's'}
             </span>{' '}
@@ -856,7 +856,7 @@ function TopWinsCard({
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
                       #1
                     </span>
-                    <span className="text-[14px] font-medium text-white sm:text-[15px]">{label}</span>
+                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">{label}</span>
                   </li>
                 ))}
               </ul>
@@ -877,7 +877,7 @@ function TopWinsCard({
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[12px] font-extrabold text-[#0E0F16] shadow-[0_0_12px_rgba(16,185,129,0.4)]">
                       📍
                     </span>
-                    <span className="text-[14px] font-medium text-white sm:text-[15px]">{label}</span>
+                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">{label}</span>
                   </li>
                 ))}
               </ul>
@@ -898,7 +898,7 @@ function TopWinsCard({
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
                       #1
                     </span>
-                    <span className="text-[14px] font-medium text-white sm:text-[15px]">
+                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">
                       {s.query}
                     </span>
                   </li>
@@ -1101,7 +1101,7 @@ function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
         {rows.map(([s, n], i) => (
           <span key={s} className="flex items-center gap-1.5 text-[12px] text-[#C8C0B0]">
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: palette[i % palette.length] }} />
-            {label(s)} <span className="text-white font-semibold">{n}</span>
+            {label(s)} <span className="text-[#ECECEF] font-semibold">{n}</span>
             <span className="text-[#6B7280]">({Math.round((n / total) * 100)}%)</span>
           </span>
         ))}
@@ -1191,7 +1191,7 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
       </div>
       {ga && !ga.error && ga.organic_sessions > 0 && (
         <p className="mt-3 text-[12px] text-[#C8C0B0]">
-          📊 Google Analytics: <span className="font-bold text-white">{ga.organic_sessions.toLocaleString()}</span> organic sessions
+          📊 Google Analytics: <span className="font-bold text-[#ECECEF]">{ga.organic_sessions.toLocaleString()}</span> organic sessions
           {ga.organic_sessions_prev ? <span className="text-[#9CA3AF]"> (prev period {ga.organic_sessions_prev.toLocaleString()})</span> : null}
         </p>
       )}
@@ -1201,7 +1201,7 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
           <div className="mt-2 space-y-1.5">
             {g.top_queries.slice(0, 5).map((q) => (
               <div key={q.query} className="flex items-center justify-between gap-3 rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
-                <span className="truncate text-[13px] text-white">{q.query}</span>
+                <span className="truncate text-[13px] text-[#ECECEF]">{q.query}</span>
                 <span className="shrink-0 text-[11px] text-[#9CA3AF]">{q.clicks} clicks · #{q.position}</span>
               </div>
             ))}
@@ -1235,7 +1235,7 @@ function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality'
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
           <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Total calls</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-white">{q.month}</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#ECECEF]">{q.month}</p>
         </div>
         <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
           <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Qualified ≥30s</p>
@@ -1286,7 +1286,7 @@ function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
         ))}
       </div>
       <p className="mt-3 text-[11px] text-[#6B7280]">
-        Overall view → contact: <span className="text-white">{f.overall}%</span>. Lola optimizes every step.
+        Overall view → contact: <span className="text-[#ECECEF]">{f.overall}%</span>. Lola optimizes every step.
       </p>
     </section>
   );
@@ -1311,7 +1311,7 @@ function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
         </div>
         <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
           <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Lifetime</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-white">{r.lifetime}</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#ECECEF]">{r.lifetime}</p>
         </div>
         <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
           <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">→ Google</p>
@@ -1561,7 +1561,7 @@ function CoverageByCity({
               {/* City header */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-3.5">
                 <div className="flex items-center gap-3">
-                  <span className="text-[14px] font-bold text-white">{city}</span>
+                  <span className="text-[14px] font-bold text-[#ECECEF]">{city}</span>
                   {/* Score pills */}
                   {sc.no1 > 0 && (
                     <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#F4D47C] uppercase tracking-[0.1em]">

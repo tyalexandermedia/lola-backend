@@ -345,7 +345,7 @@ export default function GrowthScore() {
           <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '180ms' }} />
           <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '360ms' }} />
         </div>
-        <h2 className="mt-8 text-[26px] font-bold text-white sm:text-[32px]">Calculating your Growth Score…</h2>
+        <h2 className="mt-8 text-[26px] font-bold text-[#ECECEF] sm:text-[32px]">Calculating your Growth Score…</h2>
         <p key={scoringLine} className="mt-4 max-w-md animate-fade-in text-[15px] text-[#9AA0A6] sm:text-[16px]">
           {scoringLine}
         </p>
@@ -357,7 +357,7 @@ export default function GrowthScore() {
   if (phase === 'error') {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-[26px] font-bold text-white">Lola lost the scent.</h2>
+        <h2 className="text-[26px] font-bold text-[#ECECEF]">Lola lost the scent.</h2>
         <p className="mt-3 max-w-md text-[15px] text-[#9AA0A6]">{apiError}</p>
         <div className="mt-8 flex gap-3">
           <button
@@ -395,7 +395,7 @@ export default function GrowthScore() {
             pushing the live question below the fold on a phone. Shrink it once
             they're moving. */}
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: step === 0 ? 'clamp(2.25rem, 5vw, 4rem)' : 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           What&apos;s your{' '}
@@ -503,8 +503,8 @@ export default function GrowthScore() {
                       }}
                       className={`inline-flex min-h-[56px] items-center gap-3 rounded-[12px] border px-4 py-3 text-left text-[15px] font-medium transition ${
                         selected
-                          ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-white'
-                          : 'border-[#D4AF37]/25 bg-[#0F0F12] text-[#C5C5C8] hover:border-[#D4AF37]/60 hover:text-white'
+                          ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-[#ECECEF]'
+                          : 'border-[#D4AF37]/25 bg-[#0F0F12] text-[#C5C5C8] hover:border-[#D4AF37]/60 hover:text-[#ECECEF]'
                       }`}
                     >
                       {t.label}
@@ -587,7 +587,7 @@ export default function GrowthScore() {
               <button
                 type="button"
                 onClick={goBack}
-                className="inline-flex min-h-[52px] items-center justify-center rounded-[12px] border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/50 hover:text-white"
+                className="inline-flex min-h-[52px] items-center justify-center rounded-[12px] border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/50 hover:text-[#ECECEF]"
               >
                 Back
               </button>
@@ -612,7 +612,7 @@ export default function GrowthScore() {
           What the score measures
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
           Six dimensions. One number. A clear next step.
@@ -630,7 +630,7 @@ export default function GrowthScore() {
                 <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">
                   {String(i + 1).padStart(2, '0')}
                 </p>
-                <p className="mt-2 text-[18px] font-bold text-white sm:text-[20px]">{dim}</p>
+                <p className="mt-2 text-[18px] font-bold text-[#ECECEF] sm:text-[20px]">{dim}</p>
                 <p className="mt-2 text-[14px] leading-[1.55] text-[#C5C5C8]">{d?.measures}</p>
                 {d?.stage && (
                   <p className="mt-3 inline-block rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#D4AF37]">
@@ -649,7 +649,7 @@ export default function GrowthScore() {
           After your score
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
           See it, then fix it — yourself or with us.
@@ -668,7 +668,7 @@ export default function GrowthScore() {
               }`}
             >
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{t.tagline}</p>
-              <p className="mt-2 text-[18px] font-bold text-white">{t.name}</p>
+              <p className="mt-2 text-[18px] font-bold text-[#ECECEF]">{t.name}</p>
               <p className="mt-1 text-[15px] font-extrabold text-[#D4AF37]">
                 {t.price}<span className="text-[12px] font-medium text-[#9CA3AF]"> {t.period}</span>
               </p>
@@ -684,13 +684,13 @@ export default function GrowthScore() {
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
-        <h2 className="text-[22px] font-bold leading-[1.15] text-white sm:text-[28px]">
+        <h2 className="text-[22px] font-bold leading-[1.15] text-[#ECECEF] sm:text-[28px]">
           Get your number first. Your score lands within 24 hours.
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           Run your free Growth Score above — we send it by text and email within 24 hours. Then do it
-          yourself with the <span className="font-semibold text-white">$397/month guide</span>, or have us
-          handle it with the <span className="font-semibold text-white">$397/month plan</span> — backed
+          yourself with the <span className="font-semibold text-[#ECECEF]">$397/month guide</span>, or have us
+          handle it with the <span className="font-semibold text-[#ECECEF]">$397/month plan</span> — backed
           by our 90-Day Promise.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -704,7 +704,7 @@ export default function GrowthScore() {
             href="https://calendar.app.google/J7idjUDitd2Hziuc7"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-white transition hover:border-white/[0.3]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#ECECEF] transition hover:border-white/[0.3]"
           >
             Book a free call
           </a>
@@ -727,7 +727,7 @@ function StepShell({
 }: { question: string; hint: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-[21px] font-bold leading-[1.25] text-white sm:text-[24px]">{question}</h2>
+      <h2 className="text-[21px] font-bold leading-[1.25] text-[#ECECEF] sm:text-[24px]">{question}</h2>
       <p className="mt-1.5 text-[14px] leading-[1.5] text-[#8A8F98]">{hint}</p>
       <div className="mt-5">{children}</div>
     </div>
@@ -768,7 +768,7 @@ function extractCity(address: string): string {
 
 function inputCls(hasError: boolean): string {
   return [
-    'block w-full rounded-[12px] border bg-[#0F0F12] px-4 py-3 text-[15px] font-medium text-white outline-none transition',
+    'block w-full rounded-[12px] border bg-[#0F0F12] px-4 py-3 text-[15px] font-medium text-[#ECECEF] outline-none transition',
     hasError
       ? 'border-[#E5A95B] focus:border-[#E5A95B] focus:shadow-[0_0_0_3px_rgba(229,169,91,0.12)]'
       : 'border-[#D4AF37]/25 focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',

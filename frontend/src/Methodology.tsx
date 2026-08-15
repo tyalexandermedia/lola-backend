@@ -91,7 +91,7 @@ export default function Methodology() {
           Methodology · Open Book
         </p>
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           How the Lola{' '}
@@ -112,7 +112,7 @@ export default function Methodology() {
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
           The formula
         </p>
-        <p className="mt-4 text-[18px] leading-[1.6] text-white sm:text-[20px]">
+        <p className="mt-4 text-[18px] leading-[1.6] text-[#ECECEF] sm:text-[20px]">
           <span className="font-semibold">Final Score (0–100)</span> = weighted sum of five category
           scores. Each category is scored 0–100 based on objective signals pulled from Google,
           public directories, and live AI-agent responses. No subjective scoring, no &quot;our gut feel.&quot;
@@ -125,7 +125,7 @@ export default function Methodology() {
           The five categories
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
           What we measure, and why.
@@ -210,7 +210,7 @@ export default function Methodology() {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <div className="flex items-baseline gap-3">
                   <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{c.n}</p>
-                  <h3 className="text-[20px] font-bold text-white sm:text-[22px]">{c.h}</h3>
+                  <h3 className="text-[20px] font-bold text-[#ECECEF] sm:text-[22px]">{c.h}</h3>
                 </div>
                 <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
                   Weight {c.weight}
@@ -249,7 +249,7 @@ export default function Methodology() {
           What we don&apos;t do
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           The honest fine print.
@@ -258,7 +258,7 @@ export default function Methodology() {
           <li className="flex items-start gap-3">
             <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
             <span>
-              <span className="font-semibold text-white">We don&apos;t fabricate scores.</span> If
+              <span className="font-semibold text-[#ECECEF]">We don&apos;t fabricate scores.</span> If
               Google Places or an AI API is down or rate-limited, the affected category shows as
               "pending" — we don&apos;t guess.
             </span>
@@ -266,7 +266,7 @@ export default function Methodology() {
           <li className="flex items-start gap-3">
             <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
             <span>
-              <span className="font-semibold text-white">Weights aren&apos;t arbitrary.</span> They&apos;re
+              <span className="font-semibold text-[#ECECEF]">Weights aren&apos;t arbitrary.</span> They&apos;re
               derived from what actually moves rankings in our own client data
               (Sandbar Soft Wash + the broader Lola portfolio). We update weights when the data
               tells us to — quarterly review.
@@ -275,7 +275,7 @@ export default function Methodology() {
           <li className="flex items-start gap-3">
             <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
             <span>
-              <span className="font-semibold text-white">AI search is still moving.</span> ChatGPT, Perplexity,
+              <span className="font-semibold text-[#ECECEF]">AI search is still moving.</span> ChatGPT, Perplexity,
               Gemini, and Google AI Overviews are all evolving how they rank local businesses.
               When their behavior shifts, the AI search presence signals shift — we&apos;ll update this
               page when that happens.
@@ -284,7 +284,7 @@ export default function Methodology() {
           <li className="flex items-start gap-3">
             <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
             <span>
-              <span className="font-semibold text-white">Your score is a snapshot.</span> Local
+              <span className="font-semibold text-[#ECECEF]">Your score is a snapshot.</span> Local
               search is dynamic — your score can move 5-10 points week-to-week without action.
               The trend over time is what matters.
             </span>
@@ -296,7 +296,7 @@ export default function Methodology() {
       <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Ready?</p>
         <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
           Run your free score with this methodology.

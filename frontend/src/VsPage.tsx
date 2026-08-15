@@ -615,7 +615,7 @@ export default function VsPage({ slug }: { slug: string }) {
   if (!c) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-32 text-center">
-        <h2 className="text-2xl font-semibold text-white">Comparison not found.</h2>
+        <h2 className="text-2xl font-semibold text-[#ECECEF]">Comparison not found.</h2>
         <p className="mt-3 max-w-md text-base text-[#9AA0A6]">
           We compare Lola to a short list of direct competitors. See the homepage to find Lola.
         </p>
@@ -647,7 +647,7 @@ export default function VsPage({ slug }: { slug: string }) {
         </p>
 
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Lola SEO{' '}
@@ -693,7 +693,7 @@ export default function VsPage({ slug }: { slug: string }) {
             </p>
             <ul className="mt-3 flex flex-col gap-2.5">
               {c.tldr.pickLolaIf.map((row) => (
-                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-white sm:text-[15px]">
+                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-[#ECECEF] sm:text-[15px]">
                   <span aria-hidden className="mt-1 text-[#D4AF37]">✓</span>
                   <span>{row}</span>
                 </li>
@@ -709,7 +709,7 @@ export default function VsPage({ slug }: { slug: string }) {
           At a glance
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           The honest feature compare.
@@ -736,7 +736,7 @@ export default function VsPage({ slug }: { slug: string }) {
               {c.table.map((row) => (
                 <tr key={row.label}>
                   <td className="px-4 py-3 text-[#C5C5C8] sm:px-5 sm:py-4">{row.label}</td>
-                  <td className={`border-l-2 ${row.lolaWin ? 'border-[#D4AF37]/50 bg-[#D4AF37]/[0.06] text-white' : 'border-white/[0.06] text-[#C5C5C8]'} px-4 py-3 sm:px-5 sm:py-4`}>
+                  <td className={`border-l-2 ${row.lolaWin ? 'border-[#D4AF37]/50 bg-[#D4AF37]/[0.06] text-[#ECECEF]' : 'border-white/[0.06] text-[#C5C5C8]'} px-4 py-3 sm:px-5 sm:py-4`}>
                     {row.lola}
                   </td>
                   <td className="px-4 py-3 text-[#C5C5C8] sm:px-5 sm:py-4">{row.them}</td>
@@ -753,7 +753,7 @@ export default function VsPage({ slug }: { slug: string }) {
           Where {c.name} wins
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           Credit where it&apos;s due.
@@ -777,7 +777,7 @@ export default function VsPage({ slug }: { slug: string }) {
           Where Lola wins
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           The specifics — not adjectives.
@@ -786,7 +786,7 @@ export default function VsPage({ slug }: { slug: string }) {
           {c.whereLolaWins.map((row) => (
             <li
               key={row}
-              className="flex items-start gap-3 rounded-[12px] border border-[#D4AF37]/25 bg-[#D4AF37]/[0.04] px-5 py-3 text-[14px] leading-[1.55] text-white sm:text-[15px]"
+              className="flex items-start gap-3 rounded-[12px] border border-[#D4AF37]/25 bg-[#D4AF37]/[0.04] px-5 py-3 text-[14px] leading-[1.55] text-[#ECECEF] sm:text-[15px]"
             >
               <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
               <span>{row}</span>
@@ -801,7 +801,7 @@ export default function VsPage({ slug }: { slug: string }) {
           Switch + compare FAQ
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           Straight answers.
@@ -818,7 +818,7 @@ export default function VsPage({ slug }: { slug: string }) {
                 }
               }}
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-white sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-[#ECECEF] sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
                 <span>{f.q}</span>
                 <span aria-hidden className="shrink-0 text-[18px] text-[#D4AF37] transition group-open:rotate-45">+</span>
               </summary>
@@ -836,7 +836,7 @@ export default function VsPage({ slug }: { slug: string }) {
           The honest move
         </p>
         <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
           See where you actually stand.
@@ -867,7 +867,7 @@ export default function VsPage({ slug }: { slug: string }) {
 
       {/* ── DISCLOSURE ────────────────────────────────────── */}
       <section className="mt-10 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 text-[13px] leading-[1.6] text-[#9AA0A6] sm:p-6 sm:text-[14px]">
-        <p className="font-semibold text-white">Honest disclosure.</p>
+        <p className="font-semibold text-[#ECECEF]">Honest disclosure.</p>
         <p className="mt-2">
           We don&apos;t take affiliate revenue from {c.name} or anyone in this category. We compete
           with them, which is exactly why we want to be fair about where they win.

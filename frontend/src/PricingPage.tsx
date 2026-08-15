@@ -142,7 +142,7 @@ export default function PricingPage() {
           One plan · everything included
         </p>
         <h1
-          className="mx-auto mt-4 max-w-[760px] text-balance font-display font-bold leading-[1.06] tracking-[-0.02em] text-white"
+          className="mx-auto mt-4 max-w-[760px] text-balance font-display font-bold leading-[1.06] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2rem, 4.6vw, 3.4rem)' }}
         >
           {PLAN.tagline}
@@ -153,7 +153,7 @@ export default function PricingPage() {
 
         <div className="mx-auto mt-9 w-full max-w-[520px] rounded-2xl border border-[#D4AF37]/30 bg-[#0F0F12] p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] sm:p-8">
           <p className="flex items-baseline justify-center gap-1">
-            <span className="font-display text-[52px] font-bold leading-none text-white sm:text-[64px]">
+            <span className="font-display text-[52px] font-bold leading-none text-[#ECECEF] sm:text-[64px]">
               {PLAN.price}
             </span>
             <span className="text-[18px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
@@ -204,7 +204,7 @@ export default function PricingPage() {
           Not ready?{' '}
           <a
             href={LEAD_MAGNET.href}
-            className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 hover:decoration-[#D4AF37]"
+            className="font-semibold text-[#ECECEF] underline decoration-[#D4AF37]/40 underline-offset-4 hover:decoration-[#D4AF37]"
           >
             Get your free Growth Score
           </a>{' '}
@@ -219,7 +219,7 @@ export default function PricingPage() {
           SOFTWARE you operate yourself. Same money, and you'd still need a
           website. Stated as their model vs ours, never as "they're bad". */}
       <section className="mt-16 sm:mt-20">
-        <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
+        <h2 className="text-center font-display text-[26px] font-bold text-[#ECECEF] sm:text-[32px]">
           What $397 buys everywhere else
         </h2>
         <div className="mx-auto mt-8 max-w-[720px] overflow-hidden rounded-2xl border border-white/10">
@@ -254,7 +254,7 @@ export default function PricingPage() {
             >
               <span
                 className={`w-full shrink-0 text-[14.5px] font-semibold sm:w-[210px] ${
-                  r.us ? 'text-[#D4AF37]' : 'text-white'
+                  r.us ? 'text-[#D4AF37]' : 'text-[#ECECEF]'
                 }`}
               >
                 {r.who}
@@ -272,7 +272,7 @@ export default function PricingPage() {
 
       {/* ── WHAT HAPPENS AFTER YOU START ──────────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
+        <h2 className="text-center font-display text-[26px] font-bold text-[#ECECEF] sm:text-[32px]">
           What happens after you start
         </h2>
         <ol className="mx-auto mt-8 grid max-w-[880px] grid-cols-1 gap-4 sm:grid-cols-3">
@@ -282,7 +282,7 @@ export default function PricingPage() {
               className="rounded-xl border border-white/10 bg-white/[0.02] p-5 text-left"
             >
               <p className="text-[12px] font-bold text-[#D4AF37]">Step {i + 1}</p>
-              <p className="mt-1.5 text-[16px] font-semibold text-white">{s.step}</p>
+              <p className="mt-1.5 text-[16px] font-semibold text-[#ECECEF]">{s.step}</p>
               <p className="mt-1.5 text-[13.5px] leading-[1.5] text-[#9AA0A6]">{s.detail}</p>
             </li>
           ))}
@@ -301,13 +301,13 @@ export default function PricingPage() {
 
       {/* ── FAQ ───────────────────────────────────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
+        <h2 className="text-center font-display text-[26px] font-bold text-[#ECECEF] sm:text-[32px]">
           Straight answers
         </h2>
         <div className="mx-auto mt-8 max-w-[760px] divide-y divide-white/10 border-y border-white/10">
           {PRICING_FAQS.map((f) => (
             <details key={f.q} className="group py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-[16px] font-semibold text-white">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-[16px] font-semibold text-[#ECECEF]">
                 {f.q}
                 <span
                   aria-hidden
@@ -324,7 +324,7 @@ export default function PricingPage() {
 
       {/* ── CLOSE ─────────────────────────────────────────────────── */}
       <section className="mt-16 text-center sm:mt-20">
-        <h2 className="mx-auto max-w-[640px] text-balance font-display text-[28px] font-bold leading-[1.15] text-white sm:text-[36px]">
+        <h2 className="mx-auto max-w-[640px] text-balance font-display text-[28px] font-bold leading-[1.15] text-[#ECECEF] sm:text-[36px]">
           Make sure the answer is you.
         </h2>
         <a

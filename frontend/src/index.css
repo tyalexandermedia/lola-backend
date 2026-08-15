@@ -12,8 +12,16 @@ html, body, #root {
 }
 
 body {
-  background: #0A0A0B;
-  color: #FFFFFF;
+  /* Lifted off pure black, and off pure white.
+     #FFFFFF on #0A0A0B is ~19.8:1 — well past the comfortable range for dark
+     UI, and at that ratio glyph edges bleed (halation), worst for readers with
+     astigmatism. Raising the ground and lowering the ink together lands around
+     15:1: still far beyond WCAG AA, but it stops the page glowing. Doing it
+     here fixes every surface at once rather than class by class.
+     NOTE: #0A0A0B survives all over the components as the TEXT colour on gold
+     buttons — those are correct and must not be swept. */
+  background: #101116;
+  color: #E9E9EC;
 }
 
 ::selection {

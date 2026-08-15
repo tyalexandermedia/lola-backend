@@ -86,7 +86,7 @@ function Welcome() {
       <section className="mx-auto w-full max-w-[640px] pt-8 text-center sm:pt-14">
         <p aria-hidden className="text-[40px] leading-none">🐾</p>
         <h1
-          className="mt-4 font-display font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 font-display font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2rem, 5.5vw, 3.25rem)' }}
         >
           You&apos;re in.
@@ -124,7 +124,7 @@ function Welcome() {
                 {i + 1}
               </span>
               <span>
-                <span className="block text-[15px] font-semibold text-white">{s.step}</span>
+                <span className="block text-[15px] font-semibold text-[#ECECEF]">{s.step}</span>
                 <span className="mt-0.5 block text-[13px] leading-[1.5] text-[#C5C5C8]">
                   {s.detail}
                 </span>
@@ -167,7 +167,7 @@ function BuyScreen() {
           For local service businesses
         </p>
         <h1
-          className="mx-auto mt-4 max-w-[600px] font-display font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mx-auto mt-4 max-w-[600px] font-display font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2.1rem, 5.5vw, 3.4rem)' }}
         >
           Get found online —{' '}
@@ -178,14 +178,14 @@ function BuyScreen() {
         </h1>
         <p className="mx-auto mt-5 max-w-[500px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
           You answer the phone. We handle everything that makes it ring — on
-          Google <span className="text-white">and</span> in AI answers.
+          Google <span className="text-[#ECECEF]">and</span> in AI answers.
         </p>
 
         {/* The price, anchored. Same two-row block as the homepage hero: the
             struck $3,000+ does the arithmetic so the reader doesn't have to. */}
         <div className="mx-auto mt-7 max-w-[420px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10] text-left">
           <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
-            <span className="text-[14.5px] font-semibold text-white">
+            <span className="text-[14.5px] font-semibold text-[#ECECEF]">
               Your website, designed &amp; built
             </span>
             <span className="flex shrink-0 items-baseline gap-2">
@@ -197,7 +197,7 @@ function BuyScreen() {
           </div>
           <div className="flex items-center justify-between gap-3 px-4 py-3">
             <span className="text-[14.5px] text-[#C5C5C8]">Then everything else, monthly</span>
-            <span className="shrink-0 text-[17px] font-bold text-white">
+            <span className="shrink-0 text-[17px] font-bold text-[#ECECEF]">
               {PLAN.price}
               <span className="text-[13px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
             </span>
@@ -233,7 +233,7 @@ function BuyScreen() {
               className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-4 text-center"
             >
               <div aria-hidden className="text-[24px]">{x.e}</div>
-              <p className="mt-2 text-[14px] font-semibold text-white">{x.t}</p>
+              <p className="mt-2 text-[14px] font-semibold text-[#ECECEF]">{x.t}</p>
               <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{x.s}</p>
             </div>
           ))}
@@ -259,7 +259,7 @@ function BuyScreen() {
               <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
                 Step {i + 1}
               </p>
-              <p className="mt-2 text-[17px] font-bold text-white">{s.step}</p>
+              <p className="mt-2 text-[17px] font-bold text-[#ECECEF]">{s.step}</p>
               <p className="mt-1.5 text-[13px] leading-[1.5] text-[#C5C5C8]">{s.detail}</p>
             </div>
           ))}
@@ -270,7 +270,7 @@ function BuyScreen() {
       <section className="mx-auto mt-12 flex w-full max-w-[640px] flex-col items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 text-center sm:mt-16">
         <p className="text-[14px] leading-[1.6] text-[#C5C5C8]">
           {GUARANTEE.emoji}{' '}
-          <span className="font-semibold text-white">{GUARANTEE.title}.</span> {GUARANTEE.body}
+          <span className="font-semibold text-[#ECECEF]">{GUARANTEE.title}.</span> {GUARANTEE.body}
         </p>
         <p className="text-[13px] text-[#9CA3AF]">
           Real proof:{' '}
@@ -283,7 +283,7 @@ function BuyScreen() {
       {/* FINAL CTA */}
       <section className="mx-auto mt-12 w-full max-w-[640px] rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-10">
         <h2
-          className="font-display font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="font-display font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)' }}
         >
           Start today.
@@ -340,7 +340,7 @@ function DirectLine({ heading, blurb }: { heading: string; blurb: string }) {
         </a>
         <a
           href={`tel:${FOUNDER.phone}`}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition-colors hover:border-white/35 hover:text-white"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition-colors hover:border-white/35 hover:text-[#ECECEF]"
         >
           Call {FOUNDER.phoneDisplay}
         </a>

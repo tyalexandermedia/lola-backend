@@ -39,7 +39,7 @@ export default function WorkPage() {
         />
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">The work</p>
         <h1
-          className="mt-4 max-w-[820px] font-bold leading-[1.05] tracking-[-0.02em] text-white"
+          className="mt-4 max-w-[820px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(2rem, 4.6vw, 3.4rem)' }}
         >
           Real businesses. Real sites.{' '}
@@ -52,7 +52,7 @@ export default function WorkPage() {
           AI answers. Tap any card to scroll through the real thing.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-[#9CA3AF]">
-          <span className="font-semibold text-white">{count} live build{count === 1 ? '' : 's'}</span>
+          <span className="font-semibold text-[#ECECEF]">{count} live build{count === 1 ? '' : 's'}</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
           <span>Home services + beyond</span>
           <span aria-hidden className="text-[#3A3F48]">·</span>
@@ -66,7 +66,7 @@ export default function WorkPage() {
       {/* CTA */}
       <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-24 sm:p-12">
         <h2
-          className="mx-auto max-w-[640px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
+          className="mx-auto max-w-[640px] font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
           style={{ fontSize: 'clamp(1.6rem, 3.6vw, 2.5rem)' }}
         >
           Want yours to be the next one?

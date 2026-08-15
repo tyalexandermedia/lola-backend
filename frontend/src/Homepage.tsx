@@ -152,7 +152,7 @@ function Hero() {
               className="h-12 w-12 shrink-0 rounded-full border border-[#D4AF37]/40 object-cover [object-position:center_52%]"
             />
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-semibold leading-tight text-white">
+              <span className="block text-[13.5px] font-semibold leading-tight text-[#ECECEF]">
                 {FOUNDER.knownAs} — I do the work myself
               </span>
               <span className="block text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
@@ -163,7 +163,7 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[52px] lg:text-[60px]">
+          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-[#ECECEF] sm:text-[52px] lg:text-[60px]">
             Your next customer already searched for you.
             <span className="mt-2 block text-[#D4AF37]">Did you show up?</span>
           </h1>
@@ -176,7 +176,7 @@ function Hero() {
               this only has to land the promise and get out of the way. */}
           <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
             Lola makes sure you're the one they find —{' '}
-            <span className="font-semibold text-white">and the one they choose.</span>
+            <span className="font-semibold text-[#ECECEF]">and the one they choose.</span>
           </p>
 
           {/* VALUE ANCHOR, not a sentence.
@@ -186,7 +186,7 @@ function Hero() {
               against $3,000, not against nothing. Same claim, no new promises. */}
           <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
-              <span className="text-[14.5px] font-semibold text-white">Your website, designed &amp; built</span>
+              <span className="text-[14.5px] font-semibold text-[#ECECEF]">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-[#7A7F8A] line-through">$3,000+</span>
                 <span className="rounded-full border border-[#4ADE80]/35 bg-[#4ADE80]/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#4ADE80]">
@@ -196,7 +196,7 @@ function Hero() {
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-3">
               <span className="text-[14.5px] text-[#C5C5C8]">Then everything else, monthly</span>
-              <span className="shrink-0 text-[17px] font-bold text-white">
+              <span className="shrink-0 text-[17px] font-bold text-[#ECECEF]">
                 {PLAN.price}<span className="text-[13px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
               </span>
             </div>
@@ -323,7 +323,7 @@ function ReportCard() {
         <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
           🐾 Lola · What you get
         </span>
-        <span className="text-[11px] font-bold text-white">
+        <span className="text-[11px] font-bold text-[#ECECEF]">
           {PLAN.price}
           <span className="text-[10px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
         </span>
@@ -362,7 +362,7 @@ function ReportCard() {
             {/* what they type */}
             <div className="flex justify-end">
               <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
-                <p className="text-[12.5px] leading-[1.45] text-white">
+                <p className="text-[12.5px] leading-[1.45] text-[#ECECEF]">
                   who&apos;s the best soft wash company in Dunedin?
                 </p>
               </div>
@@ -485,7 +485,7 @@ function ReportCard() {
           className="group mt-3 flex min-h-[44px] items-center gap-2 rounded-lg border border-white/[0.12] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.08]"
         >
           <p className="flex-1 text-[13px] leading-[1.45] text-[#C5C5C8]">
-            <span className="font-semibold text-white">See your own score first</span> — free, 60
+            <span className="font-semibold text-[#ECECEF]">See your own score first</span> — free, 60
             seconds, no signup.
           </p>
           <span
@@ -518,12 +518,12 @@ function ProblemSection() {
       <SectionHead kicker="What's going wrong" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
             Right now, someone near you is asking for exactly what you sell.
           </h2>
           <p className="mt-6 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
             If you're not in the answer, they hire someone else. You never find out the
-            sale existed — <span className="font-semibold text-white">and neither do they.</span>
+            sale existed — <span className="font-semibold text-[#ECECEF]">and neither do they.</span>
           </p>
         </div>
 
@@ -548,7 +548,7 @@ function ProblemSection() {
           <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
             ✓ What I guarantee
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-[#ECECEF]">
             You get found. On Google, and in the AI answers.
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
@@ -563,7 +563,7 @@ function ProblemSection() {
           <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
             ✗ What I won't fake
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-white">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-[#ECECEF]">
             Leads. Anyone promising you those is guessing.
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
@@ -582,7 +582,7 @@ function QueryCard({ engine, query, answer }: { engine: string; query: string; a
         <span aria-hidden className="text-[11px] text-[#D4AF37]">⌕</span>
         <span className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">{engine}</span>
       </div>
-      <p className="mt-3 text-[15px] font-medium text-white">"{query}"</p>
+      <p className="mt-3 text-[15px] font-medium text-[#ECECEF]">"{query}"</p>
       <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-[#9AA0A6]">
         <span aria-hidden className="mt-0.5 text-[#E5534B]">✗</span>
         <span>{answer}</span>
@@ -609,7 +609,7 @@ function ProofSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Don't take my word for it" />
-      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
         Most agencies show you a case study. I'll just give you the login.
       </h2>
       <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
@@ -626,7 +626,7 @@ function ProofSection() {
           <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
             Live client dashboard
           </p>
-          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-[#ECECEF]">
             Sandbar Soft Wash — 15 years of great work. Almost zero Google.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
@@ -648,7 +648,7 @@ function ProofSection() {
           <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
             Or skip my proof entirely
           </p>
-          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-white">
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-[#ECECEF]">
             Run it on your own business. Right now, free.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
@@ -656,7 +656,7 @@ function ProofSection() {
             AI answers — and the one fix that moves you most. Whether you hire me is a
             separate conversation.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-white">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#ECECEF]">
             Get my Growth Score
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
@@ -704,7 +704,7 @@ function StorySection() {
 
         {/* the letter */}
         <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
 
@@ -722,14 +722,14 @@ function StorySection() {
                 voice reads as someone talking, not writing. */}
             <p>
               Lola's my dog —{' '}
-              <span className="font-semibold text-white">half basset hound, half shepherd</span>,{' '}
+              <span className="font-semibold text-[#ECECEF]">half basset hound, half shepherd</span>,{' '}
               {LOLA_TURNS} this February. The basset never loses a scent. The shepherd never
               leaves the flock. Turns out that's the whole job.
             </p>
             <p>
               So that's how we work. Lola watches — your rankings, your reviews, your calls.
               Around the clock, never bored, never off.{' '}
-              <span className="font-semibold text-white">I do the work she turns up.</span>
+              <span className="font-semibold text-[#ECECEF]">I do the work she turns up.</span>
             </p>
             <p>
               I coach strength and conditioning. Same job either way: show up, do the work, keep
@@ -745,7 +745,7 @@ function StorySection() {
                   believe any of it, silently dropped them back on the homepage. */}
               <a
                 href="/r/client/sandbar"
-                className="font-semibold text-white underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
+                className="font-semibold text-[#ECECEF] underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
               >
                 Sandbar Soft Wash
               </a>
@@ -757,7 +757,7 @@ function StorySection() {
                 right level of detail on /pricing, but it turns the hardest-
                 hitting line in the letter into a procedure. The terms live one
                 click away; this paragraph only has to land the promise. */}
-            <p className="border-l-2 border-[#D4AF37] pl-4 text-white">
+            <p className="border-l-2 border-[#D4AF37] pl-4 text-[#ECECEF]">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
               I do the work myself.{' '}
               <span className="font-bold text-[#D4AF37]">{GUARANTEE.short}</span> In writing.
@@ -765,9 +765,9 @@ function StorySection() {
             <p>
               A local business that finally gets found changes what a family can say yes to.
               That's the whole point. Enough of you win,{' '}
-              <span className="font-semibold text-white">and Lola gets the backyard she deserves.</span>
+              <span className="font-semibold text-[#ECECEF]">and Lola gets the backyard she deserves.</span>
             </p>
-            <p className="text-[17px] font-semibold text-white sm:text-[18px]">
+            <p className="text-[17px] font-semibold text-[#ECECEF] sm:text-[18px]">
               Let's get your phone ringing.
             </p>
           </div>
@@ -782,7 +782,7 @@ function StorySection() {
         <div className="order-3 sm:col-start-1 sm:row-start-2 sm:-mt-1">
           <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
           <p className="mt-1.5 text-[14px] leading-[1.5] text-[#C5C5C8]">
-            <span className="font-semibold text-white">{FOUNDER.fullName}</span>
+            <span className="font-semibold text-[#ECECEF]">{FOUNDER.fullName}</span>
             <br />
             {FOUNDER.title} · {FOUNDER.company}
           </p>
@@ -846,7 +846,7 @@ function RoiSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="The math" />
-      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
       </h2>
       <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
@@ -887,7 +887,7 @@ function RoiSection() {
                   <span className="sr-only">{usd(AGENCY_MONTHLY)}/mo agency: </span>
                   {row.agency}
                 </dd>
-                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-white sm:w-[136px] lg:w-[160px]">
+                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-[#ECECEF] sm:w-[136px] lg:w-[160px]">
                   <span className="sr-only">Lola — $397/mo: </span>
                   {row.lola}
                 </dd>
@@ -899,7 +899,7 @@ function RoiSection() {
             <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
               Year-one difference
             </p>
-            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[38px]">
+            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF] sm:text-[38px]">
               {usd(AGENCY_YEAR_ONE - LOLA_YEAR_ONE)}
             </p>
             <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
@@ -921,7 +921,7 @@ function RoiSection() {
           </p>
           <label
             htmlFor="avg-job"
-            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-white"
+            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-[#ECECEF]"
           >
             What's one job worth to you?
           </label>
@@ -1006,7 +1006,7 @@ function BreakEvenRow({
     // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
     // wraps the plan label onto four lines.
     <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-      <span className={`text-[13px] ${featured ? 'font-semibold text-white' : 'text-[#C5C5C8]'}`}>
+      <span className={`text-[13px] ${featured ? 'font-semibold text-[#ECECEF]' : 'text-[#C5C5C8]'}`}>
         {label}
       </span>
       <span className={`text-[13px] tabular-nums ${featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'}`}>
@@ -1028,7 +1028,7 @@ function OfferSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Start free, then choose" />
-      <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+      <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
       </h2>
 
@@ -1040,7 +1040,7 @@ function OfferSection() {
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-[#D4AF37]">00</span>
           <div>
-            <p className="text-[17px] font-semibold text-white">Free 60-second Growth Score</p>
+            <p className="text-[17px] font-semibold text-[#ECECEF]">Free 60-second Growth Score</p>
             <p className="mt-0.5 text-[14px] text-[#C5C5C8]">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
           </div>
         </div>
@@ -1071,14 +1071,14 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
       }`}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[12px] uppercase tracking-[0.08em] text-white">{tier.name}</p>
+        <p className="text-[12px] uppercase tracking-[0.08em] text-[#ECECEF]">{tier.name}</p>
         {featured && (
           <span className="rounded-md bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B]">
             {undefined}
           </span>
         )}
       </div>
-      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-white">
+      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#ECECEF]">
         {tier.price}
         <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-[#8A8F98]">{tier.period}</span>
       </p>
@@ -1092,7 +1092,7 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
           </li>
         ))}
         {true && (
-          <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-white">
+          <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-[#ECECEF]">
             <span aria-hidden className="mt-0.5">{GUARANTEE.emoji}</span>
             <span className="font-semibold">{GUARANTEE.title}</span>
           </li>
@@ -1104,7 +1104,7 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
         className={`mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
           featured
             ? 'bg-[#D4AF37] text-[#0A0A0B] hover:bg-[#F4D47C]'
-            : 'border border-white/15 text-white hover:border-[#D4AF37]/60 hover:text-[#D4AF37]'
+            : 'border border-white/15 text-[#ECECEF] hover:border-[#D4AF37]/60 hover:text-[#D4AF37]'
         }`}
       >
         {tier.cta} <span aria-hidden>→</span>
@@ -1161,7 +1161,7 @@ function FaqSection() {
       <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
         {FAQ.map((item, i) => (
           <details key={i} className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[16px] font-semibold text-white [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[16px] font-semibold text-[#ECECEF] [&::-webkit-details-marker]:hidden">
               <span>{item.q}</span>
               <span aria-hidden className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45">+</span>
             </summary>
@@ -1181,7 +1181,7 @@ function FinalCta() {
     <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-14 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
         <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">Your next customer is searching right now</p>
-        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-white sm:text-[48px]">
+        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF] sm:text-[48px]">
           Make sure the answer is you.
         </h2>
         <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8]">
