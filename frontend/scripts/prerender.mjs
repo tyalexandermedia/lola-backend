@@ -62,7 +62,6 @@ const ROUTES = [
   '/pricing',
   '/work',
   '/growth-score',
-  '/retainer',
   '/methodology',
   '/vs',
   '/apply',

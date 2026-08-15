@@ -2,7 +2,7 @@
  * RoadmapJourney — the signature visual path.
  *
  * Renders the customer journey as a connected path:
- *   Free Growth Score → DIY ($197) → Full Build ($997)
+ *   Free Growth Score → DIY ($397/month) → Full Build ($397/month)
  *
  * Two purpose-built layouts (no awkward reflow): a horizontal stepped path on
  * sm+ and a vertical timeline on mobile. Prices come from the canonical
@@ -50,7 +50,7 @@ const STEPS: Step[] = [
     name: BUILD.name,
     price: BUILD.price,
     period: BUILD.period,
-    blurb: 'We build the site and get you ranked — on Google and in AI answers. Half-Back Guarantee.',
+    blurb: 'We build the site and get you ranked — on Google and in AI answers. 90-Day Promise.',
     href: '/pricing',
   },
 ];

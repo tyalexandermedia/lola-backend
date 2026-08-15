@@ -72,8 +72,8 @@ export default function WorkPage() {
           Want yours to be the next one?
         </h2>
         <p className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          The Full Build is $997, one-time — we build your site and get you found on Google and in
-          AI answers, backed by the Half-Back Guarantee.
+          The monthly is $397 — we build your site and get you found on Google and in
+          AI answers, backed by the 90-Day Promise.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a

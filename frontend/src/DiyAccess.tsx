@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
 /**
- * /diy — the $197 DIY deliverable: the 5-step fix-it checklist.
+ * /diy — the $397/month plan deliverable: the 5-step fix-it checklist.
  *
  * Pay-now → instant access. The DIY Stripe Payment Link redirects here with
  * ?session_id=... after payment, which unlocks the checklist. Without that
- * param the page shows a locked "unlock for $197" state with the buy button.
+ * param the page shows a locked "unlock for $397/month" state with the buy button.
  *
  * MVP gating is the redirect param (the customer only gets it post-payment).
  * Hardening step (later): verify the session server-side via Stripe before
@@ -62,16 +62,25 @@ const STEPS: ReadonlyArray<{ n: string; title: string; do_: string; win: string 
 type Gate = 'checking' | 'locked' | 'unlocked';
 
 export default function DiyAccess() {
+  // The DIY tier is retired. This route stays alive so anyone who already paid
+  // keeps their access via their Stripe success link — deleting or redirecting
+  // it would strand a paying customer. But it must not rank or compete with
+  // /pricing, so it is out of the sitemap and noindexed.
+  useSeo({
+    title: 'Your fix kit — Lola',
+    description: 'Access page for a previously purchased Lola fix kit.',
+    robots: 'noindex',
+  });
   useReveal();
   const [gate, setGate] = useState<Gate>('checking');
 
   useSeo({
     title: 'Your DIY Fix-It Guide | Lola',
     description:
-      'The $197 DIY kit: all four fixes written for your business — title tag, Google Business Profile description, first GBP post, and LocalBusiness schema — plus the checklist and the order to ship them in.',
+      'The $397/month kit: all four fixes written for your business — title tag, Google Business Profile description, first GBP post, and LocalBusiness schema — plus the checklist and the order to ship them in.',
   });
 
-  // Product + $197 Offer JSON-LD → eligible for a rich pricing result.
+  // Product + $397/month Offer JSON-LD → eligible for a rich pricing result.
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const amount = DIY.price.replace(/[^0-9]/g, '');
@@ -138,7 +147,7 @@ export default function DiyAccess() {
   /**
    * The four fixes this tier actually sells, rebuilt for the buyer's own
    * business. The free report shows fix #1 finished and names the other three;
-   * this is where those three are delivered. Without it a buyer would pay $197
+   * this is where those three are delivered. Without it a buyer would pay $397/month
    * and receive generic advice — worse than the free page they came from.
    *
    * The audit id is remembered when they click unlock on their report. If it's
@@ -164,7 +173,7 @@ export default function DiyAccess() {
     })();
     return () => { cancelled = true; };
   }, [unlocked]);
-  const buyHref = checkoutUrl('diy') || '/pricing';
+  const buyHref = checkoutUrl() || '/pricing';
 
   if (gate === 'checking') {
     return (
@@ -195,7 +204,7 @@ export default function DiyAccess() {
           }}
         />
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          {unlocked ? '✓ Payment confirmed' : 'The DIY Guide · $197'}
+          {unlocked ? '✓ Payment confirmed' : 'The DIY Guide · $397/month'}
         </p>
         <h1
           className="mx-auto mt-4 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
@@ -271,10 +280,10 @@ export default function DiyAccess() {
             <p className="mx-auto mt-3 max-w-[520px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
               The {BUILD.price} Full Build is done-for-you — new site, 30 days of visibility work
               across Google and the AI tools, and your keywords picked with Ty in week 1. Backed by
-              the Half-Back Guarantee.
+              the 90-Day Promise.
             </p>
             <a
-              href={checkoutUrl('build') || '/retainer'}
+              href={checkoutUrl() || '/pricing'}
               onClick={() => track('diy_to_build_cta')}
               className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >

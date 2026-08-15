@@ -27,7 +27,7 @@ export default function Start() {
     const desc = document.querySelector('meta[name="description"]');
     const prevDesc = desc?.getAttribute('content') || '';
     document.title = 'Get Found Online — Done For You | Lola';
-    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + AI-search visibility, done for you. The $997 Full Build, one-time — backed by the Half-Back Guarantee. Prefer to do it yourself? $197 DIY. You answer the phone; we handle the rest.');
+    if (desc) desc.setAttribute('content', 'AI website + local SEO + Google Business + AI-search visibility, done for you. The $397/month plan, one-time — backed by the 90-Day Promise. Prefer to do it yourself? $397/month. You answer the phone; we handle the rest.');
     track('start_page_viewed');
     return () => { document.title = prevTitle; if (desc) desc.setAttribute('content', prevDesc); };
   }, []);
@@ -68,7 +68,7 @@ export default function Start() {
           Book a free 15-min call →
         </a>
         <p className="mt-4 text-[13px] text-[#9CA3AF]">
-          <span className="font-semibold text-white">$997 Full Build</span>, one-time · no setup fee · Half-Back Guarantee
+          <span className="font-semibold text-white">$397/month plan</span>, one-time · no setup fee · 90-Day Promise
         </p>
       </section>
 
@@ -92,7 +92,7 @@ export default function Start() {
           ))}
         </div>
         <p className="mx-auto mt-4 max-w-[520px] text-center text-[13px] text-[#8A8F98]">
-          Prefer to do it yourself? The <span className="text-white">$197 DIY</span> guide gives you your Growth Score plus a simple 5-step fix-it checklist.
+          Prefer to do it yourself? The <span className="text-white">$397/month</span> guide gives you your Growth Score plus a simple 5-step fix-it checklist.
         </p>
       </section>
 
@@ -116,7 +116,7 @@ export default function Start() {
       {/* PROOF + GUARANTEE strip */}
       <section className="mx-auto mt-12 flex max-w-[640px] flex-col items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 text-center sm:mt-16">
         <p className="text-[14px] leading-[1.6] text-[#C5C5C8]">
-          🛡️ <span className="font-semibold text-white">Half-Back Guarantee.</span>{' '}
+          🛡️ <span className="font-semibold text-white">90-Day Promise.</span>{' '}
           We pick 5 money keywords together in week 1. If we don&apos;t get at least 1 ranking on
           page 1 or in the map pack within 30 days, you get half back.
         </p>
@@ -134,7 +134,7 @@ export default function Start() {
           Start your build today.
         </h2>
         <p className="mx-auto mt-3 max-w-[440px] text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-          The $997 Full Build gets you a new site built and ranked — on Google and in AI answers — backed by the Half-Back Guarantee. Book the call to get started.
+          The $397/month plan gets you a new site built and ranked — on Google and in AI answers — backed by the 90-Day Promise. Book the call to get started.
         </p>
         <a
           href={callHref}

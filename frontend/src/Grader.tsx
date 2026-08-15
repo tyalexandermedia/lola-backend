@@ -448,9 +448,9 @@ export default function Grader() {
           Want Lola to do the work for you?
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Do it yourself with the <span className="font-semibold text-white">$197 DIY</span> guide, or have us
-          handle it with the <span className="font-semibold text-white">$997 Full Build</span> — we build the
-          site and get you ranked on Google and in AI answers. No contracts, backed by the Half-Back Guarantee.
+          Do it yourself with the <span className="font-semibold text-white">$397/month</span> guide, or have us
+          handle it with the <span className="font-semibold text-white">$397/month plan</span> — we build the
+          site and get you ranked on Google and in AI answers. No contracts, backed by the 90-Day Promise.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a

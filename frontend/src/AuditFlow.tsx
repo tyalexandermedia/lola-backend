@@ -1481,14 +1481,14 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         {/* THE FREE / PAID LINE.
             All four of these used to be free, pre-filled with the owner's own
             business details. That is the DIY product, given away — which left
-            $197 buying "your full Growth Score", something the free tool had
+            $397/month buying "your full Growth Score", something the free tool had
             already handed over. There was no honest reason to pay.
 
             So: the diagnosis stays free — score, leak, weak spots, who's
             outranking you, and what needs doing. The EXECUTION is the product.
             One deliverable ships free and finished, because a locked box no one
             can see inside doesn't sell; you have to taste the cooking. The
-            other three are what $197 buys. */}
+            other three are what $397/month buys. */}
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
           Your fix kit
         </p>
@@ -1563,7 +1563,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         </a>
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">
           Or skip the work entirely: the {BUILD.price} Full Build has me do all of it, backed by
-          the Half-Back Guarantee.
+          the 90-Day Promise.
         </p>
       </section>
 
@@ -1934,7 +1934,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
               className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >
-              {payload.ctas.dfy_label || 'Start my build — $997'}
+              {payload.ctas.dfy_label || 'Start my build — $397/month'}
             </a>
           )}
         </div>

@@ -144,6 +144,16 @@
       "source": "/salon-seo-st-petersburg",
       "destination": "/lp/industries",
       "permanent": true
+    },
+    {
+      "source": "/retainer",
+      "destination": "/pricing",
+      "permanent": true
+    },
+    {
+      "source": "/managed",
+      "destination": "/pricing",
+      "permanent": true
     }
   ],
   "rewrites": [

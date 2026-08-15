@@ -6,7 +6,7 @@
     <title>Did You Show Up? Get Found on Google & AI — Lola Leads, Tampa Bay</title>
     <meta
       name="description"
-      content="Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee. Built by Coach Ty in Tampa Bay."
+      content="Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then one all-inclusive plan at $397/month with your website design included — backed by the 90-Day Promise. Built by Coach Ty in Tampa Bay."
     />
 
     <!-- Sharp display face for headlines. display=swap → text is visible in the
@@ -19,7 +19,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Lola Leads" />
     <meta property="og:title" content="Your next customer already searched for you. Did you show up?" />
-    <meta property="og:description" content="Local service businesses lose customers every day to Google and AI results they don't know exist. Lola makes sure you're the one they find — and choose. Free 60-second Growth Score, then DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee." />
+    <meta property="og:description" content="Local service businesses lose customers every day to Google and AI results they don't know exist. Lola makes sure you're the one they find — and choose. Free 60-second Growth Score, then one all-inclusive plan at $397/month with your website design included — backed by the 90-Day Promise." />
     <meta property="og:url" content="https://lola.tyalexandermedia.com" />
     <meta property="og:image" content="https://lola.tyalexandermedia.com/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -28,7 +28,7 @@
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Your next customer already searched for you. Did you show up?" />
-    <meta name="twitter:description" content="Lola gets local service businesses found on Google AND in ChatGPT, Perplexity, Gemini — and chosen. Free 60-second Growth Score, then DIY $197 or the $997 Full Build. Built by Coach Ty in Tampa Bay." />
+    <meta name="twitter:description" content="Lola gets local service businesses found on Google AND in ChatGPT, Perplexity, Gemini — and chosen. Free 60-second Growth Score, then $397/month all-inclusive — website design included. Built by Coach Ty in Tampa Bay." />
     <meta name="twitter:image" content="https://lola.tyalexandermedia.com/og.png" />
 
     <!-- Theme color (matches dark hero) -->
@@ -50,8 +50,8 @@
       "url": "https://lola.tyalexandermedia.com",
       "telephone": "+1-727-300-6573",
       "email": "ty@tyalexandermedia.com",
-      "priceRange": "$197-$997",
-      "description": "AI-powered local lead generation + SEO for service businesses. Done-for-you Google + AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews). Two one-time options: DIY $197 or the $997 Full Build, backed by the Half-Back Guarantee.",
+      "priceRange": "$397/month",
+      "description": "AI-powered local lead generation + SEO for service businesses. Done-for-you Google + AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews). One all-inclusive plan at $397/month with your website design included, backed by the 90-Day Promise.",
       "founder": {
         "@type": "Person",
         "name": "Ty Alexander Traufield",
@@ -83,10 +83,10 @@
       },
       "offers": {
         "@type": "AggregateOffer",
-        "lowPrice": "197",
-        "highPrice": "997",
+        "lowPrice": "397",
+        "highPrice": "397",
         "priceCurrency": "USD",
-        "offerCount": "2"
+        "offerCount": "1"
       },
       "parentOrganization": {
         "@type": "Organization",
@@ -101,12 +101,10 @@
     }
     </script>
 
-    <!-- ───────── JSON-LD: Service + the two real offers ─────────
-         The ProfessionalService block carries an AggregateOffer range; this
-         names the two tiers explicitly so an answer engine asked "how much
-         is Lola / what do I get for $997" can quote the actual package
-         instead of inferring from a price range. Prices mirror
-         frontend/src/lib/pricing.ts — update both together. -->
+    <!-- ───────── JSON-LD: Service + the single monthly offer ─────────
+         Names the plan and its recurring price so an answer engine asked
+         "how much is Lola" quotes $397/month rather than inferring from a
+         range. Mirrors frontend/src/lib/pricing.ts — update both together. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -125,24 +123,21 @@
         "@type": "BusinessAudience",
         "name": "Local service businesses — pressure washing, plumbing, HVAC, roofing, pool care and other local trades"
       },
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "DIY",
-          "price": "197",
+      "offers": {
+        "@type": "Offer",
+        "name": "The monthly",
+        "price": "397",
+        "priceCurrency": "USD",
+        "description": "All-inclusive monthly plan: your website designed and built (included, no setup fee), Google Business Profile managed, and ongoing visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini). Backed by the 90-Day Promise — ranking on page one or in the map pack within 90 days, or your next 2 months are free.",
+        "availability": "https://schema.org/InStock",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "397",
           "priceCurrency": "USD",
-          "description": "All four fixes written for your business — title tag, Google Business Profile description, first GBP post, and LocalBusiness schema — plus the order to ship them in. One-time, you do the work. The Growth Score itself and the first finished fix are free.",
-          "availability": "https://schema.org/InStock"
-        },
-        {
-          "@type": "Offer",
-          "name": "Full Build",
-          "price": "997",
-          "priceCurrency": "USD",
-          "description": "Custom website build, Google Business Profile optimization, and 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini). One-time, no contract, backed by the Half-Back Guarantee.",
-          "availability": "https://schema.org/InStock"
+          "billingIncrement": 1,
+          "unitCode": "MON"
         }
-      ]
+      }
     }
     </script>
 
@@ -165,7 +160,7 @@
           "name": "How much does Lola cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Two simple options, both one-time. DIY is $197 — you get your full Growth Score plus a simple 5-step fix-it checklist and do the work yourself. The Full Build is $997 — we build your site and get you found on Google and in AI answers, backed by the Half-Back Guarantee. No setup fee, no contract. Start with the free Growth Score to see where you stand."
+            "text": "One plan: $397/month, all-inclusive. Your website design is included — no setup fee and no build charge — then I manage your Google Business Profile and keep you visible on Google and in the AI answers. Cancel anytime after the first 3 months. Backed by the 90-Day Promise. Start with the free Growth Score to see where you stand."
           }
         },
         {
@@ -181,7 +176,7 @@
           "name": "Is there a guarantee?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes — the Half-Back Guarantee on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print."
+            "text": "Yes — the 90-Day Promise. We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print."
           }
         },
         {
@@ -189,15 +184,15 @@
           "name": "Can you actually guarantee leads?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The Half-Back Guarantee is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back."
+            "text": "No — and I won't pretend to. I guarantee visibility: that you're found and clickable on Google and in the AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The 90-Day Promise covers the ranking I control: we pick your money keywords together in week 1, and if you're not on page one or in the map pack within 90 days, your next 2 months are free."
           }
         },
         {
           "@type": "Question",
-          "name": "Why is it $997 when agencies quote $5,000 a month?",
+          "name": "Why is it $397/month when agencies quote $5,000 a month?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The Full Build is $997 one-time, no contract, and if we don't get you ranking you get half of that back. Same job, without the overhead you were funding."
+            "text": "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. This is $397/month with your website design included, no setup fee, cancel anytime after the first 3 months — and if I don't get you ranking in 90 days, your next 2 months are free. Same job, without the overhead you were funding."
           }
         },
         {
