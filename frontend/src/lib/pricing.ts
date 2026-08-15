@@ -40,15 +40,21 @@ export const TIERS: ReadonlyArray<OfferTier> = [
     name: 'DIY',
     price: '$197',
     period: 'one-time',
-    tagline: 'See your score. Fix it yourself.',
+    tagline: 'The whole fix kit. You do the pasting.',
+    // Deliberately does NOT lead with "your full Growth Score" any more. The
+    // free tool already gives the score, the revenue leak, the weak spots and
+    // the first finished fix — so listing the score as the headline item made
+    // $197 look like a charge for something the visitor already had. What this
+    // tier actually sells is the remaining execution: the written assets, in
+    // order, ready to paste.
     positioning:
-      'For owners who want the map and are happy to do the driving. You get your Growth Score plus the exact steps to lift it — no waiting on anyone.',
+      "For owners happy to do the work themselves. Your free score showed what's broken and fixed the first one — this is the rest of the kit, written for your business and ready to paste.",
     includes: [
-      'Your full Growth Score',
-      'A simple 5-step fix-it checklist',
-      'Self-service — fix it on your own time',
+      'All four fixes written for your business — title tag, Google Business Profile description, first GBP post, and your LocalBusiness schema',
+      'The order to do them in, so the highest-impact one ships first',
+      'Yours to keep — no contract, no monthly',
     ],
-    cta: 'Get the DIY guide',
+    cta: 'Unlock the fix kit',
   },
   {
     id: 'build',
