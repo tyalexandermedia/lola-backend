@@ -28,7 +28,7 @@ const clients: Client[] = [
     links: [
       { label: 'Public Dashboard', href: '/r/client/sandbar' },
       { label: 'Revenue Control Room', href: '/admin/revenue/sandbar' },
-      { label: 'Case Study', href: '/case-studies/sandbar' },
+      { label: 'Live Dashboard', href: '/r/client/sandbar' },
     ],
     status: [
       { label: 'Live', state: 'done' },

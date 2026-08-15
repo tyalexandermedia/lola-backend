@@ -30,6 +30,7 @@ const CARDS: Array<{ slug: string; name: string; oneLine: string; priceRange: st
   { slug: 'scorpion',    name: 'Scorpion',    oneLine: 'Enterprise local-services digital agency for home services, legal, franchise.', priceRange: 'Quote-only · $3K+ typical', category: 'Full-stack agency' },
   { slug: 'podium',      name: 'Podium',      oneLine: 'AI messaging + reviews platform — converts existing traffic into leads.', priceRange: '$399 – $799+ /mo', category: 'Lead capture' },
   { slug: 'yext',        name: 'Yext',        oneLine: 'Enterprise listings management + Answers AI for multi-location brands.', priceRange: 'Enterprise quote', category: 'Listings platform' },
+  { slug: 'local-service-ads', name: 'Google Local Service Ads', oneLine: "Google's own pay-per-lead placement + the Google Guaranteed badge — the one contractors ask about most.", priceRange: 'Pay per lead — ongoing', category: 'Paid placement' },
   { slug: 'hibu',        name: 'Hibu',        oneLine: 'Full-service local digital marketing agency — sites, ads, SEO, social.', priceRange: 'Quote-only', category: 'Full-stack agency' },
 ];
 

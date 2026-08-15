@@ -66,6 +66,16 @@ const ROUTES = [
   '/methodology',
   '/vs',
   '/apply',
+  // The individual comparisons are the pages that actually rank — "<vendor> vs
+  // Lola" and "are Local Service Ads worth it" are the high-intent queries.
+  // Prerendering only the hub would leave every one of them uncrawlable.
+  '/vs/local-service-ads',
+  '/vs/localiq',
+  '/vs/brightlocal',
+  '/vs/scorpion',
+  '/vs/podium',
+  '/vs/yext',
+  '/vs/hibu',
 ];
 
 async function main() {
