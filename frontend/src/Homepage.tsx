@@ -103,12 +103,28 @@ function Hero() {
             <span className="font-semibold text-white">and the one they choose.</span>
           </p>
 
-          <p className="mt-6 text-[16px] leading-[1.5] text-[#E8E4D8] sm:text-[17px]">
-            <span className="font-semibold text-white">Your website design included free</span>
-            {' '}— then {PLAN.price}{PLAN.period}.
-            <span className="block text-[14px] text-[#9AA0A6] sm:inline sm:text-[15px]">
-              {' '}Most shops charge $3,000+ just to build it.
-            </span>
+          {/* VALUE ANCHOR, not a sentence.
+              As prose, "included free ... most shops charge $3,000+" made the
+              reader do the arithmetic themselves, and most won't. Struck price
+              beside "Included" does it for them in one glance — the $397 lands
+              against $3,000, not against nothing. Same claim, no new promises. */}
+          <div className="mt-6 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10]">
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
+              <span className="text-[14.5px] font-semibold text-white">Your website, designed &amp; built</span>
+              <span className="flex shrink-0 items-baseline gap-2">
+                <span className="text-[13px] text-[#7A7F8A] line-through">$3,000+</span>
+                <span className="text-[13px] font-bold uppercase tracking-[0.04em] text-[#4ADE80]">Included</span>
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <span className="text-[14.5px] text-[#C5C5C8]">Then everything else, monthly</span>
+              <span className="shrink-0 text-[17px] font-bold text-white">
+                {PLAN.price}<span className="text-[13px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
+              </span>
+            </div>
+          </div>
+          <p className="mt-2.5 text-[13px] leading-[1.5] text-[#8A8F98]">
+            No setup fee. Most shops bill the build up front, then charge you monthly on top.
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">

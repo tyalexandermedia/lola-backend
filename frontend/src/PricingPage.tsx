@@ -189,6 +189,64 @@ export default function PricingPage() {
         </p>
       </section>
 
+      {/* WHERE $397 SITS IN THE MARKET.
+          Both facts come from the competitor research already in VsPage, not
+          from fresh claims: four of the six major players won't quote without a
+          sales call, and Podium — the closest published price — is $399/mo for
+          SOFTWARE you operate yourself. Same money, and you'd still need a
+          website. Stated as their model vs ours, never as "they're bad". */}
+      <section className="mt-16 sm:mt-20">
+        <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
+          What $397 buys everywhere else
+        </h2>
+        <div className="mx-auto mt-8 max-w-[720px] overflow-hidden rounded-2xl border border-white/10">
+          {[
+            {
+              who: 'Podium',
+              price: '$399–$799/mo',
+              what: 'Software you run yourself. No website, no one doing the work.',
+            },
+            {
+              who: 'Scorpion · LocalIQ · Yext · Hibu',
+              price: 'Quote-only',
+              what: "Four of the six biggest names won't tell you a price without a sales call.",
+            },
+            {
+              who: 'BrightLocal',
+              price: '$39–$59/mo',
+              what: 'A genuinely good DIY toolset — but you do all of the work.',
+            },
+            {
+              who: 'Lola',
+              price: '$397/mo',
+              what: 'Website designed and built, included. I do the work. Price published.',
+              us: true,
+            },
+          ].map((r) => (
+            <div
+              key={r.who}
+              className={`flex flex-col gap-1 border-b border-white/[0.07] px-5 py-4 last:border-b-0 sm:flex-row sm:items-center sm:gap-4 ${
+                r.us ? 'bg-[#D4AF37]/[0.07]' : ''
+              }`}
+            >
+              <span
+                className={`w-full shrink-0 text-[14.5px] font-semibold sm:w-[210px] ${
+                  r.us ? 'text-[#D4AF37]' : 'text-white'
+                }`}
+              >
+                {r.who}
+              </span>
+              <span className="w-full shrink-0 text-[13.5px] text-[#9AA0A6] sm:w-[120px]">{r.price}</span>
+              <span className="text-[13.5px] leading-[1.5] text-[#C5C5C8]">{r.what}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-4 max-w-[720px] text-center text-[12.5px] leading-[1.55] text-[#8A8F98]">
+          Public pricing as listed by each vendor. They're all capable — the difference is what
+          you get for the money, and whether you have to sit through a call to hear the number.
+        </p>
+      </section>
+
       {/* ── WHAT HAPPENS AFTER YOU START ──────────────────────────── */}
       <section className="mt-16 sm:mt-20">
         <h2 className="text-center font-display text-[26px] font-bold text-white sm:text-[32px]">
