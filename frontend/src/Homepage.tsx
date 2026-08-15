@@ -838,7 +838,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Is there a guarantee?',
-    a: "Yes — the 90-Day Promise on the Full Build. We pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.",
+    a: "Yes — the 90-Day Promise. We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print.",
   },
   {
     q: 'Can you actually guarantee leads?',
