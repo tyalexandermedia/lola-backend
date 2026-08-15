@@ -317,9 +317,9 @@ function ReportCard() {
   // silently drop missed-call text-back off the card entirely.
 
   return (
-    <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+    <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-gradient-to-b from-[#191A1F] to-[#141519] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
       {/* header band — names the offer and the price, not a product feature */}
-      <div className="flex items-center justify-between border-b border-white/10 bg-[#141416] px-5 py-3">
+      <div className="flex items-center justify-between border-b border-white/10 bg-[#1C1D23] px-5 py-3">
         <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
           🐾 Lola · What you get
         </span>
@@ -354,14 +354,14 @@ function ReportCard() {
           <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">
             <span aria-hidden>✦</span> Get named in AI answers
           </p>
-          <p className="mt-2 text-[14px] font-semibold leading-[1.45] text-white">
+          <p className="mt-2 text-[14px] font-semibold leading-[1.5] text-[#ECECEF]">
             Your customer stopped scrolling ten blue links. They just ask.
           </p>
 
           <div className="mt-3 space-y-2">
             {/* what they type */}
             <div className="flex justify-end">
-              <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#2C6BED] px-3.5 py-2.5">
+              <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
                 <p className="text-[12.5px] leading-[1.45] text-white">
                   who&apos;s the best soft wash company in Dunedin?
                 </p>
@@ -373,16 +373,16 @@ function ReportCard() {
                 <p className="text-[12.5px] leading-[1.5] text-[#E8E4D8]">
                   <span aria-hidden className="mr-1.5 text-[#4ADE80]">✦</span>
                   I&apos;d start with{' '}
-                  <span className="font-semibold text-white">[Your Company]</span> — strong
+                  <span className="font-semibold text-[#ECECEF]">[Your Company]</span> — strong
                   reviews and they cover Dunedin.
                 </p>
               </div>
             </div>
           </div>
 
-          <p className="mt-3 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
-            There&apos;s no page two on an answer like that. Most shops are invisible here —{' '}
-            <span className="font-semibold text-white">getting you named is the job.</span>
+          <p className="mt-3 text-[12.5px] leading-[1.5] text-[#9AA0A6]">
+            Most shops are invisible here.{' '}
+            <span className="font-semibold text-[#ECECEF]">Getting you named is the job.</span>
           </p>
         </div>
 
@@ -402,12 +402,20 @@ function ReportCard() {
           ))}
         </ul>
 
-        <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] px-3 py-2.5">
-          <span aria-hidden className="mt-[1px] text-[12px]">🌐</span>
-          <p className="text-[12px] leading-[1.45] text-[#C5C5C8]">
-            Your website — designed, built and kept updated.{' '}
-            <span className="font-semibold text-[#4ADE80]">Included free.</span>
-          </p>
+        {/* The struck price is what makes $397 land. It lived only in the left
+            column, so the card listing everything you get never showed the one
+            number that reframes the price. */}
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/[0.05] px-3.5 py-3">
+          <span className="text-[12.5px] leading-[1.4] text-[#C5C5C8]">
+            <span aria-hidden className="mr-1.5">🌐</span>
+            Your website, designed &amp; built
+          </span>
+          <span className="flex shrink-0 items-baseline gap-2">
+            <span className="text-[12px] text-[#7A7F8A] line-through">$3,000+</span>
+            <span className="rounded-full border border-[#4ADE80]/35 bg-[#4ADE80]/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-[#4ADE80]">
+              Included
+            </span>
+          </span>
         </div>
 
         {/* ── THE PROOF: the score, demoted to where it belongs ──
@@ -443,12 +451,12 @@ function ReportCard() {
                   </span>
                   <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                     <span
-                      className="block h-full rounded-full bg-[#4ADE80]"
+                      className="block h-full rounded-full bg-[#4ADE80]/60"
                       style={{ width: `${d.value}%` }}
                     />
                   </span>
                 </div>
-                <span className="font-mono text-[10px] tabular-nums text-[#4ADE80]">
+                <span className="font-mono text-[10.5px] tabular-nums text-[#4ADE80]/75">
                   {String(d.value).padStart(2, '0')}
                 </span>
               </div>
@@ -489,7 +497,7 @@ function ReportCard() {
         </a>
       </div>
 
-      <figcaption className="border-t border-white/10 bg-[#141416] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+      <figcaption className="border-t border-white/10 bg-[#1C1D23] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
         🛡️ {GUARANTEE.short}
       </figcaption>
     </figure>

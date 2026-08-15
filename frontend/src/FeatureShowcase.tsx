@@ -45,19 +45,20 @@ function Card({
 }) {
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-gradient-to-b from-[#131316] to-[#0B0B0D] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_18px_44px_-18px_rgba(212,175,55,0.30)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${span}`}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-gradient-to-b from-[#191A1F] to-[#141519] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_18px_44px_-18px_rgba(212,175,55,0.30)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${span}`}
     >
-      <div className="px-5 pt-5 pr-16">
-        <h3 className="text-balance font-display text-[19px] font-bold leading-[1.18] tracking-[-0.02em] text-white sm:text-[21px]">
+      <div className="px-6 pt-6 pr-16">
+        <h3 className="text-balance font-display text-[19px] font-bold leading-[1.25] tracking-[-0.02em] text-[#ECECEF] sm:text-[21px]">
           {headline}
         </h3>
-        <span className="mt-2 inline-block rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.06em] text-[#F4D47C]">
+        <span className="mt-2.5 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[#B99B3F]">
+          <span aria-hidden className="h-1 w-1 rounded-full bg-[#B99B3F]" />
           {worth}
         </span>
       </div>
-      <div className="mt-4 flex-1 px-5 pb-5">{children}</div>
+      <div className="mt-5 flex-1 px-6 pb-6">{children}</div>
       {/* These illustrate what the feature produces — not a client's account. */}
-      <span className="pointer-events-none absolute right-4 top-5 text-[9px] font-bold uppercase tracking-[0.1em] text-[#4B5563]">
+      <span className="pointer-events-none absolute right-4 top-5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#4B5563]">
         Example
       </span>
     </article>
@@ -100,12 +101,12 @@ export default function FeatureShowcase() {
   return (
     <section className="mt-14 sm:mt-20">
       <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">What lands</p>
-      <h2 className="mt-3 max-w-[760px] text-balance font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[40px]">
+      <h2 className="mt-3 max-w-[760px] text-balance font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
         Not a list of features. Here&apos;s what actually lands.
       </h2>
 
       {/* Six columns so cells can be 4 / 3 / 2 wide; one column on a phone. */}
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6">
         {CELLS.map((c) => (
           <Card key={c.id} span={c.span} headline={c.headline} worth={c.worth}>
             {DEMOS[c.id]}

@@ -92,8 +92,8 @@ export function Bubble({ side, children }: { side: 'them' | 'you'; children: Rea
       <div
         className={
           side === 'you'
-            ? 'max-w-[88%] rounded-2xl rounded-br-sm bg-[#2C6BED] px-3 py-2 text-[12px] leading-[1.45] text-white'
-            : 'max-w-[88%] rounded-2xl rounded-bl-sm border border-white/[0.09] bg-[#17181C] px-3 py-2 text-[12px] leading-[1.5] text-[#E8E4D8]'
+            ? 'max-w-[88%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3 py-2 text-[12px] leading-[1.45] text-[#ECECEF]'
+            : 'max-w-[88%] rounded-2xl rounded-bl-sm border border-white/[0.06] bg-[#1C1D23] px-3 py-2 text-[12px] leading-[1.5] text-[#E8E4D8]'
         }
       >
         {children}
@@ -109,7 +109,7 @@ export function Stars({ n = 5 }: { n?: number }) {
       className="text-[11px] tracking-[0.06em] text-[#F4D47C]"
     >
       {'★'.repeat(n)}
-      <span className="text-white/20">{'★'.repeat(5 - n)}</span>
+      <span className="text-[#ECECEF]/20">{'★'.repeat(5 - n)}</span>
     </span>
   );
 }
@@ -130,26 +130,26 @@ export type DemoId =
 
 export const DEMOS: Record<DemoId, ReactNode> = {
   website: (
-    <div className="overflow-hidden rounded-lg border border-white/[0.1] bg-[#0B0B0D]">
-      <div className="flex items-center gap-1.5 border-b border-white/[0.08] bg-[#17181C] px-2.5 py-1.5">
+    <div className="overflow-hidden rounded-lg border border-white/[0.07] bg-[#141519]">
+      <div className="flex items-center gap-1.5 border-b border-white/[0.06] bg-[#1C1D23] px-2.5 py-1.5">
         <span className="h-1.5 w-1.5 rounded-full bg-[#FF5F57]" />
         <span className="h-1.5 w-1.5 rounded-full bg-[#FEBC2E]" />
         <span className="h-1.5 w-1.5 rounded-full bg-[#28C840]" />
-        <span className="ml-1 truncate text-[9px] text-[#8A8F98]">yourcompany.com</span>
+        <span className="ml-1 truncate text-[10.5px] text-[#8A8F98]">yourcompany.com</span>
       </div>
       <div className="px-3 py-3">
-        <p className="text-[12.5px] font-bold leading-[1.2] text-white">
+        <p className="text-[12.5px] font-bold leading-[1.2] text-[#ECECEF]">
           Soft Washing in Dunedin, FL
         </p>
         <div className="mt-2 flex gap-1.5">
-          <span className="rounded bg-[#D4AF37] px-2 py-1 text-[9px] font-bold text-[#0A0A0B]">
+          <span className="rounded bg-[#D4AF37] px-2 py-1 text-[10.5px] font-bold text-[#0A0A0B]">
             Call now
           </span>
-          <span className="rounded border border-white/15 px-2 py-1 text-[9px] text-[#C5C5C8]">
+          <span className="rounded border border-white/15 px-2 py-1 text-[10.5px] text-[#C5C5C8]">
             Get a quote
           </span>
         </div>
-        <p className="mt-2.5 border-t border-white/[0.07] pt-2 font-mono text-[9px] leading-[1.4] text-[#8A8F98]">
+        <p className="mt-2.5 border-t border-white/[0.07] pt-2 font-mono text-[10.5px] leading-[1.4] text-[#8A8F98]">
           <span className="text-[#4ADE80]">✓</span> LocalBusiness · Dunedin · Soft Washing
         </p>
       </div>
@@ -162,7 +162,7 @@ export const DEMOS: Record<DemoId, ReactNode> = {
         <Bubble side="you">who&apos;s the best soft wash company in Dunedin?</Bubble>
         <Bubble side="them">
           <span aria-hidden className="mr-1.5 text-[#4ADE80]">✦</span>
-          I&apos;d start with <span className="font-semibold text-white">[Your Company]</span> —
+          I&apos;d start with <span className="font-semibold text-[#ECECEF]">[Your Company]</span> —
           strong reviews and they cover Dunedin.
         </Bubble>
       </div>
@@ -174,11 +174,11 @@ export const DEMOS: Record<DemoId, ReactNode> = {
         ].map((x) => (
           <div
             key={x.e}
-            className="rounded-lg border border-white/[0.08] bg-[#17181C] px-2.5 py-2 text-center"
+            className="rounded-lg border border-white/[0.06] bg-[#1C1D23] px-2.5 py-2 text-center"
           >
             <p className="text-[11px] text-[#C5C5C8]">{x.e}</p>
             <p
-              className={`mt-0.5 text-[9px] font-bold uppercase tracking-[0.08em] ${
+              className={`mt-0.5 text-[10.5px] font-bold uppercase tracking-[0.08em] ${
                 x.on ? 'text-[#4ADE80]' : 'text-[#F4D47C]'
               }`}
             >
@@ -192,7 +192,7 @@ export const DEMOS: Record<DemoId, ReactNode> = {
 
   gbp: (
     <div>
-      <p className="mb-2 text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+      <p className="mb-2 text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
         ⌕ soft wash near me
       </p>
       <ol className="space-y-1.5">
@@ -208,7 +208,7 @@ export const DEMOS: Record<DemoId, ReactNode> = {
             }`}
           >
             <span
-              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
                 b.you ? 'bg-[#4ADE80] text-[#0A0A0B]' : 'bg-white/10 text-[#8A8F98]'
               }`}
             >
@@ -217,14 +217,14 @@ export const DEMOS: Record<DemoId, ReactNode> = {
             <span className="min-w-0 flex-1">
               <span
                 className={`block truncate text-[12px] ${
-                  b.you ? 'font-semibold text-white' : 'text-[#9AA0A6]'
+                  b.you ? 'font-semibold text-[#ECECEF]' : 'text-[#9AA0A6]'
                 }`}
               >
                 {b.n}
               </span>
               <span className="flex items-center gap-1.5">
                 <Stars n={b.s} />
-                <span className="text-[9px] text-[#8A8F98]">({b.c})</span>
+                <span className="text-[10.5px] text-[#8A8F98]">({b.c})</span>
               </span>
             </span>
           </li>
@@ -235,15 +235,15 @@ export const DEMOS: Record<DemoId, ReactNode> = {
 
   copy: (
     <div className="space-y-2">
-      <div className="rounded-lg border border-white/[0.08] bg-[#17181C] px-3 py-2.5">
-        <p className="text-[9px] uppercase tracking-[0.08em] text-[#8A8F98]">Before</p>
+      <div className="rounded-lg border border-white/[0.06] bg-[#1C1D23] px-3 py-2.5">
+        <p className="text-[10.5px] uppercase tracking-[0.08em] text-[#8A8F98]">Before</p>
         <p className="mt-1 text-[12px] leading-[1.4] text-[#7A7F8A] line-through">
           Home | Welcome to our website
         </p>
       </div>
       <div className="rounded-lg border border-[#4ADE80]/25 bg-[#4ADE80]/[0.06] px-3 py-2.5">
-        <p className="text-[9px] uppercase tracking-[0.08em] text-[#4ADE80]">After</p>
-        <p className="mt-1 text-[12px] font-semibold leading-[1.4] text-white">
+        <p className="text-[10.5px] uppercase tracking-[0.08em] text-[#4ADE80]">After</p>
+        <p className="mt-1 text-[12px] font-semibold leading-[1.4] text-[#ECECEF]">
           Soft Wash &amp; Roof Cleaning in Dunedin, FL | Free Quotes
         </p>
       </div>
@@ -268,14 +268,14 @@ export const DEMOS: Record<DemoId, ReactNode> = {
 
   reviews: (
     <div>
-      <div className="rounded-lg border border-white/[0.09] bg-[#17181C] px-3 py-2.5">
+      <div className="rounded-lg border border-white/[0.06] bg-[#1C1D23] px-3 py-2.5">
         <Stars n={5} />
-        <p className="mt-1 text-[11.5px] leading-[1.45] text-[#E8E4D8]">
+        <p className="mt-1 text-[12px] leading-[1.45] text-[#E8E4D8]">
           “Showed up when they said. House looks new again.”
         </p>
       </div>
       <div className="mt-2.5 flex items-baseline justify-between rounded-lg border border-[#4ADE80]/20 bg-[#4ADE80]/[0.06] px-3 py-2.5">
-        <span className="text-[11.5px] text-[#C5C5C8]">This month</span>
+        <span className="text-[12px] text-[#C5C5C8]">This month</span>
         <span className="text-[20px] font-bold leading-none text-[#4ADE80]">
           <CountUp to={4} prefix="+" />
         </span>
@@ -293,17 +293,17 @@ export const DEMOS: Record<DemoId, ReactNode> = {
         <li key={s.w} className="flex items-start gap-2.5">
           <span
             aria-hidden
-            className={`mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] ${
+            className={`mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10.5px] ${
               s.done ? 'bg-[#4ADE80] text-[#0A0A0B]' : 'border border-white/25 text-transparent'
             }`}
           >
             ✓
           </span>
           <span className="min-w-0">
-            <span className="block text-[9px] uppercase tracking-[0.08em] text-[#D4AF37]">
+            <span className="block text-[10.5px] uppercase tracking-[0.08em] text-[#D4AF37]">
               {s.w}
             </span>
-            <span className="block text-[11.5px] leading-[1.4] text-[#E8E4D8]">{s.t}</span>
+            <span className="block text-[12px] leading-[1.4] text-[#E8E4D8]">{s.t}</span>
           </span>
         </li>
       ))}
@@ -320,12 +320,12 @@ export const DEMOS: Record<DemoId, ReactNode> = {
         ].map((m) => (
           <div
             key={m.k}
-            className="rounded-lg border border-white/[0.08] bg-[#17181C] px-2 py-2.5 text-center"
+            className="rounded-lg border border-white/[0.06] bg-[#1C1D23] px-2 py-2.5 text-center"
           >
-            <p className="text-[19px] font-bold leading-none text-white">
+            <p className="text-[19px] font-bold leading-none text-[#ECECEF]">
               <CountUp to={m.v} />
             </p>
-            <p className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#8A8F98]">{m.k}</p>
+            <p className="mt-1 text-[10.5px] uppercase tracking-[0.06em] text-[#8A8F98]">{m.k}</p>
           </div>
         ))}
       </div>
@@ -335,11 +335,11 @@ export const DEMOS: Record<DemoId, ReactNode> = {
           { l: 'AI visibility', v: 99 },
         ].map((d) => (
           <div key={d.l} className="flex items-center gap-2">
-            <span className="w-[74px] shrink-0 text-[9px] uppercase tracking-[0.06em] text-[#8A8F98]">
+            <span className="w-[74px] shrink-0 text-[10.5px] uppercase tracking-[0.06em] text-[#8A8F98]">
               {d.l}
             </span>
             <GrowBar pct={d.v} />
-            <span className="font-mono text-[10px] text-[#4ADE80]">{d.v}</span>
+            <span className="font-mono text-[11px] text-[#4ADE80]">{d.v}</span>
           </div>
         ))}
       </div>
@@ -359,13 +359,13 @@ export const DEMOS: Record<DemoId, ReactNode> = {
   promise: (
     <div className="rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-4 text-center">
       <p aria-hidden className="text-[22px] leading-none">🛡️</p>
-      <p className="mt-2 text-[13px] font-bold leading-[1.4] text-white">
+      <p className="mt-2 text-[13px] font-bold leading-[1.4] text-[#ECECEF]">
         Page one or the map pack in 90 days
       </p>
       <p className="mt-1.5 text-[12px] leading-[1.5] text-[#C5C5C8]">
         or your next <span className="font-semibold text-[#4ADE80]">2 months are free</span>
       </p>
-      <p className="mt-2.5 border-t border-white/[0.08] pt-2.5 text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+      <p className="mt-2.5 border-t border-white/[0.06] pt-2.5 text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
         In writing
       </p>
     </div>
