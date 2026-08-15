@@ -24,7 +24,7 @@
  * nobody can mistake one for a testimonial or a real result.
  */
 
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 interface Feature {
   id: string;
@@ -52,6 +52,44 @@ function Bubble({ side, children }: { side: 'them' | 'you'; children: ReactNode 
         {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * A number that counts up when it mounts.
+ *
+ * Mount is the trigger because the demo remounts every time its tab becomes
+ * active, so the number climbs each time the reader opens the panel rather
+ * than once on page load, where nobody would be looking.
+ *
+ * Honours prefers-reduced-motion by rendering the final value immediately —
+ * checked at runtime rather than in CSS, since the value is JS-driven and a
+ * CSS rule cannot stop it.
+ */
+function CountUp({ to, prefix = '' }: { to: number; prefix?: string }) {
+  const [n, setN] = useState(to);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    setN(0);
+    const DURATION = 900;
+    let raf = 0;
+    let start: number | null = null;
+    const tick = (t: number) => {
+      if (start === null) start = t;
+      const p = Math.min(1, (t - start) / DURATION);
+      // ease-out so it decelerates into the final number
+      setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to]);
+  return (
+    <>
+      {prefix}
+      {n}
+    </>
   );
 }
 
@@ -238,7 +276,9 @@ const FEATURES: ReadonlyArray<Feature> = [
         </div>
         <div className="flex items-center justify-between rounded-lg border border-[#4ADE80]/20 bg-[#4ADE80]/[0.06] px-3.5 py-2.5">
           <span className="text-[12px] text-[#C5C5C8]">Reviews this month</span>
-          <span className="text-[13px] font-bold text-[#4ADE80]">+4</span>
+          <span className="text-[13px] font-bold tabular-nums text-[#4ADE80]">
+            <CountUp to={4} prefix="+" />
+          </span>
         </div>
       </div>
     ),
@@ -291,12 +331,14 @@ const FEATURES: ReadonlyArray<Feature> = [
       <div className="overflow-hidden rounded-lg border border-white/[0.1] bg-[#0B0B0D]">
         <div className="grid grid-cols-3 divide-x divide-white/[0.07] border-b border-white/[0.07]">
           {[
-            { k: 'Calls', v: '18' },
-            { k: 'Quote forms', v: '7' },
-            { k: 'Won jobs', v: '4' },
+            { k: 'Calls', v: 18 },
+            { k: 'Quote forms', v: 7 },
+            { k: 'Won jobs', v: 4 },
           ].map((m) => (
             <div key={m.k} className="px-3 py-3 text-center">
-              <p className="text-[20px] font-bold leading-none text-white">{m.v}</p>
+              <p className="text-[20px] font-bold leading-none tabular-nums text-white">
+                <CountUp to={m.v} />
+              </p>
               <p className="mt-1 text-[10px] uppercase tracking-[0.06em] text-[#8A8F98]">{m.k}</p>
             </div>
           ))}
@@ -415,8 +457,17 @@ export default function FeatureShowcase() {
                   Example
                 </span>
               </div>
-              {/* The demo is the point, so it gets the room and the light. */}
-              <div className="bg-[#08080A]/60 px-5 py-6 sm:px-6">{f.demo}</div>
+              {/* The demo is the point, so it gets the room and the light.
+                  The key flips when this panel becomes active, remounting the
+                  demo so the staggered entrance (and any CountUp inside it)
+                  replays on every tab change instead of once, invisibly, at
+                  page load. .demo-in is disabled under prefers-reduced-motion. */}
+              <div
+                key={i === active ? `on-${f.id}` : `off-${f.id}`}
+                className={`bg-[#08080A]/60 px-5 py-6 sm:px-6 ${i === active ? 'demo-in' : ''}`}
+              >
+                {f.demo}
+              </div>
             </div>
           ))}
         </div>

@@ -35,6 +35,7 @@ import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from '.
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
+import BeforeAfter from './BeforeAfter';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -502,7 +503,7 @@ function ProblemSection() {
             You get found. On Google, and in the AI answers.
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
-            That's the part I control, so I put it in writing.
+            That's the part I control.
           </p>
           <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
             {GUARANTEE.emoji} {GUARANTEE.title}
@@ -517,8 +518,7 @@ function ProblemSection() {
             Leads. Anyone promising you those is guessing.
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
-            Whether a click becomes a booked job depends on your pricing and your
-            follow-through too. I get you in front of them. Closing is on both of us.
+            I get you in front of them. Closing is on both of us.
           </p>
         </div>
       </div>
@@ -750,6 +750,10 @@ function StorySection() {
           </a>
         </div>
       </div>
+
+      {/* Real screenshots beat every mock on this page. Renders nothing until
+          the two images are in place and the flag is on — see BeforeAfter. */}
+      <BeforeAfter />
     </section>
   );
 }
@@ -855,9 +859,8 @@ function RoiSection() {
             {/* The qualifier has to sit WITH the big number — on mobile the
                 disclaimer in the calculator card renders far below it. */}
             <p className="mt-3 text-[12px] leading-[1.55] text-[#8A8F98]">
-              Versus a {usd(AGENCY_MONTHLY)}/mo retainer over 12 months. Your quote may differ, and
-              this compares <span className="text-[#C5C5C8]">what you pay</span> — not a promise
-              that both get the same result.
+              Versus a {usd(AGENCY_MONTHLY)}/mo retainer over 12 months. Comparing{' '}
+              <span className="text-[#C5C5C8]">what you pay</span>, not what you get.
             </p>
           </div>
         </div>
@@ -923,9 +926,8 @@ function RoiSection() {
           </div>
 
           <p className="mt-5 text-[12px] leading-[1.55] text-[#8A8F98]">
-            That's <span className="text-[#C5C5C8]">cost math, not a lead promise</span> — we don't
-            make those (see above). It's simply what the monthly costs, measured in jobs you
-            already know the value of — and it's the same job every month, not a one-off.
+            <span className="text-[#C5C5C8]">Cost math, not a lead promise.</span> And that's one
+            job a month — not one job total.
           </p>
 
           {/* Peak intent: the number just resolved against their own ticket. */}
