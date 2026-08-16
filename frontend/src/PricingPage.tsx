@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 import IncludedAccordion from './IncludedAccordion';
 import { checkoutUrl, startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
-import { AFTER_YOU_START, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED } from './lib/pricing';
+import { AFTER_YOU_START, EXCLUSIVITY, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED, trialLine } from './lib/pricing';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
@@ -193,9 +193,18 @@ export default function PricingPage() {
               : `Or just text me — ${FOUNDER.phoneDisplay}`}
           </a>
 
-          {/* Guarantee and terms sit AT the button, where the hesitation is. */}
+          {/* Guarantee, exclusivity and terms sit AT the button, where the
+              hesitation is. Exclusivity is the one true reason to act now
+              rather than bookmark the page. */}
+          {trialLine() && (
+            <p className="mt-3 text-[13.5px] font-bold leading-[1.5] text-[#4ADE80]">{trialLine()}</p>
+          )}
           <p className="mt-3 text-[13px] font-semibold leading-[1.5] text-[#D4AF37]">
             {GUARANTEE.short}
+          </p>
+          <p className="mt-2 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+            <span className="font-semibold text-[#ECECEF]">{EXCLUSIVITY.short}.</span>{' '}
+            {EXCLUSIVITY.why}
           </p>
           <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">{PLAN.terms}</p>
         </div>

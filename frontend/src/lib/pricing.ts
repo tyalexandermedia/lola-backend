@@ -236,3 +236,40 @@ export const GROWTH_SCORE_DIMENSIONS: ReadonlyArray<string> = [
   'Reputation',
   'Revenue Tracking',
 ];
+
+/**
+ * One client per trade, per city.
+ *
+ * The only honest urgency this business has, and it's a real constraint rather
+ * than a tactic: two pressure washers in Dunedin cannot both rank first for
+ * "soft wash Dunedin", so taking both would be selling one outcome twice.
+ *
+ * Deliberately no counter. "3 spots left in Tampa" would convert better and is
+ * an invented number — the exact thing this business is positioned against,
+ * and trivially disprovable by anyone who checks twice.
+ */
+export const EXCLUSIVITY = {
+  short: 'One client per trade, per city',
+  why: "I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.",
+} as const;
+
+/**
+ * Free-trial length in days. 0 = OFF, and no trial copy renders anywhere.
+ *
+ * ⚠️ Before raising this above 0, the Stripe Payment Link must have a matching
+ * trial period set. Publishing "14 days free" against a link that charges
+ * immediately is worse than no trial: it breaks the promise in the same
+ * session, in front of a card form, which is where trust is most expensive.
+ *
+ * Rationale over simply charging less: the barrier to a $397 monthly from a
+ * stranger is trust, not the number. A smaller first yes removes the risk
+ * without permanently discounting the work.
+ */
+export const TRIAL_DAYS = 0;
+
+/** Trial line, or null when TRIAL_DAYS is 0. Callers render nothing on null. */
+export function trialLine(): string | null {
+  return TRIAL_DAYS > 0
+    ? `First ${TRIAL_DAYS} days free — cancel before you're charged.`
+    : null;
+}

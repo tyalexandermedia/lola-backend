@@ -31,7 +31,7 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
-import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE } from './lib/pricing';
+import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
@@ -232,7 +232,12 @@ function Hero() {
 
           {/* "No setup fee" was here too — it now sits directly above the
               buttons, and saying it twice in 60px of screen reads as filler. */}
+          {/* The only honest urgency here. No counter — "3 spots left in Tampa"
+              converts better and is invented, which is the exact thing this
+              business is positioned against. */}
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#8A8F98]">
+            {trialLine() && <span className="text-[#4ADE80]">{trialLine()}</span>}
+            {trialLine() && <span aria-hidden className="text-[#3A3F48]">/</span>}
             <span>Free 60-second Growth Score</span>
             <span aria-hidden className="text-[#3A3F48]">/</span>
             <span className="text-[#D4AF37]">Ranking in 90 days or 2 months free</span>
@@ -253,9 +258,9 @@ function Hero() {
               <span aria-hidden className="text-[#4ADE80]">●</span>
               See a real client's dashboard — no login
             </a>
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5" title={EXCLUSIVITY.why}>
               <span aria-hidden className="text-[#4ADE80]">✓</span>
-              Verified Google Business
+              {EXCLUSIVITY.short}
             </span>
             {/* The split the rest of the app already uses — ClientReport says
                 "Lola is set up and watching", AuditFlow says "Lola is on it" —

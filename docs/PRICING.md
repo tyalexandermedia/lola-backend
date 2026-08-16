@@ -130,3 +130,30 @@ the Growth Score delivery text — must include the opt-out line: **"Reply STOP 
 Flag vertical- and case-study-specific mentions with `{{VERTICAL}}` and `{{CASE_STUDY}}` so this
 becomes a reusable template for future verticals (plumbing, roofing, soft wash). Primary vertical
 today: **HVAC (Tampa Bay)**. Proof story: **Sandbar** (map-pack before/after).
+
+---
+
+## Exclusivity — one client per trade, per city
+
+**This is a real constraint, not a scarcity tactic.** Two pressure washers in
+Dunedin cannot both be ranked first for "soft wash Dunedin" — the work for one
+is work against the other. Taking both would mean selling the same outcome
+twice and delivering it once.
+
+State it plainly wherever the offer appears. Never dress it up with a counter
+("3 spots left in Tampa") — an invented number is exactly the kind of thing
+this business is positioned against, and it is trivially disprovable.
+
+## Free start — TRIAL_DAYS
+
+`TRIAL_DAYS` in `frontend/src/lib/pricing.ts` controls whether any trial copy
+renders. **It defaults to 0, meaning off, and every trial line disappears.**
+
+Before raising it above 0, the Stripe Payment Link MUST have a matching trial
+period configured. Publishing "14 days free" against a link that charges
+immediately is worse than having no trial at all — it is a promise the
+checkout breaks in the same session, in front of a card form.
+
+The rationale for a trial over a lower price: the barrier to a $397 monthly
+from a stranger is trust, not the number. A smaller first yes removes the risk
+without permanently discounting the work or signalling that it is cheap.
