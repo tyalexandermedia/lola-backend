@@ -39,7 +39,7 @@
 import { FOUNDER } from './lola';
 
 /** Live $397/month Payment Link. Public by design — see the note above. */
-const DEFAULT_MONTHLY_URL = 'https://buy.stripe.com/aFabJ00LEdVd3bj3j33oA07';
+const DEFAULT_MONTHLY_URL = 'https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c';
 
 export const STRIPE_MONTHLY_URL =
   (import.meta.env.VITE_STRIPE_MONTHLY_URL as string | undefined)?.trim() ||
