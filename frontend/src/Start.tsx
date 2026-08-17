@@ -36,6 +36,7 @@ import { useState } from 'react';
 import { FOUNDER } from './lib/lola';
 import { AFTER_YOU_START, GUARANTEE, MONTHLY_AT_A_GLANCE, PLAN } from './lib/pricing';
 import { startHref, startSmsHref } from './lib/checkout';
+import Vsl from './Vsl';
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
@@ -180,6 +181,15 @@ function BuyScreen() {
           You answer the phone. We handle everything that makes it ring — on
           Google <span className="text-[#ECECEF]">and</span> in AI answers.
         </p>
+
+        {/* The VSL belongs HERE, not only on the homepage.
+            This is the one-screen page — the link you text, and the one a video
+            CTA should point at. On the homepage the video competes with a
+            12-screen scroll and six other CTAs; here it sits between the
+            promise and the price with nothing else asking for attention.
+            Renders nothing until VITE_VSL_URL is set, so it costs nothing
+            while the video is still being recorded. */}
+        <Vsl />
 
         {/* The price, anchored. Same two-row block as the homepage hero: the
             struck $3,000+ does the arithmetic so the reader doesn't have to. */}
