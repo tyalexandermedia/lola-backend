@@ -41,5 +41,6 @@ export const FOUNDER = {
   phone: '+1-727-300-6573',
   phoneDisplay: '(727) 300-6573',
   email: 'ty@tyalexandermedia.com',
-  calendar: 'https://calendar.app.google/J7idjUDitd2Hziuc7',
+  // No `calendar` field on purpose. Ty doesn't sell on calls, and a booking URL
+  // sitting in the founder record is how one keeps reappearing in new CTAs.
 } as const;

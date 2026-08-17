@@ -10,7 +10,8 @@ import { track } from './analytics';
 
 import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
-import { PLAN } from './lib/pricing';
+import { PLAN, GUARANTEE, EXCLUSIVITY } from './lib/pricing';
+import { startHref, startSmsHref } from './lib/checkout';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
 export { API_URL };
@@ -598,7 +599,7 @@ export function ResultsStage({
     ? audit.business_type.replace(/\b\w/g, (c) => c.toUpperCase())
     : '';
 
-  const heroCtaHref = withUtm(STRATEGY_CALL_URL, 'hero_cta', { campaign: 'plug_leak' });
+  const heroCtaHref = startHref(true);
 
   return (
     <main className="lola-report flex flex-1 flex-col">
@@ -687,30 +688,29 @@ export function ResultsStage({
           </div>
         </div>
 
-        {/* Primary CTA — full-bleed, scroll-to-pricing */}
+        {/* Primary CTA — full-bleed. Same-tab on purpose: this is checkout, and
+            the Payment Link redirects back to /start on success. */}
         <a
           href={heroCtaHref}
-          target="_blank"
-          rel="noreferrer"
           onClick={() => {
-            trackClick('book_call_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
+            trackClick('start_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
           }}
           className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#D4AF37] sm:mt-10 sm:h-16 sm:text-[16px]"
         >
-          <span>Book a free call — plug the leak</span>
+          <span>Plug the leak — {PLAN.price}{PLAN.period}</span>
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
         </a>
 
         {/* Micro-benefits — single row on desktop, stacked on mobile */}
         <ul className="mt-5 flex flex-col gap-2 text-[13px] text-[#C5C5C8] sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-2">
           <li className="flex items-center gap-2">
-            <CheckIcon /> See the 3 fixes worth ${formatNumber(annualAtStake)}/yr
+            <CheckIcon /> Website build included free
           </li>
           <li className="flex items-center gap-2">
-            <CheckIcon /> Built with real Google data
+            <CheckIcon /> {GUARANTEE.short}
           </li>
           <li className="flex items-center gap-2">
-            <CheckIcon /> No pitch, just clarity
+            <CheckIcon /> No call required
           </li>
         </ul>
 
@@ -969,11 +969,16 @@ const PRICING_URL =
   (import.meta.env.VITE_PRICING_URL as string | undefined) ||
   '/pricing';
 
-// Single booking destination site-wide (Google Calendar). Call CTAs → here,
-// pay CTAs → Stripe. One env var so the funnel never splits across tools.
-const STRATEGY_CALL_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
+// 2026-08-17: the calendar is gone from this page. It used to own both gold
+// CTAs — hero and footer — which meant the single hottest moment in the funnel
+// (someone has just been shown their score and their $X/month leak) handed them
+// a booking form instead of a way to buy. Every Grader and Growth Score run
+// routes to /r/{id}, which renders this same ResultsStage, so that was the
+// default ending for essentially all top-of-funnel traffic.
+//
+// Both CTAs now go to checkout via startHref(true) — this page IS the offer by
+// the time you reach the footer — with a text-Ty link as the human escape
+// hatch. VITE_CALENDAR_URL is no longer read anywhere in the app.
 
 const GUIDE_URL =
   (import.meta.env.VITE_GUIDE_URL as string | undefined) ||
@@ -1100,9 +1105,9 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
     );
   })();
 
-  const strategyHref = withUtm(STRATEGY_CALL_URL, 'primary_cta');
+  const strategyHref = startHref(true);
 
-  const onBookClick = () => trackClick('book_call', { leak, score });
+  const onBookClick = () => trackClick('start_clicked_report_footer', { leak, score });
   const onGuideClick = () => trackClick('guide_download', { score });
   const onCaseStudyClick = () => trackClick('case_study_view', { score });
   const onRerunClick = () => {
@@ -1114,7 +1119,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
     <footer>
       {/* SECTION 1 — Primary CTA (biggest visual weight; fade-up on render) */}
       <section
-        aria-label="Book a strategy call"
+        aria-label={`Start the ${PLAN.price}${PLAN.period} plan`}
         className="animate-slide-up relative mt-12 overflow-hidden rounded-3xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.06] to-[#0A0A0B] p-7 shadow-[0_0_60px_rgba(212,175,55,0.12)] sm:p-12"
       >
         <h2 className="text-[28px] font-bold leading-[1.12] text-white sm:text-[44px]">
@@ -1128,19 +1133,24 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
 
         <a
           href={strategyHref}
-          target="_blank"
-          rel="noreferrer"
           onClick={onBookClick}
           className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[15px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_4px_18px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_8px_28px_rgba(212,175,55,0.5)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#D4AF37] sm:h-16 sm:text-[17px]"
         >
-          Book your strategy call — 15 min, free
+          {PLAN.cta} — {PLAN.price}{PLAN.period}
         </a>
+
+        <p className="mt-3 text-center text-[12px] text-[#8A8F98]">
+          🔒 Secure checkout · {PLAN.terms} ·{' '}
+          <a href={startSmsHref()} className="text-[#D4AF37] underline-offset-2 hover:underline">
+            or text Ty first
+          </a>
+        </p>
 
         <ul className="mt-6 space-y-2.5 text-[14px] sm:text-[15px]">
           {[
-            'The 3 biggest wins from your audit, explained',
-            'A 90-day game plan to fix the leak',
-            'Honest answer: should you DIY or hire it out',
+            'Your website designed and built — included free, no setup fee',
+            `${GUARANTEE.title}: ${GUARANTEE.short}`,
+            `${EXCLUSIVITY.short} — once yours is taken, it's taken`,
           ].map((item) => (
             <li key={item} className="flex items-start gap-2.5">
               <svg
@@ -1164,7 +1174,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       {/* SECTION 2 — Secondary CTAs for not-ready leads */}
       <section className="mt-10 sm:mt-14">
         <p className="text-center text-[14px] font-medium text-[#8A8F98]">
-          Not ready to talk yet?
+          Not ready yet?
         </p>
         <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-3">
           <a
@@ -1925,7 +1935,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               onClick={() => trackClick('enhancement_diy_cta', { from: 'enhancement_block' })}
               className="inline-flex flex-1 items-center justify-center rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.12]"
             >
-              {payload.ctas.diy_label || 'Book a 15-min strategy call'}
+              {payload.ctas.diy_label || "See what's included"}
             </a>
           )}
           {payload.ctas.dfy_url && (
@@ -1934,7 +1944,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
               className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >
-              {payload.ctas.dfy_label || 'Start my build — $397/month'}
+              {payload.ctas.dfy_label || `${PLAN.cta} — ${PLAN.price}${PLAN.period}`}
             </a>
           )}
         </div>

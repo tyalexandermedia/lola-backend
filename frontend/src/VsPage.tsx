@@ -12,7 +12,7 @@
  *   4. Pricing transparency = the moat. Lola's published price — $397/month,
  *      all-inclusive — visible vs every
  *      competitor's "request a demo" gate.
- *   5. Two CTAs: book a call (warm leads) + run the free Grader (cold).
+ *   5. Two CTAs: start the plan (warm leads) + run the free Grader (cold).
  *
  * Each page emits a FAQPage JSON-LD with switching/comparison questions —
  * targets high-intent organic ("lola vs localiq", "is brightlocal worth it",
@@ -22,10 +22,8 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
-
-const CALENDAR_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
+import { startHref } from './lib/checkout';
+import { GUARANTEE, PLAN } from './lib/pricing';
 
 // ── Config types ─────────────────────────────────────────────
 
@@ -119,7 +117,7 @@ const LOCALIQ: Competitor = {
     },
     {
       q: 'Can I switch from LocalIQ to Lola?',
-      a: 'Yes. Most LocalIQ contracts run annually — we\'ll help you run Lola in parallel during your remaining term so you have full data continuity, then transition cleanly. Book a free call and we\'ll map the handoff.',
+      a: "Yes. Most LocalIQ contracts run annually — we'll help you run Lola in parallel during your remaining term so you have full data continuity, then transition cleanly. Start whenever you're ready and we'll map the handoff — no call required.",
     },
     {
       q: 'Does Lola handle paid ads like LocalIQ?',
@@ -251,7 +249,7 @@ const SCORPION: Competitor = {
     },
     {
       q: 'Can I move from Scorpion to Lola mid-contract?',
-      a: 'Most Scorpion contracts are annual — we\'ll help you run Lola in parallel for the remaining term so you keep data continuity, then transition cleanly. Book a free call and we\'ll map the handoff.',
+      a: "Most Scorpion contracts are annual — we'll help you run Lola in parallel for the remaining term so you keep data continuity, then transition cleanly. Start whenever you're ready and we'll map the handoff — no call required.",
     },
     {
       q: 'Does Lola do website builds or paid ads like Scorpion?',
@@ -382,7 +380,7 @@ const YEXT: Competitor = {
     },
     {
       q: 'Can I switch from Yext to Lola?',
-      a: "Yes. Most Yext contracts run annual — we'll help you map the handoff so you don't lose listing coverage. Book a free call.",
+      a: "Yes. Most Yext contracts run annual — we'll help you map the handoff so you don't lose listing coverage. Text me and I'll walk you through it — no call required.",
     },
     {
       q: 'What about Yext Answers vs Lola AI search visibility?',
@@ -448,7 +446,7 @@ const HIBU: Competitor = {
     },
     {
       q: 'Can I move from Hibu to Lola mid-contract?',
-      a: "Most Hibu contracts are annual. We'll help you run Lola in parallel during the remainder so you don't lose data continuity, then transition cleanly. Book a free call to plan the handoff.",
+      a: "Most Hibu contracts are annual. We'll help you run Lola in parallel during the remainder so you don't lose data continuity, then transition cleanly. Text me and we'll plan the handoff — no call required.",
     },
     {
       q: 'Does Lola do paid ads or websites like Hibu?',
@@ -626,7 +624,7 @@ export default function VsPage({ slug }: { slug: string }) {
     );
   }
 
-  const callHref = `${CALENDAR_URL}${CALENDAR_URL.includes('?') ? '&' : '?'}utm_source=vs&utm_medium=vs_page&utm_campaign=${c.slug}`;
+  const startCtaHref = startHref();
 
   return (
     <main className="flex flex-1 flex-col">
@@ -842,18 +840,16 @@ export default function VsPage({ slug }: { slug: string }) {
           See where you actually stand.
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          Run the free 60-second AI Visibility Grader — or book a 15-minute call with Coach Ty.
-          We&apos;ll tell you straight whether Lola or {c.name} is the right fit.
+          Run the free 60-second AI Visibility Grader — or just start. Either way you&apos;ll
+          know within a week whether Lola or {c.name} is the right fit.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href={callHref}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => track('vs_cta_clicked', { competitor: c.slug, kind: 'call' })}
+            href={startCtaHref}
+            onClick={() => track('vs_cta_clicked', { competitor: c.slug, kind: 'start' })}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
           >
-            Book a free strategy call →
+            {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <a
             href="/grader"
@@ -873,7 +869,7 @@ export default function VsPage({ slug }: { slug: string }) {
           with them, which is exactly why we want to be fair about where they win.
           {' '}<a href={c.url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">
             Visit {c.name} ↗
-          </a>{' '}— if they&apos;re the better fit, go win with them. If Lola is, we&apos;ll know in 15 minutes.
+          </a>{' '}— if they&apos;re the better fit, go win with them. If Lola is, {GUARANTEE.short.toLowerCase()}
         </p>
       </section>
 

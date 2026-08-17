@@ -59,11 +59,15 @@ export default function Start() {
   // is fine here because this page unlocks nothing; it says thank you and links
   // to the intake. DiyAccess does real server-side verification because it
   // hands over assets.
-  const [paid] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).has('session_id'),
+  // Keep the id, not just a boolean: it gets carried into the intake so /apply
+  // can tell a paying customer from a not-ready-today lead and say the right
+  // thing to each.
+  const [sessionId] = useState(() =>
+    typeof window === 'undefined'
+      ? ''
+      : new URLSearchParams(window.location.search).get('session_id') || '',
   );
+  const paid = Boolean(sessionId);
 
   useSeo({
     title: paid
@@ -72,16 +76,21 @@ export default function Start() {
     description: paid
       ? 'Your plan is active. Here is what happens next.'
       : `Website designed and built, included free. Then ${PLAN.price}${PLAN.period} for everything that gets you found on Google and in AI answers. ${GUARANTEE.short}`,
-    robots: 'noindex',
+    // Two pages at one URL, and only one of them should rank. The receipt view
+    // (?session_id=…) must never be indexed. The bare /start is the buy screen
+    // the VSL points at — it has a title and description written to rank and it
+    // is in the sitemap, so blanket-noindexing it was submitting a URL to Google
+    // and telling Google to ignore it in the same request.
+    robots: paid ? 'noindex' : undefined,
   });
 
-  return paid ? <Welcome /> : <BuyScreen />;
+  return paid ? <Welcome sessionId={sessionId} /> : <BuyScreen />;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
    PAID — receipt and next step. No pricing, no pitch, nothing to buy.
    ───────────────────────────────────────────────────────────────────────── */
-function Welcome() {
+function Welcome({ sessionId }: { sessionId: string }) {
   return (
     <main className="flex flex-1 flex-col">
       <section className="mx-auto w-full max-w-[640px] pt-8 text-center sm:pt-14">
@@ -98,7 +107,7 @@ function Welcome() {
         </p>
 
         <a
-          href="/apply"
+          href={`/apply?session_id=${encodeURIComponent(sessionId)}`}
           onClick={() => track('start_intake_clicked')}
           className={`${GOLD_BUTTON} mt-7`}
         >

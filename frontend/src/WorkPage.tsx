@@ -11,10 +11,8 @@ import { useReveal } from './lib/useReveal';
 import { useSeo } from './lib/seo';
 import Portfolio from './Portfolio';
 import { PORTFOLIO } from './lib/portfolio';
-
-const CALENDAR_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
+import { startHref } from './lib/checkout';
+import { PLAN } from './lib/pricing';
 
 export default function WorkPage() {
   useReveal();
@@ -77,20 +75,21 @@ export default function WorkPage() {
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noreferrer"
+            href={startHref(true)}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02] sm:h-16 sm:text-[15px]"
           >
-            Book a free call →
+            {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <a
             href="/pricing"
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            See pricing
+            See what&apos;s included
           </a>
         </div>
+        <p className="mt-4 text-[12px] text-[#8A8F98]">
+          🔒 Secure checkout · {PLAN.terms}
+        </p>
       </section>
 
       <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">

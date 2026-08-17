@@ -98,7 +98,7 @@ Quick honest question — are you paying one of the big agencies $2,500-$3,500/m
 
 If yes, a lot of that bill is overhead and account management, not execution.
 
-Lola does the work for you — a one-time $997 Full Build gets you a new site built and ranked everywhere people search now (Google, ChatGPT, Perplexity, Gemini). No contract. Backed by our Half-Back Guarantee: if we don't rank at least 1 of your 5 money keywords in 30 days, you get half back.
+Lola does the work for you — $397/month, and your website design is included free. No setup fee, cancel anytime after the first 3 months. Backed by my 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free.
 
 Free Growth Score for {{business_name}}:
 
@@ -119,7 +119,7 @@ Founder, Lola SEO · Tampa Bay, FL
 
 If you're paying $99-$399/mo for an SEO tool (Semrush, Ahrefs, Search Atlas), you're also spending 10+ hours/week learning the platform and executing the fixes yourself.
 
-Lola does it FOR you — a one-time $997 Full Build gets you a new site built and ranked everywhere people search now. Same data — none of the manual work, no contract. Backed by our Half-Back Guarantee.
+Lola does it FOR you — $397/month, website design included free. Same data, none of the manual work, cancel anytime after the first 3 months. Backed by my 90-Day Promise.
 
 Free Growth Score for {{business_name}}:
 

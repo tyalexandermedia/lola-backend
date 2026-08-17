@@ -22,10 +22,6 @@ import { AFTER_YOU_START, EXCLUSIVITY, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUD
 import { useSeo } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
-const BOOKING_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
-
 // Each entry powers the visible accordion AND the FAQPage JSON-LD, which Google
 // requires to match the rendered copy.
 const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [

@@ -15,7 +15,7 @@ Edit here, then sync into each HTML file.
   "url": "https://tyalexandermedia.com",
   "telephone": "+1-727-300-6573",
   "email": "ty@tyalexandermedia.com",
-  "priceRange": "$197-$997",
+  "priceRange": "$397/month",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Tampa Bay",

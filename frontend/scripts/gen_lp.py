@@ -34,7 +34,11 @@ from pathlib import Path
 # --------------------------------------------------------------------------- #
 
 BASE_URL = "https://lola.tyalexandermedia.com"
-CALENDAR_URL = "https://calendar.app.google/J7idjUDitd2Hziuc7"
+# The live $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts.
+# These pages used to point three gold CTAs at a Google Calendar booking link,
+# which is the call path Ty removed. A Payment Link is a public URL, not a
+# secret; the Stripe API keys live in Railway.
+CHECKOUT_URL = "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
 PHONE = "+1-727-300-6573"
 EMAIL = "ty@tyalexandermedia.com"
 
@@ -47,8 +51,10 @@ TIERS = [
      "blurb": "Website design included free — no setup fee, no build charge. Then your Google Business Profile managed, every fix written for your business, and ongoing visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini) so you get named when someone asks for a company like yours. Direct line to Ty. Backed by the 90-Day Promise: ranking on page one or in the map pack within 90 days, or your next 2 months are free."},
 ]
 PRICE_RANGE = "$397/month"
-LOW_PRICE = "197"
-HIGH_PRICE = "997"
+# One offer, so no AggregateOffer and no low/high spread. These used to be
+# "197"/"997" — the retired two-tier one-time model — which meant every /lp page
+# published structured data quoting Google two prices that no longer exist.
+MONTHLY_PRICE = "397"
 
 # Repo-root-relative output locations. Resolved against the repo root, which we
 # derive from this file's location so the script works from any cwd.
@@ -185,7 +191,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you keep for good',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Soft-wash + house-wash keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -206,7 +212,7 @@ SERVICES = {
             ("Do you understand soft wash vs pressure wash?",
              "Yes. Coach Ty's dad runs Sandbar Soft Wash in Palm Harbor — 15+ years, master certified. We know the difference and we optimize for both."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
             ("Can you handle a seasonal schedule?",
              f"Yes — we build GBP post cadence around {c['name']}'s busy washing season and keep ranking signals warm in the off months."),
         ],
@@ -224,7 +230,7 @@ SERVICES = {
         ],
         this_=[
             'Organic Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Emergency-keyword targeting baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -241,13 +247,13 @@ SERVICES = {
             (f'Will this help me rank for "emergency plumber {c["name"]}"?',
              "Yes — that's exactly the kind of high-intent local keyword we target. Map Pack + organic + AI search visibility."),
             ("How fast will I see new calls?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most clients see new GMB call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most clients see new GMB call volume within 6-8 weeks."),
             ("What if my GMB profile is a mess?",
-             "That's part of week 1. We clean it up, fix categories, add proper services, photo cadence, and post strategy — all included in the $997 full build."),
+             "That's part of week 1. We clean it up, fix categories, add proper services, photo cadence, and post strategy — all included in the $397/month plan."),
             ("Do you do Google LSA (Local Service Ads)?",
              "LSA is a separate paid channel. Lola handles organic + Map Pack. Many clients pause LSA after 60 days because organic catches up."),
             ("We have 10 service vans — will the system scale?",
-             "Yes — the $997 build adds service-area pages so you show up across your whole coverage map. Same playbook whether you're 1 truck or 20."),
+             "Yes — the plan adds service-area pages so you show up across your whole coverage map. Same playbook whether you're 1 truck or 20."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -263,7 +269,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Emergency AC-repair keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -280,13 +286,13 @@ SERVICES = {
             (f'Will this help me rank for "AC repair {c["name"]}"?',
              "Yes — emergency AC keywords are the core of what we target across Map Pack, organic, and AI search."),
             ("How fast will I see new calls?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most HVAC shops see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most HVAC shops see new call volume within 6-8 weeks."),
             ("Can you handle our seasonal swings?",
              f"Yes — we tune {c['name']} GBP cadence to the season so you're visible for emergency repair in peak summer and maintenance in the shoulder months."),
             ("Do you optimize for replace-vs-repair searches?",
              "Yes. Those buyers are high-ticket and high-intent. We build content and GBP services to capture them."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -302,7 +308,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Storm + insurance-claim keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -321,11 +327,11 @@ SERVICES = {
             ("How do you beat out-of-state storm-chasers?",
              "Local trust signals: a clean GBP, real review velocity, and pre-positioned storm content so you rank before they roll into town."),
             ("How fast will I see new leads?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most roofers see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most roofers see new call volume within 6-8 weeks."),
             ("Do you build insurance-claim content?",
              "Yes — insurance-claim and storm-inspection pages are high-intent and we make them part of the playbook."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -341,7 +347,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Weekly-service + green-pool keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -360,11 +366,11 @@ SERVICES = {
             ("Can you help me sell recurring contracts, not one-offs?",
              "Yes — that's the whole point. We frame your GBP and content around the weekly plan so you win the lifetime value, not just the single job."),
             ("How fast will I see new accounts?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most pool pros see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most pool pros see new call volume within 6-8 weeks."),
             ("Do you handle seasonal demand?",
              f"Yes — we keep {c['name']} ranking signals warm year-round so you're first in line when pool season ramps."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -380,7 +386,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Weekly-service + lawn-treatment keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -399,11 +405,11 @@ SERVICES = {
             ("Can you help me build recurring routes?",
              "Yes — we frame your GBP and content around the weekly route so you win lifetime value, not just one mow."),
             ("How fast will I see new accounts?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most lawn pros see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most lawn pros see new call volume within 6-8 weeks."),
             ("Do you optimize for fertilization and treatment too?",
              "Yes — treatment and fertilization searches are higher-margin and high-intent. We target them alongside mowing."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -419,7 +425,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Emergency + panel-upgrade keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -436,13 +442,13 @@ SERVICES = {
             (f'Will this help me rank for "electrician {c["name"]}"?',
              "Yes — emergency and panel-upgrade keywords are exactly what we target across Map Pack, organic, and AI search."),
             ("How fast will I see new calls?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most electricians see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most electricians see new call volume within 6-8 weeks."),
             ("Do you optimize for high-ticket jobs like panel upgrades and EV chargers?",
              "Yes — those buyers are high-intent and we build content and GBP services to capture them."),
             ("What if my licensing info is inconsistent online?",
              "That's part of week 1. We fix NAP and licensing citations so Google trusts your listing."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -458,7 +464,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            '$197 DIY fix-it plan or a $997 full build — no setup fee',
+            '$397/month — website design included free, no setup fee',
             'Recurring + deep-clean keywords baked in',
             '90-Day Promise on the $397/mo plan',
         ],
@@ -477,11 +483,11 @@ SERVICES = {
             ("Can you help me sell recurring plans, not one-time cleans?",
              "Yes — we frame your GBP and content around weekly/biweekly plans so you win lifetime value."),
             ("How fast will I see new clients?",
-             "Half-Back Guarantee on the $997 build: we pick 5 money keywords with you in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. Most cleaning companies see new call volume within 6-8 weeks."),
+             "The 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Website design is included — no setup fee. Most cleaning companies see new call volume within 6-8 weeks."),
             ("Do you target commercial cleaning too?",
-             "Yes — the $997 full build can add commercial and office-cleaning keywords and service-area pages so you show up for those searches too."),
+             "Yes — the plan can add commercial and office-cleaning keywords and service-area pages so you show up for those searches too."),
             ("Is there a contract?",
-             "No contract — both options are one-time. It's $197 to see your score and fix it yourself, or a $997 full build we rank for you. The build comes with our Half-Back Guarantee: half your money back if we don't rank at least 1 of your 5 money keywords in 30 days."),
+             "No long contract. It's $397/month, website design included free and no setup fee, and you can cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free."),
         ],
     ),
 }
@@ -526,6 +532,20 @@ VANITY_REDIRECTS = {
     "/salon-seo-st-petersburg": "/lp/industries",
 }
 
+# Routes from the retired model. Each one used to render a page that sold a
+# product that no longer exists; the SPA now resolves them client-side, and
+# these 301s make the server say so first.
+#
+# /diy is deliberately absent — it stays live (noindexed) so anyone who bought
+# the old fix kit keeps their access link. Redirecting it would strand a
+# customer who already paid.
+RETIRED_ROUTE_REDIRECTS = {
+    "/retainer": "/pricing",     # sold "The Full Build" behind calendar CTAs
+    "/managed": "/pricing",      # published a $297/mo price that no longer exists
+    "/build": "/start",          # old post-purchase page; step 01 was "book a call"
+    "/build/start": "/start",
+}
+
 # Stale hand-written files to delete after generation.
 STALE_FILES = [
     "local-seo-pressure-washing-florida.html",
@@ -546,8 +566,13 @@ def esc(s):
 
 
 def cta_href(slug):
-    """Primary CTA — books a call on the Google Calendar link, new tab."""
-    return f"{CALENDAR_URL}?utm_source=lp&utm_medium=cta&utm_campaign={slug}"
+    """Primary CTA — straight to checkout.
+
+    No UTM string: Stripe doesn't forward unknown query params to the success
+    redirect, so they'd be decoration. Per-page attribution comes from the
+    secondary Growth Score CTA, which does carry utm_campaign={slug}.
+    """
+    return CHECKOUT_URL
 
 
 def jsonld(obj):
@@ -567,8 +592,8 @@ def render_page(svc_slug, svc, city_slug, city):
     cname = city["name"]
     title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Lola'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
-            f'ChatGPT for high-intent searches. A $197 DIY Growth Score fix-it plan '
-            f'or a $997 full build we rank for you. Book a free strategy call with Coach Ty.')
+            f'ChatGPT for high-intent searches. $397/month, website design included '
+            f'free, no setup fee. Backed by the 90-Day Promise. Built by Coach Ty.')
 
     faqs = svc["faqs"](city)
     do_items = svc["do"](city)
@@ -597,11 +622,19 @@ def render_page(svc_slug, svc, city_slug, city):
             {"@type": "State", "name": "Florida"},
         ],
         "offers": {
-            "@type": "AggregateOffer",
-            "lowPrice": LOW_PRICE,
-            "highPrice": HIGH_PRICE,
+            "@type": "Offer",
+            "name": "The monthly",
             "priceCurrency": "USD",
-            "offerCount": "2",
+            "price": MONTHLY_PRICE,
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": MONTHLY_PRICE,
+                "priceCurrency": "USD",
+                "unitCode": "MON",
+                "billingIncrement": 1,
+            },
+            "availability": "https://schema.org/InStock",
+            "url": f"{BASE_URL}/pricing",
         },
         "sameAs": ["https://www.instagram.com/tyalexandermedia"],
     }
@@ -728,7 +761,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <p class="eyebrow">Local SEO · {esc(svc["eyebrow_word"])} · {esc(cname)}, FL</p>
 <h1>{esc(svc["h1"](city))}</h1>
 <p class="sub">{esc(svc["sub"](city))}</p>
-<a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
+<a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
 <a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <h2>Not this. This.</h2>
@@ -749,15 +782,15 @@ def render_page(svc_slug, svc, city_slug, city):
 </ul>
 
 <div class="founding">
-<p class="eyebrow">&#129446; The Half-Back Guarantee</p>
-<h3 style="margin-top:8px">We pick 5 money keywords together in week 1. Miss all 5 in 30 days? Half back.</h3>
-<p>That's the deal on every $997 build: we choose 5 money keywords for your business together in week 1. If we don't get at least one ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print. Real proof you can verify: <strong><a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a></strong> — Coach Ty's father's Palm Harbor pressure-washing business, 15+ years, master certified. We get you found when people ask ChatGPT, Perplexity, Gemini, or Google for a company like yours — that's where your next customer is already searching. Your {esc(cname)} {esc(svc["name"])} case study is being written right now. Want to be it?</p>
-<span class="spots">Half-Back Guarantee · half your money back if we don't rank you</span>
+<p class="eyebrow">&#128737;&#65039; The 90-Day Promise</p>
+<h3 style="margin-top:8px">We pick your 5 money keywords together in week 1. Not ranking in 90 days? Your next 2 months are free.</h3>
+<p>That's the deal on every plan: we choose 5 money keywords for your business together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print. Real proof you can verify: <strong><a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a></strong> — Coach Ty's father's Palm Harbor pressure-washing business, 15+ years, master certified. We get you found when people ask ChatGPT, Perplexity, Gemini, or Google for a company like yours — that's where your next customer is already searching. Your {esc(cname)} {esc(svc["name"])} case study is being written right now. Want to be it?</p>
+<span class="spots">One client per trade, per city · once yours is taken, it's taken</span>
 </div>
 
-<h2>Two ways in</h2>
-<p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. From there it's simple — <strong>$197</strong> to see your score and fix it yourself, or <strong>$997</strong> and we build it and rank it for you. Both one-time. No contract. The build is backed by the Half-Back Guarantee.</p>
-<a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
+<h2>One plan. One price.</h2>
+<p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. Or skip the wait — it's <strong>$397/month</strong>, and your website design is included free. No setup fee, no build charge, cancel anytime after the first 3 months. Backed by the 90-Day Promise.</p>
+<a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
 <a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <div class="divider"></div>
@@ -768,7 +801,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h2>FAQ</h2>
 {faq_details}
 
-<a class="cta" href="{esc(primary_cta)}" target="_blank" rel="noopener" style="margin-top:40px">Book a free strategy call &rarr;</a>
+<a class="cta" href="{esc(primary_cta)}" style="margin-top:40px">Start my monthly &mdash; $397/month &rarr;</a>
 <a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 {footer_links}
@@ -793,8 +826,8 @@ def render_hub():
     title = "Local SEO by Industry & City — Tampa Bay & Florida | Lola"
     desc = ("Done-for-you local SEO for service businesses across Tampa Bay & "
             "Florida. Pick your trade and city. Rank on Google + ChatGPT. "
-            "A $197 DIY fix-it plan or a $997 full build we rank for you. "
-            "Book a free strategy call with Coach Ty.")
+            "$397/month, website design included free, no setup fee. "
+            "Backed by the 90-Day Promise. Built by Coach Ty.")
 
     # ItemList of every generated page for the CollectionPage schema.
     item_list = []
@@ -831,8 +864,9 @@ def render_hub():
         "geo": {"@type": "GeoCoordinates", "latitude": "27.9506", "longitude": "-82.4572"},
         "areaServed": [{"@type": "State", "name": "Florida"}]
         + [{"@type": "City", "name": c["name"]} for c in CITIES.values()],
-        "offers": {"@type": "AggregateOffer", "lowPrice": LOW_PRICE,
-                   "highPrice": HIGH_PRICE, "priceCurrency": "USD", "offerCount": "2"},
+        "offers": {"@type": "Offer", "name": "The monthly", "price": MONTHLY_PRICE,
+                   "priceCurrency": "USD", "availability": "https://schema.org/InStock",
+                   "url": f"{BASE_URL}/pricing"},
         "sameAs": ["https://www.instagram.com/tyalexandermedia"],
     }
     breadcrumb = {
@@ -918,22 +952,22 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 <main class="wrap">
 <p class="eyebrow">Industries &amp; Cities · Lola SEO</p>
 <h1>Local SEO by industry &amp; city. Tampa Bay &amp; Florida.</h1>
-<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). Two ways in: a $197 DIY Growth Score fix-it plan, or a $997 full build we rank for you.</p>
-<a class="cta" href="{esc(cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
+<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). One plan: $397/month, website design included free, no setup fee.</p>
+<a class="cta" href="{esc(cta)}">Start my monthly &mdash; $397/month &rarr;</a>
 
 {sections}
 
 <h2>Two ways in</h2>
-<p>Start free with your <strong>60-second Growth Score</strong>. From there it's simple: <strong>$197</strong> to see your score and fix it yourself, or <strong>$997</strong> and we build it and rank it for you. Both one-time, no contract — and the build is backed by the Half-Back Guarantee.</p>
-<a class="cta" href="{esc(cta)}" target="_blank" rel="noopener">Book a free strategy call &rarr;</a>
+<p>Start free with your <strong>60-second Growth Score</strong>. Or skip the wait — it's <strong>$397/month</strong>, and your website design is included free. No setup fee, no build charge, cancel anytime after the first 3 months. Backed by the 90-Day Promise.</p>
+<a class="cta" href="{esc(cta)}">Start my monthly &mdash; $397/month &rarr;</a>
 
 <div class="coachty">
 <p class="eyebrow">Why Lola</p>
-<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (<a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a>, Palm Harbor — 15+ years, master certified) kept losing jobs to bigger competitors with worse work but better Google. Lola fixes that for local service businesses. On every $997 build we pick 5 money keywords with you in week 1 — if we don't rank at least one in 30 days, you get half your money back. Built with faith, run with hustle, and yes — there's a dog named Lola. &#128062;</p>
+<p>I'm Coach Ty. I answer my own phone. &#128241; I built Lola because my dad's pressure-washing business (<a href="https://www.sandbarsoftwash.com" target="_blank" rel="noopener">Sandbar Soft Wash</a>, Palm Harbor — 15+ years, master certified) kept losing jobs to bigger competitors with worse work but better Google. Lola fixes that for local service businesses. On every plan we pick your 5 money keywords together in week 1 — if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Built with faith, run with hustle, and yes — there's a dog named Lola. &#128062;</p>
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.08)">
-<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{esc(cta)}" target="_blank" rel="noopener">Book a strategy call</a>
+<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{esc(cta)}">Start my monthly</a>
 <a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/growth-score">Get your free Growth Score</a>
 <a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/pricing">See pricing</a>
 </div>
@@ -966,8 +1000,11 @@ def render_sitemap(slugs):
         ("/growth-score", "monthly", "0.9"),   # free Growth Score opt-in
         ("/pricing", "monthly", "0.9"),
         ("/roadmap", "monthly", "0.88"),   # interactive Growth Score page (static LP)
-        ("/diy", "monthly", "0.85"),      # $197 DIY access page
-        ("/retainer", "monthly", "0.9"),
+        # /diy and /retainer are deliberately absent. /diy is a noindexed access
+        # page for the retired fix kit, and /retainer 301s to /pricing — listing
+        # either one submits a URL Google is then told not to index, which shows
+        # up in Search Console as "Submitted URL marked noindex" / "Page with
+        # redirect" rather than as coverage.
         ("/work", "monthly", "0.85"),     # portfolio of real builds
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
@@ -1044,6 +1081,16 @@ def render_vercel(slugs):
     # dedicated page exists). Preserved here so regeneration never drops the
     # inbound link equity these earn.
     for src, dest in VANITY_REDIRECTS.items():
+        redirects.append({"source": src, "destination": dest, "permanent": True})
+
+    # Retired routes. These MUST live here rather than being hand-added to
+    # vercel.json: this function rewrites that file wholesale, so anything not
+    # generated is silently dropped on the next regeneration — which is exactly
+    # how the /retainer and /managed 301s went missing once already.
+    #
+    # Without the 301 each of these still resolves client-side, which is worse
+    # than a redirect: Google gets a second indexable URL serving the same page.
+    for src, dest in RETIRED_ROUTE_REDIRECTS.items():
         redirects.append({"source": src, "destination": dest, "permanent": True})
 
     obj = {"redirects": redirects, "rewrites": rewrites}

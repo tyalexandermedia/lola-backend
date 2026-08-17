@@ -19,6 +19,8 @@ import { useEffect, useState } from 'react';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
+import { startHref } from './lib/checkout';
+import { GUARANTEE, PLAN } from './lib/pricing';
 
 const TRADE_TO_SERVICE: Record<string, string> = {
   // Mirrors AuditFlow's map. Kept here so this component is self-contained.
@@ -211,7 +213,7 @@ export default function Grader() {
       if (auditId) {
         window.location.assign(`/r/${encodeURIComponent(auditId)}?from=grader`);
       } else {
-        setApiError('No audit ID returned. Try again or book a call.');
+        setApiError('No audit ID returned. Try again — or text Ty and he’ll run it for you.');
         setPhase('error');
       }
     } catch (err) {
@@ -448,24 +450,22 @@ export default function Grader() {
           Want Lola to do the work for you?
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
-          Do it yourself with the <span className="font-semibold text-white">$397/month</span> guide, or have us
-          handle it with the <span className="font-semibold text-white">$397/month plan</span> — we build the
-          site and get you ranked on Google and in AI answers. No contracts, backed by the 90-Day Promise.
+          One plan — <span className="font-semibold text-white">{PLAN.price}{PLAN.period}</span>. We design and
+          build the site (included free, no setup fee) and get you found on Google and in AI answers.
+          {' '}{PLAN.terms} Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
-            href="/pricing"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
+            href={startHref()}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.3)] transition hover:scale-[1.02]"
           >
-            See pricing →
+            {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
           <a
-            href="https://calendar.app.google/J7idjUDitd2Hziuc7"
-            target="_blank"
-            rel="noreferrer"
+            href="/pricing"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-white transition hover:border-white/[0.3]"
           >
-            Book a free call
+            See what&apos;s included
           </a>
         </div>
       </section>

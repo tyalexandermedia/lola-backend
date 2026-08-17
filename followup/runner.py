@@ -2,16 +2,17 @@
 Growth Score follow-up runner.
 
 Walks enrolled leads (db/followups.py) through a 3-touch cadence so a free
-Growth Score turns into a booked call or a sale:
+Growth Score turns into a sale:
 
-    Step 1  (~24h)  Nudge  — "did you see your score? here's the #1 fix" + pricing
-    Step 2  (~72h)  Proof  — the Half-Back Guarantee + book/build
-    Step 3  (~7d)   Final  — EMAIL ONLY, quietly introduces the monthly option
+    Step 1  (~24h)  Nudge  — "did you see your score? here's the #1 fix" + checkout
+    Step 2  (~72h)  Proof  — the 90-Day Promise + exclusivity
+    Step 3  (~7d)   Final  — EMAIL ONLY, the offer stated plainly one last time
 
-There's a SECOND sequence, kind='build', for people who bought the $997 Full
-Build — it nurtures them toward the $297/mo "Lola Managed" continuity, timed to
-land as their 30-day build window closes (~day 25 → 32 → 46). Recurring MRR is
-the LTV engine; the build is the on-ramp.
+There's a SECOND sequence, kind='build', for people who have already paid. It
+used to upsell them from a $997 one-time build to a $297/mo retainer; with a
+single $397/month plan there is nothing to upsell, so it now chases the thing
+that actually blocks delivery — the 2-minute intake at /apply. Checkout takes a
+card; it doesn't tell Ty what the business does.
 
 Channels: email (Resend) + SMS (Twilio, only if the lead consented). Every SMS
 gets "Reply STOP to opt out." appended by reviews.sms.send_sms.
@@ -21,8 +22,10 @@ Safety:
     so enabling the loop with nothing wired up never silently burns the sequence.
   • A step is advanced on ATTEMPT (not only on success), so a transient provider
     error can't trap a lead in an infinite resend loop.
-  • The monthly retainer is mentioned in the prospect final EMAIL only — never
-    in prospect SMS (the build sequence does pitch it, since they're customers).
+  • Step 3 is EMAIL ONLY in both sequences — the last touch is the one most
+    likely to read as pestering, and it costs less trust in an inbox than a text.
+  • The 'build' sequence never sells. Those rows are paying subscribers; every
+    message in it points at the intake form and nothing else.
 """
 
 import asyncio
@@ -38,9 +41,13 @@ from reviews.sms import send_sms, twilio_enabled
 
 # ── Config (env-overridable; hours) ───────────────────────────────────────
 PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
-CALL_URL = os.getenv(
-    "FOLLOWUP_CALL_URL", "https://calendar.app.google/J7idjUDitd2Hziuc7"
-)
+# Checkout, not a calendar. These emails used to point at a Google Calendar
+# booking link; Ty doesn't sell on calls, and a booking form is a slower, lossier
+# ask than the Payment Link the rest of the site now uses.
+CHECKOUT_URL = os.getenv(
+    "STRIPE_MONTHLY_URL", "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
+).strip()
+PLAN_PRICE = os.getenv("FOLLOWUP_PLAN_PRICE", "$397/month")
 from api_clients.ghl import outbound_via_ghl
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip() or None
@@ -69,18 +76,19 @@ def _days(name: str, default_days: float) -> float:
         return default_days
 
 
-# ── Post-build → $297/mo "Lola Managed" continuity ─────────────────────────
-# After someone buys the $997 Full Build, nurture them toward the monthly that
-# keeps them ranked. Timed to land as the 30-day build window closes — right
-# when they've felt the win and momentum matters most.
-MANAGED_MONTHLY = os.getenv("FOLLOWUP_MANAGED_PRICE", "$297/mo")
-# Nurture CTAs point at the /managed landing page by default (it holds the
-# subscribe button + the full pitch). Override with a direct Stripe link if you
-# prefer one-click checkout from the text/email.
-MANAGED_URL = (os.getenv("FOLLOWUP_MANAGED_URL", "").strip() or f"{PUBLIC_APP_URL}/managed")
-BUILD_STEP1_SEC = _days("FOLLOWUP_BUILD_STEP1_DAYS", 25) * 86400
-BUILD_GAP_1_2_SEC = _days("FOLLOWUP_BUILD_GAP12_DAYS", 7) * 86400   # ~day 32
-BUILD_GAP_2_3_SEC = _days("FOLLOWUP_BUILD_GAP23_DAYS", 14) * 86400  # ~day 46
+# ── Post-purchase onboarding nudges ────────────────────────────────────────
+# This branch used to nurture $997 Full Build buyers toward a $297/mo "Lola
+# Managed" upsell. Both of those products are retired: there is one plan, and a
+# "build" row is now someone who is already paying $397/month. Pitching them a
+# monthly they already have is the worst email we could send.
+#
+# What they actually need is the intake form. Checkout collects a card, not a
+# business — until /apply is filled in, Ty has a subscriber he can't start work
+# for. So these three steps chase the intake, not a sale.
+INTAKE_URL = f"{PUBLIC_APP_URL}/apply"
+BUILD_STEP1_SEC = _days("FOLLOWUP_BUILD_STEP1_DAYS", 1) * 86400
+BUILD_GAP_1_2_SEC = _days("FOLLOWUP_BUILD_GAP12_DAYS", 2) * 86400
+BUILD_GAP_2_3_SEC = _days("FOLLOWUP_BUILD_GAP23_DAYS", 4) * 86400
 
 
 def followup_enabled() -> bool:
@@ -164,108 +172,115 @@ def _content(step: int, row: dict) -> dict:
         html = _email_wrap(
             "Did you catch your Growth Score?",
             f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Hey {name}, it's Ty. Your Growth Score came with your first fix already written — the title tag for your page. Paste it in and it works; that one's yours free.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">Three left: your Google Business Profile description, your first GBP post, and the schema that decides whether AI can read your business at all. <a href="{report}" style="color:#B8860B;">👉 Re-open your score</a> — the $197 kit unlocks all three, written for you. Or the $997 Full Build and I do the whole thing myself.</p>
-<p style="margin:0 0 22px;">{_btn(pricing, "See my two options →")}</p>""",
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">Three left: your Google Business Profile description, your first GBP post, and the schema that decides whether AI can read your business at all. <a href="{report}" style="color:#B8860B;">👉 Re-open your score</a> — or I do all of it, plus build you a new site, for {PLAN_PRICE}.</p>
+<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")} &nbsp; <a href="{pricing}" style="color:#B8860B;font-weight:700;">or see what's included</a></p>""",
         )
         text = (
             f"Hey {name}, it's Ty. Your Growth Score came with your first fix written and ready "
             f"to paste — that one's free. Three left: GBP description, first post, and your "
-            f"schema. Re-open it: {report} — $197 unlocks all three, or $997 and I do it: {pricing}"
+            f"schema. Re-open it: {report} — or I do all of it plus build your site for "
+            f"{PLAN_PRICE}: {CHECKOUT_URL}"
         )
         sms = (
             f"Hey {name}, it's Lola 🐾 Your first fix is written and waiting in your score: "
-            f"{report} — three more in the $197 kit, or we do all of it: {pricing}"
+            f"{report} — or Ty does all of it plus builds your site: {PLAN_PRICE}, {pricing}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
     if step == 2:
-        subject = "We'll put the guarantee in writing"
+        subject = "I'll put the guarantee in writing"
         html = _email_wrap(
-            "The Half-Back Guarantee",
-            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Most agencies want $2,000–$5,000/mo and a 6-month contract. The Full Build is a one-time $997 — a new site, 30 days of getting you found on Google and in AI answers, and your Google Business Profile dialed in.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;"><strong>And it's guaranteed:</strong> we pick 5 money keywords together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.</p>
-<p style="margin:0 0 22px;">{_btn(CALL_URL, "Book a free 15-min call →")}</p>""",
+            "The 90-Day Promise",
+            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Most agencies want $2,000–$5,000/mo and a 6-month contract. Mine is {PLAN_PRICE} — and your website design is included free. No setup fee, no build charge. Cancel anytime after the first 3 months.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;"><strong>And it's guaranteed:</strong> we pick your 5 money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">One more thing worth knowing: I take one client per trade, per city. I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
+<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")}</p>""",
         )
         text = (
-            "The $997 Full Build: new site + 30 days getting you found on Google and AI, "
-            "backed by the Half-Back Guarantee (5 money keywords in week 1; if we don't rank "
-            f"at least 1 in 30 days, half back). Book: {CALL_URL}"
+            f"{PLAN_PRICE} — website design included free, no setup fee, cancel anytime after 3 "
+            "months. Backed by the 90-Day Promise: we pick your 5 money keywords in week 1, and "
+            "if I don't get you ranking on page one or in the map pack within 90 days, your next "
+            f"2 months are free. Start: {CHECKOUT_URL}"
         )
         sms = (
-            f"{name}, the $997 Full Build is backed by our Half-Back Guarantee — we rank 1 of "
-            f"your 5 money keywords in 30 days or half back. Grab a free call: {CALL_URL}"
+            f"{name}, it's {PLAN_PRICE} and your site build is included free — backed by my "
+            f"90-Day Promise: ranking in 90 days or your next 2 months are free. {CHECKOUT_URL}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
-    # step 3 — final, EMAIL ONLY (introduces the $297/mo option)
+    # step 3 — final, EMAIL ONLY
     subject = "Last note from Lola 🐾"
     html = _email_wrap(
         "One last thing",
         f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I won't keep bugging you, {name} — but you ran your Growth Score for a reason, and every week you're not found is jobs going to the competitor above you.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Two ways to fix it: the <strong>$197 DIY kit</strong> — your remaining three fixes written for your business — or the <strong>$997 Full Build</strong> (done-for-you, Half-Back Guarantee). And if you want us to keep working your visibility every month after the build, there's an optional <strong>{MANAGED_MONTHLY}</strong> to keep you climbing and keep the reviews and rankings coming.</p>
-<p style="margin:0 0 22px;">{_btn(CALL_URL, "Let's talk — free call →")} &nbsp; <a href="{PUBLIC_APP_URL}/pricing" style="color:#B8860B;font-weight:700;">or see pricing</a></p>""",
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">One plan, one price: <strong>{PLAN_PRICE}</strong>. Your website designed and built — included free — then your Google Business Profile managed and ongoing work to get you named when someone asks Google or ChatGPT for a company like yours. Backed by the 90-Day Promise.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I take one client per trade, per city. If someone in your trade and town starts before you, that's the seat.</p>
+<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")} &nbsp; <a href="{pricing}" style="color:#B8860B;font-weight:700;">or see what's included</a></p>""",
     )
     text = (
-        f"Last note, {name}. Fix your visibility: the $197 DIY kit (your three remaining "
-        f"fixes, written for you) or the $997 Full Build "
-        f"(Half-Back Guarantee). Optional {MANAGED_MONTHLY} after the build keeps you climbing. "
-        f"Book: {CALL_URL} · Pricing: {PUBLIC_APP_URL}/pricing"
+        f"Last note, {name}. One plan: {PLAN_PRICE}, website design included free, no setup fee, "
+        "cancel anytime after 3 months. Backed by the 90-Day Promise. One client per trade, per "
+        f"city. Start: {CHECKOUT_URL} · What's included: {pricing}"
     )
     return {"subject": subject, "html": html, "text": text, "sms": None}
 
 
 def _build_content(step: int, row: dict) -> dict:
-    """Post-build continuity toward $297/mo 'Lola Managed'. Steps 1..3."""
+    """Post-purchase onboarding. Steps 1..3 — chase the intake, never upsell.
+
+    These rows are paying subscribers. The only thing missing is the 2-minute
+    intake at /apply: without it Ty has a card on file and no idea what the
+    business does, where it works, or which keywords to pick in week 1.
+    """
     name = _name(row)
-    keep = MANAGED_URL  # Stripe subscription link when set, else the booking link
 
     if step == 1:
-        subject = "Your 30 days are almost up 🐾"
+        subject = "Two minutes and I can start 🐾"
         html = _email_wrap(
-            "Want us to keep you climbing?",
-            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Hey {name}, we're near the end of your Full Build's 30-day window — your site's live and we've been getting you found on Google and in AI answers.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Here's the thing: rankings and reviews aren't "set it and forget it." The businesses that stay on top keep showing up every week. <strong>Lola Managed ({MANAGED_MONTHLY})</strong> keeps the engine running — rankings + AI answers monitored, fresh Google Business posts, review requests going out, and new leads followed up automatically.</p>
-<p style="margin:0 0 22px;">{_btn(keep, "Keep me climbing →")}</p>""",
+            "You're in — one small thing left",
+            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Welcome aboard, {name}. Your payment's in and your seat is held — one client per trade, per city, and that's yours now.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I need about two minutes from you before I can start: your trade, the towns you actually drive to, and your current site if you have one. That's what I use to pick your 5 money keywords in week 1 — the ones the 90-Day Promise is measured against.</p>
+<p style="margin:0 0 22px;">{_btn(INTAKE_URL, "Fill in my 2-minute intake →")}</p>""",
         )
         text = (
-            f"Hey {name}, your Full Build's 30-day window is almost up. Lola Managed "
-            f"({MANAGED_MONTHLY}) keeps you ranked + in AI answers, keeps reviews and GBP "
-            f"posts flowing, and follows up your leads. Keep it going: {keep}"
+            f"Welcome aboard, {name}. Your payment's in. I need ~2 minutes from you before I can "
+            f"start — trade, towns you serve, current site: {INTAKE_URL}"
         )
         sms = (
-            f"Hey {name}, it's Lola 🐾 Your 30-day build window's almost up. Want us to keep you "
-            f"climbing every month? Lola Managed = {MANAGED_MONTHLY}. Keep it going: {keep}"
+            f"Hey {name}, it's Lola 🐾 You're in. Ty needs 2 min from you before he can start — "
+            f"trade, towns, current site: {INTAKE_URL}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
     if step == 2:
-        subject = "Don't let the momentum stall"
+        subject = "Still need your details to start"
         html = _email_wrap(
-            "What stops if we stop",
-            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">{name} — the hardest part is done. But the moment the work stops, competitors keep posting, keep gathering reviews, and slowly climb back over you. Momentum is the whole game in local + AI search.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">For <strong>{MANAGED_MONTHLY}</strong>, Lola Managed keeps you in front: monthly Google Business posts, review requests to your happy customers, rankings + AI-answer monitoring, and automatic follow-up on every new lead — so the phone keeps ringing.</p>
-<p style="margin:0 0 22px;">{_btn(keep, "Keep the momentum →")}</p>""",
+            "I don't want to burn your week 1",
+            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">{name} — you're paid up and I still can't start. I've got a card and no business: I don't know your trade, your service area, or what your customers actually type into Google.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">The 90-day clock is real, and week 1 is when we pick the keywords it's measured against. Two minutes fixes it.</p>
+<p style="margin:0 0 22px;">{_btn(INTAKE_URL, "Send Ty my details →")}</p>""",
         )
         text = (
-            f"{name}, the hard part's done — don't let it stall. Lola Managed ({MANAGED_MONTHLY}) "
-            f"keeps your rankings, reviews, GBP posts and lead follow-up going every month: {keep}"
+            f"{name} — you're paid up and I still can't start. Two minutes: trade, service area, "
+            f"current site. {INTAKE_URL}"
         )
         sms = (
-            f"{name}, don't let your momentum stall — competitors keep climbing. Lola Managed "
-            f"({MANAGED_MONTHLY}) keeps you in front every month: {keep}"
+            f"{name}, Ty still can't start — he needs your trade + service area. 2 min: {INTAKE_URL}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
     # step 3 — final, email only
-    subject = "Keeping your spot 🐾"
+    subject = "Want me to just call you? 🐾"
     html = _email_wrap(
-        "One last note",
-        f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I won't keep nudging, {name}. You've got a great site and a real head start. If you want us to keep it working — rankings, AI answers, reviews, and lead follow-up handled every month — Lola Managed is {MANAGED_MONTHLY}, cancel anytime.</p>
-<p style="margin:0 0 22px;">{_btn(keep, "Keep me on top →")} &nbsp; <a href="{CALL_URL}" style="color:#B8860B;font-weight:700;">or grab a quick call</a></p>""",
+        "Last nudge, then I'll come to you",
+        f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Last one, {name}. You're paying and not being worked on, and that sits wrong with me.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Either fill in the intake — two minutes, link below — or just hit reply to this email with your trade and the towns you serve, and I'll set the rest up myself. Whichever is easier for you.</p>
+<p style="margin:0 0 22px;">{_btn(INTAKE_URL, "Fill in my intake →")}</p>""",
     )
     text = (
-        f"Last note, {name}. Keep it working every month with Lola Managed ({MANAGED_MONTHLY}), "
-        f"cancel anytime: {keep} — or book a call: {CALL_URL}"
+        f"Last one, {name}. You're paying and not being worked on. Fill in the intake "
+        f"({INTAKE_URL}) or just reply to this email with your trade and the towns you serve, "
+        "and I'll set it up myself."
     )
     return {"subject": subject, "html": html, "text": text, "sms": None}
 

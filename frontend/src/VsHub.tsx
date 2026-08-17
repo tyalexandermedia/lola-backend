@@ -16,10 +16,8 @@
 import { useEffect } from 'react';
 import { track } from './analytics';
 import { getCompetitorSlugs } from './VsPage';
-
-const CALENDAR_URL =
-  (import.meta.env.VITE_CALENDAR_URL as string | undefined) ||
-  'https://calendar.app.google/J7idjUDitd2Hziuc7';
+import { startHref } from './lib/checkout';
+import { PLAN } from './lib/pricing';
 
 // Light-weight per-card data (shape mirrors the hero cards on competitor
 // pages but doesn't pull the entire VsPage config — we just need the
@@ -193,7 +191,7 @@ export default function VsHub() {
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
           See exactly where you stand on Google, ChatGPT, Perplexity, and Gemini —
-          then book a 15-minute call to pick the right next move.
+          then fix it. No call, no pitch deck, no quote request.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
@@ -203,12 +201,10 @@ export default function VsHub() {
             Run the free Grader →
           </a>
           <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noreferrer"
+            href={startHref()}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
           >
-            Book a strategy call
+            {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
         </div>
       </section>

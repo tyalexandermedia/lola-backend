@@ -84,6 +84,14 @@ The live Payment Link now ships in `frontend/src/lib/checkout.ts`. A Payment
 Link is a public URL, not a secret, so it belongs in the code; the real Stripe
 secrets stay in Railway.
 
+It is now the destination of **every** call-to-action on the site. As of
+2026-08-17 the Google Calendar booking link is gone from the product — the
+report page, `/work`, `/vs`, `/grader`, `/growth-score`, all 48 `/lp` pages and
+the follow-up emails used to point at it, which meant the hottest moment in the
+funnel handed people a booking form instead of a way to buy. Nothing reads
+`VITE_CALENDAR_URL` or `FOLLOWUP_CALL_URL` any more; delete both from Vercel and
+Railway so a future CTA can't quietly reach for a calendar again.
+
 Verify by hand in Stripe — the build environment can't reach it:
 
 - **Recurring** $397/month, not one-time. Stripe prices are immutable, so a

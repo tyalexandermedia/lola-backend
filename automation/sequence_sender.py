@@ -1,9 +1,23 @@
 """
 LOLA SEO — Nurture Email Sequence Sender
 Sends 3 emails at D+0 (2hr), D+2, D+5 after audit delivery.
-Triggered from background task in main.py.
 Uses Resend API + asyncio.sleep for delays (Railway keeps process alive).
 All placeholder variables are replaced with real audit data.
+
+⚠️  DORMANT, AND THE TEMPLATES ARE OUT OF DATE. Read before wiring this up.
+
+The docstring used to say "Triggered from background task in main.py" — nothing
+imports run_nurture_sequence, so no email in this module has been sent since the
+offer changed. That is the only reason it isn't a live problem.
+
+All three templates in ./emails still sell the RETIRED model: a $197 DIY plan, a
+$997 Full Build, and the Half-Back Guarantee, with CTAs pointing at
+tyalexandermedia.com/contact. The live offer is one plan at $397/month backed by
+the 90-Day Promise (source of truth: docs/PRICING.md).
+
+Rewrite email1_day0.html / email2_day2.html / email3_day5.html onto the live
+offer BEFORE calling run_nurture_sequence from anywhere. As written, connecting
+it would email prospects three products they cannot buy.
 """
 import asyncio, httpx, logging, os
 from pathlib import Path

@@ -42,7 +42,7 @@ SYSTEM_PROMPT = """You write cold outreach emails for Lola SEO, a Florida servic
 
 Offer facts (use only if a variant names the paid offer):
 - The free lead magnet is always the "Growth Score" — never an "audit".
-- Paid: a one-time $997 Full Build (a new site built and ranked everywhere people search now), backed by the Half-Back Guarantee — pick 5 money keywords in week 1, and if we don't rank at least 1 on page 1 or the map pack in 30 days, you get half back. Never mention a monthly retainer or old tier names.
+- Paid: ONE plan, $397/month — your website designed and built (included free, no setup fee), then your Google Business Profile managed and ongoing work to get you found on Google and in AI answers. Cancel anytime after the first 3 months. Backed by the 90-Day Promise: we pick your 5 money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. Never quote $197, $997, $297, a one-time price, a "Full Build", a "DIY guide", the Half-Back Guarantee, or a call/calendar link — all retired.
 
 Hard rules per variant:
 - Subject ≤50 characters, no spam triggers (no "free", "guaranteed", "act now", no all-caps words, no exclamation in subject)

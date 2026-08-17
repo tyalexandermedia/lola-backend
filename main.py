@@ -1637,10 +1637,12 @@ async def pricing():
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        # Two-tier offer (source of truth: docs/PRICING.md).
+        # One offer (source of truth: docs/PRICING.md). This used to publish
+        # {"diy": 197, "build": 997} — a public endpoint serving two prices that
+        # no longer exist. Nothing in the frontend reads it today, which is
+        # exactly why it went stale unnoticed.
         "tiers": {
-            "diy": {"one_time": 197},
-            "build": {"one_time": 997},
+            "monthly": {"recurring_monthly": 397},
         },
     }
 
@@ -1664,17 +1666,23 @@ REVENUE_LABELS = {
     "100k_plus": "$100K+",
 }
 
+# These strings go out in the confirmation email the applicant receives, so a
+# stale key here quotes a retired product back to a live lead. Every retired
+# key now resolves to the one plan rather than to "$997 one-time · Half-Back
+# Guarantee" — the apply form posts "monthly", which wasn't even in this map, so
+# it silently fell through to the bare string.
+_MONTHLY_LABEL = "The monthly — $397/month, website design included free"
 TIER_LABELS = {
-    # Current two-tier offer (what the apply form posts).
-    "diy": "DIY — Growth Score + 5-step fix-it checklist ($197 one-time)",
-    "build": "Full Build ($997 one-time · Half-Back Guarantee)",
+    "monthly": _MONTHLY_LABEL,
     "both": "Tell me which fits better",
-    # Back-compat for older/retired inbound payloads.
-    "foundation": "DIY — Growth Score + 5-step fix-it checklist ($197 one-time)",
-    "growth": "Full Build ($997 one-time · Half-Back Guarantee)",
-    "scale": "Full Build ($997 one-time · Half-Back Guarantee)",
-    "retainer": "Full Build ($997 one-time · Half-Back Guarantee)",
-    "pro": "Full Build ($997 one-time · Half-Back Guarantee)",
+    # Back-compat for older/retired inbound payloads (stale cached bundles).
+    "diy": _MONTHLY_LABEL,
+    "build": _MONTHLY_LABEL,
+    "foundation": _MONTHLY_LABEL,
+    "growth": _MONTHLY_LABEL,
+    "scale": _MONTHLY_LABEL,
+    "retainer": _MONTHLY_LABEL,
+    "pro": _MONTHLY_LABEL,
 }
 
 
@@ -2649,7 +2657,8 @@ def draft_outreach_email(
         f"{fix_line}\n\n"
         f"I do this done-for-you for one {niche_label} per city (so I'd never take your "
         f"competitor here). Want me to send your full scorecard + the 3 fixes worth the most? "
-        f"Or grab 15 min: https://calendar.app.google/J7idjUDitd2Hziuc7\n\n"
+        f"Just reply. Or start today — $397/month, website design included free, backed by my "
+        f"90-Day Promise: {STRIPE_MONTHLY_URL}\n\n"
         f"— Coach Ty\nLola — AI Leads Expert · Ty Alexander Media"
     )
     return subject, body

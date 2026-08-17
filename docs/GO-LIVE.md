@@ -151,7 +151,8 @@ curl -H "X-Admin-Key: $KEY" $API/mctb/stats/<client-slug>
 ```
 # Vercel
 VITE_API_URL      = https://<backend>
-VITE_CALENDAR_URL = https://calendar.app.google/J7idjUDitd2Hziuc7
+# VITE_CALENDAR_URL is retired — nothing reads it. Every CTA goes to the Stripe
+# Payment Link now, with a text-to-Ty link as the fallback. Delete it in Vercel.
 
 # Railway
 LOLA_SECRET_ADMIN_KEY = <random string; gates all admin endpoints>

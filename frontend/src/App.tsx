@@ -14,7 +14,6 @@ const AdminCalls = lazy(() => import('./AdminCalls'));
 const AdminRevenue = lazy(() => import('./AdminRevenue'));
 const OwnerDashboard = lazy(() => import('./OwnerDashboard'));
 const PricingPage = lazy(() => import('./PricingPage'));
-const RetainerPage = lazy(() => import('./RetainerPage'));
 const ApplyPage = lazy(() => import('./ApplyPage'));
 const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
@@ -33,9 +32,7 @@ const SHOW_SANDBAR_CASE_STUDY =
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
-const BuildOnboarding = lazy(() => import('./BuildOnboarding'));
 const WorkPage = lazy(() => import('./WorkPage'));
-const ManagedPage = lazy(() => import('./ManagedPage'));
 
 type Route =
   | { name: 'home' }
@@ -50,11 +47,8 @@ type Route =
   | { name: 'vs-hub' }
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
-  | { name: 'retainer' }
   | { name: 'work' }
-  | { name: 'managed' }
   | { name: 'diy' }
-  | { name: 'build-onboarding' }
   | { name: 'apply' }
   | { name: 'lead-gen' }
   | { name: 'swarm' }
@@ -82,18 +76,23 @@ function parseRoute(pathname: string): Route {
   // already published in vercel.json — production redirects before the SPA ever
   // loads, so these arms only fire on client-side navigation and local dev.
   //
-  // They deliberately do NOT render RetainerPage / ManagedPage. Both are
-  // survivors of the retired model: RetainerPage still sells "The Full Build"
-  // behind calendar CTAs, and ManagedPage publishes a $297/mo price that no
-  // longer exists anywhere in docs/PRICING.md. Rendering either would contradict
-  // the live offer. (The pricing sweep also mangled this test into
-  // `pathname === '/pricing' || pathname === '/retainer/'`, so bare '/retainer'
-  // matched nothing and fell through to the 404.)
+  // RetainerPage.tsx and ManagedPage.tsx are no longer imported at all. Both
+  // were survivors of the retired model — RetainerPage sold "The Full Build"
+  // behind calendar CTAs, ManagedPage published a $297/mo price that exists
+  // nowhere in docs/PRICING.md — and while their route arms were already
+  // unreachable, Vite kept emitting their chunks, so retired pricing shipped to
+  // the CDN as fetchable JS. The files stay in the repo for reference.
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'pricing' };
   if (pathname === '/managed' || pathname === '/managed/') return { name: 'pricing' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
-  if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'build-onboarding' };
+  // /build was the old post-purchase page, and it is now a third onboarding
+  // story competing with /start (the Stripe success URL) and /apply (intake).
+  // Its step 01 is "Book your kickoff call" — the call path Ty removed — so a
+  // buyer who lands here is told to schedule something that isn't offered.
+  // Both paths resolve to /start, which branches on session_id, so an old
+  // /build/start?session_id=… bookmark still shows the right screen.
+  if (pathname === '/build' || pathname === '/build/' || pathname === '/build/start' || pathname === '/build/start/') return { name: 'start' };
   if (pathname === '/apply' || pathname === '/apply/') return { name: 'apply' };
   if (pathname === '/lead-gen' || pathname === '/lead-gen/') return { name: 'lead-gen' };
   if (pathname === '/swarm' || pathname === '/swarm/') return { name: 'swarm' };
@@ -121,11 +120,8 @@ function canonicalPathForRoute(route: Route): string | null {
   switch (route.name) {
     case 'home': return '/';
     case 'pricing': return '/pricing';
-    case 'retainer': return '/pricing';
     case 'work': return '/work';
-    case 'managed': return '/managed';
     case 'diy': return '/diy';
-    case 'build-onboarding': return '/build/start';
     case 'apply': return '/apply';
     case 'grader': return '/grader';
     case 'growth-score': return '/growth-score';
@@ -183,7 +179,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
   const containerCls =
     route.name === 'report' || route.name === 'admin' || route.name === 'admin-hq' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
-      : route.name === 'home' || route.name === 'pricing' || route.name === 'retainer' || route.name === 'work' || route.name === 'managed'
+      : route.name === 'home' || route.name === 'pricing' || route.name === 'work'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'audit'
       ? 'max-w-[640px] pt-3 sm:pt-6'
@@ -199,7 +195,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'vs' || route.name === 'vs-hub'
       ? 'max-w-[960px] pt-6 sm:pt-10'
-      : route.name === 'diy' || route.name === 'build-onboarding'
+      : route.name === 'diy'
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'apply'
       ? 'max-w-[720px] pt-8 sm:pt-12'
@@ -217,7 +213,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
        `hidden`) prevents a scroll container so the sticky header keeps
        working. Invisible on desktop — nothing overflows there. */
     <div className="min-h-screen scroll-smooth overflow-x-clip bg-[#0A0A0B] text-white">
-      <Header />
+      <Header bare={route.name === 'start'} />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
           {route.name === 'home' && <Homepage />}
@@ -233,11 +229,8 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
           {route.name === 'vs' && <VsPage slug={route.slug} />}
           {route.name === 'vs-hub' && <VsHub />}
           {route.name === 'pricing' && <PricingPage />}
-          {route.name === 'retainer' && <RetainerPage />}
           {route.name === 'work' && <WorkPage />}
-          {route.name === 'managed' && <ManagedPage />}
           {route.name === 'diy' && <DiyAccess />}
-          {route.name === 'build-onboarding' && <BuildOnboarding />}
           {route.name === 'apply' && <ApplyPage />}
           {route.name === 'lead-gen' && <LeadGenGenerator />}
           {route.name === 'swarm' && <SwarmWorkflow />}
@@ -413,7 +406,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
  * vs a single hero-only CTA. Pattern from Podium / Birdeye marketing sites.
  */
 function MobileStickyCTA({ route }: { route: Route }) {
-  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index', 'retainer']);
+  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   // Self-serve, not scheduled. The gold button used to open a calendar — the
@@ -446,7 +439,16 @@ function MobileStickyCTA({ route }: { route: Route }) {
   );
 }
 
-function Header() {
+/**
+ * `bare` drops the nav links on one-decision pages — /start, which is the
+ * destination for a video CTA or a texted link. Every nav link there is an
+ * escape route off a page whose entire job is a single yes.
+ *
+ * The wordmark stays and stays clickable: on a page reached from an IG bio it
+ * is the only thing telling a stranger whose site they are on, and removing it
+ * costs more trust than the link leaks.
+ */
+function Header({ bare = false }: { bare?: boolean } = {}) {
   return (
     <header className="no-print sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
@@ -466,6 +468,7 @@ function Header() {
         </a>
 
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
+        {bare ? null : (
         <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
           {/* Work — desktop only, so the mobile header stays uncluttered
               (mobile reaches /work via the footer + homepage section). */}
@@ -488,6 +491,7 @@ function Header() {
             Pricing
           </a>
         </nav>
+        )}
       </div>
     </header>
   );

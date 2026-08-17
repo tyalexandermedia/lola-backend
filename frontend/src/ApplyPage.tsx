@@ -14,6 +14,9 @@ import { useState } from 'react';
 import { useReveal } from './lib/useReveal';
 import { API_URL } from './api';
 import { track } from './analytics';
+import { startHref } from './lib/checkout';
+import { PLAN } from './lib/pricing';
+import { FOUNDER } from './lib/lola';
 import { useSeo } from './lib/seo';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
@@ -36,8 +39,10 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
   { value: '100k_plus', label: '$100K+' },
 ];
 
-// Two-tier offer (DIY / Full Build) from docs/PRICING.md; the applicant picks
-// which they want and Coach Ty confirms the fit on the call.
+// One plan (source of truth: docs/PRICING.md). The radio group is a single
+// option on purpose — it confirms what they're starting rather than asking them
+// to choose, and the value posted here becomes the tier label in the
+// confirmation email the backend sends (main.py::TIER_LABELS).
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
   { value: 'monthly', label: 'The monthly — $397/month' },
 ];
@@ -57,6 +62,14 @@ export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  // A session_id means they arrived from checkout — they have already paid, so
+  // "I review every application and will reach out" is the wrong thing to say
+  // to them. Read once, guarded for the prerender pass.
+  const [paid] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      Boolean(new URLSearchParams(window.location.search).get('session_id')),
+  );
 
   useSeo({
     title: 'Apply to Work With Lola | Local AI Visibility for Service Businesses',
@@ -124,19 +137,39 @@ export default function ApplyPage() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-24 text-center">
         <div className="text-[44px]">🐾</div>
-        <h1 className="mt-6 text-[28px] font-bold text-white sm:text-[34px]">
-          Got it. Coach Ty's on it.
+        <h1 className="mt-6 text-[28px] font-bold text-[#ECECEF] sm:text-[34px]">
+          {paid ? "That's everything I need." : "Got it. Coach Ty's on it."}
         </h1>
         <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
-          Your application's in. I review every single one personally and will reach out within
-          24 hours via email (or text, if you've replied to Lola before).
+          {paid
+            ? "I start on your build today. You'll get your dashboard link as soon as the first work lands — no call needed, and you can text me any time."
+            : "I read every one of these myself and will reply within 24 hours. If you'd rather not wait, you can start right now — same thing, minus the waiting."}
         </p>
-        <a
-          href="/"
-          className="mt-8 inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-6 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] hover:bg-[#D4AF37]/[0.12]"
-        >
-          Back to home →
-        </a>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          {paid ? (
+            <a
+              href={`sms:${FOUNDER.phone}`}
+              className="inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-6 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] hover:bg-[#D4AF37]/[0.12]"
+            >
+              Text Ty — {FOUNDER.phoneDisplay}
+            </a>
+          ) : (
+            <>
+              {/* This used to be "Back to home →" — a dead end for someone who
+                  had just handed over their details. They are the warmest lead
+                  on the site at this exact moment; send them somewhere. */}
+              <a
+                href={startHref(true)}
+                className="inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)]"
+              >
+                Start now — {PLAN.price}{PLAN.period} →
+              </a>
+              <a href="/" className="text-[13px] text-[#8A8F98] underline-offset-4 hover:text-[#D4AF37] hover:underline">
+                Or keep looking around
+              </a>
+            </>
+          )}
+        </div>
       </main>
     );
   }

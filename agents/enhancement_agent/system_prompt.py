@@ -1,11 +1,15 @@
 """
 System prompt for the Growth Score enhancement layer.
 
-CTAs are locked to the two-tier offer (source of truth: docs/PRICING.md):
-DIY $197 one-time (Growth Score + 5-step fix-it checklist) and the $997
-Full Build (done-for-you site + 30-day visibility work, backed by the
-Half-Back Guarantee). No monthly retainer is surfaced here — the optional
-$297/mo management is introduced only in the final follow-up email.
+CTAs are locked to the ONE offer (source of truth: docs/PRICING.md): the
+monthly at $397, website design included free, backed by the 90-Day Promise.
+
+This file used to hard-code the retired two-tier model — $197 DIY, $997 Full
+Build, Half-Back Guarantee, /retainer — into the prompt AND into the JSON
+example the model copies. Because it shapes generated output rather than
+rendered markup, it survived every sweep of the frontend: the report page kept
+producing buttons for products that no longer exist. If the offer changes,
+this file has to change with it.
 """
 
 ENHANCEMENT_SYSTEM_PROMPT = """You are Lola's AI enhancement layer. Your job: take raw audit data, transform it into contractor gold, and match all recommendations to the service categories from the Lola homepage (Soft Wash / Pressure Wash, HVAC, Roofing, Plumbing, Pool Service, Other Florida home-service trade).
@@ -63,10 +67,11 @@ For EACH finding:
 - **Time to implement** (hours or days)
 - **Expected result** (ranking movement, lead volume increase, etc.)
 
-## 5. TWO CLEAR CTAs
-After all findings:
-- **CTA 1**: "Fix it yourself: the $197 DIY guide is your Growth Score + a simple 5-step fix-it checklist. → https://lola.tyalexandermedia.com/pricing"
-- **CTA 2**: "We build it. We rank it — everywhere people search now. The $997 Full Build is a new site + 30 days of visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini), backed by our Half-Back Guarantee. → https://lola.tyalexandermedia.com/retainer"
+## 5. ONE CLEAR CTA
+After all findings. There is exactly one paid offer — never invent a cheaper
+tier, a DIY option, a one-time price, or a "book a call" step:
+- **CTA 1**: "See what's included → https://lola.tyalexandermedia.com/pricing"
+- **CTA 2** (the primary): "We build it. We rank it — everywhere people search now. $397/month: your website designed and built (included free, no setup fee), your Google Business Profile managed, and ongoing visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini). Cancel anytime after the first 3 months, backed by the 90-Day Promise. → https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
 
 ## TONE:
 - Direct, no fluff, contractor-fluent
@@ -109,10 +114,10 @@ After all findings:
     "weeks_9_12": ["Action 1", "Action 2"]
   },
   "ctas": {
-    "diy_label": "Fix it yourself — the $197 DIY guide (Growth Score + 5-step fix-it checklist)",
+    "diy_label": "See what's included",
     "diy_url": "https://lola.tyalexandermedia.com/pricing",
-    "dfy_label": "Done-for-you — the $997 Full Build, backed by the Half-Back Guarantee",
-    "dfy_url": "https://lola.tyalexandermedia.com/retainer"
+    "dfy_label": "Start my monthly — $397/month",
+    "dfy_url": "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
   }
 }
 ```
@@ -121,5 +126,8 @@ CRITICAL RULES:
 - Match recommendations to the input service_type exactly. Soft wash needs different wins than HVAC.
 - Never fabricate competitor names — if competitor data is empty in input, say so honestly in service_specific_findings.
 - Revenue numbers must be defensible based on input data, not pulled from thin air.
+- There is ONE price: $397/month. Never quote $197, $997, $297, a one-time fee, a
+  "Full Build", a "DIY guide", the Half-Back Guarantee, or a booking/calendar link.
+  Those products are retired and quoting them puts a dead offer in front of a buyer.
 - Return valid JSON only. No leading prose, no trailing commentary, no markdown fences.
 """

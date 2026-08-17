@@ -1,14 +1,15 @@
 /// <reference types="vite/client" />
 /**
- * /diy — the $397/month plan deliverable: the 5-step fix-it checklist.
+ * /diy — access page for the RETIRED self-serve fix kit.
  *
- * Pay-now → instant access. The DIY Stripe Payment Link redirects here with
- * ?session_id=... after payment, which unlocks the checklist. Without that
- * param the page shows a locked "unlock for $397/month" state with the buy button.
+ * The kit is no longer sold. This route survives only so anyone who already
+ * paid keeps their access: their Stripe success link carries ?session_id=...,
+ * the backend confirms it was paid, and the checklist unlocks. Deleting or
+ * redirecting the route would strand a paying customer.
  *
- * MVP gating is the redirect param (the customer only gets it post-payment).
- * Hardening step (later): verify the session server-side via Stripe before
- * unlocking, and the webhook emails/texts a copy so access survives a refresh.
+ * Without that param the page shows a locked state that says so plainly and
+ * points at the one plan that exists. It is noindexed and out of the sitemap so
+ * it never ranks against /pricing.
  */
 
 import { useEffect, useState } from 'react';
@@ -23,8 +24,8 @@ import {
 } from './AuditFlow';
 import type { AuditResult } from './types';
 import { useSeo } from './lib/seo';
-import { checkoutUrl } from './lib/checkout';
-import { DIY, BUILD } from './lib/pricing';
+import { startHref } from './lib/checkout';
+import { GUARANTEE, PLAN } from './lib/pricing';
 
 const STEPS: ReadonlyArray<{ n: string; title: string; do_: string; win: string }> = [
   {
@@ -74,41 +75,11 @@ export default function DiyAccess() {
   useReveal();
   const [gate, setGate] = useState<Gate>('checking');
 
-  useSeo({
-    title: 'Your DIY Fix-It Guide | Lola',
-    description:
-      'The $397/month kit: all four fixes written for your business — title tag, Google Business Profile description, first GBP post, and LocalBusiness schema — plus the checklist and the order to ship them in.',
-  });
-
-  // Product + $397/month Offer JSON-LD → eligible for a rich pricing result.
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const amount = DIY.price.replace(/[^0-9]/g, '');
-    const block = {
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: 'Lola DIY Fix-It Guide',
-      description:
-        'All four fixes written for your business, plus the checklist and the order to ship them in — self-service.',
-      brand: { '@type': 'Brand', name: 'Lola' },
-      offers: {
-        '@type': 'Offer',
-        price: amount,
-        priceCurrency: 'USD',
-        category: 'OneTimePayment',
-        url: 'https://lola.tyalexandermedia.com/diy',
-        availability: 'https://schema.org/InStock',
-      },
-    };
-    const t = document.createElement('script');
-    t.type = 'application/ld+json';
-    t.dataset.lola = 'diy-schema';
-    t.textContent = JSON.stringify(block);
-    document.head.appendChild(t);
-    return () => {
-      t.parentNode?.removeChild(t);
-    };
-  }, []);
+  // A second useSeo() used to sit here selling "the $397/month kit", which ran
+  // after the noindex call above and silently overwrote it — so the page meant
+  // to be hidden was indexable and advertising a retired product. Its companion
+  // Product/Offer JSON-LD published a rich-result price for that same retired
+  // product. Both are gone; the noindex above is now the only SEO call.
 
   // Unlock ONLY when the backend confirms the Stripe Checkout Session was paid —
   // never trust a bare URL param (a guessed ?session_id must not reveal the guide).
@@ -173,7 +144,6 @@ export default function DiyAccess() {
     })();
     return () => { cancelled = true; };
   }, [unlocked]);
-  const buyHref = checkoutUrl() || '/pricing';
 
   if (gate === 'checking') {
     return (
@@ -204,7 +174,7 @@ export default function DiyAccess() {
           }}
         />
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
-          {unlocked ? '✓ Payment confirmed' : 'The DIY Guide · $397/month'}
+          {unlocked ? '✓ Payment confirmed' : 'Retired · access page'}
         </p>
         <h1
           className="mx-auto mt-4 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
@@ -213,13 +183,13 @@ export default function DiyAccess() {
           {unlocked ? (
             <>Your fix kit is ready.</>
           ) : (
-            <>See your score. Fix it yourself.</>
+            <>This kit is retired.</>
           )}
         </h1>
         <p className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           {unlocked
             ? "Do these five in order. Each one is a move you can make this week — no agency, no jargon. We also texted and emailed you a copy so you have it on the truck."
-            : "Your Growth Score shows where you stand. This guide is the exact 5 steps to lift it — the same moves we run for paying clients, written so you can do them yourself."}
+            : "If you bought the fix kit, open the access link we texted and emailed you and it unlocks here. Otherwise there's one plan now, and I run all five of these steps for you."}
         </p>
       </section>
 
@@ -278,40 +248,48 @@ export default function DiyAccess() {
               Rather we just handle it?
             </h2>
             <p className="mx-auto mt-3 max-w-[520px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
-              The {BUILD.price} Full Build is done-for-you — new site, 30 days of visibility work
-              across Google and the AI tools, and your keywords picked with Ty in week 1. Backed by
-              the 90-Day Promise.
+              {PLAN.price}{PLAN.period}, done for you — your website designed and built (included
+              free), your Google Business Profile managed, and your keywords picked with Ty in
+              week 1. Backed by {GUARANTEE.title}.
             </p>
             <a
-              href={checkoutUrl() || '/pricing'}
-              onClick={() => track('diy_to_build_cta')}
+              href={startHref()}
+              onClick={() => track('diy_to_plan_cta')}
               className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
             >
-              See the Full Build →
+              {PLAN.cta} — {PLAN.price}{PLAN.period} →
             </a>
           </section>
         </>
       ) : (
+        /* Locked. This used to sell "Unlock the guide — $397/month →" under the
+           label "One-time" — the retired DIY kit, repriced by the pricing sweep
+           into a self-contradicting button. Nobody can buy this product, so the
+           locked state stops selling it and points at the plan that exists. */
         <section className="mx-auto mt-12 w-full max-w-[560px] rounded-2xl border border-[#D4AF37]/30 bg-white/[0.02] p-7 text-center sm:mt-16 sm:p-9">
-          <ul className="flex flex-col gap-3 text-left">
-            {DIY.includes.map(
-              (b) => (
-                <li key={b} className="flex items-start gap-3 text-[15px] text-white">
-                  <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
-                  {b}
-                </li>
-              ),
-            )}
-          </ul>
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+            Nothing to unlock here
+          </p>
+          <h2 className="mt-4 text-[20px] font-bold leading-[1.2] text-white sm:text-[24px]">
+            The self-serve kit isn&apos;t sold anymore.
+          </h2>
+          <p className="mx-auto mt-4 max-w-[440px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+            If you bought it, your access link came by text and email — open that link and this
+            page unlocks. If you&apos;re here looking for help, there&apos;s one plan now:{' '}
+            {PLAN.price}{PLAN.period}, and I do all of it for you.
+          </p>
           <a
-            href={buyHref}
-            onClick={() => track('diy_unlock_cta')}
+            href={startHref()}
+            onClick={() => track('diy_locked_to_plan_cta')}
             className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02]"
           >
-            Unlock the guide — {DIY.price} →
+            {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <p className="mt-4 text-[12px] text-[#7A7F8A]">
-            One-time. Instant access. Already paid? Check your text or email for the link.
+            Website design included free ·{' '}
+            <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">
+              see what&apos;s included
+            </a>
           </p>
         </section>
       )}

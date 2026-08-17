@@ -154,6 +154,16 @@
       "source": "/managed",
       "destination": "/pricing",
       "permanent": true
+    },
+    {
+      "source": "/build",
+      "destination": "/start",
+      "permanent": true
+    },
+    {
+      "source": "/build/start",
+      "destination": "/start",
+      "permanent": true
     }
   ],
   "rewrites": [
