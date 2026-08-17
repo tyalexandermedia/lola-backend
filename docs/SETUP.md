@@ -171,11 +171,22 @@ expensive place on the site to lose someone.
 
 ## Order I'd do it in
 
-1. **Twilio** → review engine on → point it at Sandbar's past customers
-2. **Stripe link** (~20 min) while the reviews come in
-3. **Resend** → follow-up wakes up, email review requests become an option
-4. Two weeks later: reviews landed, Sandbar climbing, a testimonial worth
-   filming, and a site that can take money
-5. Then the before/after images, the VSL, and the case-study flag
+1. **Build the segment** — run `build_review_segment.py` dry, check the CSV,
+   re-run with `--apply`. Nothing sends.
+2. **Build the review campaign in GHL** against `review-send-eligible`, sending
+   from Sandbar's own domain and number. This is the highest-ROI step in the
+   whole document: Sandbar has 0 Google reviews, review count is the biggest
+   lever in the map pack, and the public dashboard currently shows a client who
+   hasn't visibly won yet.
+3. **Verify the Stripe link** (~20 min) while those go out — recurring, wallets
+   on, redirect correct, old links killed.
+4. **DMARC to `p=quarantine`**, and drop the Brevo TXT if it's unused.
+5. Two weeks later: reviews landed, Sandbar climbing, a testimonial worth
+   filming, and a site that can take money.
+6. Then the before/after images, the VSL, and the case-study flag.
 
-Everything in steps 1–3 is account configuration. None of it needs code.
+Steps 1–4 are account configuration and one script. None of it needs new code.
+
+**Do not set `TWILIO_*` anywhere** — that would put a second sender in front of
+the same customers GHL is already messaging. Earlier drafts of this file said
+Twilio first; that was written before outbound moved to GHL.
