@@ -297,17 +297,16 @@ AUDIT_REPLY_TO_EMAIL = os.getenv(
 ).strip()
 PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
 
-# Stripe Payment Link URLs used in the audit-confirmation email upsell.
-# Same as VITE_STRIPE_*_URL on the frontend — env-overridable so they can be
-# swapped per environment without code changes. Defaults are the live prod links.
-STRIPE_DIY_URL = os.getenv(
-    "STRIPE_DIY_URL", "https://buy.stripe.com/14A7sK65YaJ127fg5P3oA09"
-).strip()
-STRIPE_SPRINT_URL = os.getenv(
-    "STRIPE_SPRINT_URL", "https://buy.stripe.com/aFabJ00LEdVd3bj3j33oA07"
-).strip()
-STRIPE_RETAINER_URL = os.getenv(
-    "STRIPE_RETAINER_URL", "https://buy.stripe.com/7sY7sK2TMdVd13b4n73oA08"
+# The one live Payment Link — $397/month, matching the frontend's
+# DEFAULT_MONTHLY_URL. Env-overridable so a test-mode link can be swapped in
+# without a code change.
+#
+# Three constants were retired here: STRIPE_SPRINT_URL ($197 DIY),
+# STRIPE_RETAINER_URL ($997 build) and STRIPE_DIY_URL. Their defaults were live
+# Payment Links for tiers that no longer exist — quoted from inside an email
+# that was still selling them to every Growth Score lead.
+STRIPE_MONTHLY_URL = os.getenv(
+    "STRIPE_MONTHLY_URL", "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
 ).strip()
 
 # Stripe API secret + webhook signing secret — power server-side verification
@@ -944,7 +943,7 @@ async def send_audit_email(
     monthly_fmt = f"${monthly_leak:,}"
     yearly_fmt = f"${monthly_leak * 12:,}"
     report_url = f"{PUBLIC_APP_URL}/r/{audit_id}"
-    retainer_url = f"{PUBLIC_APP_URL}/retainer"
+    pricing_url = f"{PUBLIC_APP_URL}/pricing"
     apply_url = f"{PUBLIC_APP_URL}/apply"
     subject = _pick_subject(business_name, monthly_leak, audit_id)
 
@@ -955,10 +954,9 @@ async def send_audit_email(
     except Exception:
         founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
     founding_line = (
-        "P.P.S. — The $997 Full Build comes with our Half-Back Guarantee: we pick 5 money "
-        "keywords for your business together in week 1. If we don't get at least 1 of them "
-        "ranking on page 1 or in the map pack within 30 days, you get half your investment "
-        "back. No fine print."
+        "P.P.S. — The 90-Day Promise: we pick your money keywords together in week 1, "
+        "and if I don't get you ranking on page one or in the map pack within 90 days, "
+        "your next 2 months are free. I only make money if the work lands."
     )
 
     # Plain-text fallback (Gmail uses this for the preview pane + accessibility)
@@ -988,24 +986,23 @@ Inside the report:
 - Citation cleanup opportunities
 - The exact moves to lock in your lead
 
-WHAT NOW? YOUR CHOICE:
+WANT ME TO FIX IT?
 
-OPTION 1 — DIY ($197 one-time)
-See your score. Fix it yourself. You get your full Growth Score plus a simple 5-step fix-it checklist — the exact moves for every gap Lola found. $197 one-time. Yours forever.
-{STRIPE_SPRINT_URL}
+$397/month — and your website is included free.
 
-OPTION 2 — Full Build ($997 one-time)
-We build it. We rank it — everywhere people search now. A custom website build, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build. We get you found when people ask ChatGPT or Google for a company like yours. Backed by our Half-Back Guarantee: we pick 5 money keywords together in week 1, and if we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.
-{STRIPE_RETAINER_URL}
+Most shops charge $3,000+ just to build the site, then bill you monthly on top. Yours is part of it: designed, built, and written so Google AND ChatGPT can actually read it. Plus your Google Business Profile managed every month, and a live dashboard you can open any time to check my work.
+
+Ranking on page one or in the map pack within 90 days, or your next 2 months are free.
+
+One client per trade, per city — I can't rank two soft-wash companies in the same town against each other, so I don't take the second one.
+
+{STRIPE_MONTHLY_URL}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🦴 Want us to build it and rank it for you?
-
-→ See the $997 Full Build: {retainer_url}
-→ Apply (Coach Ty reviews every application): {apply_url}
+→ See everything included: {pricing_url}
 
 Coach Ty
 Founder, Ty Alexander Media
@@ -1079,10 +1076,10 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;border:1px solid #222222;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 1 — DIY</strong> <span style="color:#C9A84C;">($197 one-time)</span></p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">See your score. Fix it yourself. You get your full Growth Score plus a simple 5-step fix-it checklist — the exact moves for every gap Lola found. $197 one-time. Yours forever.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want to fix it yourself?</strong></p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;">Everything above is yours to act on — the score, the gaps, and the order to fix them in. No charge, nothing to buy. If you'd rather I did it, that's below.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#222222;border:1px solid #C9A84C;">
-<a href="{STRIPE_SPRINT_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">Get the $197 DIY Plan →</a>
+<a href="{pricing_url}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 22px;font-size:13px;font-weight:700;color:#C9A84C;text-decoration:none;min-height:44px;line-height:1.4;">See what's included →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1090,11 +1087,12 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>OPTION 2 — Full Build</strong> <span style="color:#C9A84C;">($997 one-time)</span></p>
-<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;">We build it. We rank it — everywhere people search now. A custom website build, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty during the build. We get you found when people ask ChatGPT or Google for a company like yours.</p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>Half-Back Guarantee:</strong> we pick 5 money keywords for your business together in week 1. If we don't get at least 1 of them ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want me to fix it?</strong> <span style="color:#C9A84C;">$397/month</span></p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">Your website is included free.</strong> Most shops charge $3,000+ just to build it, then bill you monthly on top. Yours is designed, built, and written so Google AND ChatGPT can actually read it — plus your Google Business Profile managed every month, and a live dashboard you can open any time to check my work.</p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>The 90-Day Promise:</strong> ranking on page one or in the map pack within 90 days, or your next 2 months are free.</p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">One client per trade, per city.</strong> I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{STRIPE_RETAINER_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start My Build — $997 →</a>
+<a href="{STRIPE_MONTHLY_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start — $397/month →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1111,7 +1109,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:24px 28px;">
 <p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#F0EAD6;font-weight:600;">🦴 Want us to build it and rank it for you?</p>
 <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{retainer_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See the $997 Full Build →</a>
+<a href="{pricing_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:44px;line-height:1.2;">See everything included →</a>
 </td></tr></table>
 <p style="margin:0 0 18px;font-size:13px;line-height:1.55;color:#A89F94;"><a href="{apply_url}" target="_blank" rel="noopener" style="color:#C9A84C;text-decoration:none;font-weight:600;">Or apply first — Coach Ty reviews every application →</a></p>
 <p style="margin:0;font-size:15px;color:#F0EAD6;font-weight:600;">Coach Ty</p>
@@ -1123,7 +1121,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — The $997 Full Build comes with our <strong style="color:#C9A84C">Half-Back Guarantee</strong>: we pick 5 money keywords together in week 1, and if we don't get at least 1 ranking on page 1 or in the map pack within 30 days, you get half your investment back. No fine print.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — <strong style="color:#C9A84C">The 90-Day Promise</strong>: we pick your money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. I only make money if the work lands.</p>
 </td></tr>
 
 </table>
