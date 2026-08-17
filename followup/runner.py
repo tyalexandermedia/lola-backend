@@ -41,6 +41,8 @@ PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com"
 CALL_URL = os.getenv(
     "FOLLOWUP_CALL_URL", "https://calendar.app.google/J7idjUDitd2Hziuc7"
 )
+from api_clients.ghl import outbound_via_ghl
+
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip() or None
 FROM_EMAIL = os.getenv("AUDIT_FROM_EMAIL", "Coach Ty (Lola) <ty@tyalexandermedia.com>")
 REPLY_TO = os.getenv("AUDIT_REPLY_TO_EMAIL", "ty@tyalexandermedia.com")
@@ -86,7 +88,13 @@ def followup_enabled() -> bool:
 
 
 def _providers_ready() -> bool:
-    """Only run when we can actually deliver something."""
+    """Only run when we can actually deliver something — and when it's ours to send."""
+    # GHL owns outbound to clients' customers. RESEND_API_KEY is set on this
+    # service regardless (main.py sends Lola's own audit-confirmation mail with
+    # it), so without this check that key alone would wake this runner and put
+    # a second sender in front of people GHL is already messaging.
+    if outbound_via_ghl():
+        return False
     return bool(RESEND_API_KEY) or twilio_enabled()
 
 

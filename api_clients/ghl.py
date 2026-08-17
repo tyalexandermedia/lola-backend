@@ -43,6 +43,32 @@ def ghl_enabled() -> bool:
     return bool(GHL_INBOUND_WEBHOOK_URL)
 
 
+def outbound_via_ghl() -> bool:
+    """
+    True when GoHighLevel owns outbound messaging to CLIENTS' customers —
+    review requests, lead follow-up, missed-call text-back.
+
+    Defaults to true. Lola still pushes contacts and tags INTO GHL
+    (push_growth_score_lead, services/build_review_segment.py); GHL decides
+    what goes out and sends it from the client's own domain and number.
+
+    This is a guard against double-sending, not a preference. RESEND_API_KEY
+    has to be set on the backend anyway — main.py uses it for Lola's own
+    audit-confirmation emails to Lola's own leads — and the follow-up runner
+    wakes as soon as it sees that key (followup/runner.py). Without this switch,
+    turning on Lola's prospecting email silently starts a second sender to a
+    client's customers, duplicating whatever GHL is already sending them.
+
+    Two sends of the same review request is a spam complaint, and a complaint
+    costs a domain far more than it used to: the sending domain was used in an
+    authenticated phishing blast in Aug 2026, so its reputation has no slack.
+
+    Set OUTBOUND_VIA_GHL=false only when Lola is meant to send directly — and
+    then make sure the corresponding GHL workflows are switched off.
+    """
+    return os.getenv("OUTBOUND_VIA_GHL", "true").strip().lower() == "true"
+
+
 async def posthog_capture(
     event: str, distinct_id: str, properties: Optional[dict] = None
 ) -> None:

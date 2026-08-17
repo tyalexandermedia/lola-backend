@@ -18,6 +18,8 @@ from typing import Optional
 
 import httpx
 
+from api_clients.ghl import outbound_via_ghl
+
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip() or None
 # Match the existing audit-confirmation From so we don't fragment domain reputation.
 REVIEWS_FROM_EMAIL = os.getenv(
@@ -28,6 +30,12 @@ SEND_TIMEOUT = float(os.getenv("API_TIMEOUT", "8.0"))
 
 
 async def _resend_post(payload: dict) -> bool:
+    # Single choke point for every review email. GHL owns outbound to clients'
+    # customers and sends from the CLIENT's domain — a Sandbar customer should
+    # never receive a review request from tyalexandermedia.com. See
+    # api_clients.ghl.outbound_via_ghl.
+    if outbound_via_ghl():
+        return False
     if not RESEND_API_KEY:
         print("Reviews email skipped: RESEND_API_KEY not configured.")
         return False

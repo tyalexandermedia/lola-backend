@@ -19,11 +19,18 @@ from typing import Optional
 
 import httpx
 
+from api_clients.ghl import outbound_via_ghl
+
 OPT_OUT = "Reply STOP to opt out."
 _TWILIO_API = "https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
 
 
 def twilio_enabled() -> bool:
+    # GHL owns outbound to clients' customers, and sends from the client's own
+    # number rather than Lola's — so Lola's direct Twilio path stays shut even
+    # if Twilio credentials are present. See api_clients.ghl.outbound_via_ghl.
+    if outbound_via_ghl():
+        return False
     return os.getenv("TWILIO_ENABLED", "false").strip().lower() == "true"
 
 

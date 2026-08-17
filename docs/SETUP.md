@@ -13,117 +13,104 @@ yourself.
 
 ---
 
-## 1 · Turn on the review engine — highest ROI
+## 1 · Reviews and follow-up run through GoHighLevel
 
-Sandbar has 0 Google reviews. Review count is the biggest lever in the map
-pack, which is the thing Lola sells — so the flagship client can't rank, and
-the public dashboard shows a client who hasn't visibly won yet. Fixing this
-unblocks the case study, the ranking claims, and the testimonial in one move.
+**Decision, Aug 2026: GHL owns all outbound to clients' customers** — review
+requests, lead follow-up, missed-call text-back. Lola pushes contacts and tags
+*into* GHL; GHL decides what goes out and sends it from the client's own domain
+and number.
 
-**The engine is already built** — `reviews/` has the SMS sender, the star-tap
-flow, a `review_requests` table and an admin UI. It needs credentials, not code.
+Two reasons, and the second is the one that actually forced it:
 
-### Railway
+1. A Sandbar customer should never get a review request from
+   `tyalexandermedia.com`. They don't know who that is — low opens, high spam
+   complaints, and it puts Lola's domain reputation behind someone else's
+   campaign.
+2. The sending domain was used in an authenticated phishing blast (valid key,
+   valid DKIM/SPF) in Aug 2026. Its reputation has no slack left to spend.
+
+### What that means for env vars
+
+**Do NOT set `TWILIO_*` on the backend.** GHL's LC Phone is Twilio underneath —
+setting both means one 10DLC registration paying for two senders.
+
+`RESEND_API_KEY` **does** still belong on the backend: `main.py` uses it for
+Lola's own audit-confirmation emails to Lola's own leads. That is Lola talking
+to its own prospects, which is fine.
 
 ```
-TWILIO_ENABLED=true
-TWILIO_ACCOUNT_SID=AC...
-TWILIO_AUTH_TOKEN=...
-TWILIO_FROM_NUMBER=+1727...        # must be a number you own in Twilio
-LOLA_SECRET_ADMIN_KEY=<long random string>   # guards every admin endpoint
+OUTBOUND_VIA_GHL=true    # the default — no need to set it explicitly
 ```
 
-`reviews/sms.py:26` — `twilio_enabled()` returns false unless `TWILIO_ENABLED`
-is the literal string `true`. Setting the SID and token alone does nothing.
+`api_clients/ghl.py::outbound_via_ghl()` gates the follow-up runner, the review
+SMS sender and the review email sender. It exists because
+`RESEND_API_KEY` has to be present anyway, and the follow-up runner wakes the
+moment it sees that key — so without the switch, turning on Lola's own
+prospecting email would silently start a **second** sender to a client's
+customers, duplicating whatever GHL is already sending them.
 
-Every outbound template already includes "Reply STOP to opt out", which US
-carriers require. Don't remove it.
+Verified with credentials present: `twilio_enabled()`, the follow-up runner and
+the review email sender all return False, and the email sender returns before
+making any network call at all.
 
-### Then load Sandbar and send
+Set `OUTBOUND_VIA_GHL=false` only to hand sending back to Lola — and switch the
+corresponding GHL workflows off in the same change, or you get the double-send
+this switch exists to prevent.
 
-1. Create the business (`reviews/routes.py:194`) — needs `google_review_url`,
-   the direct "leave a review" link from their Google Business Profile:
+### Building Sandbar's review segment
 
-   ```
-   POST /reviews/businesses      header: admin key
-   { "id": "sandbar", "name": "Sandbar Soft Wash",
-     "industry": "soft wash", "google_review_url": "https://g.page/r/..." }
-   ```
+`services/build_review_segment.py` pulls GHL contacts tagged `customer:past`,
+classifies real customers vs directory entries, excludes Email DND /
+`exclusion:no-marketing` / `sandbar-optout` / invalid addresses, and tags the
+rest `review-send-eligible`. It never sends anything.
 
-2. Send one request per past customer (`reviews/routes.py:301`):
+```
+export GHL_API_TOKEN=pit-...        # fresh Private Integration token
+export GHL_LOCATION_ID=...
+python3 services/build_review_segment.py           # dry-run, sends nothing
+# read reports/review_eligible.csv, sanity-check the names
+python3 services/build_review_segment.py --apply   # tags eligible contacts
+```
 
-   ```
-   POST /reviews/request         header: admin key
-   { "business_id": "sandbar", "channel": "sms", "customer_phone": "+1727..." }
-   ```
+Line 220 halts if the token is still the revoked Aug-2 one, so generate a fresh
+Private Integration token rather than reusing an old one. Requires `httpx`.
 
-   `channel: "email"` works instead if you set `RESEND_API_KEY` and would
-   rather not text.
-
-Or use the admin page at `/lp/reviews-admin` if you'd rather click than curl.
-
-**Start with customers you know were happy.** The flow asks for a star rating
-first and only routes 4–5 star raters to Google; lower ratings go to private
-feedback. That is deliberate and it is why this is safe to send in bulk.
-
----
+Then build the review campaign **in GHL**, against the `review-send-eligible`
+tag, sending from Sandbar's own domain and number.
 
 ## 2 · Take money — Stripe
 
-Right now **every buy button on the site goes to `/apply`, a form.** The site
-cannot take a payment.
+The live Payment Link now ships in `frontend/src/lib/checkout.ts`. A Payment
+Link is a public URL, not a secret, so it belongs in the code; the real Stripe
+secrets stay in Railway.
 
-### Vercel
+Verify by hand in Stripe — the build environment can't reach it:
 
-```
-VITE_STRIPE_MONTHLY_URL=https://buy.stripe.com/...
-```
-
-Create the Payment Link as:
-
-- **Recurring**, $397/month — *not* one-time. Stripe prices are immutable, so a
-  one-time price can't be converted later; you'd rebuild the link.
-- **Apple Pay / Google Pay / Link enabled** in the link's settings. On a phone
-  that's most of the conversion win and it's a checkbox.
-- **Success redirect** to exactly:
+- **Recurring** $397/month, not one-time. Stripe prices are immutable, so a
+  one-time price can't be converted later.
+- Apple Pay / Google Pay / Link enabled.
+- Success redirect exactly:
   `https://lola.tyalexandermedia.com/start?session_id={CHECKOUT_SESSION_ID}`
-  Copy it literally — `{CHECKOUT_SESSION_ID}` is Stripe's placeholder, not
-  something you fill in. `/start` already branches on it: a buyer lands on
-  "You're in" with the intake link instead of a sales page.
+- **Deactivate the old $197 / $997 / $297 links.** They may still be live in
+  the account; a bookmarked URL still charges.
 
-**Redeploy after saving.** `VITE_` vars are compiled in at build time.
-
-### Railway (for webhooks, if you want payment events recorded)
+Optional, for recording payment events:
 
 ```
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-### Also: kill the old links
+## 3 · Email hygiene, after the Aug 2026 incident
 
-`$197`, `$997` and `$297` are gone from the site, but **Payment Links you
-created for them may still be live in your Stripe account.** Anyone holding one
-of those URLs can still subscribe at the old price. Deactivate them in Stripe.
-
----
-
-## 3 · Turn on lead follow-up
-
-`followup/runner.py:90` — the runner is dormant until a provider exists, then
-runs on its own (`FOLLOWUP_ENABLED` already defaults to true).
-
-### Railway
-
-```
-RESEND_API_KEY=re_...
-AUDIT_FROM_EMAIL=ty@tyalexandermedia.com   # must be a verified Resend sender
-```
-
-Twilio (section 1) covers the text half. Either provider alone wakes it up;
-both gives you text *and* email, which is what the site advertises.
-
----
+- Resend API key rotated. ✅
+- Tighten DMARC from `p=none` to `p=quarantine; pct=100; adkim=s; aspf=s`, run
+  two weeks, then `p=reject`. `p=none` observes and does nothing.
+- Remove the `brevo-code` TXT from the root domain if Brevo is unused — it's a
+  second authorized sending platform with a second set of credentials.
+- Keep Lola's own app mail off the root domain: verify a subdomain in Resend
+  and send from it, so the domain running Google Workspace and client
+  conversations isn't sharing reputation with an automated script.
 
 ## 4 · Make the client dashboard tell the truth
 
