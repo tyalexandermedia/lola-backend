@@ -317,8 +317,9 @@ STRIPE_RETAINER_URL = os.getenv(
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "").strip()
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
 # Amount (in cents) → which tier was bought, for fulfillment + gating.
-STRIPE_DIY_AMOUNT = int(os.getenv("STRIPE_DIY_AMOUNT", "19700"))
-STRIPE_BUILD_AMOUNT = int(os.getenv("STRIPE_BUILD_AMOUNT", "99700"))
+# $397/month, in cents. The retired STRIPE_DIY_AMOUNT (19700) and
+# STRIPE_BUILD_AMOUNT (99700) went with the tiers they priced.
+STRIPE_MONTHLY_AMOUNT = int(os.getenv("STRIPE_MONTHLY_AMOUNT", "39700"))
 
 HOME_SERVICES_TYPES = {
     "soft wash",
@@ -3833,10 +3834,21 @@ async def _stripe_get_session(session_id: str) -> Optional[dict]:
 
 
 def _tier_for_amount(amount_cents: int) -> Optional[str]:
-    if amount_cents >= STRIPE_BUILD_AMOUNT:
-        return "build"
-    if amount_cents >= STRIPE_DIY_AMOUNT:
-        return "diy"
+    """
+    There is one paid offer: the $397/month monthly.
+
+    This used to map an amount onto the retired DIY ($197) / Full Build ($997)
+    tiers, and the fall-through was live-fire wrong: 39700 cents is under the
+    build threshold but over the DIY one, so a customer paying $397/MONTH was
+    classified "diy", emailed "Here's your DIY guide", and sent to /diy — a
+    retired page — instead of the intake. Paid the most, told they bought the
+    cheapest thing that no longer exists.
+
+    Anything at or above the monthly amount is the monthly. Below it is not a
+    recognised purchase, so fulfillment is skipped rather than guessed at.
+    """
+    if amount_cents >= STRIPE_MONTHLY_AMOUNT:
+        return "monthly"
     return None
 
 
@@ -3860,16 +3872,27 @@ async def checkout_verify(session_id: str = ""):
 
 
 async def _send_purchase_email(to_email: str, tier: str, link: str) -> None:
-    label = "Full Build" if tier == "build" else "DIY guide"
-    cta = "Start your build" if tier == "build" else "Open your guide"
+    """
+    The buyer's copy of the next step.
+
+    This matters more than a receipt: Stripe's redirect to /start only helps if
+    the tab stays open. Someone who pays on a phone and closes it would
+    otherwise be a paying customer with no intake on file and no prompt to
+    complete one. Sent from Lola to Lola's own customer, so it is unaffected by
+    OUTBOUND_VIA_GHL, which governs messaging to CLIENTS' customers.
+    """
+    label = "Lola Leads Monthly"
+    cta = "Do the 2-minute intake"
     html = (
         f'<div style="font-family:sans-serif;max-width:520px;margin:0 auto">'
         f"<h2>You're in! 🐾</h2>"
-        f"<p>Thanks for grabbing the {label}. Here's your access link:</p>"
+        f"<p>Thanks for starting {label}. One thing before I get going — "
+        f"a 2-minute intake so I know your trade, your town and the jobs you want:</p>"
         f'<p><a href="{link}" style="display:inline-block;padding:12px 22px;'
         f"background:#D4AF37;color:#0A0A0B;font-weight:700;border-radius:8px;"
         f'text-decoration:none">{cta} →</a></p>'
-        f'<p style="color:#888;font-size:13px">Save this email — it\'s your link back in.</p>'
+        f'<p style="color:#888;font-size:13px">No call needed. Save this email — '
+        f'it\'s your link back in.</p>'
         f"</div>"
     )
     try:
@@ -3880,7 +3903,7 @@ async def _send_purchase_email(to_email: str, tier: str, link: str) -> None:
                 json={
                     "from": os.getenv("AUDIT_FROM_EMAIL", "Lola <ty@tyalexandermedia.com>"),
                     "to": [to_email],
-                    "subject": f"Your {label} is ready 🐾",
+                    "subject": "You're in 🐾 — one 2-minute step",
                     "html": html,
                 },
             )
@@ -3927,30 +3950,25 @@ async def stripe_webhook(request: Request):
     email = (details.get("email") or "").strip()
     phone = (details.get("phone") or "").strip()
     sid = sess.get("id", "")
-    tier = _tier_for_amount(int(sess.get("amount_total") or 0)) or "diy"
-    path = "/build/start" if tier == "build" else "/diy"
-    link = f"{PUBLIC_APP_URL}{path}?session_id={sid}"
+    tier = _tier_for_amount(int(sess.get("amount_total") or 0))
+    if not tier:
+        # Unrecognised amount — do not guess a fulfillment path. The old code
+        # defaulted to "diy" here, which is how a $397 subscriber ended up
+        # being sent a DIY guide.
+        print(f"⚠️  Stripe paid but amount unrecognised: {sess.get('amount_total')}")
+        return {"received": True, "unrecognised_amount": True}
+    # /start reads session_id and shows "You're in" plus the 2-minute intake —
+    # the same page the Payment Link redirects to, so the emailed link and the
+    # browser redirect land in exactly the same place.
+    link = f"{PUBLIC_APP_URL}/start?session_id={sid}"
     print(f"💳 Stripe paid: {tier} · {email or phone or 'no-contact'}")
 
     # Converted — stop the prospect ('score') follow-up sequence for this buyer.
     asyncio.create_task(mark_followup_purchased(email=email, phone=phone))
 
-    # A Full Build buyer enters the post-build → $297/mo continuity sequence,
-    # timed to land as their 30-day build window closes. Dormant until a
-    # provider is configured; suppressed if they later subscribe.
-    if tier == "build":
-        asyncio.create_task(
-            enroll_followup(
-                audit_id=f"build:{sid}",
-                kind="build",
-                email=email,
-                phone=phone,
-                sms_consent=bool(phone),  # buyer gave their number at checkout
-                business_name=details.get("name") or "",
-                report_url=link,
-                first_delay_sec=followup_build_first_delay(),
-            )
-        )
+    # The post-build → $297/mo continuity enrollment that sat here went with the
+    # Full Build tier and the $297 price, neither of which exists. A monthly
+    # subscriber has nothing to be upsold to.
 
     if email:
         try:
@@ -3960,8 +3978,9 @@ async def stripe_webhook(request: Request):
         if RESEND_API_KEY:
             asyncio.create_task(_send_purchase_email(email, tier, link))
     if phone:
-        label = "Full Build" if tier == "build" else "DIY guide"
-        asyncio.create_task(send_sms(phone, f"You're in! 🐾 Here's your {label}: {link}"))
+        asyncio.create_task(
+            send_sms(phone, f"You're in! 🐾 Two-minute intake and I get started: {link}")
+        )
     return {"received": True, "tier": tier}
 
 
