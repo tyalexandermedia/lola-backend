@@ -86,6 +86,15 @@ def build_checks() -> list:
         "      python3 -c \"import secrets; print(secrets.token_urlsafe(32))\"",
     ))
 
+    checks.append(Check(
+        "GOOGLE_PLACES_API_KEY", HIGH, has("GOOGLE_PLACES_API_KEY"),
+        "outreach/build_leads.py can't build a lead list, so cold outreach has "
+        "no CSV to send from — and the Growth Score's business autofill stops "
+        "working too. Same key for both.",
+        "Railway (and locally, to build lists) -> GOOGLE_PLACES_API_KEY=…\n"
+        "      python3 -m outreach.build_leads --config outreach/targets.example.json",
+    ))
+
     from_email = val("OUTREACH_FROM_EMAIL")
     root_domain = from_email.endswith("tyalexandermedia.com>") or from_email.endswith("@tyalexandermedia.com")
     checks.append(Check(

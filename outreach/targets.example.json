@@ -1,0 +1,12 @@
+[
+  { "trade": "pressure washing company", "city": "Tampa FL" },
+  { "trade": "pressure washing company", "city": "St. Petersburg FL" },
+  { "trade": "roofing contractor",       "city": "Tampa FL" },
+  { "trade": "roofing contractor",       "city": "Clearwater FL" },
+  { "trade": "plumber",                  "city": "Tampa FL" },
+  { "trade": "HVAC contractor",          "city": "Tampa FL" },
+  { "trade": "pool service",             "city": "Palm Harbor FL" },
+  { "trade": "lawn care service",        "city": "Brandon FL" },
+  { "trade": "electrician",              "city": "Sarasota FL" },
+  { "trade": "cleaning service",         "city": "Tampa FL" }
+]

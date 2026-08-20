@@ -1,7 +1,10 @@
 # Launch runbook
 
-Everything here is account configuration — DNS, Stripe, Railway, GHL. None of
-it is code, which is why none of it could be done for you.
+Everything here is account configuration — DNS, Stripe, Railway, GHL. It needs
+your credentials, which is why it couldn't be done for you.
+
+The one piece that WAS code is done: `outreach/build_leads.py` builds the lead
+list §3 needs, so the revenue step is no longer blocked on a spreadsheet.
 
 Run this first; it reads the same variables the code reads, so it can't drift
 the way a checklist does:
@@ -134,13 +137,36 @@ python3 -m outreach.cli status --days 7
 The cap comes from `outreach/warmup.py` and is enforced by `send`, so the way
 to go faster is to wait, not to pass a flag.
 
-### Lead list
+### Lead list — built for you
 
-`outreach/leads.example.csv` is the shape:
+`outreach/build_leads.py` produces the CSV. It was the one genuinely missing
+piece: `leads.py` validated a lead file and `cli.py` sent from one, but nothing
+made one, so the whole machine was blocked on a spreadsheet.
 
+```bash
+# see what Places returns for a target, fetch nothing
+python3 -m outreach.build_leads --trade "roofing contractor" --city "Tampa FL" --dry-run
+
+# build it
+python3 -m outreach.build_leads --trade "roofing contractor" --city "Tampa FL"
+
+# or run the whole Tampa Bay target set in one pass
+python3 -m outreach.build_leads --config outreach/targets.example.json --append
 ```
-business_name,owner_first_name,website,city,email
-```
+
+It searches Google Places (the same `GOOGLE_PLACES_API_KEY` the Growth Score
+already uses), keeps operational businesses that publish a website, then reads
+each business's own site for a published address.
+
+**It never guesses an address.** No email on the site means the business is
+skipped, not written as `info@theirdomain.com`. A fabricated address bounces,
+and bounces are what get a sending domain blocked — which on this domain is the
+thing to avoid above all else. Role accounts (`info@`, `sales@`, `office@`) are
+dropped for the same reason, using `leads.py`'s own filter so the builder and
+the validator can't disagree.
+
+It's sequential with a delay between sites and an honest User-Agent. These are
+small-business web hosts, not CDNs.
 
 Every email deep-links to `/growth-score?biz=<their business>`, which prefills
 the form and fires the Places lookup — so a cold reader lands with the business
@@ -162,8 +188,10 @@ ranking lever available — but it is not "run the script."
 
 1. **Is Sandbar's Google Business Profile claimed and verified?**
    Everything below is blocked until it is. This is the gate.
-2. Get its place ID → build the review link →
-   `SANDBAR_REVIEW_URL=https://search.google.com/local/writereview?placeid=…`
+2. Get its place ID → build the review link:
+   `https://search.google.com/local/writereview?placeid=…`
+   This is **not** an env var in this repo. GHL owns outbound to clients'
+   customers, so the link belongs in the GHL campaign.
 3. **Are the past customers actually in GHL, tagged `customer:past`?**
    `build_review_segment.py` reads that tag. If the customer list is in a
    notebook or QuickBooks, that import is the real work, not the script.
