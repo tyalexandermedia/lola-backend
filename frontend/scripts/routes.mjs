@@ -19,6 +19,13 @@ export const ROUTES = [
   '/methodology',
   '/vs',
   '/apply',
+  // Live lead magnet and the buy screen the VSL points at. Both were indexable
+  // with a canonical but absent from this list, so each was served the
+  // HOMEPAGE's <head> — the same duplicate-metadata bug this file exists to
+  // prevent, just outside the original set.
+  '/grader',
+  '/start',
+  '/case-studies',
   // The individual comparisons are the pages that actually rank — "<vendor> vs
   // Lola" and "are Local Service Ads worth it" are the high-intent queries.
   // Prerendering only the hub would leave every one of them uncrawlable.

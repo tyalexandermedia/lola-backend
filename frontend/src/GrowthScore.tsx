@@ -727,6 +727,11 @@ export default function GrowthScore() {
         items={SCORE_QA}
         kicker="Common questions"
         heading="What a Growth Score is, and how you get found"
+        // Collapsed: this page's job is the form above it, and open these were
+        // the tallest section on the page — 240 words of supporting copy
+        // between the reader and the footer. The answers stay in the HTML, so
+        // nothing is lost for search or AI citation.
+        collapsible
       />
 
       <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">

@@ -15,6 +15,7 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
+import { usePageMeta } from './lib/seo';
 
 // D-014: the Sandbar case-study page is held until the ranking tracker has
 // verified day-0 → day-30 receipts. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true
@@ -23,6 +24,7 @@ const SHOW_SANDBAR_CASE_STUDY =
   (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) === 'true';
 
 export default function CaseStudiesIndex() {
+  usePageMeta('/case-studies');
   useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;

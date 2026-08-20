@@ -124,7 +124,10 @@ function canonicalPathForRoute(route: Route): string | null {
     case 'home': return '/';
     case 'pricing': return '/pricing';
     case 'work': return '/work';
-    case 'diy': return '/diy';
+    // No canonical for /diy: DiyAccess sets robots:noindex (it is an access
+    // page for the retired fix kit), and publishing a canonical on a page
+    // you are also telling Google not to index is two contradictory
+    // instructions about the same URL.
     case 'apply': return '/apply';
     case 'grader': return '/grader';
     case 'growth-score': return '/growth-score';

@@ -11,12 +11,13 @@
  * choice is what puts these questions in the page outline where a crawler
  * building a passage index can find them.
  *
- * ── Open by default, on purpose ──────────────────────────────────────────
- * Google indexes content inside a collapsed <details>, but it is the answer
- * text that has to be liftable, and the safest way to guarantee that is to
- * render it as plain flow content. `collapsible` is available for long
- * secondary lists where the wall of text would hurt the page; the default is
- * open because the whole point is being quotable.
+ * ── When to collapse ─────────────────────────────────────────────────────
+ * Google indexes content inside a collapsed <details>, and the answer text is
+ * in the served HTML either way — so `collapsible` costs nothing in
+ * citability. Use it whenever the Q&A is SUPPORTING content on a page with
+ * another job (the homepage, /pricing, /growth-score, whose primary job is the
+ * form). Reserve the open flow variant for a page where the answers ARE the
+ * content and a reader arrived to read them.
  *
  * ── The schema contract ──────────────────────────────────────────────────
  * The array passed in MUST be the same array used to build the route's
@@ -71,7 +72,17 @@ export default function AnswerBlock({
         {heading}
       </h2>
 
-      <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
+      {/* Single column, deliberately.
+          A two-column grid was tried here and reverted: /growth-score's
+          container is max-w-[820px] because it is a form page, so the columns
+          came out 358px wide — about 45 characters — and the section barely got
+          shorter because narrow measure makes text taller. Two columns only pay
+          off in the 1120px containers, and gating on a breakpoint can't tell
+          the difference. The density fix that DOES work on a narrow page is
+          `collapsible`. */}
+      <div
+        className={`mt-8 divide-y divide-white/10 border-y border-white/10`}
+      >
         {items.map((item) =>
           collapsible ? (
             <details key={item.q} className="group">

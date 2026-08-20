@@ -263,6 +263,27 @@ export const PAGE_META: Record<string, PageMeta> = {
     path: '/apply',
     breadcrumb: [{ name: 'Get Started', path: '/apply' }],
   },
+  '/grader': {
+    title: 'Free AI Visibility Grader for Local Businesses',
+    description:
+      'Score your business on Google and in AI answers in 60 seconds. Free grader for local service businesses — no signup, no card, no sales call.',
+    path: '/grader',
+    breadcrumb: [{ name: 'Grader', path: '/grader' }],
+  },
+  '/start': {
+    title: 'Start Local SEO — $397/mo, Website Included',
+    description:
+      'Start done-for-you local SEO for your service business: $397/month, website design included free, no setup fee. One tap, no sales call. 90-Day Promise.',
+    path: '/start',
+    breadcrumb: [{ name: 'Start', path: '/start' }],
+  },
+  '/case-studies': {
+    title: 'Local SEO Case Studies — Tampa Bay Contractors',
+    description:
+      'How Lola rebuilt local visibility for real Tampa Bay service businesses, tracked in the open on live public dashboards rather than in a sales deck.',
+    path: '/case-studies',
+    breadcrumb: [{ name: 'Case Studies', path: '/case-studies' }],
+  },
   '/vs': {
     title: 'Lola vs Local SEO Agencies & Tools — Compared',
     description:

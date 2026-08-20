@@ -998,6 +998,8 @@ def render_sitemap(slugs):
         ("/start", "monthly", "0.95"),    # dead-simple texted front door
         ("/grader", "weekly", "0.95"),    # primary lead magnet
         ("/growth-score", "monthly", "0.9"),   # free Growth Score opt-in
+        ("/grader", "weekly", "0.9"),      # second live lead magnet
+        ("/case-studies", "monthly", "0.8"),
         ("/pricing", "monthly", "0.9"),
         ("/roadmap", "monthly", "0.88"),   # interactive Growth Score page (static LP)
         # /diy and /retainer are deliberately absent. /diy is a noindexed access

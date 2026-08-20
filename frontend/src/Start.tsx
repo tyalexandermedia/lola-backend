@@ -27,8 +27,13 @@
  * It rotted because it hardcoded every number and promise. Everything below now
  * reads from lib/pricing, so it cannot drift from the canonical offer again.
  *
- * Not prerendered and noindexed on purpose: /pricing is the canonical pricing
- * page, and a second indexable page selling the same plan splits the keyword.
+ * 2026-08-20: this page IS prerendered and indexable now, in its unpaid state.
+ * The old note here said the opposite — "not prerendered and noindexed on
+ * purpose" — while App.tsx published a canonical for it and the sitemap
+ * submitted it. Three sources disagreeing about one URL. The buy screen is a
+ * legitimate landing page (it is where the VSL points), so it ranks; the
+ * receipt view (?session_id=…) is the part that must never be indexed, and
+ * that is now the only thing carrying noindex.
  */
 
 import { useState } from 'react';
@@ -38,6 +43,7 @@ import { AFTER_YOU_START, GUARANTEE, MONTHLY_AT_A_GLANCE, PLAN } from './lib/pri
 import { startHref, startSmsHref } from './lib/checkout';
 import Vsl from './Vsl';
 import { useSeo } from './lib/seo';
+import { PAGE_META, canonicalFor } from './lib/pageMeta';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 
@@ -70,12 +76,14 @@ export default function Start() {
   const paid = Boolean(sessionId);
 
   useSeo({
-    title: paid
-      ? "You're in — Lola Leads"
-      : `Start — ${PLAN.price}${PLAN.period}, website included | Lola Leads`,
+    // The unpaid title/description come from PAGE_META so the prerendered
+    // /start head and this one cannot disagree; the paid view gets its own,
+    // and its noindex, because it is a receipt rather than a landing page.
+    title: paid ? "You're in — Lola Leads" : PAGE_META['/start'].title,
     description: paid
       ? 'Your plan is active. Here is what happens next.'
-      : `Website designed and built, included free. Then ${PLAN.price}${PLAN.period} for everything that gets you found on Google and in AI answers. ${GUARANTEE.short}`,
+      : PAGE_META['/start'].description,
+    canonical: paid ? undefined : canonicalFor('/start'),
     // Two pages at one URL, and only one of them should rank. The receipt view
     // (?session_id=…) must never be indexed. The bare /start is the buy screen
     // the VSL points at — it has a title and description written to rank and it

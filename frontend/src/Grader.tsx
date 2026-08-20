@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
+import { usePageMeta } from './lib/seo';
 import { startHref } from './lib/checkout';
 import { GUARANTEE, PLAN } from './lib/pricing';
 
@@ -59,6 +60,7 @@ const SCORING_LINES = [
 ];
 
 export default function Grader() {
+  usePageMeta('/grader');
   const [form, setForm] = useState<BusinessAuditRequest>({
     business_name: '',
     city: '',
