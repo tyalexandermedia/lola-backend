@@ -20,8 +20,11 @@ import { useReveal } from './lib/useReveal';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
+import { usePageMeta } from './lib/seo';
 import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
+import AnswerBlock from './AnswerBlock';
+import { SCORE_QA } from './lib/pageMeta';
 
 const TRADE_TO_SERVICE: Record<string, string> = {
   'Soft Wash / Pressure Wash': 'soft wash',
@@ -73,6 +76,7 @@ const DIMENSION_DETAIL: Record<string, { measures: string; stage: string }> = {
 };
 
 export default function GrowthScore() {
+  usePageMeta('/growth-score');
   useReveal();
   const [form, setForm] = useState<BusinessAuditRequest>({
     business_name: '',
@@ -691,7 +695,10 @@ export default function GrowthScore() {
         <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
           Run your free Growth Score above — we send it by text and email within 24 hours. Or skip the
           wait and start now: one plan, <span className="font-semibold text-[#ECECEF]">{PLAN.price}{PLAN.period}</span>,
-          website build included free. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}
+          website build included free. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
+          <a href="/#founder" className="text-[#D4AF37] underline underline-offset-2 decoration-[#D4AF37]/50 hover:decoration-[#D4AF37]">
+            Who&apos;s behind it →
+          </a>
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
@@ -708,6 +715,19 @@ export default function GrowthScore() {
           </a>
         </div>
       </section>
+
+      {/* Visible Q&A. SCORE_QA is the same array pageMeta turns into this
+          route's FAQPage — and scripts/check-seo.mjs fails the build if a
+          question in the schema isn't in the page's visible text, so these
+          cannot drift apart. Rendered as flow content rather than a collapsed
+          accordion because the point is being quotable: "what is a Growth
+          Score" is a question people genuinely type, and the answer here is
+          written to be lifted whole. */}
+      <AnswerBlock
+        items={SCORE_QA}
+        kicker="Common questions"
+        heading="What a Growth Score is, and how you get found"
+      />
 
       <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>

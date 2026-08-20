@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/prerender.mjs",
+    "build": "tsc && vite build && node scripts/prerender.mjs && node scripts/check-seo.mjs",
     "preview": "vite preview",
-    "prerender": "node scripts/prerender.mjs"
+    "prerender": "node scripts/prerender.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
     "posthog-js": "^1.376.0",

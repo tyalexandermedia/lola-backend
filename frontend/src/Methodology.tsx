@@ -14,22 +14,13 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
+import { usePageMeta } from './lib/seo';
 
 export default function Methodology() {
+  usePageMeta('/methodology');
   useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Methodology — How the Lola Local AI Visibility Grader Scores | Lola';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'Full transparency: exactly how the Lola Local AI Visibility Grader scores your business across 5 categories (GBP, citations, reviews, on-page, AI search presence). No black box.',
-      );
-    }
 
     // Article + BreadcrumbList JSON-LD. The Article makes the page
     // eligible for AI Overview / featured-snippet coverage on
@@ -68,8 +59,6 @@ export default function Methodology() {
 
     return () => {
       tags.forEach((t) => t.parentNode?.removeChild(t));
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 

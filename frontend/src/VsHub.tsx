@@ -15,6 +15,7 @@
 
 import { useEffect } from 'react';
 import { track } from './analytics';
+import { usePageMeta } from './lib/seo';
 import { getCompetitorSlugs } from './VsPage';
 import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
@@ -33,6 +34,7 @@ const CARDS: Array<{ slug: string; name: string; oneLine: string; priceRange: st
 ];
 
 export default function VsHub() {
+  usePageMeta('/vs');
   // Validate cards stay in sync with COMPETITORS map. If anyone adds a
   // config to VsPage.tsx but forgets the hub card, console.warn so it
   // gets noticed in dev — production still renders fine.
@@ -51,17 +53,6 @@ export default function VsHub() {
   // homepage's static title).
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Compare Lola to Local SEO Alternatives — LocalIQ, BrightLocal, Scorpion + more | Lola';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'Honest side-by-side comparisons of Lola vs LocalIQ, BrightLocal, Scorpion, Podium, Yext, and Hibu. Pricing, model, AI search, guarantee — see which fits.',
-      );
-    }
-
     const block = {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
@@ -88,8 +79,6 @@ export default function VsHub() {
 
     return () => {
       tag.parentNode?.removeChild(tag);
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 

@@ -8,7 +8,7 @@
  */
 
 import { useReveal } from './lib/useReveal';
-import { useSeo } from './lib/seo';
+import { usePageMeta } from './lib/seo';
 import Portfolio from './Portfolio';
 import { PORTFOLIO } from './lib/portfolio';
 import { startHref } from './lib/checkout';
@@ -16,11 +16,7 @@ import { PLAN } from './lib/pricing';
 
 export default function WorkPage() {
   useReveal();
-  useSeo({
-    title: 'Our Work — Real Sites Lola Built & Ranked | Lola',
-    description:
-      'Real local-business websites built by Lola — Sandbar Soft Wash, Travels by Val, and more. Scroll through the live sites.',
-  });
+  usePageMeta('/work');
 
   const count = PORTFOLIO.length;
 
