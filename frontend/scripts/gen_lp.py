@@ -592,9 +592,39 @@ def jsonld(obj):
 # Page rendering
 # --------------------------------------------------------------------------- #
 
+# The metro these pages actually cover. Named on every page so the
+# canonicalisation below is honest: a reader who lands on the Tampa page from a
+# Clearwater search sees Clearwater in the service area, because it is.
+METRO_CITIES = "Tampa, St. Petersburg, Clearwater, Brandon, Palm Harbor and Sarasota"
+
+# The one indexable page per trade. The other five city variants canonicalise
+# into it.
+CANONICAL_CITY = "tampa"
+
+
 def render_page(svc_slug, svc, city_slug, city):
+    """Render one trade x city page.
+
+    ── Why the non-Tampa pages canonicalise away ─────────────────────────────
+    These 48 pages come from one template with the city name swapped in.
+    Measured: two pages for the same trade in different cities share 68-74% of
+    their 8-word phrases, and roofing-seo-tampa vs roofing-seo-clearwater is
+    929 words of which NINE differ — the city name and a neighbourhood list.
+
+    That is the shape Google's scaled-content-abuse and doorway-page policies
+    describe, and the risk is not only that these pages don't rank: ~44,000
+    words of near-duplicate text can drag site-wide quality signals on a domain
+    with little authority to spare.
+
+    Canonical rather than noindex, deliberately. noindex removes a page and
+    throws away whatever links point at it; a canonical tells Google these are
+    the same page and CONSOLIDATES those signals into the survivor. Every URL
+    stays live and nothing 404s, so inbound links, ads and printed collateral
+    keep working — the reader just lands on the page Google indexes.
+    """
     slug = f"{svc_slug}-seo-{city_slug}"
     url = f"{BASE_URL}/lp/{slug}"
+    canonical = f"{BASE_URL}/lp/{svc_slug}-seo-{CANONICAL_CITY}"
     cname = city["name"]
     title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Lola'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
@@ -608,10 +638,10 @@ def render_page(svc_slug, svc, city_slug, city):
     professional_service = {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        "@id": f"{url}#business",
+        "@id": f"{canonical}#business",
         "name": "Lola SEO by Ty Alexander Media",
         "image": f"{BASE_URL}/coach-ty.jpg",
-        "url": url,
+        "url": canonical,
         "telephone": PHONE,
         "email": EMAIL,
         "priceRange": PRICE_RANGE,
@@ -690,7 +720,7 @@ def render_page(svc_slug, svc, city_slug, city):
             {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{BASE_URL}/"},
             {"@type": "ListItem", "position": 2, "name": "Industries",
              "item": f"{BASE_URL}/lp/industries"},
-            {"@type": "ListItem", "position": 3, "name": f"{svc['name']} — {cname}", "item": url},
+            {"@type": "ListItem", "position": 3, "name": f"{svc['name']} — Tampa Bay", "item": canonical},
         ],
     }
 
@@ -742,11 +772,11 @@ def render_page(svc_slug, svc, city_slug, city):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{url}">
+<link rel="canonical" href="{canonical}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
-<meta property="og:url" content="{url}">
+<meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0A0A0B">
@@ -767,6 +797,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <p class="eyebrow">Local SEO · {esc(svc["eyebrow_word"])} · {esc(cname)}, FL</p>
 <h1>{esc(svc["h1"](city))}</h1>
 <p class="sub">{esc(svc["sub"](city))}</p>
+<p class="sub" style="font-size:15px;opacity:.78">Serving {METRO_CITIES} &mdash; and the service areas around them.</p>
 <a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
 <a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
@@ -1036,7 +1067,12 @@ def render_sitemap(slugs):
                  f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>{freq}</changefreq>\n"
                  f"    <priority>{pri}</priority>\n  </url>\n")
-    for slug in slugs:
+    # Only the ONE indexable page per trade. The other 40 city variants
+    # canonicalise into these, and listing a canonicalised-away URL reports in
+    # Search Console as "Alternate page with proper canonical tag" — noise, not
+    # coverage. They stay live and crawlable; they just aren't submitted.
+    canonical_slugs = [sg for sg in slugs if sg.endswith(f"-seo-{CANONICAL_CITY}")]
+    for slug in canonical_slugs:
         rows += (f"  <url>\n    <loc>{BASE_URL}/lp/{slug}</loc>\n"
                  f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>monthly</changefreq>\n"
