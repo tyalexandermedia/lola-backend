@@ -29,17 +29,6 @@ export default function CaseStudiesIndex() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Case Studies — Lola | Local AI Visibility Wins';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'Real Lola case studies — how we moved local service businesses from invisible to ranked across Google + AI search. Honest fine print, real claims only.',
-      );
-    }
-
     const block = {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
@@ -67,8 +56,6 @@ export default function CaseStudiesIndex() {
 
     return () => {
       tag.parentNode?.removeChild(tag);
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 
@@ -172,10 +159,10 @@ export default function CaseStudiesIndex() {
               Share-of-Voice graphs. Want to be next?
             </p>
             <a
-              href="/grader"
+              href="/growth-score"
               className="mt-5 inline-flex h-11 items-center justify-center gap-2 self-start rounded-[10px] border border-gold/40 bg-white/[0.02] px-5 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.08]"
             >
-              Run the free Grader →
+              Run the free Growth Score →
             </a>
           </div>
         </div>

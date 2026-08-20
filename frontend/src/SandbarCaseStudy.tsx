@@ -15,6 +15,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
+import { usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import { SANDBAR_JOBS } from './lib/sandbarJobs';
@@ -22,20 +23,10 @@ import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
 
 export default function SandbarCaseStudy() {
+  usePageMeta('/case-studies/sandbar');
   useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Sandbar Soft Wash — Lola Local SEO Case Study | Palm Harbor, FL';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'How Lola rebuilt local visibility for Sandbar Soft Wash — a 15+ year Palm Harbor pressure-washing business — with every move tracked on a live public dashboard.',
-      );
-    }
 
     const blocks: object[] = [
       {
@@ -75,8 +66,6 @@ export default function SandbarCaseStudy() {
 
     return () => {
       tags.forEach((t) => t.parentNode?.removeChild(t));
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 
@@ -355,10 +344,10 @@ export default function SandbarCaseStudy() {
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href="/grader"
+            href="/growth-score"
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
           >
-            Run the free Grader →
+            Run the free Growth Score →
           </a>
           <a
             href={startHref()}

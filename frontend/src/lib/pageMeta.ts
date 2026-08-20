@@ -263,19 +263,22 @@ export const PAGE_META: Record<string, PageMeta> = {
     path: '/apply',
     breadcrumb: [{ name: 'Get Started', path: '/apply' }],
   },
-  '/grader': {
-    title: 'Free AI Visibility Grader for Local Businesses',
-    description:
-      'Score your business on Google and in AI answers in 60 seconds. Free grader for local service businesses — no signup, no card, no sales call.',
-    path: '/grader',
-    breadcrumb: [{ name: 'Grader', path: '/grader' }],
-  },
   '/start': {
     title: 'Start Local SEO — $397/mo, Website Included',
     description:
       'Start done-for-you local SEO for your service business: $397/month, website design included free, no setup fee. One tap, no sales call. 90-Day Promise.',
     path: '/start',
     breadcrumb: [{ name: 'Start', path: '/start' }],
+  },
+  '/case-studies/sandbar': {
+    title: 'Sandbar Soft Wash — Local SEO Case Study',
+    description:
+      'How Lola rebuilt local visibility for a 15-year Palm Harbor pressure-washing business, tracked in the open on a live public dashboard anyone can check.',
+    path: '/case-studies/sandbar',
+    breadcrumb: [
+      { name: 'Case Studies', path: '/case-studies' },
+      { name: 'Sandbar Soft Wash', path: '/case-studies/sandbar' },
+    ],
   },
   '/case-studies': {
     title: 'Local SEO Case Studies — Tampa Bay Contractors',

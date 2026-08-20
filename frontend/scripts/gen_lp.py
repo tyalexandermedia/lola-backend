@@ -544,6 +544,12 @@ RETIRED_ROUTE_REDIRECTS = {
     "/managed": "/pricing",      # published a $297/mo price that no longer exists
     "/build": "/start",          # old post-purchase page; step 01 was "book a call"
     "/build/start": "/start",
+    # One lead magnet. These two ran the same pipeline as /growth-score, so the
+    # site was competing with itself for "free local SEO check". 301 rather
+    # than noindex: both have inbound links and whatever equity they carry
+    # should land on the survivor.
+    "/grader": "/growth-score",
+    "/audit": "/growth-score",
 }
 
 # Stale hand-written files to delete after generation.
@@ -996,10 +1002,12 @@ def render_sitemap(slugs):
     core = [
         ("/", "weekly", "1.0"),
         ("/start", "monthly", "0.95"),    # dead-simple texted front door
-        ("/grader", "weekly", "0.95"),    # primary lead magnet
+        # /grader and /audit are absent: both 301 to /growth-score now, and a
+        # sitemap that submits a redirecting URL reports as "Page with
+        # redirect" in Search Console rather than as coverage.
         ("/growth-score", "monthly", "0.9"),   # free Growth Score opt-in
-        ("/grader", "weekly", "0.9"),      # second live lead magnet
         ("/case-studies", "monthly", "0.8"),
+        ("/case-studies/sandbar", "monthly", "0.85"),   # the published proof story
         ("/pricing", "monthly", "0.9"),
         ("/roadmap", "monthly", "0.88"),   # interactive Growth Score page (static LP)
         # /diy and /retainer are deliberately absent. /diy is a noindexed access
@@ -1011,12 +1019,10 @@ def render_sitemap(slugs):
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
         ("/methodology", "monthly", "0.8"),
-        ("/case-studies", "monthly", "0.82"),
-        # D-014: /case-studies/sandbar held (gated behind VITE_SHOW_SANDBAR_CASE_STUDY)
-        # until verified ranking receipts exist — re-add here when republished.
         # High-intent comparison pages — keep in sync with COMPETITORS
         # in frontend/src/VsPage.tsx.
         ("/vs", "monthly", "0.88"),
+        ("/vs/local-service-ads", "monthly", "0.85"),   # highest-intent of the set
         ("/vs/localiq", "monthly", "0.85"),
         ("/vs/brightlocal", "monthly", "0.85"),
         ("/vs/scorpion", "monthly", "0.85"),

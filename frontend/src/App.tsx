@@ -10,7 +10,6 @@ import { SITE_ORIGIN } from './lib/seo';
 // Core Web Vitals (LCP). Each lazy import becomes its own JS chunk under
 // dist/assets that Vite will only fetch when the route is hit.
 import Homepage from './Homepage';
-const AuditFlow = lazy(() => import('./AuditFlow'));
 const SharedReport = lazy(() => import('./SharedReport'));
 const AdminLeads = lazy(() => import('./AdminLeads'));
 const AdminCalls = lazy(() => import('./AdminCalls'));
@@ -21,17 +20,20 @@ const ApplyPage = lazy(() => import('./ApplyPage'));
 const LeadGenGenerator = lazy(() => import('./LeadGenGenerator'));
 const SwarmWorkflow = lazy(() => import('./SwarmWorkflow'));
 const ClientReport = lazy(() => import('./ClientReport'));
-const Grader = lazy(() => import('./Grader'));
 const GrowthScore = lazy(() => import('./GrowthScore'));
 const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
 const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
-// D-014: Sandbar case-study page held (404) until verified ranking receipts
-// exist. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true in Vercel to republish.
+// D-014 released 2026-08-20 by the owner: Sandbar is the published case study.
+// The hold existed because the page must not claim ranking results it can't
+// evidence — that constraint still holds and the page still honours it. Its
+// four stat tiles are verifiable business facts (live public dashboard, weekly
+// work feed, 20+ cities served, 15+ years in business); no ranking metric
+// appears anywhere on it. Set VITE_SHOW_SANDBAR_CASE_STUDY=false to pull it.
 const SHOW_SANDBAR_CASE_STUDY =
-  (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) === 'true';
+  (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) !== 'false';
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
@@ -39,8 +41,6 @@ const WorkPage = lazy(() => import('./WorkPage'));
 
 type Route =
   | { name: 'home' }
-  | { name: 'audit' }
-  | { name: 'grader' }
   | { name: 'growth-score' }
   | { name: 'start' }
   | { name: 'methodology' }
@@ -65,8 +65,16 @@ type Route =
 
 function parseRoute(pathname: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'home' };
-  if (pathname === '/audit' || pathname === '/audit/') return { name: 'audit' };
-  if (pathname === '/grader' || pathname === '/grader/') return { name: 'grader' };
+  // ONE lead magnet. /grader, /audit and /growth-score were three URLs running
+  // the same pipeline (POST /audit -> /r/{id}), which is three pages competing
+  // for one query — the site out-competing itself for "free local SEO check".
+  // Both older doorways now resolve to /growth-score, and vercel.json 301s them
+  // at the edge so the redirect happens before the SPA loads.
+  //
+  // AuditFlow.tsx itself STAYS: SharedReport (/r/{id}), AdminLeads and
+  // DiyAccess all import from it. Only its route is retired.
+  if (pathname === '/audit' || pathname === '/audit/') return { name: 'growth-score' };
+  if (pathname === '/grader' || pathname === '/grader/') return { name: 'growth-score' };
   if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
@@ -129,16 +137,15 @@ function canonicalPathForRoute(route: Route): string | null {
     // you are also telling Google not to index is two contradictory
     // instructions about the same URL.
     case 'apply': return '/apply';
-    case 'grader': return '/grader';
     case 'growth-score': return '/growth-score';
     case 'start': return '/start';
     case 'methodology': return '/methodology';
-    case 'lola-os': return '/os';
+    // No canonical for /os: it is the client-facing status board, not a
+    // marketing page, and it has no business ranking against /pricing.
     case 'case-studies-index': return '/case-studies';
     case 'case-study': return `/case-studies/${route.slug}`;
     case 'vs-hub': return '/vs';
     case 'vs': return `/vs/${route.slug}`;
-    case 'audit': return '/audit';
     default: return null; // lead-gen, swarm, report, client-report, admin*, unknown
   }
 }
@@ -187,9 +194,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
       ? 'max-w-[1280px] pt-8 sm:pt-12'
       : route.name === 'home' || route.name === 'pricing' || route.name === 'work'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
-      : route.name === 'audit'
-      ? 'max-w-[640px] pt-3 sm:pt-6'
-      : route.name === 'grader' || route.name === 'growth-score'
+      : route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
@@ -223,8 +228,6 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
           {route.name === 'home' && <Homepage />}
-          {route.name === 'audit' && <AuditFlow />}
-          {route.name === 'grader' && <Grader />}
           {route.name === 'growth-score' && <GrowthScore />}
           {route.name === 'start' && <Start />}
           {route.name === 'methodology' && <Methodology />}
@@ -263,7 +266,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
  */
 function BackToTop({ route }: { route: Route }) {
   const [show, setShow] = useState(false);
-  const HIDE = new Set(['audit', 'report', 'admin', 'admin-hq', 'admin-calls', 'admin-revenue']);
+  const HIDE = new Set(['report', 'admin', 'admin-hq', 'admin-calls', 'admin-revenue']);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onScroll = () => setShow(window.scrollY > window.innerHeight);
@@ -315,7 +318,7 @@ function RouteFallback() {
 function SiteFooter({ route }: { route: Route }) {
   // Routes that own their own bottom-of-page footer or shouldn't have a
   // global one (admin / report dashboards / interactive tools).
-  const HIDE = new Set(['admin', 'admin-hq', 'admin-calls', 'admin-revenue', 'report', 'client-report', 'audit', 'lead-gen', 'swarm', 'start']);
+  const HIDE = new Set(['admin', 'admin-hq', 'admin-calls', 'admin-revenue', 'report', 'client-report', 'lead-gen', 'swarm', 'start']);
   if (HIDE.has(route.name)) return null;
 
   return (
@@ -353,7 +356,7 @@ function SiteFooter({ route }: { route: Route }) {
             <FooterLink href="/r/client/sandbar">Sandbar Soft Wash — live dashboard</FooterLink>
           )}
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
-          <FooterLink href="/grader">Free AI Visibility Grader</FooterLink>
+          <FooterLink href="/growth-score">Free Growth Score</FooterLink>
         </FooterCol>
 
         <FooterCol title="Compare">

@@ -12,7 +12,7 @@
  *   4. Pricing transparency = the moat. Lola's published price — $397/month,
  *      all-inclusive — visible vs every
  *      competitor's "request a demo" gate.
- *   5. Two CTAs: start the plan (warm leads) + run the free Grader (cold).
+ *   5. Two CTAs: start the plan (warm leads) + the free Growth Score (cold).
  *
  * Each page emits a FAQPage JSON-LD with switching/comparison questions —
  * targets high-intent organic ("lola vs localiq", "is brightlocal worth it",
@@ -21,6 +21,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
+import { usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import { startHref } from './lib/checkout';
 import { GUARANTEE, PLAN } from './lib/pricing';
@@ -101,7 +102,7 @@ const LOCALIQ: Competitor = {
     { label: 'Done-for-you?',          lola: 'Yes — every stage',                them: 'Yes (enterprise tiers)',   lolaWin: false },
     { label: 'Contract',               lola: 'Monthly · cancel after 3 months',          them: 'Typical annual term',      lolaWin: true  },
     { label: 'AI search visibility',   lola: 'Core product (ChatGPT / Perplexity / Gemini / Google AI)', them: 'Not a primary offering', lolaWin: true },
-    { label: 'Free tool',              lola: '60-second AI Visibility Grader',  them: 'Website Grader (email-gated, 2 layers)', lolaWin: true },
+    { label: 'Free tool',              lola: '60-second Growth Score',  them: 'Website Grader (email-gated, 2 layers)', lolaWin: true },
     { label: 'Guarantee',              lola: '90-Day Promise',    them: 'Not published',            lolaWin: true  },
     { label: 'Founder access',         lola: 'Direct text / Slack with Coach Ty', them: 'Account manager',        lolaWin: true  },
     { label: 'Best for',               lola: '$200K–$2M/yr local service biz',  them: 'Multi-location / enterprise', lolaWin: false },
@@ -558,6 +559,7 @@ export function getCompetitorSlugs(): string[] {
 
 export default function VsPage({ slug }: { slug: string }) {
   useReveal();
+  usePageMeta(`/vs/${slug}`);
   const c = COMPETITORS[slug.toLowerCase()];
 
   // Inject route-specific FAQPage + BreadcrumbList JSON-LD on mount.
@@ -593,20 +595,21 @@ export default function VsPage({ slug }: { slug: string }) {
       document.head.appendChild(t);
       return t;
     });
-    // Also patch <title> + meta description for this route. The SPA shell
-    // gives us the homepage's static title otherwise.
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = c.metaTitle;
-    if (desc) desc.setAttribute('content', c.metaDescription);
+    // The <title> and description are NOT set here. They come from
+    // usePageMeta below, which reads the same PAGE_META table the prerenderer
+    // writes into the static HTML.
+    //
+    // This block used to assign c.metaTitle, which meant the prerendered head
+    // and the client-side head disagreed on every /vs page — and the config
+    // titles run to 62-78 characters, past the 60-char limit the checker
+    // enforces. The checker only reads built HTML, so it could never have
+    // caught the client-side value. The metaTitle/metaDescription fields stay
+    // on the config as reference copy for now.
 
     track('vs_page_viewed', { competitor: c.slug });
 
     return () => {
       tags.forEach((t) => t.parentNode?.removeChild(t));
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, [c]);
 
@@ -840,7 +843,7 @@ export default function VsPage({ slug }: { slug: string }) {
           See where you actually stand.
         </h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:text-[16px]">
-          Run the free 60-second AI Visibility Grader — or just start. Either way you&apos;ll
+          Run the free 60-second Growth Score — or just start. Either way you&apos;ll
           know within a week whether Lola or {c.name} is the right fit.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -852,7 +855,7 @@ export default function VsPage({ slug }: { slug: string }) {
             {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <a
-            href="/grader"
+            href="/growth-score"
             onClick={() => track('vs_cta_clicked', { competitor: c.slug, kind: 'grader' })}
             className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/40 hover:bg-gold/[0.06] sm:h-16 sm:text-[15px]"
           >

@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 /**
- * /methodology — How the Lola Local AI Visibility Grader scores you.
+ * /methodology — How the Lola Local Growth Score scores you.
  *
  * Pure E-E-A-T play. Transparency about how the score is computed kills
  * the "black box" objection competitors leverage, earns linking from
@@ -29,7 +29,7 @@ export default function Methodology() {
       {
         '@context': 'https://schema.org',
         '@type': 'Article',
-        headline: 'How the Lola Local AI Visibility Grader Scores',
+        headline: 'How the Lola Local Growth Score Scores',
         description: 'Full methodology for the 0-100 Local AI Visibility Score: 5 categories, weighting, and how each signal is measured.',
         author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
         publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
@@ -91,7 +91,7 @@ export default function Methodology() {
         </h1>
         <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           We don&apos;t hide the math. Five categories, weighted by what actually moves rankings and
-          AI recommendations for local service businesses. Run the Grader and you get the same
+          AI recommendations for local service businesses. Run the Growth Score and you get the same
           breakdown — this page just shows you what&apos;s under the hood.
         </p>
       </section>
@@ -294,10 +294,10 @@ export default function Methodology() {
           60 seconds. Same five categories. Same math. You see your number and your top fixes.
         </p>
         <a
-          href="/grader"
+          href="/growth-score"
           className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
         >
-          Run the Grader →
+          Run the Growth Score →
         </a>
       </section>
 
