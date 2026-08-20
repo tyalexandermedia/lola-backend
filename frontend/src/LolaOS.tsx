@@ -117,7 +117,7 @@ export default function LolaOS() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="pt-2 sm:pt-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           LOLA OS · Client Status
         </p>
         <h1
@@ -126,7 +126,7 @@ export default function LolaOS() {
         >
           The operating system behind local growth.
         </h1>
-        <p className="mt-5 max-w-[760px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[760px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           A client does not become a LOLA client because a page exists. It becomes
           real when brand, tracking, SEO, calls, opportunities, revenue, and reporting
           are connected in one slug-based system.
@@ -140,7 +140,7 @@ export default function LolaOS() {
       <section className="mt-12 sm:mt-16">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
               Client Status
             </p>
             <h2 className="mt-3 text-[28px] font-bold tracking-[-0.01em] text-white sm:text-[36px]">
@@ -149,7 +149,7 @@ export default function LolaOS() {
           </div>
           <a
             href="/r/client/tampa-bay-power-clean"
-            className="inline-flex h-11 items-center justify-center rounded-[10px] border border-[#D4AF37]/35 px-4 text-[12px] font-bold uppercase tracking-[0.08em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.06]"
+            className="inline-flex h-11 items-center justify-center rounded-[10px] border border-gold/35 px-4 text-[12px] font-bold uppercase tracking-[0.08em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.06]"
           >
             Open Tampa Dashboard
           </a>
@@ -163,7 +163,7 @@ export default function LolaOS() {
       </section>
 
       <section className="mt-14 rounded-[18px] border border-white/[0.08] bg-white/[0.02] p-5 sm:mt-20 sm:p-7">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Interactive Ecosystem
         </p>
         <h2 className="mt-3 text-[28px] font-bold tracking-[-0.01em] text-white sm:text-[36px]">
@@ -173,9 +173,9 @@ export default function LolaOS() {
           {ecosystem.map((item) => (
             <article
               key={item.step}
-              className="rounded-[14px] border border-white/[0.07] bg-[#0F0F12] p-4"
+              className="rounded-[14px] border border-white/[0.07] bg-surface p-4"
             >
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
                 {item.step}
               </p>
               <h3 className="mt-3 text-[17px] font-bold text-white">{item.title}</h3>
@@ -186,14 +186,14 @@ export default function LolaOS() {
       </section>
 
       <section className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.82fr]">
-        <div className="rounded-[18px] border border-[#D4AF37]/25 bg-gradient-to-br from-[#D4AF37]/[0.08] via-white/[0.02] to-transparent p-5 sm:p-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <div className="rounded-[18px] border border-gold/25 bg-gradient-to-br from-gold/[0.08] via-white/[0.02] to-transparent p-5 sm:p-7">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
             Next Highest ROI
           </p>
           <h2 className="mt-3 text-[26px] font-bold tracking-[-0.01em] text-white sm:text-[34px]">
             Finish attribution before adding more pages.
           </h2>
-          <p className="mt-3 text-[15px] leading-[1.65] text-[#C5C5C8]">
+          <p className="mt-3 text-[15px] leading-[1.65] text-ink-2">
             Tampa Bay Power Clean already has a live page, temporary shared call routing,
             SEO targets, and a public Google Business Profile signal. The next compounding
             work is dedicated tracking: domain, CallRail, Search Console, GA4, and GBP access.
@@ -201,10 +201,10 @@ export default function LolaOS() {
         </div>
 
         <div className="rounded-[18px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#9CA3AF]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-ink-3">
             Guardrails
           </p>
-          <ul className="mt-4 flex flex-col gap-3 text-[14px] leading-[1.6] text-[#C5C5C8]">
+          <ul className="mt-4 flex flex-col gap-3 text-[14px] leading-[1.6] text-ink-2">
             <li>No fake GBP, ranking, review, or revenue claims.</li>
             <li>No secrets in client config.</li>
             <li>Sandbar stays the flagship production case study.</li>
@@ -221,12 +221,12 @@ function Metric({ label, value, tone }: { label: string; value: number; tone: 'g
     <div
       className={`rounded-[14px] border p-4 ${
         tone === 'gold'
-          ? 'border-[#D4AF37]/30 bg-[#D4AF37]/[0.08]'
+          ? 'border-gold/30 bg-gold/[0.08]'
           : 'border-white/[0.08] bg-white/[0.02]'
       }`}
     >
       <p className="text-[28px] font-bold leading-none text-white">{value}</p>
-      <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#9CA3AF]">
+      <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-ink-3">
         {label}
       </p>
     </div>
@@ -235,14 +235,14 @@ function Metric({ label, value, tone }: { label: string; value: number; tone: 'g
 
 function ClientStatus({ client }: { client: Client }) {
   return (
-    <article className="rounded-[18px] border border-white/[0.08] bg-[#0F0F12] p-5 shadow-[0_18px_45px_rgba(0,0,0,0.22)] sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <article className="rounded-[18px] border border-white/[0.08] bg-surface p-5 shadow-[0_18px_45px_rgba(0,0,0,0.22)] sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         {client.role}
       </p>
       <h3 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white">
         {client.name}
       </h3>
-      <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8]">{client.summary}</p>
+      <p className="mt-3 text-[14px] leading-[1.6] text-ink-2">{client.summary}</p>
 
       <div className="mt-5 grid grid-cols-1 gap-2">
         {client.status.map((item) => (
@@ -259,7 +259,7 @@ function ClientStatus({ client }: { client: Client }) {
                 className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[13px] font-black ${
                   item.state === 'done'
                     ? 'bg-emerald-400 text-[#08110D]'
-                    : 'border border-white/20 text-[#9CA3AF]'
+                    : 'border border-white/20 text-ink-3'
                 }`}
                 aria-hidden="true"
               >
@@ -269,7 +269,7 @@ function ClientStatus({ client }: { client: Client }) {
             </div>
             <span
               className={`text-[12px] font-bold uppercase tracking-[0.14em] ${
-                item.state === 'done' ? 'text-emerald-300' : 'text-[#9CA3AF]'
+                item.state === 'done' ? 'text-emerald-300' : 'text-ink-3'
               }`}
             >
               {item.state === 'done' ? 'Done' : 'Pending'}
@@ -283,7 +283,7 @@ function ClientStatus({ client }: { client: Client }) {
           <a
             key={link.href}
             href={link.href}
-            className="inline-flex h-10 items-center rounded-[10px] border border-white/[0.10] bg-white/[0.02] px-3 text-[12px] font-bold text-[#D4AF37] transition hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/[0.06]"
+            className="inline-flex h-10 items-center rounded-[10px] border border-white/[0.10] bg-white/[0.02] px-3 text-[12px] font-bold text-gold transition hover:border-gold/50 hover:bg-gold/[0.06]"
           >
             {link.label}
           </a>

@@ -56,7 +56,7 @@ export default function AnswerBlock({
   return (
     <section className={`mt-14 sm:mt-20 ${className}`} aria-labelledby="answers-heading">
       {kicker && !hideHeading && (
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
           {kicker}
         </p>
       )}
@@ -65,7 +65,7 @@ export default function AnswerBlock({
         className={
           hideHeading
             ? 'sr-only'
-            : 'mt-3 font-display text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-[#ECECEF] sm:text-[34px]'
+            : 'mt-3 font-display text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[34px]'
         }
       >
         {heading}
@@ -78,22 +78,22 @@ export default function AnswerBlock({
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 [&::-webkit-details-marker]:hidden">
                 {/* h3 inside summary: keeps the question in the document
                     outline while staying a valid disclosure control. */}
-                <h3 className="text-[16px] font-semibold text-[#ECECEF]">{item.q}</h3>
+                <h3 className="text-[16px] font-semibold text-ink">{item.q}</h3>
                 <span
                   aria-hidden
-                  className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45"
+                  className="shrink-0 text-[20px] text-gold transition-transform group-open:rotate-45"
                 >
                   +
                 </span>
               </summary>
-              <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-[#C5C5C8]">{item.a}</p>
+              <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-ink-2">{item.a}</p>
             </details>
           ) : (
             <div key={item.q} className="py-6">
-              <h3 className="text-[17px] font-semibold leading-[1.35] text-[#ECECEF] sm:text-[19px]">
+              <h3 className="text-[17px] font-semibold leading-[1.35] text-ink sm:text-[19px]">
                 {item.q}
               </h3>
-              <p className="mt-3 max-w-[70ch] text-[15px] leading-[1.7] text-[#C5C5C8] sm:text-[16px]">
+              <p className="mt-3 max-w-[70ch] text-[15px] leading-[1.7] text-ink-2 sm:text-[16px]">
                 {item.a}
               </p>
             </div>

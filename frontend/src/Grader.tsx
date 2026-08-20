@@ -227,15 +227,15 @@ export default function Grader() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
         <div className="flex items-center gap-3">
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '0ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '180ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '360ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '0ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '180ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '360ms' }} />
         </div>
         <h2 className="mt-8 text-[26px] font-bold text-white sm:text-[32px]">Scoring your local AI visibility…</h2>
-        <p key={scoringLine} className="mt-4 max-w-md animate-fade-in text-[15px] text-[#9AA0A6] sm:text-[16px]">
+        <p key={scoringLine} className="mt-4 max-w-md animate-fade-in text-[15px] text-ink-3 sm:text-[16px]">
           {scoringLine}
         </p>
-        <p className="mt-10 text-[11px] uppercase tracking-[0.28em] text-[#5A5F68]">
+        <p className="mt-10 text-[11px] uppercase tracking-[0.28em] text-ink-4">
           Usually 10–20 seconds
         </p>
       </main>
@@ -246,12 +246,12 @@ export default function Grader() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
         <h2 className="text-[26px] font-bold text-white">Lola lost the scent.</h2>
-        <p className="mt-3 max-w-md text-[15px] text-[#9AA0A6]">{apiError}</p>
+        <p className="mt-3 max-w-md text-[15px] text-ink-3">{apiError}</p>
         <div className="mt-8 flex gap-3">
           <button
             type="button"
             onClick={() => { setPhase('idle'); setApiError(null); }}
-            className="inline-flex h-12 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+            className="inline-flex h-12 items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold"
           >
             Try again
           </button>
@@ -269,7 +269,7 @@ export default function Grader() {
           className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[480px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.10)_0%,transparent_60%)] blur-2xl"
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Free Tool · 60 Seconds · No Signup
         </p>
 
@@ -278,13 +278,13 @@ export default function Grader() {
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Get your{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             AI Visibility Score
           </span>{' '}
           in 60 seconds.
         </h1>
 
-        <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-ink-2 sm:text-[18px]">
           Lola grades your local business 0–100 across 5 categories — including whether
           ChatGPT, Perplexity, and Gemini actually recommend you when buyers ask.
         </p>
@@ -292,14 +292,14 @@ export default function Grader() {
         {/* The form — single page, all fields visible. */}
         <form
           onSubmit={(e) => { e.preventDefault(); grade(); }}
-          className="mt-8 rounded-[16px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-7"
+          className="mt-8 rounded-[16px] border border-gold/25 bg-white/[0.02] p-5 sm:p-7"
         >
           {/* Auto-fill status — only renders when the user came in via
               ?biz= (Homepage deep-link) so they see Lola "doing something"
               while Places resolves the website + city. Subtle, gold-themed. */}
           {lookup === 'searching' && (
-            <p className="mb-4 flex items-center gap-2 text-[12px] text-[#D4AF37]">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#D4AF37]" />
+            <p className="mb-4 flex items-center gap-2 text-[12px] text-gold">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-gold" />
               Looking up your business on Google…
             </p>
           )}
@@ -310,7 +310,7 @@ export default function Grader() {
             </p>
           )}
           {lookup === 'no_match' && (
-            <p className="mb-4 text-[12px] text-[#7A7F8A]">
+            <p className="mb-4 text-[12px] text-ink-4">
               No Google match — fill the fields manually and we&apos;ll still score you.
             </p>
           )}
@@ -383,12 +383,12 @@ export default function Grader() {
 
           <button
             type="submit"
-            className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
+            className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] sm:h-16 sm:text-[15px]"
           >
             Get my AI Visibility Score →
           </button>
 
-          <p className="mt-4 text-center text-[12px] text-[#7A7F8A]">
+          <p className="mt-4 text-center text-[12px] text-ink-4">
             No credit card · No spam · Free shareable scorecard
           </p>
         </form>
@@ -396,7 +396,7 @@ export default function Grader() {
 
       {/* ── WHAT GETS SCORED ─────────────────────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           What gets scored
         </p>
         <h2
@@ -416,9 +416,9 @@ export default function Grader() {
             { n: '★', h: 'Top 3 competitor compare', body: 'Who Google\'s putting in front of buyers before you. The gap is the playbook.' },
           ].map((c) => (
             <div key={c.n} className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-              <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{c.n}</p>
+              <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-gold/70">{c.n}</p>
               <p className="mt-2 text-[18px] font-bold text-white sm:text-[20px]">{c.h}</p>
-              <p className="mt-2 text-[14px] leading-[1.55] text-[#C5C5C8]">{c.body}</p>
+              <p className="mt-2 text-[14px] leading-[1.55] text-ink-2">{c.body}</p>
             </div>
           ))}
         </div>
@@ -426,7 +426,7 @@ export default function Grader() {
 
       {/* ── WHO USES IT ─────────────────────────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Built for
         </p>
         <h2
@@ -435,21 +435,21 @@ export default function Grader() {
         >
           Local service businesses of every flavor.
         </h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Home services, cleaning, salons, med spas, auto detailing, lawn care, fitness
           studios — any local business buyers find on Google or ask AI to recommend.
         </p>
       </section>
 
       {/* ── PRICING TEASE ────────────────────────────────────────── */}
-      <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-16 rounded-2xl border border-gold/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           After your score
         </p>
         <h2 className="mt-3 text-[22px] font-bold leading-[1.15] text-white sm:text-[28px]">
           Want Lola to do the work for you?
         </h2>
-        <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-3 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           One plan — <span className="font-semibold text-white">{PLAN.price}{PLAN.period}</span>. We design and
           build the site (included free, no setup fee) and get you found on Google and in AI answers.
           {' '}{PLAN.terms} Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}
@@ -457,7 +457,7 @@ export default function Grader() {
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
             href={startHref()}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.3)] transition hover:scale-[1.02]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_4px_16px_rgba(212,175,55,0.3)] transition hover:scale-[1.02]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
@@ -471,7 +471,7 @@ export default function Grader() {
       </section>
 
       {/* Footer */}
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>
@@ -486,7 +486,7 @@ function Field({
 }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
+      <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-gold/85">
         {label}
       </label>
       <div className="mt-2">{children}</div>
@@ -516,9 +516,9 @@ function extractCity(address: string): string {
 
 function inputCls(hasError: boolean): string {
   return [
-    'block w-full rounded-[12px] border bg-[#0F0F12] px-4 py-3 text-[15px] font-medium text-white outline-none transition',
+    'block w-full rounded-[12px] border bg-surface px-4 py-3 text-[15px] font-medium text-white outline-none transition',
     hasError
       ? 'border-[#E5A95B] focus:border-[#E5A95B] focus:shadow-[0_0_0_3px_rgba(229,169,91,0.12)]'
-      : 'border-[#D4AF37]/25 focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
+      : 'border-gold/25 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
   ].join(' ');
 }

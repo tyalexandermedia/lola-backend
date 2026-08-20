@@ -1,6 +1,9 @@
 /// <reference types="vite/client" />
 import { useEffect, useState, lazy, Suspense } from 'react';
-import { startHref } from './lib/checkout';
+import PawMark from './PawMark';
+import { startHref, startSmsHref } from './lib/checkout';
+import { FOUNDER } from './lib/lola';
+import { PLAN } from './lib/pricing';
 import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
@@ -212,7 +215,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
        oversized radial-glow elements on the hero sections. `clip` (not
        `hidden`) prevents a scroll container so the sticky header keeps
        working. Invisible on desktop — nothing overflows there. */
-    <div className="min-h-screen scroll-smooth overflow-x-clip bg-[#0A0A0B] text-white">
+    <div className="min-h-screen scroll-smooth overflow-x-clip bg-on-gold text-white">
       <Header bare={route.name === 'start'} />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
@@ -272,7 +275,7 @@ function BackToTop({ route }: { route: Route }) {
       type="button"
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })}
-      className="no-print fixed bottom-20 right-4 z-[55] flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/40 bg-[#0A0A0B]/90 text-[#D4AF37] shadow-[0_4px_16px_rgba(0,0,0,0.5)] backdrop-blur-[10px] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12] sm:bottom-6"
+      className="no-print fixed bottom-20 right-4 z-[55] flex h-11 w-11 items-center justify-center rounded-full border border-gold/40 bg-on-gold/90 text-gold shadow-[0_4px_16px_rgba(0,0,0,0.5)] backdrop-blur-[10px] transition hover:border-gold/70 hover:bg-gold/[0.12] sm:bottom-6"
     >
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M12 19V5M5 12l7-7 7 7" />
@@ -291,9 +294,9 @@ function RouteFallback() {
   return (
     <main className="flex flex-1 items-center justify-center py-32">
       <div className="flex items-center gap-2 opacity-0 animate-fade-in" style={{ animationDelay: '120ms', animationFillMode: 'forwards' }}>
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '120ms' }} />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#D4AF37]" style={{ animationDelay: '240ms' }} />
+        <span className="h-2 w-2 animate-pulse rounded-full bg-gold" />
+        <span className="h-2 w-2 animate-pulse rounded-full bg-gold" style={{ animationDelay: '120ms' }} />
+        <span className="h-2 w-2 animate-pulse rounded-full bg-gold" style={{ animationDelay: '240ms' }} />
       </div>
     </main>
   );
@@ -313,24 +316,25 @@ function SiteFooter({ route }: { route: Route }) {
   if (HIDE.has(route.name)) return null;
 
   return (
-    <footer className="no-print mt-12 border-t border-[#D4AF37]/15 bg-[#0A0A0B] pb-24 pt-12 sm:pb-12">
+    <footer className="no-print mt-12 border-t border-gold/15 bg-on-gold pb-24 pt-12 sm:pb-12">
       <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
-          <a href="/" className="inline-flex items-center gap-2">
-            <span aria-hidden className="text-[18px]">🐾</span>
-            <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent">
+          {/* min-h-[44px]: measured 27px tall on a 390px viewport. */}
+          <a href="/" className="-mx-2 inline-flex min-h-[44px] items-center gap-2 px-2">
+            <PawMark size={18} className="text-gold" />
+            <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent">
               LOLA LEADS
             </span>
           </a>
-          <p className="mt-3 max-w-[260px] text-[12px] leading-[1.55] text-[#9CA3AF]">
+          <p className="mt-3 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
             Done-for-you AI Leads + Local SEO for service businesses. Recommended on
             Google AND ChatGPT, Perplexity, and Gemini.
           </p>
           {/* #5A5F68 on #0A0A0B is 3.08:1 — below the 4.5:1 AA minimum for
               11px text. #8A8F98 is 6.09:1. Breaks are unconditional: hiding
               them on mobile only ran the three clauses together. */}
-          <p className="mt-3 text-[11px] leading-[1.6] text-[#8A8F98]">
-            Built and run by <span className="text-[#C5C5C8]">Ty Alexander Traufield</span> — “Coach Ty.”
+          <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
+            Built and run by <span className="text-ink-2">Ty Alexander Traufield</span> — “Coach Ty.”
             <br /> Founder, Lola Leads · Ty Alexander Media
             <br /> St. Pete · serving all of Tampa Bay, FL
           </p>
@@ -364,10 +368,10 @@ function SiteFooter({ route }: { route: Route }) {
         </FooterCol>
       </div>
 
-      <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-[#5A5F68] sm:px-6">
+      <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-ink-4 sm:px-6">
         <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
         <p className="mt-1">
-          Get found on Google and in AI answers — $397/month, website design included. <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">See pricing</a>.
+          Get found on Google and in AI answers — $397/month, website design included. <a href="/pricing" className="text-gold underline-offset-2 hover:underline">See pricing</a>.
         </p>
       </div>
     </footer>
@@ -377,7 +381,7 @@ function SiteFooter({ route }: { route: Route }) {
 function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{title}</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{title}</p>
       <ul className="mt-3 flex flex-col gap-2">{children}</ul>
     </div>
   );
@@ -386,9 +390,14 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
+      {/* inline-flex + min-h-[44px] rather than a bare inline <a>: measured on a
+          390px viewport these were 15px tall, so a whole column of navigation
+          sat well under the 44px touch minimum and the rows were close enough
+          to mis-tap. The negative margin keeps the text optically aligned with
+          the column heading despite the added padding. */}
       <a
         href={href}
-        className="text-[13px] text-[#C5C5C8] underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
+        className="-mx-2 inline-flex min-h-[44px] items-center px-2 text-[13px] text-ink-2 underline-offset-2 transition hover:text-gold hover:underline"
       >
         {children}
       </a>
@@ -420,19 +429,43 @@ function MobileStickyCTA({ route }: { route: Route }) {
   const buyHref = startHref(route.name === 'pricing');
 
   return (
-    <div className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-[#D4AF37]/30 bg-[#0A0A0B]/95 px-3 py-2.5 backdrop-blur-[14px] sm:hidden">
-      <div className="mx-auto flex max-w-[640px] gap-2">
+    // pb uses env(safe-area-inset-bottom): on an iPhone the home indicator sits
+    // in the bottom ~34px, and a bar pinned to bottom-0 without this puts the
+    // most-tapped controls on the site underneath it. Falls back to the plain
+    // padding everywhere the env() var resolves to 0.
+    <div
+      className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-gold/30 bg-on-gold/95 px-3 pt-2.5 backdrop-blur-[14px] sm:hidden"
+      style={{ paddingBottom: 'calc(0.625rem + env(safe-area-inset-bottom, 0px))' }}
+    >
+      <div className="mx-auto flex max-w-[640px] items-stretch gap-2">
         <a
           href="/growth-score"
-          className="flex h-12 flex-1 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37]"
+          className="flex h-12 flex-1 items-center justify-center rounded-md border border-gold/40 bg-white/[0.02] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition-transform duration-150 ease-press active:scale-[0.97]"
         >
           Free Score
         </a>
         <a
           href={buyHref}
-          className="flex h-12 flex-[1.4] items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B] shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
+          className="flex h-12 flex-[1.35] items-center justify-center rounded-md bg-gradient-to-r from-gold via-gold-bright to-gold px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-on-gold shadow-glow transition-transform duration-150 ease-press active:scale-[0.97]"
         >
-          Start — $397/mo →
+          {/* The full "Start — $397/month" wrapped to two lines at 390px and
+              looked cramped beside the other two controls. Abbreviated so the
+              primary control stays on one line on the narrowest phone. */}
+          Start · {PLAN.price}/mo →
+        </a>
+        {/* Reaching a human is the offer ("you text Ty directly"), so it earns
+            a permanent control rather than living only in the footer. Icon-only
+            to protect the two selling buttons' width, but it is a full 48px
+            square — above the 44px minimum — and carries a real label for
+            screen readers, since an emoji alone announces as "envelope". */}
+        <a
+          href={startSmsHref()}
+          aria-label={`Text ${FOUNDER.knownAs} directly at ${FOUNDER.phoneDisplay}`}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-gold/40 bg-white/[0.02] text-gold transition-transform duration-150 ease-press active:scale-[0.97]"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
         </a>
       </div>
     </div>
@@ -450,19 +483,23 @@ function MobileStickyCTA({ route }: { route: Route }) {
  */
 function Header({ bare = false }: { bare?: boolean } = {}) {
   return (
-    <header className="no-print sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-[#0A0A0B]/85 backdrop-blur-[14px]">
+    <header className="no-print sticky top-0 z-40 border-b border-gold/20 bg-on-gold/85 backdrop-blur-[14px]">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
         {/* Logo — gold gradient wordmark + paw */}
         <a
           href="/"
           className="group -mx-2 flex min-h-[44px] items-center gap-2 px-2"
-          aria-label="Lola — AI Leads Expert — home"
+          // WCAG 2.5.3 (Label in Name): the accessible name has to CONTAIN the
+          // visible text. The visible wordmark is "LOLA LEADS"; the old label
+          // read "Lola — AI Leads Expert — home", which doesn't contain it — so
+          // a voice-control user saying "click Lola Leads" got nothing.
+          aria-label="Lola Leads — home"
         >
-          <span aria-hidden className="text-[16px] leading-none">🐾</span>
+          <PawMark size={16} className="shrink-0 text-gold" />
           {/* One wordmark at every breakpoint — "Lola Leads" is the brand name.
               (The descriptor "AI Leads Expert" lives in the hero kicker and
               meta copy, where it works as positioning rather than as a name.) */}
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent">
+          <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent">
             LOLA LEADS
           </span>
         </a>
@@ -474,19 +511,19 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
               (mobile reaches /work via the footer + homepage section). */}
           <a
             href="/work"
-            className="hidden min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:flex sm:px-3"
+            className="hidden min-h-[44px] items-center px-2.5 py-3 text-ink-2 transition hover:text-gold sm:flex sm:px-3"
           >
             Work
           </a>
           <a
             href="/growth-score"
-            className="flex min-h-[44px] items-center px-2.5 py-3 text-[#C5C5C8] transition hover:text-[#D4AF37] sm:px-3"
+            className="flex min-h-[44px] items-center px-2.5 py-3 text-ink-2 transition hover:text-gold sm:px-3"
           >
             Free Score
           </a>
           <a
             href="/pricing"
-            className="flex min-h-[44px] items-center rounded-[8px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-3 py-3 font-bold text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.12]"
+            className="flex min-h-[44px] items-center rounded-[8px] border border-gold/40 bg-gold/[0.06] px-3 py-3 font-bold text-gold transition hover:border-gold/70 hover:bg-gold/[0.12]"
           >
             Pricing
           </a>
@@ -501,12 +538,12 @@ function NotFound() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center py-32 text-center">
       <h2 className="text-2xl font-semibold text-white">No trail here.</h2>
-      <p className="mt-3 max-w-md text-base text-[#9AA0A6]">Lola couldn't find a page at this URL.</p>
+      <p className="mt-3 max-w-md text-base text-ink-3">Lola couldn't find a page at this URL.</p>
       <a
         href="/"
-        className="mt-8 inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] px-8 text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25"
+        className="mt-8 inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-br from-gold-hi via-gold-deep to-gold-deep px-8 text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-gold-hi/25"
       >
-        Back to the audit
+        Back to the Growth Score
       </a>
     </main>
   );

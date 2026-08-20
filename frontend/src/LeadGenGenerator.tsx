@@ -83,7 +83,7 @@ export default function LeadGenGenerator() {
         <h1 className="text-3xl font-bold text-white sm:text-4xl">
           Lead Gen System Builder
         </h1>
-        <p className="mt-2 text-[15px] text-[#C5C5C8]">
+        <p className="mt-2 text-[15px] text-ink-2">
           Drop in your URL. Get landing page copy, a 3-email sequence, ad variants,
           tracking template, and an implementation checklist — copy-paste ready.
         </p>
@@ -92,12 +92,12 @@ export default function LeadGenGenerator() {
       {!result ? (
         <form
           onSubmit={handleGenerate}
-          className="rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8"
+          className="rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8"
         >
           <div className="grid grid-cols-1 gap-5">
             <label className="block">
-              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-[#C5C5C8]">
-                Business URL <span className="text-[#D4AF37]">*</span>
+              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-2">
+                Business URL <span className="text-gold">*</span>
               </span>
               <input
                 type="text"
@@ -105,40 +105,40 @@ export default function LeadGenGenerator() {
                 value={businessUrl}
                 onChange={(e) => setBusinessUrl(e.target.value)}
                 required
-                className="w-full rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-[#C5C5C8]">
-                Business Name <span className="text-[#6B7280]">(optional)</span>
+              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-2">
+                Business Name <span className="text-ink-4">(optional)</span>
               </span>
               <input
                 type="text"
                 placeholder="e.g., Sandbar Soft Wash"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-[#C5C5C8]">
-                Services <span className="text-[#6B7280]">(optional)</span>
+              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-2">
+                Services <span className="text-ink-4">(optional)</span>
               </span>
               <input
                 type="text"
                 placeholder="e.g., roof cleaning, house washing, soft wash"
                 value={serviceType}
                 onChange={(e) => setServiceType(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-[12px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-[12px] bg-gradient-to-br from-gold-hi via-gold-deep to-gold-deep text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -210,7 +210,7 @@ export default function LeadGenGenerator() {
 
           <button
             onClick={handleReset}
-            className="w-full rounded-[12px] border border-white/10 bg-[#11121A] py-3 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/40 hover:text-white"
+            className="w-full rounded-[12px] border border-white/10 bg-surface-2 py-3 text-[14px] font-semibold text-ink-2 transition hover:border-gold/40 hover:text-white"
           >
             Generate Another System
           </button>
@@ -232,27 +232,27 @@ interface SectionProps {
 
 function Section({ title, content, sectionName, filename, copied, onCopy, onDownload }: SectionProps) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-[#11121A] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.25)] sm:p-8">
+    <section className="rounded-2xl border border-white/10 bg-surface-2 p-6 shadow-[0_12px_28px_rgba(0,0,0,0.25)] sm:p-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-bold text-white sm:text-2xl">{title}</h2>
         <div className="flex gap-2">
           <button
             onClick={() => onCopy(content, sectionName)}
-            className="flex items-center gap-2 rounded-[10px] border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-2 text-[13px] font-semibold text-[#F4D47C] transition hover:bg-[#D4AF37]/20"
+            className="flex items-center gap-2 rounded-[10px] border border-gold/30 bg-gold/10 px-3 py-2 text-[13px] font-semibold text-gold-bright transition hover:bg-gold/20"
           >
             <CopyIcon />
             {copied === sectionName ? 'Copied!' : 'Copy'}
           </button>
           <button
             onClick={() => onDownload(content, filename)}
-            className="flex items-center gap-2 rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-[13px] font-semibold text-[#C5C5C8] transition hover:border-white/20 hover:text-white"
+            className="flex items-center gap-2 rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 text-[13px] font-semibold text-ink-2 transition hover:border-white/20 hover:text-white"
           >
             <DownloadIcon />
             Download
           </button>
         </div>
       </div>
-      <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-[#0A0A0B] p-4 font-mono text-[13px] leading-[1.6] text-[#E5E7EB]">
+      <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-on-gold p-4 font-mono text-[13px] leading-[1.6] text-ink">
         {content}
       </pre>
     </section>

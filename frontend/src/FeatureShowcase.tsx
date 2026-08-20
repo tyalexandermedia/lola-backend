@@ -45,10 +45,10 @@ function Card({
 }) {
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-gradient-to-b from-[#191A1F] to-[#141519] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_18px_44px_-18px_rgba(212,175,55,0.30)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${span}`}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-gradient-to-b from-[#191A1F] to-[#141519] transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-[0_18px_44px_-18px_rgba(212,175,55,0.30)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${span}`}
     >
       <div className="px-6 pt-6 pr-16">
-        <h3 className="text-balance font-display text-[19px] font-bold leading-[1.25] tracking-[-0.02em] text-[#ECECEF] sm:text-[21px]">
+        <h3 className="text-balance font-display text-[19px] font-bold leading-[1.25] tracking-[-0.02em] text-ink sm:text-[21px]">
           {headline}
         </h3>
         <span className="mt-2.5 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[#B99B3F]">
@@ -100,8 +100,8 @@ const CELLS: ReadonlyArray<{
 export default function FeatureShowcase() {
   return (
     <section className="mt-14 sm:mt-20">
-      <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">What lands</p>
-      <h2 className="mt-3 max-w-[760px] text-balance font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+      <p className="text-[11px] uppercase tracking-[0.1em] text-gold">What lands</p>
+      <h2 className="mt-3 max-w-[760px] text-balance font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         Not a list of features. Here&apos;s what actually lands.
       </h2>
 

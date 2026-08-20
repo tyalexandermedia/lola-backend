@@ -31,7 +31,12 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
+/** Real Google Business Profile listing URL. Until it is set the badge makes
+ *  no verification claim — see the note where it renders. */
+const GBP_URL = (import.meta.env.VITE_GBP_URL as string | undefined)?.trim() || '';
+
 import AnswerBlock from './AnswerBlock';
+import PawMark from './PawMark';
 import { HOME_QA } from './lib/pageMeta';
 import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
@@ -64,8 +69,8 @@ const START = startHref();
  */
 const GOLD_CTA =
   'group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg ' +
-  'bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left ' +
-  'text-[14px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] ' +
+  'bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left ' +
+  'text-[14px] font-bold uppercase tracking-[0.04em] text-on-gold ' +
   'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_20px_rgba(212,175,55,0.28)] ' +
   'transition-all duration-200 hover:bg-right ' +
   'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_10px_30px_rgba(212,175,55,0.44)] ' +
@@ -147,13 +152,13 @@ function Hero() {
               // man and a dog at sunset rather than a face — the right warm
               // signal from the only photo that exists, but a real headshot
               // would be materially better here.
-              className="h-12 w-12 shrink-0 rounded-full border border-[#D4AF37]/40 object-cover [object-position:center_52%]"
+              className="h-12 w-12 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
             />
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-semibold leading-tight text-[#ECECEF]">
+              <span className="block text-[13.5px] font-semibold leading-tight text-ink">
                 {FOUNDER.knownAs} — I do the work myself
               </span>
-              <span className="block text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
+              <span className="block text-[11px] uppercase tracking-[0.1em] text-gold">
                 AI Leads Expert · Tampa Bay
               </span>
             </span>
@@ -161,9 +166,9 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-[#ECECEF] sm:text-[52px] lg:text-[60px]">
+          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
             Your next customer already searched for you.
-            <span className="mt-2 block text-[#D4AF37]">Did you show up?</span>
+            <span className="mt-2 block text-gold">Did you show up?</span>
           </h1>
 
           {/* ONE line, not four.
@@ -172,9 +177,9 @@ function Hero() {
               that pushed the button off a phone screen, and that ProblemSection
               already makes better two scrolls down. The headline is the punch;
               this only has to land the promise and get out of the way. */}
-          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
             Lola makes sure you're the one they find —{' '}
-            <span className="font-semibold text-[#ECECEF]">and the one they choose.</span>
+            <span className="font-semibold text-ink">and the one they choose.</span>
           </p>
 
           {/* VALUE ANCHOR, not a sentence.
@@ -182,27 +187,27 @@ function Hero() {
               reader do the arithmetic themselves, and most won't. Struck price
               beside "Included" does it for them in one glance — the $397 lands
               against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-[#D4AF37]/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
+          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
-              <span className="text-[14.5px] font-semibold text-[#ECECEF]">Your website, designed &amp; built</span>
+              <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
-                <span className="text-[13px] text-[#7A7F8A] line-through">$3,000+</span>
-                <span className="rounded-full border border-[#4ADE80]/35 bg-[#4ADE80]/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#4ADE80]">
+                <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
+                <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-ok">
                   Included
                 </span>
               </span>
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-3">
-              <span className="text-[14.5px] text-[#C5C5C8]">Then everything else, monthly</span>
-              <span className="shrink-0 text-[17px] font-bold text-[#ECECEF]">
-                {PLAN.price}<span className="text-[13px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
+              <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
+              <span className="shrink-0 text-[17px] font-bold text-ink">
+                {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
               </span>
             </div>
           </div>
           {/* One line. The struck $3,000+ above already makes the comparison —
               spelling it out again in two more lines was the reader doing the
               same arithmetic twice. */}
-          <p className="mt-2.5 text-[13px] leading-[1.5] text-[#8A8F98]">
+          <p className="mt-2.5 text-[13px] leading-[1.5] text-ink-3">
             No setup fee. Most shops charge that up front.
           </p>
 
@@ -222,7 +227,7 @@ function Hero() {
               // permanently at the bottom of the screen, so this rendered the
               // same ask twice within one thumb-reach — and the lower copy was
               // clipped by the bar duplicating it.
-              className="hidden min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-[14px] font-semibold text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08] sm:inline-flex"
+              className="hidden min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-gold/35 px-5 py-3 text-[14px] font-semibold text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08] sm:inline-flex"
             >
               Start — {PLAN.price}{PLAN.period}
             </a>
@@ -233,12 +238,12 @@ function Hero() {
           {/* The only honest urgency here. No counter — "3 spots left in Tampa"
               converts better and is invented, which is the exact thing this
               business is positioned against. */}
-          <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#8A8F98]">
-            {trialLine() && <span className="text-[#4ADE80]">{trialLine()}</span>}
-            {trialLine() && <span aria-hidden className="text-[#3A3F48]">/</span>}
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
+            {trialLine() && <span className="text-ok">{trialLine()}</span>}
+            {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
             <span>Free 60-second Growth Score</span>
-            <span aria-hidden className="text-[#3A3F48]">/</span>
-            <span className="text-[#D4AF37]">Ranking in 90 days or 2 months free</span>
+            <span aria-hidden className="text-ink-4">/</span>
+            <span className="text-gold">Ranking in 90 days or 2 months free</span>
           </p>
 
           {/* PROOF ABOVE THE FOLD.
@@ -248,16 +253,16 @@ function Hero() {
               real, and "Ty does the work" is the offer itself. Deliberately no
               star rating or client count — D-014 holds those until there are
               receipts, and an invented one would undo the rest of the page. */}
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.07] pt-5 text-[12.5px] text-[#9AA0A6]">
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.07] pt-5 text-[12.5px] text-ink-3">
             <a
               href="/r/client/sandbar"
-              className="inline-flex items-center gap-1.5 underline decoration-white/20 underline-offset-4 transition hover:text-[#D4AF37] hover:decoration-[#D4AF37]"
+              className="inline-flex items-center gap-1.5 underline decoration-white/20 underline-offset-4 transition hover:text-gold hover:decoration-gold"
             >
-              <span aria-hidden className="text-[#4ADE80]">●</span>
+              <span aria-hidden className="text-ok">●</span>
               See a real client's dashboard — no login
             </a>
             <span className="inline-flex items-center gap-1.5" title={EXCLUSIVITY.why}>
-              <span aria-hidden className="text-[#4ADE80]">✓</span>
+              <span aria-hidden className="text-ok">✓</span>
               {EXCLUSIVITY.short}
             </span>
             {/* The split the rest of the app already uses — ClientReport says
@@ -274,11 +279,11 @@ function Hero() {
                 Only the tail is underlined; the whole chip is the target. */}
             <a
               href={`sms:${FOUNDER.phone}?&body=${encodeURIComponent('Hi Ty — quick question about Lola.')}`}
-              className="group inline-flex items-center gap-1.5 py-0.5 transition hover:text-[#D4AF37]"
+              className="group inline-flex items-center gap-1.5 py-0.5 transition hover:text-gold"
             >
-              <span aria-hidden className="text-[#4ADE80]">✓</span>
+              <span aria-hidden className="text-ok">✓</span>
               Lola watches 24/7. Ty does the work.{' '}
-              <span className="underline decoration-white/25 underline-offset-4 group-hover:decoration-[#D4AF37]">
+              <span className="underline decoration-white/25 underline-offset-4 group-hover:decoration-gold">
                 You text him.
               </span>
             </a>
@@ -292,7 +297,7 @@ function Hero() {
       </div>
 
       {/* Full-bleed hairline under the hero. */}
-      <div aria-hidden className="mt-14 h-px w-full bg-gradient-to-r from-[#D4AF37]/40 via-white/10 to-transparent sm:mt-20" />
+      <div aria-hidden className="mt-14 h-px w-full bg-gradient-to-r from-gold/40 via-white/10 to-transparent sm:mt-20" />
     </section>
   );
 }
@@ -320,15 +325,15 @@ function ReportCard() {
   // silently drop missed-call text-back off the card entirely.
 
   return (
-    <figure className="relative overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-gradient-to-b from-[#191A1F] to-[#141519] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+    <figure className="relative overflow-hidden rounded-xl border border-gold/25 bg-gradient-to-b from-[#191A1F] to-[#141519] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
       {/* header band — names the offer and the price, not a product feature */}
-      <div className="flex items-center justify-between border-b border-white/10 bg-[#1C1D23] px-5 py-3">
-        <span className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-surface-2 px-5 py-3">
+        <span className="text-[10px] uppercase tracking-[0.08em] text-gold">
           🐾 Lola · What you get
         </span>
-        <span className="text-[11px] font-bold text-[#ECECEF]">
+        <span className="text-[11px] font-bold text-ink">
           {PLAN.price}
-          <span className="text-[10px] font-semibold text-[#8A8F98]">{PLAN.period}</span>
+          <span className="text-[10px] font-semibold text-ink-3">{PLAN.period}</span>
         </span>
       </div>
 
@@ -353,11 +358,11 @@ function ReportCard() {
 
             Rendered as a chat exchange for the same reason the SMS was a
             bubble: the reader recognises the shape before reading a word. */}
-        <div className="rounded-lg border border-[#4ADE80]/25 bg-[#4ADE80]/[0.05] p-4">
-          <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">
+        <div className="rounded-lg border border-ok/25 bg-ok/[0.05] p-4">
+          <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-ok">
             <span aria-hidden>✦</span> Get named in AI answers
           </p>
-          <p className="mt-2 text-[14px] font-semibold leading-[1.5] text-[#ECECEF]">
+          <p className="mt-2 text-[14px] font-semibold leading-[1.5] text-ink">
             Your customer stopped scrolling ten blue links. They just ask.
           </p>
 
@@ -365,7 +370,7 @@ function ReportCard() {
             {/* what they type */}
             <div className="flex justify-end">
               <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
-                <p className="text-[12.5px] leading-[1.45] text-[#ECECEF]">
+                <p className="text-[12.5px] leading-[1.45] text-ink">
                   who&apos;s the best soft wash company in Dunedin?
                 </p>
               </div>
@@ -373,33 +378,33 @@ function ReportCard() {
             {/* what comes back */}
             <div className="flex justify-start">
               <div className="max-w-[92%] rounded-2xl rounded-bl-sm border border-white/[0.09] bg-[#17181C] px-3.5 py-2.5">
-                <p className="text-[12.5px] leading-[1.5] text-[#E8E4D8]">
-                  <span aria-hidden className="mr-1.5 text-[#4ADE80]">✦</span>
+                <p className="text-[12.5px] leading-[1.5] text-ink-2">
+                  <span aria-hidden className="mr-1.5 text-ok">✦</span>
                   I&apos;d start with{' '}
-                  <span className="font-semibold text-[#ECECEF]">[Your Company]</span> — strong
+                  <span className="font-semibold text-ink">[Your Company]</span> — strong
                   reviews and they cover Dunedin.
                 </p>
               </div>
             </div>
           </div>
 
-          <p className="mt-3 text-[12.5px] leading-[1.5] text-[#9AA0A6]">
+          <p className="mt-3 text-[12.5px] leading-[1.5] text-ink-3">
             Most shops are invisible here.{' '}
-            <span className="font-semibold text-[#ECECEF]">Getting you named is the job.</span>
+            <span className="font-semibold text-ink">Getting you named is the job.</span>
           </p>
         </div>
 
         {/* ── the rest of the monthly, as a plain checklist ── */}
-        <p className="mt-5 text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+        <p className="mt-5 text-[10px] uppercase tracking-[0.08em] text-gold">
           Every month, you also get
         </p>
         <ul className="mt-2.5 grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
           {MONTHLY_AT_A_GLANCE.map((item) => (
             <li
               key={item}
-              className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-[#C5C5C8]"
+              className="flex items-start gap-1.5 text-[12px] leading-[1.45] text-ink-2"
             >
-              <span aria-hidden className="mt-[2px] shrink-0 text-[10px] text-[#4ADE80]">✓</span>
+              <span aria-hidden className="mt-[2px] shrink-0 text-[10px] text-ok">✓</span>
               {item}
             </li>
           ))}
@@ -408,14 +413,14 @@ function ReportCard() {
         {/* The struck price is what makes $397 land. It lived only in the left
             column, so the card listing everything you get never showed the one
             number that reframes the price. */}
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/[0.05] px-3.5 py-3">
-          <span className="text-[12.5px] leading-[1.4] text-[#C5C5C8]">
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-gold/25 bg-gold/[0.05] px-3.5 py-3">
+          <span className="text-[12.5px] leading-[1.4] text-ink-2">
             <span aria-hidden className="mr-1.5">🌐</span>
             Your website, designed &amp; built
           </span>
           <span className="flex shrink-0 items-baseline gap-2">
-            <span className="text-[12px] text-[#7A7F8A] line-through">$3,000+</span>
-            <span className="rounded-full border border-[#4ADE80]/35 bg-[#4ADE80]/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-[#4ADE80]">
+            <span className="text-[12px] text-ink-4 line-through">$3,000+</span>
+            <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-ok">
               Included
             </span>
           </span>
@@ -428,19 +433,19 @@ function ReportCard() {
         <div className="mt-5 border-t border-white/10 pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+              <p className="text-[10px] uppercase tracking-[0.08em] text-gold">
                 And you can watch it work
               </p>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-ink-2">
                 Your Growth Score, re-checked every month on your own dashboard.
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] text-[#4ADE80]">
+              <p className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] text-ok">
                 {SAMPLE_SCORE}
-                <span className="text-[13px] text-[#8A8F98]">/100</span>
+                <span className="text-[13px] text-ink-3">/100</span>
               </p>
-              <p className="text-[10px] uppercase tracking-[0.08em] text-[#4ADE80]">Grade {grade}</p>
+              <p className="text-[10px] uppercase tracking-[0.08em] text-ok">Grade {grade}</p>
             </div>
           </div>
 
@@ -449,23 +454,23 @@ function ReportCard() {
             {SAMPLE_DIMENSIONS.map((d) => (
               <div key={d.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-[132px] shrink-0 text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+                  <span className="w-[132px] shrink-0 text-[10px] uppercase tracking-[0.08em] text-ink-3">
                     {d.name}
                   </span>
                   <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                     <span
-                      className="block h-full rounded-full bg-[#4ADE80]/60"
+                      className="block h-full rounded-full bg-ok/60"
                       style={{ width: `${d.value}%` }}
                     />
                   </span>
                 </div>
-                <span className="font-mono text-[10.5px] tabular-nums text-[#4ADE80]/75">
+                <span className="font-mono text-[10.5px] tabular-nums text-ok/75">
                   {String(d.value).padStart(2, '0')}
                 </span>
               </div>
             ))}
           </div>
-          <p className="mt-2.5 text-[11px] text-[#8A8F98]">
+          <p className="mt-2.5 text-[11px] text-ink-3">
             Most start near 60. Sample shown — yours takes 60 seconds.
           </p>
         </div>
@@ -478,29 +483,29 @@ function ReportCard() {
           Start — {PLAN.price}{PLAN.period}
           <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
         </a>
-        <p className="mt-2 text-center text-[11.5px] leading-[1.45] text-[#8A8F98]">
+        <p className="mt-2 text-center text-[11.5px] leading-[1.45] text-ink-3">
           No setup fee · cancel anytime after the first 3 months
         </p>
 
         {/* Softer second path, 44px min height. */}
         <a
           href="/growth-score"
-          className="group mt-3 flex min-h-[44px] items-center gap-2 rounded-lg border border-white/[0.12] px-3 py-2.5 transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.08]"
+          className="group mt-3 flex min-h-[44px] items-center gap-2 rounded-lg border border-white/[0.12] px-3 py-2.5 transition-colors hover:border-gold/60 hover:bg-gold/[0.08]"
         >
-          <p className="flex-1 text-[13px] leading-[1.45] text-[#C5C5C8]">
-            <span className="font-semibold text-[#ECECEF]">See your own score first</span> — free, 60
+          <p className="flex-1 text-[13px] leading-[1.45] text-ink-2">
+            <span className="font-semibold text-ink">See your own score first</span> — free, 60
             seconds, no signup.
           </p>
           <span
             aria-hidden
-            className="shrink-0 text-[13px] text-[#D4AF37] transition-transform group-hover:translate-x-0.5"
+            className="shrink-0 text-[13px] text-gold transition-transform group-hover:translate-x-0.5"
           >
             →
           </span>
         </a>
       </div>
 
-      <figcaption className="border-t border-white/10 bg-[#1C1D23] px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+      <figcaption className="border-t border-white/10 bg-surface-2 px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-ink-3">
         🛡️ {GUARANTEE.short}
       </figcaption>
     </figure>
@@ -521,12 +526,12 @@ function ProblemSection() {
       <SectionHead kicker="What's going wrong" />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
             Right now, someone near you is asking for exactly what you sell.
           </h2>
-          <p className="mt-6 text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+          <p className="mt-6 text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
             If you're not in the answer, they hire someone else. You never find out the
-            sale existed — <span className="font-semibold text-[#ECECEF]">and neither do they.</span>
+            sale existed — <span className="font-semibold text-ink">and neither do they.</span>
           </p>
         </div>
 
@@ -547,29 +552,29 @@ function ProblemSection() {
 
       {/* The honest split — what's guaranteed, what isn't. */}
       <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2">
-        <div className="bg-[#0E0E10] p-6 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
+        <div className="bg-surface p-6 sm:p-7">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-gold">
             ✓ What I guarantee
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-[#ECECEF]">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
             You get found. On Google, and in the AI answers.
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+          <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
             That's the part I control.
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
+          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-gold">
             {GUARANTEE.emoji} {GUARANTEE.title}
           </p>
         </div>
 
-        <div className="bg-[#0E0E10] p-6 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
+        <div className="bg-surface p-6 sm:p-7">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-3">
             ✗ What I won't fake
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-[#ECECEF]">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
             Leads. Anyone promising you those is guessing.
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8]">
+          <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
             I get you in front of them. Closing is on both of us.
           </p>
         </div>
@@ -580,13 +585,13 @@ function ProblemSection() {
 
 function QueryCard({ engine, query, answer }: { engine: string; query: string; answer: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#0E0E10] p-4 sm:p-5">
+    <div className="rounded-xl border border-white/10 bg-surface p-4 sm:p-5">
       <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
-        <span aria-hidden className="text-[11px] text-[#D4AF37]">⌕</span>
-        <span className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">{engine}</span>
+        <span aria-hidden className="text-[11px] text-gold">⌕</span>
+        <span className="text-[10px] uppercase tracking-[0.08em] text-ink-3">{engine}</span>
       </div>
-      <p className="mt-3 text-[15px] font-medium text-[#ECECEF]">"{query}"</p>
-      <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-[#9AA0A6]">
+      <p className="mt-3 text-[15px] font-medium text-ink">"{query}"</p>
+      <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-ink-3">
         <span aria-hidden className="mt-0.5 text-[#E5534B]">✗</span>
         <span>{answer}</span>
       </p>
@@ -612,10 +617,10 @@ function ProofSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Don't take my word for it" />
-      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         Most agencies show you a case study. I'll just give you the login.
       </h2>
-      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
         Every move I make for a client is tracked on a dashboard anyone can open. No
         screenshot I picked, no number I typed in myself.
       </p>
@@ -624,20 +629,20 @@ function ProofSection() {
         {/* the receipts */}
         <a
           href="/r/client/sandbar"
-          className="group flex flex-col rounded-xl border border-[#D4AF37]/30 bg-[#0E0E10] p-6 transition-colors hover:border-[#D4AF37]/60 sm:p-7"
+          className="group flex flex-col rounded-xl border border-gold/30 bg-surface p-6 transition-colors hover:border-gold/60 sm:p-7"
         >
-          <p className="text-[11px] uppercase tracking-[0.08em] text-[#D4AF37]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-gold">
             Live client dashboard
           </p>
-          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-[#ECECEF]">
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-ink">
             Sandbar Soft Wash — 15 years of great work. Almost zero Google.
           </p>
-          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
             A real Palm Harbor business serving 20+ cities across Tampa Bay, that nobody
             could find online. The whole rebuild is in the open — every move, timestamped,
             for anyone to check.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#D4AF37]">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-gold">
             Open the dashboard
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
@@ -646,20 +651,20 @@ function ProofSection() {
         {/* self-proof — better than any case study, because it's about them */}
         <a
           href="/growth-score"
-          className="group flex flex-col rounded-xl border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-[#D4AF37]/40 sm:p-7"
+          className="group flex flex-col rounded-xl border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-gold/40 sm:p-7"
         >
-          <p className="text-[11px] uppercase tracking-[0.08em] text-[#8A8F98]">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-3">
             Or skip my proof entirely
           </p>
-          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-[#ECECEF]">
+          <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-ink">
             Run it on your own business. Right now, free.
           </p>
-          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-[#C5C5C8]">
+          <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
             Sixty seconds, no signup. You'll see exactly where you stand on Google and in
             AI answers — and the one fix that moves you most. Whether you hire me is a
             separate conversation.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#ECECEF]">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-ink">
             Get my Growth Score
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
@@ -694,7 +699,7 @@ function StorySection() {
             column beside the text — which is what read as "choppy". Sticking it
             means the portrait travels with the letter instead of abandoning it. */}
         <figure className="order-1 sm:col-start-1 sm:row-start-1">
-          <div className="overflow-hidden rounded-xl border border-[#D4AF37]/25">
+          <div className="overflow-hidden rounded-xl border border-gold/25">
             <img
               src="/images/ty-lola-beach.jpg"
               alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
@@ -704,7 +709,7 @@ function StorySection() {
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
-          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
             Ty &amp; Lola · St. Pete, FL
           </figcaption>
         </figure>
@@ -712,12 +717,12 @@ function StorySection() {
 
         {/* the letter */}
         <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
-          <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-[#C5C5C8] sm:text-[17px]">
+          <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-ink-2 sm:text-[17px]">
             {/* The two halves of the dog ARE the two halves of the product, and
                 saying so is the cleanest way to explain what's software and
                 what's a person without using either word. Matches the hero
@@ -730,14 +735,14 @@ function StorySection() {
                 voice reads as someone talking, not writing. */}
             <p>
               Lola's my dog —{' '}
-              <span className="font-semibold text-[#ECECEF]">half basset hound, half shepherd</span>,{' '}
+              <span className="font-semibold text-ink">half basset hound, half shepherd</span>,{' '}
               {LOLA_TURNS} this February. The basset never loses a scent. The shepherd never
               leaves the flock. Turns out that's the whole job.
             </p>
             <p>
               So that's how we work. Lola watches — your rankings, your reviews, your calls.
               Around the clock, never bored, never off.{' '}
-              <span className="font-semibold text-[#ECECEF]">I do the work she turns up.</span>
+              <span className="font-semibold text-ink">I do the work she turns up.</span>
             </p>
             <p>
               I coach strength and conditioning. Same job either way: show up, do the work, keep
@@ -753,7 +758,7 @@ function StorySection() {
                   believe any of it, silently dropped them back on the homepage. */}
               <a
                 href="/r/client/sandbar"
-                className="font-semibold text-[#ECECEF] underline decoration-[#D4AF37]/40 underline-offset-4 transition hover:decoration-[#D4AF37]"
+                className="font-semibold text-ink underline decoration-gold/40 underline-offset-4 transition hover:decoration-gold"
               >
                 Sandbar Soft Wash
               </a>
@@ -765,17 +770,17 @@ function StorySection() {
                 right level of detail on /pricing, but it turns the hardest-
                 hitting line in the letter into a procedure. The terms live one
                 click away; this paragraph only has to land the promise. */}
-            <p className="border-l-2 border-[#D4AF37] pl-4 text-[#ECECEF]">
+            <p className="border-l-2 border-gold pl-4 text-ink">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
               I do the work myself.{' '}
-              <span className="font-bold text-[#D4AF37]">{GUARANTEE.short}</span> In writing.
+              <span className="font-bold text-gold">{GUARANTEE.short}</span> In writing.
             </p>
             <p>
               A local business that finally gets found changes what a family can say yes to.
               That's the whole point. Enough of you win,{' '}
-              <span className="font-semibold text-[#ECECEF]">and Lola gets the backyard she deserves.</span>
+              <span className="font-semibold text-ink">and Lola gets the backyard she deserves.</span>
             </p>
-            <p className="text-[17px] font-semibold text-[#ECECEF] sm:text-[18px]">
+            <p className="text-[17px] font-semibold text-ink sm:text-[18px]">
               Let's get your phone ringing.
             </p>
           </div>
@@ -788,23 +793,55 @@ function StorySection() {
             is what made this section read as choppy. On mobile the explicit
             order keeps the human sequence — photo, letter, then who signed it. */}
         <div className="order-3 sm:col-start-1 sm:row-start-2 sm:-mt-1">
-          <p className="font-display text-[20px] text-[#D4AF37]">— {FOUNDER.knownAs}</p>
-          <p className="mt-1.5 text-[14px] leading-[1.5] text-[#C5C5C8]">
-            <span className="font-semibold text-[#ECECEF]">{FOUNDER.fullName}</span>
+          <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
+          <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-2">
+            <span className="font-semibold text-ink">{FOUNDER.fullName}</span>
             <br />
             {FOUNDER.title} · {FOUNDER.company}
           </p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[#8A8F98]">
+          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-3">
             {FOUNDER.location}
           </p>
+          {/* This used to read "✓ Verified Google Business" while pointing at a
+              Google Maps SEARCH QUERY — not a claimed listing — and the GBP
+              integration is still unconfigured (see docs/SETUP.md). Claiming a
+              verification the business doesn't have yet is the one thing this
+              site cannot afford, on the page where it argues that everyone else
+              inflates their proof.
+
+              So the badge is honest by default and only claims verification
+              when VITE_GBP_URL points at a real listing. Set that var and the
+              ✓ appears with a link that actually proves it. */}
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL"
+            href={GBP_URL || 'https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL'}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-[#D4AF37] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/[0.12]"
+            className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
           >
-            ✓ Verified Google Business <span aria-hidden>↗</span>
+            {GBP_URL ? '✓ Verified Google Business' : 'Find us on Google Maps'}{' '}
+            <span aria-hidden>↗</span>
           </a>
+
+          {/* The signals the letter doesn't have room for, as chips rather than
+              three more paragraphs — the brief asks for warm and credible, and
+              a fourth paragraph of prose is neither. Every one is checkable or
+              is a promise already published elsewhere on the site. */}
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {[
+              'Hybrid athlete · trains HYROX',
+              'Faith and family first',
+              'Started with my dad\u2019s crew',
+              GUARANTEE.title,
+            ].map((chip) => (
+              <li
+                key={chip}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.10] bg-white/[0.03] px-3 py-1.5 text-[11.5px] leading-none text-ink-3"
+              >
+                <PawMark className="shrink-0 text-gold/70" />
+                {chip}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -854,27 +891,27 @@ function RoiSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="The math" />
-      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
       </h2>
-      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-[#C5C5C8] sm:text-[17px]">
+      <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
         Same job. An agency just has salaries to cover before your first result. I don't.
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         {/* the comparison */}
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0E0E10]">
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-surface">
           {/* Mobile: label on its own line, then the two values side by side.
               sm+: a true three-column table. Keeps the label readable at 320px
               instead of crushing it into a ~70px gutter. */}
           <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-[#141416] px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
-            <span className="hidden text-[10px] uppercase tracking-[0.08em] text-[#8A8F98] sm:block">
+            <span className="hidden text-[10px] uppercase tracking-[0.08em] text-ink-3 sm:block">
               Compare
             </span>
-            <span className="text-left text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#8A8F98] sm:w-[128px] sm:text-right lg:w-[152px]">
+            <span className="text-left text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-ink-3 sm:w-[128px] sm:text-right lg:w-[152px]">
               {usd(AGENCY_MONTHLY)}/mo agency
             </span>
-            <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-[#D4AF37] sm:w-[136px] lg:w-[160px]">
+            <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-gold sm:w-[136px] lg:w-[160px]">
               Lola — $397/mo
             </span>
           </div>
@@ -885,17 +922,17 @@ function RoiSection() {
                 key={row.label}
                 className="grid grid-cols-2 items-start gap-x-3 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5"
               >
-                <dt className="col-span-2 mb-1.5 text-[10px] uppercase tracking-[0.06em] text-[#8A8F98] sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
+                <dt className="col-span-2 mb-1.5 text-[10px] uppercase tracking-[0.06em] text-ink-3 sm:col-span-1 sm:mb-0 sm:font-sans sm:text-[13px] sm:normal-case sm:tracking-normal">
                   {row.label}
                 </dt>
                 {/* The strike-through is the only thing marking the agency
                     column, and text-decoration isn't exposed to screen
                     readers — so name each side explicitly. */}
-                <dd className="text-left text-[13px] leading-[1.4] text-[#9AA0A6] line-through decoration-[#E5534B]/50 sm:w-[128px] sm:text-right lg:w-[152px]">
+                <dd className="text-left text-[13px] leading-[1.4] text-ink-3 line-through decoration-[#E5534B]/50 sm:w-[128px] sm:text-right lg:w-[152px]">
                   <span className="sr-only">{usd(AGENCY_MONTHLY)}/mo agency: </span>
                   {row.agency}
                 </dd>
-                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-[#ECECEF] sm:w-[136px] lg:w-[160px]">
+                <dd className="text-right text-[13px] font-semibold leading-[1.4] text-ink sm:w-[136px] lg:w-[160px]">
                   <span className="sr-only">Lola — $397/mo: </span>
                   {row.lola}
                 </dd>
@@ -903,33 +940,33 @@ function RoiSection() {
             ))}
           </dl>
 
-          <div className="border-t border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-4 py-4 sm:px-5">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#D4AF37]">
+          <div className="border-t border-gold/25 bg-gold/[0.06] px-4 py-4 sm:px-5">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-gold">
               Year-one difference
             </p>
-            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF] sm:text-[38px]">
+            <p className="mt-1 font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[38px]">
               {usd(AGENCY_YEAR_ONE - LOLA_YEAR_ONE)}
             </p>
-            <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-[#C5C5C8]">
+            <p className="mt-1 text-[12px] uppercase tracking-[0.14em] text-ink-2">
               stays in your business
             </p>
             {/* The qualifier has to sit WITH the big number — on mobile the
                 disclaimer in the calculator card renders far below it. */}
-            <p className="mt-3 text-[12px] leading-[1.55] text-[#8A8F98]">
+            <p className="mt-3 text-[12px] leading-[1.55] text-ink-3">
               Versus a {usd(AGENCY_MONTHLY)}/mo retainer over 12 months. Comparing{' '}
-              <span className="text-[#C5C5C8]">what you pay</span>, not what you get.
+              <span className="text-ink-2">what you pay</span>, not what you get.
             </p>
           </div>
         </div>
 
         {/* break-even calculator */}
         <div className="flex flex-col rounded-xl border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-[#8A8F98]">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-ink-3">
             Break-even
           </p>
           <label
             htmlFor="avg-job"
-            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-[#ECECEF]"
+            className="mt-3 block text-[17px] font-semibold leading-[1.35] text-ink"
           >
             What's one job worth to you?
           </label>
@@ -939,7 +976,7 @@ function RoiSection() {
           <output
             htmlFor="avg-job"
             aria-hidden="true"
-            className="mt-4 block font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#D4AF37]"
+            className="mt-4 block font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-gold"
           >
             {usd(avgJob)}
           </output>
@@ -954,11 +991,11 @@ function RoiSection() {
             onChange={(e) => setAvgJob(Number(e.target.value))}
             aria-valuetext={usd(avgJob)}
             aria-describedby="avg-job-help"
-            className="mt-4 h-12 w-full cursor-pointer accent-[#D4AF37]"
+            className="mt-4 h-12 w-full cursor-pointer accent-gold"
           />
           <div
             id="avg-job-help"
-            className="-mt-1 flex justify-between text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]"
+            className="-mt-1 flex justify-between text-[10px] uppercase tracking-[0.14em] text-ink-3"
           >
             <span>$100</span>
             {/* Visually the first casualty at 375px, but `hidden` would drop it
@@ -982,8 +1019,8 @@ function RoiSection() {
             />
           </div>
 
-          <p className="mt-5 text-[12px] leading-[1.55] text-[#8A8F98]">
-            <span className="text-[#C5C5C8]">Cost math, not a lead promise.</span> And that's one
+          <p className="mt-5 text-[12px] leading-[1.55] text-ink-3">
+            <span className="text-ink-2">Cost math, not a lead promise.</span> And that's one
             job a month — not one job total.
           </p>
 
@@ -1014,10 +1051,10 @@ function BreakEvenRow({
     // Stacks on mobile: side-by-side crushes the label to ~37px at 320px and
     // wraps the plan label onto four lines.
     <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-      <span className={`text-[13px] ${featured ? 'font-semibold text-[#ECECEF]' : 'text-[#C5C5C8]'}`}>
+      <span className={`text-[13px] ${featured ? 'font-semibold text-ink' : 'text-ink-2'}`}>
         {label}
       </span>
-      <span className={`text-[13px] tabular-nums ${featured ? 'text-[#D4AF37]' : 'text-[#C5C5C8]'}`}>
+      <span className={`text-[13px] tabular-nums ${featured ? 'text-gold' : 'text-ink-2'}`}>
         pays for itself at{' '}
         <span className="whitespace-nowrap font-bold">
           {jobs} job{jobs === 1 ? '' : 's'}
@@ -1036,23 +1073,23 @@ function OfferSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Start free, then choose" />
-      <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-[#ECECEF] sm:text-[40px]">
+      <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
       </h2>
 
       {/* free step */}
       <a
         href="/growth-score"
-        className="group mt-8 flex flex-col gap-3 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] p-5 transition-colors hover:bg-[#D4AF37]/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-gold/[0.05] p-5 transition-colors hover:bg-gold/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
       >
         <div className="flex items-center gap-4">
-          <span className="font-display text-[26px] font-bold text-[#D4AF37]">00</span>
+          <span className="font-display text-[26px] font-bold text-gold">00</span>
           <div>
-            <p className="text-[17px] font-semibold text-[#ECECEF]">Free 60-second Growth Score</p>
-            <p className="mt-0.5 text-[14px] text-[#C5C5C8]">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
+            <p className="text-[17px] font-semibold text-ink">Free 60-second Growth Score</p>
+            <p className="mt-0.5 text-[14px] text-ink-2">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.1em] text-[#D4AF37]">
+        <span className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.1em] text-gold">
           Start free <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
         </span>
       </a>
@@ -1063,7 +1100,7 @@ function OfferSection() {
         <TierCard tier={PLAN} href={START} featured />
       </div>
 
-      <p className="mt-5 text-[12px] leading-[1.6] text-[#8A8F98]">
+      <p className="mt-5 text-[12px] leading-[1.6] text-ink-3">
         Website design included · $0 setup · cancel after 3 months · {GUARANTEE.emoji}{' '}
         {GUARANTEE.title}.
       </p>
@@ -1075,32 +1112,32 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
   return (
     <div
       className={`flex flex-col rounded-xl border p-6 sm:p-7 ${
-        featured ? 'border-[#D4AF37]/50 bg-[#0E0E10]' : 'border-white/12 bg-[#0B0B0D]'
+        featured ? 'border-gold/50 bg-surface' : 'border-white/12 bg-[#0B0B0D]'
       }`}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[12px] uppercase tracking-[0.08em] text-[#ECECEF]">{tier.name}</p>
+        <p className="text-[12px] uppercase tracking-[0.08em] text-ink">{tier.name}</p>
         {featured && (
-          <span className="rounded-md bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-[#0A0A0B]">
+          <span className="rounded-md bg-gold px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-on-gold">
             {undefined}
           </span>
         )}
       </div>
-      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-[#ECECEF]">
+      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-ink">
         {tier.price}
-        <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-[#8A8F98]">{tier.period}</span>
+        <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-ink-3">{tier.period}</span>
       </p>
-      <p className="mt-3 text-[15px] font-medium leading-[1.45] text-[#E8E4D8]">{tier.tagline}</p>
+      <p className="mt-3 text-[15px] font-medium leading-[1.45] text-ink-2">{tier.tagline}</p>
 
       <ul className="mt-5 flex-1 space-y-2.5 border-t border-white/[0.07] pt-5">
         {tier.includes.map((line) => (
-          <li key={line} className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-[#C5C5C8]">
-            <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
+          <li key={line} className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-ink-2">
+            <span aria-hidden className="mt-0.5 text-gold">✓</span>
             <span>{line}</span>
           </li>
         ))}
         {true && (
-          <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-[#ECECEF]">
+          <li className="flex items-start gap-2.5 text-[14px] leading-[1.5] text-ink">
             <span aria-hidden className="mt-0.5">{GUARANTEE.emoji}</span>
             <span className="font-semibold">{GUARANTEE.title}</span>
           </li>
@@ -1111,8 +1148,8 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
         href={href}
         className={`mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
           featured
-            ? 'bg-[#D4AF37] text-[#0A0A0B] hover:bg-[#F4D47C]'
-            : 'border border-white/15 text-[#ECECEF] hover:border-[#D4AF37]/60 hover:text-[#D4AF37]'
+            ? 'bg-gold text-on-gold hover:bg-gold-bright'
+            : 'border border-white/15 text-ink hover:border-gold/60 hover:text-gold'
         }`}
       >
         {tier.cta} <span aria-hidden>→</span>
@@ -1145,13 +1182,13 @@ function FaqSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function FinalCta() {
   return (
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-[#D4AF37]/30 bg-black py-14 sm:mt-20 sm:py-16">
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-black py-14 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
-        <p className="text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">Your next customer is searching right now</p>
-        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF] sm:text-[48px]">
+        <p className="text-[11px] uppercase tracking-[0.1em] text-gold">Your next customer is searching right now</p>
+        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[48px]">
           Make sure the answer is you.
         </h2>
-        <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-[#C5C5C8]">
+        <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
           See where you stand in 60 seconds — free, no card. Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -1163,7 +1200,7 @@ function FinalCta() {
           </a>
           <a
             href={START}
-            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-[#D4AF37]/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition-colors hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
+            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-gold/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08]"
           >
             Start now — {PLAN.price}{PLAN.period}
           </a>
@@ -1183,8 +1220,8 @@ function FinalCta() {
 function SectionHead({ kicker }: { kicker: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-[#D4AF37]" />
-      <span className="text-[14px] font-semibold text-[#D4AF37] sm:text-[15px]">{kicker}</span>
+      <PawMark className="shrink-0 text-gold" />
+      <span className="text-[14px] font-semibold text-gold sm:text-[15px]">{kicker}</span>
     </div>
   );
 }

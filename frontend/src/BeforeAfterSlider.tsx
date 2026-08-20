@@ -82,19 +82,19 @@ export default function BeforeAfterSlider({ before, after, alt }: Props) {
         aria-valuenow={Math.round(pct)}
         tabIndex={0}
         onKeyDown={onKeyDown}
-        className="absolute top-0 h-full w-11 -translate-x-1/2 outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/70"
+        className="absolute top-0 h-full w-11 -translate-x-1/2 outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
         style={{ left: `${pct}%` }}
       >
-        <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-[#D4AF37]" />
-        <div className="absolute left-1/2 top-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#D4AF37]/60 bg-[#0A0A0B]/85 text-[13px] font-bold text-[#D4AF37] shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+        <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-gold" />
+        <div className="absolute left-1/2 top-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gold/60 bg-on-gold/85 text-[13px] font-bold text-gold shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
           ⇔
         </div>
       </div>
 
-      <span className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-[#0A0A0B]/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/85">
+      <span className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-on-gold/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/85">
         Before
       </span>
-      <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-[#0A0A0B]/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+      <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-on-gold/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">
         After
       </span>
     </div>

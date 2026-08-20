@@ -121,14 +121,14 @@ export default function Vsl() {
   return (
     <section className="mt-14 sm:mt-20">
       <div className="mx-auto max-w-[860px]">
-        <p className="text-center text-[11px] uppercase tracking-[0.1em] text-[#D4AF37]">
+        <p className="text-center text-[11px] uppercase tracking-[0.1em] text-gold">
           Watch first
         </p>
         <h2 className="mt-3 text-balance text-center font-display text-[28px] font-bold leading-[1.1] tracking-[-0.02em] text-white sm:text-[38px]">
           Why your business is invisible — in 90 seconds.
         </h2>
 
-        <div className="mt-7 overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0E0E10] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+        <div className="mt-7 overflow-hidden rounded-xl border border-gold/25 bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
           {playing ? (
             ytId ? (
               <iframe
@@ -160,10 +160,10 @@ export default function Vsl() {
                   className="h-full w-full object-cover transition group-hover:scale-[1.02]"
                 />
               ) : (
-                <span className="absolute inset-0 bg-gradient-to-br from-[#1A1A1F] to-[#0A0A0B]" />
+                <span className="absolute inset-0 bg-gradient-to-br from-[#1A1A1F] to-on-gold" />
               )}
               <span className="absolute inset-0 flex items-center justify-center">
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#D4AF37] text-[22px] text-[#0A0A0B] shadow-[0_8px_28px_rgba(212,175,55,0.5)] transition group-hover:scale-105 sm:h-20 sm:w-20">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gold text-[22px] text-on-gold shadow-[0_8px_28px_rgba(212,175,55,0.5)] transition group-hover:scale-105 sm:h-20 sm:w-20">
                   ▶
                 </span>
               </span>
@@ -174,26 +174,26 @@ export default function Vsl() {
         <div className="mt-5 text-center">
           <a
             href={LEAD_MAGNET.href}
-            className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-7 py-3 text-[14px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] transition-colors hover:bg-[#F4D47C]"
+            className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-lg bg-gold px-7 py-3 text-[14px] font-bold uppercase tracking-[0.04em] text-on-gold transition-colors hover:bg-gold-bright"
           >
             Run my free Growth Score
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
-          <p className="mt-2.5 text-[12.5px] text-[#8A8F98]">
+          <p className="mt-2.5 text-[12.5px] text-ink-3">
             Free · 60 seconds · no signup
           </p>
         </div>
 
         {/* Crawlable transcript. Collapsed for readers, present in the HTML for
             Google and for the AI crawlers this whole business is aimed at. */}
-        <details className="mt-8 rounded-xl border border-white/[0.08] bg-[#0E0E10]">
-          <summary className="cursor-pointer list-none px-5 py-3.5 text-[13px] font-semibold text-[#C5C5C8] transition hover:text-white">
+        <details className="mt-8 rounded-xl border border-white/[0.08] bg-surface">
+          <summary className="cursor-pointer list-none px-5 py-3.5 text-[13px] font-semibold text-ink-2 transition hover:text-white">
             Read the transcript
           </summary>
           <div className="space-y-3 border-t border-white/[0.07] px-5 py-4">
             {TRANSCRIPT.map((t) => (
-              <p key={t.at} className="text-[14px] leading-[1.65] text-[#C5C5C8]">
-                <span className="mr-2 font-mono text-[11px] tabular-nums text-[#8A8F98]">{t.at}</span>
+              <p key={t.at} className="text-[14px] leading-[1.65] text-ink-2">
+                <span className="mr-2 font-mono text-[11px] tabular-nums text-ink-3">{t.at}</span>
                 {t.text}
               </p>
             ))}

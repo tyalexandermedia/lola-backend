@@ -20,9 +20,9 @@ export default function Marquee() {
   // We render the stats list twice so the loop is seamless — when the first
   // copy scrolls fully off, the second copy is already in position.
   return (
-    <div className="group relative overflow-hidden border-y border-[#D4AF37]/15 bg-[#0A0A0B] py-4">
+    <div className="group relative overflow-hidden border-y border-gold/15 bg-on-gold py-4">
       <div
-        className="flex w-max animate-marquee gap-8 whitespace-nowrap text-[12px] uppercase tracking-[0.18em] text-[#C5C5C8] sm:text-[13px] sm:tracking-[0.22em]"
+        className="flex w-max animate-marquee gap-8 whitespace-nowrap text-[12px] uppercase tracking-[0.18em] text-ink-2 sm:text-[13px] sm:tracking-[0.22em]"
         style={{ animationPlayState: 'running' }}
       >
         {[0, 1].map((copy) => (
@@ -32,7 +32,7 @@ export default function Marquee() {
             {STATS.map((s, i) => (
               <div key={`${copy}-${i}`} className="flex shrink-0 items-center gap-8">
                 <span>{s}</span>
-                <span aria-hidden className="text-[#D4AF37]">◇</span>
+                <span aria-hidden className="text-gold">◇</span>
               </div>
             ))}
           </div>

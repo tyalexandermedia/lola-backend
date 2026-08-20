@@ -73,7 +73,7 @@ export default function BuildOnboarding() {
               'radial-gradient(40% 52% at 24% 12%, rgba(111,155,255,0.10), transparent 70%), radial-gradient(46% 56% at 80% 6%, rgba(212,175,55,0.18), transparent 70%)',
           }}
         />
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           {paid ? '✓ Payment confirmed' : 'The monthly · $397/month'}
         </p>
         <h1
@@ -82,7 +82,7 @@ export default function BuildOnboarding() {
         >
           {paid ? "You're in. Let's build it." : 'Ready to build it and rank it?'}
         </h1>
-        <p className="mx-auto mt-5 max-w-[620px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mx-auto mt-5 max-w-[620px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           {paid
             ? 'One thing to do right now: book your kickoff call. Everything else, we drive.'
             : 'The monthly is done-for-you — your site built and kept current, your profile managed, and your keywords picked with Ty. Start below.'}
@@ -93,7 +93,7 @@ export default function BuildOnboarding() {
           target={paid ? '_blank' : undefined}
           rel={paid ? 'noreferrer' : undefined}
           onClick={() => track(paid ? 'build_kickoff_cta' : 'build_buy_cta')}
-          className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02] sm:text-[15px]"
+          className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02] sm:text-[15px]"
         >
           {paid ? 'Book your kickoff call →' : `Start my build — ${BUILD.price} →`}
         </a>
@@ -104,18 +104,18 @@ export default function BuildOnboarding() {
         {STEPS.map((s) => (
           <div key={s.n} className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
             <div className="flex items-baseline gap-3">
-              <span className="text-[13px] font-bold text-[#D4AF37]/70">{s.n}</span>
+              <span className="text-[13px] font-bold text-gold/70">{s.n}</span>
               <h3 className="text-[18px] font-bold text-white sm:text-[20px]">{s.title}</h3>
             </div>
-            <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">{s.body}</p>
+            <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">{s.body}</p>
           </div>
         ))}
       </section>
 
       {/* Prep list */}
-      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-7 sm:p-9">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Bring to your kickoff</p>
-        <p className="mt-2 text-[14px] text-[#9CA3AF]">Two minutes of thinking now saves a week later.</p>
+      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-2xl border border-gold/25 bg-white/[0.02] p-7 sm:p-9">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">Bring to your kickoff</p>
+        <p className="mt-2 text-[14px] text-ink-3">Two minutes of thinking now saves a week later.</p>
         <ul className="mt-4 flex flex-col gap-2.5 text-[15px] text-white">
           {[
             'The 5 jobs or searches you most want to win (e.g. "AC repair Tampa")',
@@ -124,7 +124,7 @@ export default function BuildOnboarding() {
             'Your logo and a few real job photos, if you have them',
           ].map((b) => (
             <li key={b} className="flex items-start gap-3">
-              <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
+              <span aria-hidden className="mt-0.5 text-gold">✓</span>
               {b}
             </li>
           ))}
@@ -132,8 +132,8 @@ export default function BuildOnboarding() {
       </section>
 
       {/* Guarantee reminder */}
-      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-2xl border border-[#D4AF37]/40 bg-[#D4AF37]/[0.05] p-7 text-center sm:p-8">
-        <p className="flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-2xl border border-gold/40 bg-gold/[0.05] p-7 text-center sm:p-8">
+        <p className="flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-[0.22em] text-gold">
           <span aria-hidden>{HALF_BACK_GUARANTEE.emoji}</span>
           {HALF_BACK_GUARANTEE.title}
         </p>
@@ -144,15 +144,15 @@ export default function BuildOnboarding() {
 
       {/* Soft pointer to the continuity option — no pressure, just so it's not
           a surprise when the 30 days wrap. */}
-      <p className="mx-auto mt-12 max-w-[560px] text-center text-[13px] leading-[1.6] text-[#8A8F98]">
+      <p className="mx-auto mt-12 max-w-[560px] text-center text-[13px] leading-[1.6] text-ink-3">
         After your 30 days, some owners keep us on to hold their spot —{' '}
-        <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">
+        <a href="/pricing" className="text-gold underline-offset-2 hover:underline">
           see Lola Managed
         </a>
         . Totally optional, cancel anytime.
       </p>
 
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-16">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

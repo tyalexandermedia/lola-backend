@@ -78,21 +78,21 @@ export default function WatchExplainer({
           setOpen(true);
           track('watch_explainer_open', { label });
         }}
-        className={`inline-flex items-center gap-2.5 rounded-full border border-[#D4AF37]/40 bg-white/[0.03] px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08] ${className}`}
+        className={`inline-flex items-center gap-2.5 rounded-full border border-gold/40 bg-white/[0.03] px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.08] ${className}`}
       >
         <span
           aria-hidden
-          className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D4AF37] text-[10px] text-[#0A0A0B]"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-gold text-[10px] text-on-gold"
         >
           ▶
         </span>
         {label}
-        {seconds ? <span className="text-[#9CA3AF]">· {seconds}s</span> : null}
+        {seconds ? <span className="text-ink-3">· {seconds}s</span> : null}
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0A0A0B]/92 p-4 backdrop-blur-[6px] sm:p-6"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-on-gold/92 p-4 backdrop-blur-[6px] sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Demo video"
@@ -103,7 +103,7 @@ export default function WatchExplainer({
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close video"
-              className="absolute -top-11 right-0 flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.15] bg-white/[0.03] text-[18px] text-[#C5C5C8] transition hover:border-[#D4AF37]/40 hover:text-white"
+              className="absolute -top-11 right-0 flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.15] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-white"
             >
               ✕
             </button>
