@@ -27,13 +27,16 @@ Design notes
 
 import html
 import json
+import os
 from pathlib import Path
 
 # --------------------------------------------------------------------------- #
 # Constants / brand facts (single source of truth)
 # --------------------------------------------------------------------------- #
 
-BASE_URL = "https://lola.tyalexandermedia.com"
+# Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts and the
+# VITE_SITE_ORIGIN the build scripts read, so the whole site moves together.
+BASE_URL = os.getenv("VITE_SITE_ORIGIN", "https://www.coachtyalexander.com").rstrip("/")
 # The live $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts.
 # These pages used to point three gold CTAs at a Google Calendar booking link,
 # which is the call path Ty removed. A Payment Link is a public URL, not a
@@ -544,6 +547,12 @@ RETIRED_ROUTE_REDIRECTS = {
     "/managed": "/pricing",      # published a $297/mo price that no longer exists
     "/build": "/start",          # old post-purchase page; step 01 was "book a call"
     "/build/start": "/start",
+    # One lead magnet. These two ran the same pipeline as /growth-score, so the
+    # site was competing with itself for "free local SEO check". 301 rather
+    # than noindex: both have inbound links and whatever equity they carry
+    # should land on the survivor.
+    "/grader": "/growth-score",
+    "/audit": "/growth-score",
 }
 
 # Stale hand-written files to delete after generation.
@@ -586,9 +595,39 @@ def jsonld(obj):
 # Page rendering
 # --------------------------------------------------------------------------- #
 
+# The metro these pages actually cover. Named on every page so the
+# canonicalisation below is honest: a reader who lands on the Tampa page from a
+# Clearwater search sees Clearwater in the service area, because it is.
+METRO_CITIES = "Tampa, St. Petersburg, Clearwater, Brandon, Palm Harbor and Sarasota"
+
+# The one indexable page per trade. The other five city variants canonicalise
+# into it.
+CANONICAL_CITY = "tampa"
+
+
 def render_page(svc_slug, svc, city_slug, city):
+    """Render one trade x city page.
+
+    ── Why the non-Tampa pages canonicalise away ─────────────────────────────
+    These 48 pages come from one template with the city name swapped in.
+    Measured: two pages for the same trade in different cities share 68-74% of
+    their 8-word phrases, and roofing-seo-tampa vs roofing-seo-clearwater is
+    929 words of which NINE differ — the city name and a neighbourhood list.
+
+    That is the shape Google's scaled-content-abuse and doorway-page policies
+    describe, and the risk is not only that these pages don't rank: ~44,000
+    words of near-duplicate text can drag site-wide quality signals on a domain
+    with little authority to spare.
+
+    Canonical rather than noindex, deliberately. noindex removes a page and
+    throws away whatever links point at it; a canonical tells Google these are
+    the same page and CONSOLIDATES those signals into the survivor. Every URL
+    stays live and nothing 404s, so inbound links, ads and printed collateral
+    keep working — the reader just lands on the page Google indexes.
+    """
     slug = f"{svc_slug}-seo-{city_slug}"
     url = f"{BASE_URL}/lp/{slug}"
+    canonical = f"{BASE_URL}/lp/{svc_slug}-seo-{CANONICAL_CITY}"
     cname = city["name"]
     title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Lola'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
@@ -602,10 +641,10 @@ def render_page(svc_slug, svc, city_slug, city):
     professional_service = {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        "@id": f"{url}#business",
+        "@id": f"{canonical}#business",
         "name": "Lola SEO by Ty Alexander Media",
         "image": f"{BASE_URL}/coach-ty.jpg",
-        "url": url,
+        "url": canonical,
         "telephone": PHONE,
         "email": EMAIL,
         "priceRange": PRICE_RANGE,
@@ -684,7 +723,7 @@ def render_page(svc_slug, svc, city_slug, city):
             {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{BASE_URL}/"},
             {"@type": "ListItem", "position": 2, "name": "Industries",
              "item": f"{BASE_URL}/lp/industries"},
-            {"@type": "ListItem", "position": 3, "name": f"{svc['name']} — {cname}", "item": url},
+            {"@type": "ListItem", "position": 3, "name": f"{svc['name']} — Tampa Bay", "item": canonical},
         ],
     }
 
@@ -722,8 +761,8 @@ def render_page(svc_slug, svc, city_slug, city):
         f'<div class="footer-links">{other_cities}</div>'
         f'<p class="footer-links-h">Start here</p>'
         f'<div class="footer-links">'
-        f'<a href="https://lola.tyalexandermedia.com/growth-score">&#128202; Free Growth Score</a>'
-        f'<a href="https://lola.tyalexandermedia.com/roadmap">See the roadmap</a>'
+        f'<a href="{BASE_URL}/growth-score">&#128202; Free Growth Score</a>'
+        f'<a href="{BASE_URL}/roadmap">See the roadmap</a>'
         f'<a href="/lp/industries">All industries &amp; cities</a>'
         f'</div>'
         '</div>'
@@ -736,11 +775,11 @@ def render_page(svc_slug, svc, city_slug, city):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{url}">
+<link rel="canonical" href="{canonical}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
-<meta property="og:url" content="{url}">
+<meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0A0A0B">
@@ -761,8 +800,9 @@ def render_page(svc_slug, svc, city_slug, city):
 <p class="eyebrow">Local SEO · {esc(svc["eyebrow_word"])} · {esc(cname)}, FL</p>
 <h1>{esc(svc["h1"](city))}</h1>
 <p class="sub">{esc(svc["sub"](city))}</p>
+<p class="sub" style="font-size:15px;opacity:.78">Serving {METRO_CITIES} &mdash; and the service areas around them.</p>
 <a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <h2>Not this. This.</h2>
 <div class="row row-2">
@@ -791,7 +831,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h2>One plan. One price.</h2>
 <p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. Or skip the wait — it's <strong>$397/month</strong>, and your website design is included free. No setup fee, no build charge, cancel anytime after the first 3 months. Backed by the 90-Day Promise.</p>
 <a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <div class="divider"></div>
 
@@ -802,7 +842,7 @@ def render_page(svc_slug, svc, city_slug, city):
 {faq_details}
 
 <a class="cta" href="{esc(primary_cta)}" style="margin-top:40px">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 {footer_links}
 
@@ -968,8 +1008,8 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.08)">
 <a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{esc(cta)}">Start my monthly</a>
-<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/growth-score">Get your free Growth Score</a>
-<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/pricing">See pricing</a>
+<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{BASE_URL}/growth-score">Get your free Growth Score</a>
+<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{BASE_URL}/pricing">See pricing</a>
 </div>
 
 <div class="foot">
@@ -996,8 +1036,12 @@ def render_sitemap(slugs):
     core = [
         ("/", "weekly", "1.0"),
         ("/start", "monthly", "0.95"),    # dead-simple texted front door
-        ("/grader", "weekly", "0.95"),    # primary lead magnet
+        # /grader and /audit are absent: both 301 to /growth-score now, and a
+        # sitemap that submits a redirecting URL reports as "Page with
+        # redirect" in Search Console rather than as coverage.
         ("/growth-score", "monthly", "0.9"),   # free Growth Score opt-in
+        ("/case-studies", "monthly", "0.8"),
+        ("/case-studies/sandbar", "monthly", "0.85"),   # the published proof story
         ("/pricing", "monthly", "0.9"),
         ("/roadmap", "monthly", "0.88"),   # interactive Growth Score page (static LP)
         # /diy and /retainer are deliberately absent. /diy is a noindexed access
@@ -1009,12 +1053,10 @@ def render_sitemap(slugs):
         ("/apply", "monthly", "0.7"),
         ("/lp/industries", "monthly", "0.8"),
         ("/methodology", "monthly", "0.8"),
-        ("/case-studies", "monthly", "0.82"),
-        # D-014: /case-studies/sandbar held (gated behind VITE_SHOW_SANDBAR_CASE_STUDY)
-        # until verified ranking receipts exist — re-add here when republished.
         # High-intent comparison pages — keep in sync with COMPETITORS
         # in frontend/src/VsPage.tsx.
         ("/vs", "monthly", "0.88"),
+        ("/vs/local-service-ads", "monthly", "0.85"),   # highest-intent of the set
         ("/vs/localiq", "monthly", "0.85"),
         ("/vs/brightlocal", "monthly", "0.85"),
         ("/vs/scorpion", "monthly", "0.85"),
@@ -1028,7 +1070,12 @@ def render_sitemap(slugs):
                  f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>{freq}</changefreq>\n"
                  f"    <priority>{pri}</priority>\n  </url>\n")
-    for slug in slugs:
+    # Only the ONE indexable page per trade. The other 40 city variants
+    # canonicalise into these, and listing a canonicalised-away URL reports in
+    # Search Console as "Alternate page with proper canonical tag" — noise, not
+    # coverage. They stay live and crawlable; they just aren't submitted.
+    canonical_slugs = [sg for sg in slugs if sg.endswith(f"-seo-{CANONICAL_CITY}")]
+    for slug in canonical_slugs:
         rows += (f"  <url>\n    <loc>{BASE_URL}/lp/{slug}</loc>\n"
                  f"    <lastmod>{lastmod}</lastmod>\n"
                  f"    <changefreq>monthly</changefreq>\n"

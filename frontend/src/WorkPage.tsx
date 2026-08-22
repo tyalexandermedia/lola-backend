@@ -31,25 +31,25 @@ export default function WorkPage() {
               'radial-gradient(40% 52% at 24% 12%, rgba(111,155,255,0.10), transparent 70%), radial-gradient(46% 56% at 80% 6%, rgba(212,175,55,0.18), transparent 70%)',
           }}
         />
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">The work</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">The work</p>
         <h1
-          className="mt-4 max-w-[820px] font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 max-w-[820px] font-bold leading-[1.05] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(2rem, 4.6vw, 3.4rem)' }}
         >
           Real businesses. Real sites.{' '}
-          <span className="animate-shimmer bg-gradient-to-r from-[#D4AF37] via-[#FFF0B8] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="animate-shimmer bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-transparent">
             Live right now.
           </span>
         </h1>
-        <p className="mt-5 max-w-[660px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[660px] text-[16px] leading-[1.55] text-ink-2 sm:text-[18px]">
           Every one of these is a live site Lola built — and works to get found on Google and in
           AI answers. Tap any card to scroll through the real thing.
         </p>
-        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-[#9CA3AF]">
-          <span className="font-semibold text-[#ECECEF]">{count} live build{count === 1 ? '' : 's'}</span>
-          <span aria-hidden className="text-[#3A3F48]">·</span>
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-ink-3">
+          <span className="font-semibold text-ink">{count} live build{count === 1 ? '' : 's'}</span>
+          <span aria-hidden className="text-ink-4">·</span>
           <span>Home services + beyond</span>
-          <span aria-hidden className="text-[#3A3F48]">·</span>
+          <span aria-hidden className="text-ink-4">·</span>
           <span>Tampa Bay &amp; up</span>
         </div>
       </section>
@@ -58,37 +58,37 @@ export default function WorkPage() {
       <Portfolio showHeader={false} />
 
       {/* CTA */}
-      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-24 sm:p-12">
+      <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-24 sm:p-12">
         <h2
-          className="mx-auto max-w-[640px] font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mx-auto max-w-[640px] font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 3.6vw, 2.5rem)' }}
         >
           Want yours to be the next one?
         </h2>
-        <p className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.55] text-ink-2 sm:text-[16px]">
           The monthly is $397 — we build your site and get you found on Google and in
           AI answers, backed by the 90-Day Promise.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
             href={startHref(true)}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02] sm:h-16 sm:text-[15px]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <a
             href="/pricing"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/40 hover:bg-gold/[0.06] sm:h-16 sm:text-[15px]"
           >
             See what&apos;s included
           </a>
         </div>
-        <p className="mt-4 text-[12px] text-[#8A8F98]">
+        <p className="mt-4 text-[12px] text-ink-3">
           🔒 Secure checkout · {PLAN.terms}
         </p>
       </section>
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

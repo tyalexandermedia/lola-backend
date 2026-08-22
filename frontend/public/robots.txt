@@ -17,4 +17,4 @@ Allow: /
 User-agent: anthropic-ai
 Allow: /
 
-Sitemap: https://lola.tyalexandermedia.com/sitemap.xml
+Sitemap: https://www.coachtyalexander.com/sitemap.xml

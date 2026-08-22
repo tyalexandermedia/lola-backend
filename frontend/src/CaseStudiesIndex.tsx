@@ -15,6 +15,7 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 
 // D-014: the Sandbar case-study page is held until the ranking tracker has
 // verified day-0 → day-30 receipts. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true
@@ -23,33 +24,23 @@ const SHOW_SANDBAR_CASE_STUDY =
   (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) === 'true';
 
 export default function CaseStudiesIndex() {
+  usePageMeta('/case-studies');
   useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Case Studies — Lola | Local AI Visibility Wins';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'Real Lola case studies — how we moved local service businesses from invisible to ranked across Google + AI search. Honest fine print, real claims only.',
-      );
-    }
 
     const block = {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Lola Local AI Visibility — Case Studies',
-      url: 'https://lola.tyalexandermedia.com/case-studies',
+      url: `${SITE_ORIGIN}/case-studies`,
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: [
           {
             '@type': 'ListItem',
             position: 1,
-            url: 'https://lola.tyalexandermedia.com/case-studies/sandbar',
+            url: `${SITE_ORIGIN}/case-studies/sandbar`,
             name: 'Sandbar Soft Wash — Palm Harbor, FL',
           },
         ],
@@ -65,8 +56,6 @@ export default function CaseStudiesIndex() {
 
     return () => {
       tag.parentNode?.removeChild(tag);
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 
@@ -74,7 +63,7 @@ export default function CaseStudiesIndex() {
     <main className="flex flex-1 flex-col">
       {/* ── HERO ───────────────────────────────────────────── */}
       <section className="pt-2 sm:pt-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Case Studies · Real Wins
         </p>
         <h1
@@ -82,12 +71,12 @@ export default function CaseStudiesIndex() {
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           The{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             proof
           </span>{' '}
           file.
         </h1>
-        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           Each case study uses only claims we already publish elsewhere on the site —
           no fabricated metrics. Live time-series graphs land on each page as the
           tracker accumulates more history.
@@ -96,7 +85,7 @@ export default function CaseStudiesIndex() {
 
       {/* ── PUBLISHED ─────────────────────────────────────── */}
       <section className="mt-12 sm:mt-16">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Published
         </p>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
@@ -104,31 +93,31 @@ export default function CaseStudiesIndex() {
             <a
               href="/case-studies/sandbar"
               onClick={() => track('case_studies_card_clicked', { slug: 'sandbar' })}
-              className="group relative flex flex-col rounded-[14px] border border-[#D4AF37]/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.10)] transition-all hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-[0_0_44px_rgba(212,175,55,0.22)] sm:p-7"
+              className="group relative flex flex-col rounded-[14px] border border-gold/30 bg-gradient-to-br from-surface via-surface to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.10)] transition-all hover:-translate-y-1 hover:border-gold/60 hover:shadow-[0_0_44px_rgba(212,175,55,0.22)] sm:p-7"
             >
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
                 Pressure Washing · Palm Harbor, FL
               </p>
               <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
                 Sandbar Soft Wash
               </h2>
-              <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+              <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
                 The original proof story — Coach Ty&apos;s father&apos;s 15+ year
                 master-certified family business, and the reason Lola exists. Every
                 move tracked in the open.
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                <span className="rounded-full border border-gold/30 bg-gold/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
                   Live tracker
                 </span>
-                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                <span className="rounded-full border border-gold/30 bg-gold/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
                   20+ cities
                 </span>
-                <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                <span className="rounded-full border border-gold/30 bg-gold/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
                   15+ years
                 </span>
               </div>
-              <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition group-hover:translate-x-1">
+              <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.06em] text-gold transition group-hover:translate-x-1">
                 Read the case study →
               </p>
             </a>
@@ -138,7 +127,7 @@ export default function CaseStudiesIndex() {
           <a
             href="/r/client/sandbar"
             onClick={() => track('case_studies_card_clicked', { slug: 'sandbar', kind: 'live' })}
-            className="group relative flex flex-col rounded-[14px] border border-emerald-500/30 bg-gradient-to-br from-[#0F0F12] via-[#0F0F12] to-[#0A1410] p-6 shadow-[0_0_28px_rgba(16,185,129,0.10)] transition-all hover:-translate-y-1 hover:border-emerald-500/60 sm:p-7"
+            className="group relative flex flex-col rounded-[14px] border border-emerald-500/30 bg-gradient-to-br from-surface via-surface to-[#0A1410] p-6 shadow-[0_0_28px_rgba(16,185,129,0.10)] transition-all hover:-translate-y-1 hover:border-emerald-500/60 sm:p-7"
           >
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
               <span aria-hidden className="mr-1">●</span>Live dashboard · updated weekly
@@ -146,7 +135,7 @@ export default function CaseStudiesIndex() {
             <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-white sm:text-[28px]">
               Sandbar Soft Wash — live data
             </h2>
-            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
               The real ranking history, AI Share of Voice, and calls/leads/clicks Lola is driving
               right now. No login. PII stripped. The dashboard we&apos;d hand your business too.
             </p>
@@ -158,22 +147,22 @@ export default function CaseStudiesIndex() {
           {/* Honest placeholder card — we're explicit it's coming, no
               fake business names or fabricated numbers. */}
           <div className="flex flex-col rounded-[14px] border border-dashed border-white/[0.10] bg-white/[0.01] p-6 sm:p-7">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-3">
               Next publish — coming
             </p>
-            <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-[#9CA3AF] sm:text-[28px]">
+            <h2 className="mt-3 text-[24px] font-bold tracking-[-0.01em] text-ink-3 sm:text-[28px]">
               Your business?
             </h2>
-            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#9CA3AF] sm:text-[15px]">
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-ink-3 sm:text-[15px]">
               When a roadmap client agrees to go public, this is where their story lands.
               Real numbers from the live tracker, week-by-week playbook breakdown, AI
               Share-of-Voice graphs. Want to be next?
             </p>
             <a
-              href="/grader"
-              className="mt-5 inline-flex h-11 items-center justify-center gap-2 self-start rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-5 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:border-[#D4AF37]/70 hover:bg-[#D4AF37]/[0.08]"
+              href="/growth-score"
+              className="mt-5 inline-flex h-11 items-center justify-center gap-2 self-start rounded-[10px] border border-gold/40 bg-white/[0.02] px-5 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.08]"
             >
-              Run the free Grader →
+              Run the free Growth Score →
             </a>
           </div>
         </div>
@@ -181,7 +170,7 @@ export default function CaseStudiesIndex() {
 
       {/* ── HOW WE WRITE THESE ─────────────────────────── */}
       <section className="mt-14 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           How we write these
         </p>
         <h2
@@ -190,9 +179,9 @@ export default function CaseStudiesIndex() {
         >
           The rules.
         </h2>
-        <ul className="mt-5 flex flex-col gap-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+        <ul className="mt-5 flex flex-col gap-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
           <li className="flex items-start gap-3">
-            <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
+            <span aria-hidden className="mt-1 text-gold">→</span>
             <span>
               <span className="font-semibold text-white">No fabricated metrics.</span>{' '}
               Every number on a Lola case study comes from a public claim we already make
@@ -200,7 +189,7 @@ export default function CaseStudiesIndex() {
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
+            <span aria-hidden className="mt-1 text-gold">→</span>
             <span>
               <span className="font-semibold text-white">Client written consent.</span>{' '}
               We don&apos;t name a client publicly until they&apos;ve agreed in writing.
@@ -208,7 +197,7 @@ export default function CaseStudiesIndex() {
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
+            <span aria-hidden className="mt-1 text-gold">→</span>
             <span>
               <span className="font-semibold text-white">Conflict of interest disclosure.</span>{' '}
               Sandbar is Coach Ty&apos;s father&apos;s business. That&apos;s flagged on the
@@ -216,7 +205,7 @@ export default function CaseStudiesIndex() {
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span aria-hidden className="mt-1 text-[#D4AF37]">→</span>
+            <span aria-hidden className="mt-1 text-gold">→</span>
             <span>
               <span className="font-semibold text-white">Live time-series graphs.</span>{' '}
               As each case study&apos;s tracker accumulates more history, we publish the
@@ -227,7 +216,7 @@ export default function CaseStudiesIndex() {
         </ul>
       </section>
 
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-16">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

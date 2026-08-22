@@ -11,12 +11,13 @@
  * choice is what puts these questions in the page outline where a crawler
  * building a passage index can find them.
  *
- * ── Open by default, on purpose ──────────────────────────────────────────
- * Google indexes content inside a collapsed <details>, but it is the answer
- * text that has to be liftable, and the safest way to guarantee that is to
- * render it as plain flow content. `collapsible` is available for long
- * secondary lists where the wall of text would hurt the page; the default is
- * open because the whole point is being quotable.
+ * ── When to collapse ─────────────────────────────────────────────────────
+ * Google indexes content inside a collapsed <details>, and the answer text is
+ * in the served HTML either way — so `collapsible` costs nothing in
+ * citability. Use it whenever the Q&A is SUPPORTING content on a page with
+ * another job (the homepage, /pricing, /growth-score, whose primary job is the
+ * form). Reserve the open flow variant for a page where the answers ARE the
+ * content and a reader arrived to read them.
  *
  * ── The schema contract ──────────────────────────────────────────────────
  * The array passed in MUST be the same array used to build the route's
@@ -56,7 +57,7 @@ export default function AnswerBlock({
   return (
     <section className={`mt-14 sm:mt-20 ${className}`} aria-labelledby="answers-heading">
       {kicker && !hideHeading && (
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
           {kicker}
         </p>
       )}
@@ -65,35 +66,45 @@ export default function AnswerBlock({
         className={
           hideHeading
             ? 'sr-only'
-            : 'mt-3 font-display text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-[#ECECEF] sm:text-[34px]'
+            : 'mt-3 font-display text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[34px]'
         }
       >
         {heading}
       </h2>
 
-      <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
+      {/* Single column, deliberately.
+          A two-column grid was tried here and reverted: /growth-score's
+          container is max-w-[820px] because it is a form page, so the columns
+          came out 358px wide — about 45 characters — and the section barely got
+          shorter because narrow measure makes text taller. Two columns only pay
+          off in the 1120px containers, and gating on a breakpoint can't tell
+          the difference. The density fix that DOES work on a narrow page is
+          `collapsible`. */}
+      <div
+        className={`mt-8 divide-y divide-white/10 border-y border-white/10`}
+      >
         {items.map((item) =>
           collapsible ? (
             <details key={item.q} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 [&::-webkit-details-marker]:hidden">
                 {/* h3 inside summary: keeps the question in the document
                     outline while staying a valid disclosure control. */}
-                <h3 className="text-[16px] font-semibold text-[#ECECEF]">{item.q}</h3>
+                <h3 className="text-[16px] font-semibold text-ink">{item.q}</h3>
                 <span
                   aria-hidden
-                  className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45"
+                  className="shrink-0 text-[20px] text-gold transition-transform group-open:rotate-45"
                 >
                   +
                 </span>
               </summary>
-              <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-[#C5C5C8]">{item.a}</p>
+              <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-ink-2">{item.a}</p>
             </details>
           ) : (
             <div key={item.q} className="py-6">
-              <h3 className="text-[17px] font-semibold leading-[1.35] text-[#ECECEF] sm:text-[19px]">
+              <h3 className="text-[17px] font-semibold leading-[1.35] text-ink sm:text-[19px]">
                 {item.q}
               </h3>
-              <p className="mt-3 max-w-[70ch] text-[15px] leading-[1.7] text-[#C5C5C8] sm:text-[16px]">
+              <p className="mt-3 max-w-[70ch] text-[15px] leading-[1.7] text-ink-2 sm:text-[16px]">
                 {item.a}
               </p>
             </div>

@@ -123,7 +123,7 @@ export default function ClientReport({ slug }: { slug: string }) {
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-4xl py-12 text-center text-[#9AA0A6]">
+      <main className="mx-auto w-full max-w-4xl py-12 text-center text-ink-3">
         Loading client dashboard…
       </main>
     );
@@ -131,8 +131,8 @@ export default function ClientReport({ slug }: { slug: string }) {
   if (error || !data) {
     return (
       <main className="mx-auto w-full max-w-4xl py-12 text-center">
-        <h1 className="text-2xl font-bold text-[#ECECEF]">Dashboard not found</h1>
-        <p className="mt-3 text-[14px] text-[#9AA0A6]">{error}</p>
+        <h1 className="text-2xl font-bold text-ink">Dashboard not found</h1>
+        <p className="mt-3 text-[14px] text-ink-3">{error}</p>
       </main>
     );
   }
@@ -230,7 +230,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
       {anyRankings && <RankingMomentum google={data.google} />}
 
-      <p className="mt-10 text-center text-[12px] text-[#6B7280]">
+      <p className="mt-10 text-center text-[12px] text-ink-4">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
       </p>
     </main>
@@ -261,12 +261,12 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
   const totalDone = impl?.total_done ?? done.length;
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-[#11121A]">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2">
       <div className="border-b border-white/10 px-6 py-4 sm:px-8">
-        <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">
+        <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">
           Where things stand
         </h2>
-        <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+        <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
           Everything on this page is live and yours to check any time — nothing here is
           waiting on a report from me.
         </p>
@@ -275,18 +275,18 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
       <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {/* 1. What you got — the count is the retainer's receipt. */}
         <div className="px-6 py-5 sm:px-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
             Work finished
           </p>
-          <p className="mt-2 text-[34px] font-bold leading-none text-[#ECECEF]">{totalDone}</p>
-          <p className="mt-1 text-[12px] text-[#9AA0A6]">
+          <p className="mt-2 text-[34px] font-bold leading-none text-ink">{totalDone}</p>
+          <p className="mt-1 text-[12px] text-ink-3">
             {totalDone === 1 ? 'job completed' : 'jobs completed'} on your account
           </p>
           {done.length > 0 && (
             <ul className="mt-3 space-y-1.5">
               {done.slice(0, 3).map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#C5C5C8]">
-                  <span aria-hidden className="mt-[2px] text-[#4ADE80]">✓</span>
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-ink-2">
+                  <span aria-hidden className="mt-[2px] text-ok">✓</span>
                   <span>{t.title}</span>
                 </li>
               ))}
@@ -296,38 +296,38 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
 
         {/* 2 + 3. Happening now / next — proves this is ongoing, not a one-off. */}
         <div className="px-6 py-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
             Happening now
           </p>
           {inProgress.length > 0 ? (
             <ul className="mt-2 space-y-1.5">
               {inProgress.slice(0, 2).map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#ECECEF]">
-                  <span aria-hidden className="mt-[2px] text-[#D4AF37]">◈</span>
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-ink">
+                  <span aria-hidden className="mt-[2px] text-gold">◈</span>
                   <span>{t.title}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-[12.5px] text-[#9AA0A6]">
+            <p className="mt-2 text-[12.5px] text-ink-3">
               Nothing mid-flight — the queue below is what's coming.
             </p>
           )}
 
-          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#8A8F98]">
+          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-3">
             Up next
           </p>
           {nextUp.length > 0 ? (
             <ul className="mt-2 space-y-1.5">
               {nextUp.slice(0, 3).map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-[#C5C5C8]">
-                  <span aria-hidden className="mt-[2px] text-[#8A8F98]">→</span>
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-[1.45] text-ink-2">
+                  <span aria-hidden className="mt-[2px] text-ink-3">→</span>
                   <span>{t.title}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-[12.5px] text-[#9AA0A6]">
+            <p className="mt-2 text-[12.5px] text-ink-3">
               Ask me what's next — I'll queue it this week.
             </p>
           )}
@@ -336,28 +336,28 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
         {/* 4. Access. "You text Ty directly" is the whole offer; the number
             belongs where he'd reach for it, not on a contact page. */}
         <div className="px-6 py-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
             Your direct line
           </p>
-          <p className="mt-2 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
+          <p className="mt-2 text-[12.5px] leading-[1.5] text-ink-2">
             You're not routed through anyone. This is {FOUNDER.knownAs}'s phone.
           </p>
           <div className="mt-3 flex flex-col gap-2">
             <a
               href={`sms:${FOUNDER.phone}`}
-              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#D4AF37] px-4 text-[13px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C]"
+              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg bg-gold px-4 text-[13px] font-bold text-on-gold transition hover:bg-gold-bright"
             >
               Text {FOUNDER.phoneDisplay}
             </a>
             <a
               href={`tel:${FOUNDER.phone}`}
-              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-4 text-[13px] font-semibold text-[#ECECEF] transition hover:border-[#D4AF37]/60 hover:text-[#D4AF37]"
+              className="report-actions inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/15 px-4 text-[13px] font-semibold text-ink transition hover:border-gold/60 hover:text-gold"
             >
               Call
             </a>
             <a
               href={`mailto:${FOUNDER.email}`}
-              className="text-center text-[12px] text-[#9AA0A6] underline-offset-2 hover:text-[#D4AF37] hover:underline"
+              className="text-center text-[12px] text-ink-3 underline-offset-2 hover:text-gold hover:underline"
             >
               {FOUNDER.email}
             </a>
@@ -393,9 +393,9 @@ function FreshnessPill({ iso }: { iso: string }) {
 
 function Header({ data }: { data: DashboardPayload }) {
   return (
-    <header className="mb-6 rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
+    <header className="mb-6 rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
           Retainer Dashboard
         </p>
         <div className="flex flex-wrap items-center gap-2">
@@ -403,19 +403,19 @@ function Header({ data }: { data: DashboardPayload }) {
           <button
             type="button"
             onClick={() => window.print()}
-            className="report-actions inline-flex h-8 items-center rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#F4D47C] transition hover:bg-[#D4AF37]/18"
+            className="report-actions inline-flex h-8 items-center rounded-full border border-gold/30 bg-gold/10 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-bright transition hover:bg-gold/18"
           >
             Save PDF
           </button>
         </div>
       </div>
-      <h1 className="mt-2 text-3xl font-bold text-[#ECECEF] sm:text-4xl">{data.client_name}</h1>
+      <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">{data.client_name}</h1>
       {data.target_url && (
         <a
           href={data.target_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-[13px] text-[#F4D47C] underline-offset-2 hover:underline"
+          className="mt-2 inline-block text-[13px] text-gold-bright underline-offset-2 hover:underline"
         >
           {data.target_url} ↗
         </a>
@@ -479,15 +479,15 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
   const liveCount = feeds.filter((f) => f.on).length;
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#11121A]">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
         <div>
-          <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">What&apos;s live right now</h2>
-          <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+          <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">What&apos;s live right now</h2>
+          <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
             Every data feed on this page, and what it&apos;s doing for you.
           </p>
         </div>
-        <span className="shrink-0 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#F4D47C]">
+        <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-gold-bright">
           {liveCount} of {feeds.length} connected
         </span>
       </div>
@@ -507,7 +507,7 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
               }`}
             />
             <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-[#ECECEF]">
+              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-ink">
                 {f.label}
                 <span
                   className={`text-[10px] font-bold uppercase tracking-[0.1em] ${
@@ -517,7 +517,7 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
                   {f.on ? 'Live' : 'Pending'}
                 </span>
               </p>
-              <p className="mt-1 text-[12.5px] leading-[1.5] text-[#9AA0A6]">
+              <p className="mt-1 text-[12.5px] leading-[1.5] text-ink-3">
                 {f.on ? f.live : f.pending}
               </p>
             </div>
@@ -562,11 +562,11 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
       // tracked and when it lands — this used to repeat both at full height, so
       // a new client read the same reassurance three times before reaching a
       // single number. All this needs to own is "no calls or forms yet".
-      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-[#D4AF37]/15 bg-[#11121A] px-6 py-4 sm:px-8">
-        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-gold/15 bg-surface-2 px-6 py-4 sm:px-8">
+        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
           {monthLabel} so far
         </span>
-        <span className="text-[14px] text-[#C8C0B0]">
+        <span className="text-[14px] text-ink-2">
           No calls or quote requests yet this month — the moment one lands on{' '}
           {siteHost}, it appears here.
         </span>
@@ -578,26 +578,26 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
     );
   }
 
-  const deltaTone = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-[#FCA5A5]' : 'text-[#9CA3AF]';
+  const deltaTone = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-[#FCA5A5]' : 'text-ink-3';
   const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
   const deltaText = delta === 0
     ? 'flat vs last month'
     : `${deltaArrow} ${Math.abs(delta)} vs last month`;
 
   return (
-    <section className="mb-6 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.08)] sm:p-8">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mb-6 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.08)] sm:p-8">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         {monthLabel} so far
       </p>
-      <h2 className="mt-3 text-[24px] font-bold leading-snug text-[#ECECEF] sm:text-[30px]">
-        <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+      <h2 className="mt-3 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">
+        <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
           {contacts} new contact{contacts === 1 ? '' : 's'}
         </span>{' '}
         — <span className={deltaTone}>{deltaText}</span>.
       </h2>
-      <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-[#C8C0B0]">
-        <strong className="text-[#ECECEF]">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
-        and <strong className="text-[#ECECEF]">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
+      <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-ink-2">
+        <strong className="text-ink">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
+        and <strong className="text-ink">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
         landed this month.
         {wonMonth > 0 && (
           <> You&apos;ve confirmed <strong className="text-emerald-300">{wonMonth} won job{wonMonth === 1 ? '' : 's'}</strong> totaling{' '}
@@ -619,7 +619,7 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
         Revenue Agent
       </p>
-      <h2 className="mt-2 text-[22px] font-bold text-[#ECECEF]">
+      <h2 className="mt-2 text-[22px] font-bold text-ink">
         {money(revenue.pipeline_value)} open pipeline · {money(revenue.won_revenue)} confirmed won
       </h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-4">
@@ -635,8 +635,8 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
 function MiniMetric({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-      <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
-      <p className="mt-1 text-xl font-bold text-[#ECECEF]">{value}</p>
+      <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{label}</p>
+      <p className="mt-1 text-xl font-bold text-ink">{value}</p>
     </div>
   );
 }
@@ -698,8 +698,8 @@ function WhatWeWatchCard({
     keywords > 0 && {
       label: 'Keywords tracked for you',
       value: keywords,
-      tone: 'text-[#F4D47C]',
-      ring: 'border-white/10 bg-[#0F0F12]',
+      tone: 'text-gold-bright',
+      ring: 'border-white/10 bg-surface',
       blurb: `Every search a paying customer types to find you${cities.length ? ` — across ${cities.length} ${cities.length === 1 ? 'city' : 'cities'}` : ''}. Re-checked on a schedule, not when someone remembers.`,
       foot: cities.length ? cities.slice(0, 6).join(' · ') : null,
     },
@@ -707,7 +707,7 @@ function WhatWeWatchCard({
       label: 'AI questions tested',
       value: prompts,
       tone: 'text-[#C4B5FD]',
-      ring: 'border-white/10 bg-[#0F0F12]',
+      ring: 'border-white/10 bg-surface',
       blurb:
         'The questions people actually ask ChatGPT and Claude when they want someone like you. We check whether you get named.',
       foot: null,
@@ -725,12 +725,12 @@ function WhatWeWatchCard({
   }>;
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A]">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A]">
       <div className="border-b border-white/10 px-6 py-4 sm:px-8">
-        <h2 className="text-[17px] font-bold text-[#ECECEF] sm:text-[19px]">
+        <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">
           What Lola is watching for {firstName}
         </h2>
-        <p className="mt-1 text-[13px] leading-[1.5] text-[#9AA0A6]">
+        <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
           This runs whether or not anything has happened yet. The numbers below fill in as
           snapshots land — you don&apos;t have to ask for a report.
         </p>
@@ -740,12 +740,12 @@ function WhatWeWatchCard({
         <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-3 sm:px-8">
           {tiles.map((t) => (
             <div key={t.label} className={`rounded-[12px] border p-4 ${t.ring}`}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9CA3AF]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">
                 {t.label}
               </p>
               <p className={`mt-1 text-[34px] font-extrabold leading-none ${t.tone}`}>{t.value}</p>
-              <p className="mt-2 text-[11.5px] leading-[1.5] text-[#C8C0B0]">{t.blurb}</p>
-              {t.foot && <p className="mt-2 text-[10px] text-[#9CA3AF]">{t.foot}</p>}
+              <p className="mt-2 text-[11.5px] leading-[1.5] text-ink-2">{t.blurb}</p>
+              {t.foot && <p className="mt-2 text-[10px] text-ink-3">{t.foot}</p>}
             </div>
           ))}
         </div>
@@ -756,7 +756,7 @@ function WhatWeWatchCard({
           WORK on a schedule, never results on a schedule — the only dated
           outcome promise Lola makes is the 90-Day Promise. */}
       <div className="border-t border-white/10 px-6 py-5 sm:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
           What happens from here
         </p>
         <ol className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -765,13 +765,13 @@ function WhatWeWatchCard({
             { when: 'Weeks 2–4', what: 'First snapshots land. Positions and calls start appearing on this page.' },
             { when: 'Every month after', what: 'Posts, reviews and new pages keep shipping. The ledger below grows.' },
           ].map((s) => (
-            <li key={s.when} className="rounded-[12px] border border-white/[0.08] bg-[#0F0F12] p-4">
-              <p className="text-[12px] font-bold text-[#F4D47C]">{s.when}</p>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#C8C0B0]">{s.what}</p>
+            <li key={s.when} className="rounded-[12px] border border-white/[0.08] bg-surface p-4">
+              <p className="text-[12px] font-bold text-gold-bright">{s.when}</p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-ink-2">{s.what}</p>
             </li>
           ))}
         </ol>
-        <p className="mt-4 text-[11.5px] leading-[1.55] text-[#9AA0A6]">
+        <p className="mt-4 text-[11.5px] leading-[1.55] text-ink-3">
           Nothing here waits on a manual report. If you want to know something before it shows
           up, text {FOUNDER.knownAs} — that&apos;s what the number at the top is for.
         </p>
@@ -821,42 +821,42 @@ function TopWinsCard({
   const num1Count = num1.length + verifiedOrganic.length + verifiedMapPack.length;
 
   return (
-    <section className="mb-6 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#15110A] via-[#11121A] to-[#0E0F16] p-6 shadow-[0_0_36px_rgba(212,175,55,0.12)] sm:p-8">
+    <section className="mb-6 rounded-2xl border border-gold/30 bg-gradient-to-br from-[#15110A] via-surface-2 to-[#0E0F16] p-6 shadow-[0_0_36px_rgba(212,175,55,0.12)] sm:p-8">
       <div className="flex items-center gap-2">
         <span className="text-[20px]">🏆</span>
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
           Top Wins — Live on Google Right Now
         </p>
       </div>
 
       {num1Count > 0 && (
         <>
-          <h2 className="mt-3 text-[24px] font-bold leading-snug text-[#ECECEF] sm:text-[30px]">
-            <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <h2 className="mt-3 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">
+            <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
               {num1Count} #1 placement{num1Count === 1 ? '' : 's'}
             </span>{' '}
             across Google organic + map packs.
           </h2>
-          <p className="mt-2 max-w-[640px] text-[13px] leading-[1.6] text-[#C8C0B0] sm:text-[14px]">
+          <p className="mt-2 max-w-[640px] text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">
             When customers search these terms, {clientName} is the first result they see —
             the position competitors pay $5–$15 per click for.
           </p>
 
           {verifiedOrganic.length > 0 && (
             <>
-              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 #1 Organic Rankings · Confirmed
               </p>
               <ul className="mt-2 space-y-2">
                 {verifiedOrganic.map(label => (
                   <li
                     key={`vo-${label}`}
-                    className="flex items-center gap-3 rounded-[10px] border border-[#D4AF37]/20 bg-gradient-to-r from-[#D4AF37]/[0.10] to-transparent px-3 py-2.5 sm:px-4 sm:py-3"
+                    className="flex items-center gap-3 rounded-[10px] border border-gold/20 bg-gradient-to-r from-gold/[0.10] to-transparent px-3 py-2.5 sm:px-4 sm:py-3"
                   >
-                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-hi to-gold text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
                       #1
                     </span>
-                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">{label}</span>
+                    <span className="text-[14px] font-medium text-ink sm:text-[15px]">{label}</span>
                   </li>
                 ))}
               </ul>
@@ -865,7 +865,7 @@ function TopWinsCard({
 
           {verifiedMapPack.length > 0 && (
             <>
-              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 #1 in Google Map Pack · Confirmed
               </p>
               <ul className="mt-2 space-y-2">
@@ -877,7 +877,7 @@ function TopWinsCard({
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[12px] font-extrabold text-[#0E0F16] shadow-[0_0_12px_rgba(16,185,129,0.4)]">
                       📍
                     </span>
-                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">{label}</span>
+                    <span className="text-[14px] font-medium text-ink sm:text-[15px]">{label}</span>
                   </li>
                 ))}
               </ul>
@@ -886,19 +886,19 @@ function TopWinsCard({
 
           {num1.length > 0 && (
             <>
-              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 Auto-tracked #1 Rankings · This Week
               </p>
               <ul className="mt-2 space-y-2">
                 {num1.map(s => (
                   <li
                     key={`win-${s.query}`}
-                    className="flex items-center gap-3 rounded-[10px] border border-[#D4AF37]/15 bg-white/[0.02] px-3 py-2.5 sm:px-4 sm:py-3"
+                    className="flex items-center gap-3 rounded-[10px] border border-gold/15 bg-white/[0.02] px-3 py-2.5 sm:px-4 sm:py-3"
                   >
-                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD166] to-[#D4AF37] text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-hi to-gold text-[12px] font-extrabold text-[#1A1410] shadow-[0_0_12px_rgba(212,175,55,0.4)]">
                       #1
                     </span>
-                    <span className="text-[14px] font-medium text-[#ECECEF] sm:text-[15px]">
+                    <span className="text-[14px] font-medium text-ink sm:text-[15px]">
                       {s.query}
                     </span>
                   </li>
@@ -913,35 +913,35 @@ function TopWinsCard({
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {top3.length > 0 && (
             <div className="rounded-[10px] border border-white/10 bg-white/[0.03] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 Top 3 on Google
               </p>
               <p className="mt-1 text-[22px] font-bold text-emerald-300">
-                {top3.length} <span className="text-[13px] font-medium text-[#9CA3AF]">/ {totalTrackedG}</span>
+                {top3.length} <span className="text-[13px] font-medium text-ink-3">/ {totalTrackedG}</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-[#9CA3AF]">map pack territory</p>
+              <p className="mt-0.5 text-[11px] text-ink-3">map pack territory</p>
             </div>
           )}
           {top10.length > 0 && (
             <div className="rounded-[10px] border border-white/10 bg-white/[0.03] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 Page 1 on Google
               </p>
-              <p className="mt-1 text-[22px] font-bold text-[#E8E4D8]">
-                {top10.length} <span className="text-[13px] font-medium text-[#9CA3AF]">/ {totalTrackedG}</span>
+              <p className="mt-1 text-[22px] font-bold text-ink-2">
+                {top10.length} <span className="text-[13px] font-medium text-ink-3">/ {totalTrackedG}</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-[#9CA3AF]">positions 4–10</p>
+              <p className="mt-0.5 text-[11px] text-ink-3">positions 4–10</p>
             </div>
           )}
           {aiWins.length > 0 && (
             <div className="rounded-[10px] border border-white/10 bg-white/[0.03] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 AI Mentions
               </p>
-              <p className="mt-1 text-[22px] font-bold text-[#F4D47C]">
-                {aiWins.length} <span className="text-[13px] font-medium text-[#9CA3AF]">/ {totalTrackedAi}</span>
+              <p className="mt-1 text-[22px] font-bold text-gold-bright">
+                {aiWins.length} <span className="text-[13px] font-medium text-ink-3">/ {totalTrackedAi}</span>
               </p>
-              <p className="mt-0.5 text-[11px] text-[#9CA3AF]">ChatGPT &amp; Claude recommend you</p>
+              <p className="mt-0.5 text-[11px] text-ink-3">ChatGPT &amp; Claude recommend you</p>
             </div>
           )}
         </div>
@@ -959,31 +959,31 @@ function TopWinsCard({
 function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
   const live = sov.last_30d;
   const delta = sov.delta_pts;
-  const deltaColor = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#9AA0A6]';
+  const deltaColor = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-ink-3';
   const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
   // Pick the headline tone by current value, not delta.
   const headlineColor = live.pct >= 50 ? 'text-emerald-300' : live.pct >= 20 ? '#F4D47C' : '#F59E0B';
 
   return (
-    <section className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-6 shadow-[0_0_36px_rgba(212,175,55,0.10)] sm:p-8">
+    <section className="mt-10 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-6 shadow-[0_0_36px_rgba(212,175,55,0.10)] sm:p-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
             AI Share of Voice
           </p>
-          <p className="mt-2 max-w-[460px] text-[13px] leading-[1.55] text-[#9CA3AF] sm:text-[14px]">
+          <p className="mt-2 max-w-[460px] text-[13px] leading-[1.55] text-ink-3 sm:text-[14px]">
             Of every AI query we tested across {sov.queries_tracked} tracked prompt{sov.queries_tracked === 1 ? '' : 's'} in the last 30 days,
             this is the percent where AI agents actually named you.
           </p>
         </div>
         <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-end">
           <span
-            className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]"
+            className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[56px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[64px]"
             style={{ color: headlineColor }}
           >
             {live.pct}%
           </span>
-          <span className="text-[12px] text-[#9CA3AF]">
+          <span className="text-[12px] text-ink-3">
             {live.mentions}/{live.total} runs · last 30d
           </span>
         </div>
@@ -991,18 +991,18 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
 
       <div className="mt-6 grid grid-cols-3 gap-3">
         <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Vs prior 30d</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-ink-3">Vs prior 30d</p>
           <p className={`mt-1 text-[16px] font-bold ${deltaColor}`}>
             {deltaArrow} {Math.abs(delta)} pts
           </p>
         </div>
         <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Prior 30d</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.prev_30d.pct}%</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-ink-3">Prior 30d</p>
+          <p className="mt-1 text-[16px] font-bold text-ink-2">{sov.prev_30d.pct}%</p>
         </div>
         <div className="rounded-[10px] bg-white/[0.02] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9CA3AF]">Lifetime</p>
-          <p className="mt-1 text-[16px] font-bold text-[#E8E4D8]">{sov.lifetime.pct}%</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-ink-3">Lifetime</p>
+          <p className="mt-1 text-[16px] font-bold text-ink-2">{sov.lifetime.pct}%</p>
         </div>
       </div>
     </section>
@@ -1030,24 +1030,24 @@ function GbpCard({ g }: { g: NonNullable<DashboardPayload['gbp_performance']> })
     { label: 'Listing impressions', val: g.impressions, accent: '#D4AF37' },
   ];
   return (
-    <section className="mt-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
+    <section className="mt-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-surface-2 via-surface-2 to-[#0A1410] p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
         📍 Google Business Profile · last {g.window_days || 30} days
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-ink-3">
           straight from Google — the unarguable call proof
         </span>
       </p>
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {tiles.map((t) => (
-          <div key={t.label} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{t.label}</p>
+          <div key={t.label} className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{t.label}</p>
             <p className="mt-1 text-[26px] font-extrabold leading-none" style={{ color: t.accent }}>
               {(t.val || 0).toLocaleString()}
             </p>
           </div>
         ))}
       </div>
-      {g.fetched_at && <p className="mt-3 text-[10px] text-[#6B7280]">Updated {fmtDateTime(g.fetched_at)}</p>}
+      {g.fetched_at && <p className="mt-3 text-[10px] text-ink-4">Updated {fmtDateTime(g.fetched_at)}</p>}
     </section>
   );
 }
@@ -1055,25 +1055,25 @@ function GbpCard({ g }: { g: NonNullable<DashboardPayload['gbp_performance']> })
 /** Bing Webmaster card — captures the Bing/Copilot/ChatGPT-Search index. */
 function BingCard({ b }: { b: NonNullable<DashboardPayload['bing']> }) {
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Ⓑ Bing / Copilot search
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-ink-3">
           the index behind ChatGPT Search + Copilot
         </span>
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Clicks</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Clicks</p>
           <p className="mt-1 text-[24px] font-extrabold leading-none text-[#6EE7B7]">{b.clicks.toLocaleString()}</p>
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Impressions</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Impressions</p>
           <p className="mt-1 text-[24px] font-extrabold leading-none text-[#93C5FD]">{b.impressions.toLocaleString()}</p>
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">CTR</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#F4D47C]">{b.ctr}%</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">CTR</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-gold-bright">{b.ctr}%</p>
         </div>
       </div>
     </section>
@@ -1087,26 +1087,26 @@ function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
   const palette = ['#6EE7B7', '#93C5FD', '#F4D47C', '#D4AF37', '#FCA5A5', '#C4B5FD'];
   const rows = Object.entries(sources).sort((a, b) => b[1] - a[1]);
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Where your contacts came from · this month
       </p>
       {/* Stacked bar */}
-      <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-[#0F0F12]">
+      <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-surface">
         {rows.map(([s, n], i) => (
           <div key={s} title={`${label(s)}: ${n}`} style={{ width: `${(n / total) * 100}%`, background: palette[i % palette.length] }} />
         ))}
       </div>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
         {rows.map(([s, n], i) => (
-          <span key={s} className="flex items-center gap-1.5 text-[12px] text-[#C8C0B0]">
+          <span key={s} className="flex items-center gap-1.5 text-[12px] text-ink-2">
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: palette[i % palette.length] }} />
-            {label(s)} <span className="text-[#ECECEF] font-semibold">{n}</span>
-            <span className="text-[#6B7280]">({Math.round((n / total) * 100)}%)</span>
+            {label(s)} <span className="text-ink font-semibold">{n}</span>
+            <span className="text-ink-4">({Math.round((n / total) * 100)}%)</span>
           </span>
         ))}
       </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">Every contact, attributed to the channel Lola earned it through.</p>
+      <p className="mt-3 text-[11px] text-ink-4">Every contact, attributed to the channel Lola earned it through.</p>
     </section>
   );
 }
@@ -1120,11 +1120,11 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
     const was = first[key] || 0;
     const delta = now - was;
     return (
-      <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p>
+      <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+        <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{label}</p>
         <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: accent }}>{now}</p>
         {series.length > 1 && (
-          <p className={`mt-1 text-[11px] font-semibold ${delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-[#6B7280]'}`}>
+          <p className={`mt-1 text-[11px] font-semibold ${delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-red-300' : 'text-ink-4'}`}>
             {delta > 0 ? '↑' : delta < 0 ? '↓' : '·'} {delta !== 0 ? Math.abs(delta) : 'flat'}
           </p>
         )}
@@ -1132,8 +1132,8 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
     );
   };
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Site health (Google PageSpeed) · {series.length} snapshot{series.length === 1 ? '' : 's'}
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -1141,7 +1141,7 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
         {metric('seo', 'SEO', '#F4D47C')}
         {metric('accessibility', 'Accessibility', '#93C5FD')}
       </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
+      <p className="mt-3 text-[11px] text-ink-4">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
     </section>
   );
 }
@@ -1169,20 +1169,20 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
     { label: 'Avg position', val: g.position ? g.position.toFixed(1) : '—', d: null, accent: '#D4AF37', lowerBetter: true },
   ];
   return (
-    <section className="mt-6 rounded-2xl border border-[#93C5FD]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1018] p-5 sm:p-6">
+    <section className="mt-6 rounded-2xl border border-[#93C5FD]/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#0A1018] p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#93C5FD]">
         🔎 Google Search Console · last 28 days
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-ink-3">
           your real Google performance
         </span>
       </p>
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {tiles.map((t) => (
-          <div key={t.label} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{t.label}</p>
+          <div key={t.label} className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{t.label}</p>
             <p className="mt-1 text-[26px] font-extrabold leading-none" style={{ color: t.accent }}>{t.val}</p>
             {t.d !== null && t.d !== undefined && (
-              <p className={`mt-1 text-[11px] font-semibold ${t.d > 0 ? 'text-emerald-300' : t.d < 0 ? 'text-red-300' : 'text-[#6B7280]'}`}>
+              <p className={`mt-1 text-[11px] font-semibold ${t.d > 0 ? 'text-emerald-300' : t.d < 0 ? 'text-red-300' : 'text-ink-4'}`}>
                 {t.d > 0 ? '↑' : t.d < 0 ? '↓' : '·'} {Math.abs(t.d)}% vs prev 28d
               </p>
             )}
@@ -1190,26 +1190,26 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
         ))}
       </div>
       {ga && !ga.error && ga.organic_sessions > 0 && (
-        <p className="mt-3 text-[12px] text-[#C8C0B0]">
-          📊 Google Analytics: <span className="font-bold text-[#ECECEF]">{ga.organic_sessions.toLocaleString()}</span> organic sessions
-          {ga.organic_sessions_prev ? <span className="text-[#9CA3AF]"> (prev period {ga.organic_sessions_prev.toLocaleString()})</span> : null}
+        <p className="mt-3 text-[12px] text-ink-2">
+          📊 Google Analytics: <span className="font-bold text-ink">{ga.organic_sessions.toLocaleString()}</span> organic sessions
+          {ga.organic_sessions_prev ? <span className="text-ink-3"> (prev period {ga.organic_sessions_prev.toLocaleString()})</span> : null}
         </p>
       )}
       {g.top_queries && g.top_queries.length > 0 && (
         <div className="mt-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Top queries bringing you traffic</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">Top queries bringing you traffic</p>
           <div className="mt-2 space-y-1.5">
             {g.top_queries.slice(0, 5).map((q) => (
-              <div key={q.query} className="flex items-center justify-between gap-3 rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
-                <span className="truncate text-[13px] text-[#ECECEF]">{q.query}</span>
-                <span className="shrink-0 text-[11px] text-[#9CA3AF]">{q.clicks} clicks · #{q.position}</span>
+              <div key={q.query} className="flex items-center justify-between gap-3 rounded-[8px] border border-white/[0.06] bg-surface px-3 py-2">
+                <span className="truncate text-[13px] text-ink">{q.query}</span>
+                <span className="shrink-0 text-[11px] text-ink-3">{q.clicks} clicks · #{q.position}</span>
               </div>
             ))}
           </div>
         </div>
       )}
       {sc.fetched_at && (
-        <p className="mt-3 text-[10px] text-[#6B7280]">Updated {fmtDateTime(sc.fetched_at)}</p>
+        <p className="mt-3 text-[10px] text-ink-4">Updated {fmtDateTime(sc.fetched_at)}</p>
       )}
     </section>
   );
@@ -1225,32 +1225,32 @@ function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality'
   const mins = Math.floor(q.avg_duration_sec / 60);
   const secs = q.avg_duration_sec % 60;
   return (
-    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#0A1410] p-5 sm:p-6">
+    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#0A1410] p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
         📞 Tracked calls · this month
-        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-[#9CA3AF]">
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-ink-3">
           real calls through your Lola tracking number
         </span>
       </p>
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Total calls</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#ECECEF]">{q.month}</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Total calls</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-ink">{q.month}</p>
         </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Qualified ≥30s</p>
+        <div className="rounded-[10px] border border-emerald-500/20 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Qualified ≥30s</p>
           <p className="mt-1 text-[26px] font-extrabold leading-none text-emerald-300">{q.qualified_month}</p>
         </div>
-        <div className="rounded-[10px] border border-emerald-500/20 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Long ≥2 min</p>
+        <div className="rounded-[10px] border border-emerald-500/20 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Long ≥2 min</p>
           <p className="mt-1 text-[26px] font-extrabold leading-none text-[#6EE7B7]">{q.long_month}</p>
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Avg length</p>
-          <p className="mt-1 text-[26px] font-extrabold leading-none text-[#F4D47C]">{mins}:{String(secs).padStart(2, '0')}</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Avg length</p>
+          <p className="mt-1 text-[26px] font-extrabold leading-none text-gold-bright">{mins}:{String(secs).padStart(2, '0')}</p>
         </div>
       </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
+      <p className="mt-3 text-[11px] text-ink-4">
         Qualified + long calls are the ones most likely to be real jobs. Full caller log (with numbers) is in your private weekly report.
       </p>
     </section>
@@ -1270,23 +1270,23 @@ function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
     { k: 'lead', n: f.lead, label: 'Leads', accent: '#F4D47C', rate: f.lead_rate },
   ];
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Conversion funnel · this month
       </p>
       <div className="mt-4 grid grid-cols-4 gap-2">
         {steps.map((s) => (
-          <div key={s.k} className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">{s.label}</p>
+          <div key={s.k} className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{s.label}</p>
             <p className="mt-1 text-[24px] font-extrabold leading-none" style={{ color: s.accent }}>{s.n}</p>
             {s.rate !== null && s.rate !== undefined && (
-              <p className="mt-1 text-[10px] text-[#6B7280]">{s.rate}% from prev</p>
+              <p className="mt-1 text-[10px] text-ink-4">{s.rate}% from prev</p>
             )}
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
-        Overall view → contact: <span className="text-[#ECECEF]">{f.overall}%</span>. Lola optimizes every step.
+      <p className="mt-3 text-[11px] text-ink-4">
+        Overall view → contact: <span className="text-ink">{f.overall}%</span>. Lola optimizes every step.
       </p>
     </section>
   );
@@ -1300,25 +1300,25 @@ function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
  */
 function ReviewsCard({ r }: { r: NonNullable<DashboardPayload['reviews']> }) {
   return (
-    <section className="mt-6 rounded-2xl border border-white/10 bg-[#11121A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Reviews collected
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">This month</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#F4D47C]">{r.month}</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">This month</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-gold-bright">{r.month}</p>
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">Lifetime</p>
-          <p className="mt-1 text-[24px] font-extrabold leading-none text-[#ECECEF]">{r.lifetime}</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">Lifetime</p>
+          <p className="mt-1 text-[24px] font-extrabold leading-none text-ink">{r.lifetime}</p>
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0F0F12] p-3 text-center">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[#9CA3AF]">→ Google</p>
+        <div className="rounded-[10px] border border-white/10 bg-surface p-3 text-center">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">→ Google</p>
           <p className="mt-1 text-[24px] font-extrabold leading-none text-emerald-300">{r.google_routed_month}</p>
         </div>
       </div>
-      <p className="mt-3 text-[11px] text-[#6B7280]">
+      <p className="mt-3 text-[11px] text-ink-4">
         Star rating is the #1 conversion lever in local search. Lola routes 4–5★ to Google, 1–3★ to private feedback.
       </p>
     </section>
@@ -1352,8 +1352,8 @@ function TrackingRow({
   }[s] || s);
 
   return (
-    <section className="mb-6 rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-[#11121A] via-[#11121A] to-[#15110A] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+    <section className="mb-6 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         Results this month — calls · leads · clicks
       </p>
       <div className="mt-4 grid grid-cols-3 gap-3">
@@ -1362,21 +1362,21 @@ function TrackingRow({
           const src = (sources && sources[c.key]) || {};
           const srcEntries = Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 3);
           const tr = trends?.[c.key];
-          const arrowColor = tr && tr.delta > 0 ? 'text-emerald-300' : tr && tr.delta < 0 ? 'text-red-300' : 'text-[#6B7280]';
+          const arrowColor = tr && tr.delta > 0 ? 'text-emerald-300' : tr && tr.delta < 0 ? 'text-red-300' : 'text-ink-4';
           return (
-            <div key={c.key} className="rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-[#9CA3AF]">{c.emoji} {c.label}</p>
+            <div key={c.key} className="rounded-[12px] border border-white/10 bg-surface p-4 text-center">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-ink-3">{c.emoji} {c.label}</p>
               <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{t.month}</p>
               {tr && (
                 <p className={`mt-1 text-[11px] font-semibold ${arrowColor}`}>
                   {tr.arrow} {tr.delta !== 0 ? `${tr.delta > 0 ? '+' : ''}${tr.delta}` : 'flat'} vs last mo
                 </p>
               )}
-              <p className="mt-2 text-[11px] text-[#6B7280]">30d: {t.last_30d} · all: {t.lifetime}</p>
+              <p className="mt-2 text-[11px] text-ink-4">30d: {t.last_30d} · all: {t.lifetime}</p>
               {srcEntries.length > 0 && (
                 <div className="mt-3 flex flex-wrap justify-center gap-1">
                   {srcEntries.map(([s, n]) => (
-                    <span key={s} className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#C8C0B0]">
+                    <span key={s} className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-ink-2">
                       {sourceLabel(s)} {n}
                     </span>
                   ))}
@@ -1387,7 +1387,7 @@ function TrackingRow({
         })}
       </div>
       {!anyData && (
-        <p className="mt-3 text-[11px] leading-[1.5] text-[#6B7280]">
+        <p className="mt-3 text-[11px] leading-[1.5] text-ink-4">
           Tracking links not live yet — once your Call button + website link route through Lola, calls, leads, and clicks land here automatically.
         </p>
       )}
@@ -1404,12 +1404,12 @@ function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatPill label="Keywords tracked" value={google.length} />
-      <StatPill label="Currently ranked" value={ranked} accent={ranked > 0 ? '#10B981' : '#6B7280'} />
-      <StatPill label="Top 10" value={top10} accent={top10 > 0 ? '#F4D47C' : '#6B7280'} />
+      <StatPill label="Currently ranked" value={ranked} accent={ranked > 0 ? '#10B981' : '#7C828C'} />
+      <StatPill label="Top 10" value={top10} accent={top10 > 0 ? '#F4D47C' : '#7C828C'} />
       <StatPill
         label={`AI mentions (${aiMode.length})`}
         value={aiHits}
-        accent={aiHits > 0 ? '#10B981' : '#6B7280'}
+        accent={aiHits > 0 ? '#10B981' : '#7C828C'}
         sub={`Top 3: ${top3}`}
       />
     </div>
@@ -1420,10 +1420,10 @@ function StatPill({
   label, value, accent = '#F4D47C', sub,
 }: { label: string; value: number; accent?: string; sub?: string }) {
   return (
-    <div className="rounded-[12px] border border-white/10 bg-[#11121A] px-4 py-3 text-center">
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{label}</p>
+    <div className="rounded-[12px] border border-white/10 bg-surface-2 px-4 py-3 text-center">
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">{label}</p>
       <p className="mt-1 text-[28px] font-bold leading-none" style={{ color: accent }}>{value}</p>
-      {sub && <p className="mt-1 text-[11px] text-[#9AA0A6]">{sub}</p>}
+      {sub && <p className="mt-1 text-[11px] text-ink-3">{sub}</p>}
     </div>
   );
 }
@@ -1535,10 +1535,10 @@ function CoverageByCity({
 
   return (
     <section className="mt-10">
-      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         Coverage by Market
       </h2>
-      <p className="mb-5 text-[12px] text-[#9AA0A6]">
+      <p className="mb-5 text-[12px] text-ink-3">
         Where you're winning — and where the next opportunity is.
       </p>
 
@@ -1557,14 +1557,14 @@ function CoverageByCity({
                             '#374151';
 
           return (
-            <div key={city} className="rounded-[16px] border border-white/[0.08] bg-[#11121A] overflow-hidden">
+            <div key={city} className="rounded-[16px] border border-white/[0.08] bg-surface-2 overflow-hidden">
               {/* City header */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-3.5">
                 <div className="flex items-center gap-3">
-                  <span className="text-[14px] font-bold text-[#ECECEF]">{city}</span>
+                  <span className="text-[14px] font-bold text-ink">{city}</span>
                   {/* Score pills */}
                   {sc.no1 > 0 && (
-                    <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#F4D47C] uppercase tracking-[0.1em]">
+                    <span className="rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-[10px] font-bold text-gold-bright uppercase tracking-[0.1em]">
                       {sc.no1} × #1
                     </span>
                   )}
@@ -1574,13 +1574,13 @@ function CoverageByCity({
                     </span>
                   )}
                   {ranked === 0 && (
-                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#6B7280] uppercase tracking-[0.1em]">
+                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-ink-4 uppercase tracking-[0.1em]">
                       Not yet ranking
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-[#6B7280]">{ranked}/{total} in top-10</span>
+                  <span className="text-[11px] text-ink-4">{ranked}/{total} in top-10</span>
                   {/* Mini progress bar */}
                   <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
                     <div
@@ -1654,13 +1654,13 @@ function RankingMomentum({ google }: { google: Series[] }) {
 
   return (
     <section className="mt-8">
-      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+      <h2 className="mb-1 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         Ranking Momentum
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-ink-3">
           {ranked.length} keyword{ranked.length === 1 ? '' : 's'} with position history
         </span>
       </h2>
-      <p className="mb-4 text-[12px] text-[#9AA0A6]">
+      <p className="mb-4 text-[12px] text-ink-3">
         Lower = better. #1 is the top of the chart.
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1692,7 +1692,7 @@ function MomentumCard({ series }: { series: Series }) {
           <p className="truncate text-[12px] font-semibold text-[#D1D5DB]">
             {extractService(series.query)}
           </p>
-          <p className="mt-0.5 text-[10px] text-[#6B7280]">
+          <p className="mt-0.5 text-[10px] text-ink-4">
             {extractCity(series.query)} · {series.history.filter(h => h.position !== null).length} snapshots
           </p>
         </div>
@@ -1797,9 +1797,9 @@ function WorkDelivered({ impl }: { impl: Implementation }) {
 
   return (
     <section className="mt-8">
-      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         Work Delivered
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-ink-3">
           What Lola did between snapshots
         </span>
       </h2>
@@ -1810,9 +1810,9 @@ function WorkDelivered({ impl }: { impl: Implementation }) {
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.label} className="rounded-[12px] border border-white/10 bg-[#11121A] px-4 py-3 text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{s.label}</p>
-                <p className="mt-1 text-[28px] font-bold leading-none text-[#F4D47C]">{s.value}</p>
+              <div key={s.label} className="rounded-[12px] border border-white/10 bg-surface-2 px-4 py-3 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">{s.label}</p>
+                <p className="mt-1 text-[28px] font-bold leading-none text-gold-bright">{s.value}</p>
               </div>
             ))}
           </div>
@@ -1832,29 +1832,29 @@ function TaskColumn({
   title, emoji, accent, tasks,
 }: { title: string; emoji: string; accent: string; tasks: TaskItem[] }) {
   return (
-    <div className="rounded-[14px] border border-white/10 bg-[#11121A] p-4">
+    <div className="rounded-[14px] border border-white/10 bg-surface-2 p-4">
       <p className="mb-3 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: accent }}>
         <span aria-hidden>{emoji}</span>
         {title}
-        <span className="text-[#6B7280]">({tasks.length})</span>
+        <span className="text-ink-4">({tasks.length})</span>
       </p>
       {tasks.length === 0 ? (
-        <p className="text-[13px] text-[#6B7280]">—</p>
+        <p className="text-[13px] text-ink-4">—</p>
       ) : (
         <ul className="space-y-2.5">
           {tasks.map((t, i) => (
-            <li key={i} className="text-[13px] leading-[1.45] text-[#E5E7EB]">
+            <li key={i} className="text-[13px] leading-[1.45] text-ink">
               <div className="flex items-start gap-2">
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
                 <span>
                   {t.url ? (
-                    <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-[#F4D47C] underline-offset-2 hover:underline">
+                    <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-gold-bright underline-offset-2 hover:underline">
                       {t.title}
                     </a>
                   ) : (
                     t.title
                   )}
-                  {t.detail && <span className="block text-[11px] text-[#9AA0A6]">{t.detail}</span>}
+                  {t.detail && <span className="block text-[11px] text-ink-3">{t.detail}</span>}
                 </span>
               </div>
             </li>
@@ -1898,7 +1898,7 @@ function RankingsTable({
   };
 
   const posTier = (p: number | null) => {
-    if (p === null) return { label: '—', color: '#6B7280', bg: 'rgba(107,114,128,0.08)' };
+    if (p === null) return { label: '—', color: '#7C828C', bg: 'rgba(107,114,128,0.08)' };
     if (p === 1)    return { label: '#1', color: '#FFD166', bg: 'rgba(212,175,55,0.12)' };
     if (p <= 3)     return { label: `#${p}`, color: '#6EE7B7', bg: 'rgba(16,185,129,0.10)' };
     if (p <= 10)    return { label: `#${p}`, color: '#93C5FD', bg: 'rgba(147,197,253,0.08)' };
@@ -1924,15 +1924,15 @@ function RankingsTable({
 
   return (
     <section className="mt-8">
-      <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+      <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         Organic Rankings · Full Keyword List
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-ink-3">
           live positions across {google.length} tracked keywords
         </span>
       </h2>
       <div className="overflow-hidden rounded-[14px] border border-white/10">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 border-b border-white/10 bg-[#0F0F12] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#6B7280]">
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 border-b border-white/10 bg-surface px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-4">
           <span>Keyword</span>
           <span className="text-right">Map Pack</span>
           <span className="text-right w-12">Trend</span>
@@ -1945,9 +1945,9 @@ function RankingsTable({
           return (
             <div
               key={s.query}
-              className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 px-4 py-3 ${idx < sorted.length - 1 ? 'border-b border-white/[0.05]' : ''} ${idx % 2 === 0 ? 'bg-[#11121A]' : 'bg-[#0F0F12]'}`}
+              className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 px-4 py-3 ${idx < sorted.length - 1 ? 'border-b border-white/[0.05]' : ''} ${idx % 2 === 0 ? 'bg-surface-2' : 'bg-surface'}`}
             >
-              <span className="text-[13px] font-medium text-[#E5E7EB] leading-tight">{s.query}</span>
+              <span className="text-[13px] font-medium text-ink leading-tight">{s.query}</span>
               <span className="text-center">
                 {mp && (
                   <span title="Confirmed #1 in Google Map Pack" className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
@@ -1972,7 +1972,7 @@ function RankingsTable({
           );
         })}
       </div>
-      <p className="mt-2 text-[10px] text-[#6B7280]">
+      <p className="mt-2 text-[10px] text-ink-4">
         📍 = confirmed #1 in Google Map Pack · trend arrow vs first recorded snapshot
       </p>
     </section>
@@ -1998,13 +1998,13 @@ function CompetitorWatchlist({ google }: { google: Series[] }) {
   if (rows.length === 0) return null;
 
   return (
-    <section className="mt-6 rounded-[14px] border border-[#F59E0B]/20 bg-[#11121A] p-5">
+    <section className="mt-6 rounded-[14px] border border-[#F59E0B]/20 bg-surface-2 p-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+          <h2 className="text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
             Competitor Watchlist
           </h2>
-          <p className="mt-1 text-[12px] leading-relaxed text-[#9CA3AF]">
+          <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
             Top organic pages showing up for each tracked money keyword.
           </p>
         </div>
@@ -2017,8 +2017,8 @@ function CompetitorWatchlist({ google }: { google: Series[] }) {
         {rows.slice(0, 6).map((row) => (
           <div key={row.query} className="py-3 first:pt-0 last:pb-0">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[13px] font-semibold leading-tight text-[#E5E7EB]">{row.query}</p>
-              <span className="text-[11px] font-medium text-[#6B7280]">
+              <p className="text-[13px] font-semibold leading-tight text-ink">{row.query}</p>
+              <span className="text-[11px] font-medium text-ink-4">
                 {row.position ? `You: #${row.position}` : 'You: not top 10'}
               </span>
             </div>
@@ -2026,7 +2026,7 @@ function CompetitorWatchlist({ google }: { google: Series[] }) {
               {row.competitors.map((name, i) => (
                 <span
                   key={`${row.query}-${name}`}
-                  className="rounded-full border border-white/[0.08] bg-[#0F0F12] px-2.5 py-1 text-[11px] text-[#C8C0B0]"
+                  className="rounded-full border border-white/[0.08] bg-surface px-2.5 py-1 text-[11px] text-ink-2"
                 >
                   #{i + 1} {name}
                 </span>
@@ -2076,12 +2076,12 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
     if (!rate) return null;
     const meta = aiProviderMeta(source);
     return (
-      <div className="min-w-[150px] flex-1 rounded-[12px] border border-white/10 bg-[#0F0F12] p-4 text-center">
+      <div className="min-w-[150px] flex-1 rounded-[12px] border border-white/10 bg-surface p-4 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: meta.color }}>
           {meta.icon} {meta.label}
         </p>
         <p className="mt-2 text-[36px] font-extrabold leading-none" style={{ color: meta.color }}>{rate.pct}%</p>
-        <p className="mt-1 text-[11px] text-[#9CA3AF]">{rate.wins}/{rate.total} prompts recommended you</p>
+        <p className="mt-1 text-[11px] text-ink-3">{rate.wins}/{rate.total} prompts recommended you</p>
       </div>
     );
   };
@@ -2100,9 +2100,9 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
 
   return (
     <section className="mt-10">
-      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#F4D47C]">
+      <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         AI Search Visibility
-        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-[#9AA0A6]">
+        <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-ink-3">
           Are AI assistants recommending you?
         </span>
       </h2>
@@ -2125,9 +2125,9 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
           const anyLoss = rows.some(row => row.current?.mentioned === false);
 
           return (
-            <div key={query} className={`rounded-[12px] border p-4 ${anyWin ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : 'border-white/10 bg-[#11121A]'}`}>
+            <div key={query} className={`rounded-[12px] border p-4 ${anyWin ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : 'border-white/10 bg-surface-2'}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <p className="flex-1 text-[13px] font-medium leading-snug text-[#E5E7EB]">{query}</p>
+                <p className="flex-1 text-[13px] font-medium leading-snug text-ink">{query}</p>
                 <div className="flex shrink-0 items-center gap-2">
                   {rows.map(row => {
                     const meta = aiProviderMeta(row.source);
@@ -2146,7 +2146,7 @@ function AIVisibilityCard({ series }: { series: Series[] }) {
               {anyLoss && allCompetitors.length > 0 && (
                 <div className="mt-3 rounded-[8px] border border-amber-500/20 bg-amber-500/[0.05] px-3 py-2">
                   <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-amber-300/80">AI recommended instead:</p>
-                  <p className="mt-1 flex flex-wrap gap-x-3 text-[12px] text-[#E5E7EB]">
+                  <p className="mt-1 flex flex-wrap gap-x-3 text-[12px] text-ink">
                     {allCompetitors.map(c => <span key={c}>· {c}</span>)}
                   </p>
                 </div>
@@ -2179,27 +2179,27 @@ function WonJobsCard({
     catch { return iso.slice(0, 10); }
   };
   return (
-    <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-[#11121A] p-5 sm:p-6">
+    <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-surface-2 p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
         💰 Confirmed revenue · this month
       </p>
       <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
         ${wonJobs.revenue_month.toLocaleString()}
       </p>
-      <p className="mt-1 text-[12px] text-[#9CA3AF]">
+      <p className="mt-1 text-[12px] text-ink-3">
         {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} closed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
       </p>
       {recentJobs.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6B7280]">Recent closed jobs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-4">Recent closed jobs</p>
           {recentJobs.map(j => (
-            <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-[#0F0F12] px-3 py-2">
+            <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-surface px-3 py-2">
               <div className="flex items-center gap-3">
                 <span className="text-[12px] font-semibold text-emerald-300">${j.job_value.toLocaleString()}</span>
-                {j.service_type && <span className="text-[11px] text-[#C8C0B0]">{j.service_type}</span>}
-                {j.source && <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.1em] text-[#9CA3AF]">{j.source}</span>}
+                {j.service_type && <span className="text-[11px] text-ink-2">{j.service_type}</span>}
+                {j.source && <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.1em] text-ink-3">{j.source}</span>}
               </div>
-              <span className="text-[11px] text-[#6B7280]">{fmtDate(j.created_at)}</span>
+              <span className="text-[11px] text-ink-4">{fmtDate(j.created_at)}</span>
             </div>
           ))}
         </div>
@@ -2210,7 +2210,7 @@ function WonJobsCard({
 
 function EmptyHint({ label }: { label: string }) {
   return (
-    <div className="rounded-[14px] border border-dashed border-white/10 bg-[#11121A] px-5 py-8 text-center text-[14px] text-[#9AA0A6]">
+    <div className="rounded-[14px] border border-dashed border-white/10 bg-surface-2 px-5 py-8 text-center text-[14px] text-ink-3">
       {label}
     </div>
   );

@@ -19,6 +19,14 @@ export const ROUTES = [
   '/methodology',
   '/vs',
   '/apply',
+  // The buy screen the VSL points at, and the proof pages.
+  //
+  // /grader is deliberately ABSENT and /audit never was here: both now 301 to
+  // /growth-score. Three URLs ran the same pipeline, which is one site
+  // competing with itself for "free local SEO check".
+  '/start',
+  '/case-studies',
+  '/case-studies/sandbar',
   // The individual comparisons are the pages that actually rank — "<vendor> vs
   // Lola" and "are Local Service Ads worth it" are the high-intent queries.
   // Prerendering only the hub would leave every one of them uncrawlable.

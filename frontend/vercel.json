@@ -164,6 +164,16 @@
       "source": "/build/start",
       "destination": "/start",
       "permanent": true
+    },
+    {
+      "source": "/grader",
+      "destination": "/growth-score",
+      "permanent": true
+    },
+    {
+      "source": "/audit",
+      "destination": "/growth-score",
+      "permanent": true
     }
   ],
   "rewrites": [

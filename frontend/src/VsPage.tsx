@@ -12,7 +12,7 @@
  *   4. Pricing transparency = the moat. Lola's published price — $397/month,
  *      all-inclusive — visible vs every
  *      competitor's "request a demo" gate.
- *   5. Two CTAs: start the plan (warm leads) + run the free Grader (cold).
+ *   5. Two CTAs: start the plan (warm leads) + the free Growth Score (cold).
  *
  * Each page emits a FAQPage JSON-LD with switching/comparison questions —
  * targets high-intent organic ("lola vs localiq", "is brightlocal worth it",
@@ -21,6 +21,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import { startHref } from './lib/checkout';
 import { GUARANTEE, PLAN } from './lib/pricing';
@@ -101,7 +102,7 @@ const LOCALIQ: Competitor = {
     { label: 'Done-for-you?',          lola: 'Yes — every stage',                them: 'Yes (enterprise tiers)',   lolaWin: false },
     { label: 'Contract',               lola: 'Monthly · cancel after 3 months',          them: 'Typical annual term',      lolaWin: true  },
     { label: 'AI search visibility',   lola: 'Core product (ChatGPT / Perplexity / Gemini / Google AI)', them: 'Not a primary offering', lolaWin: true },
-    { label: 'Free tool',              lola: '60-second AI Visibility Grader',  them: 'Website Grader (email-gated, 2 layers)', lolaWin: true },
+    { label: 'Free tool',              lola: '60-second Growth Score',  them: 'Website Grader (email-gated, 2 layers)', lolaWin: true },
     { label: 'Guarantee',              lola: '90-Day Promise',    them: 'Not published',            lolaWin: true  },
     { label: 'Founder access',         lola: 'Direct text / Slack with Coach Ty', them: 'Account manager',        lolaWin: true  },
     { label: 'Best for',               lola: '$200K–$2M/yr local service biz',  them: 'Multi-location / enterprise', lolaWin: false },
@@ -558,13 +559,14 @@ export function getCompetitorSlugs(): string[] {
 
 export default function VsPage({ slug }: { slug: string }) {
   useReveal();
+  usePageMeta(`/vs/${slug}`);
   const c = COMPETITORS[slug.toLowerCase()];
 
   // Inject route-specific FAQPage + BreadcrumbList JSON-LD on mount.
   // Cleaned up on unmount so navigating away doesn't leave stale schema.
   useEffect(() => {
     if (typeof document === 'undefined' || !c) return;
-    const url = `https://lola.tyalexandermedia.com/vs/${c.slug}`;
+    const url = `${SITE_ORIGIN}/vs/${c.slug}`;
     const blocks: object[] = [
       {
         '@context': 'https://schema.org',
@@ -579,8 +581,8 @@ export default function VsPage({ slug }: { slug: string }) {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://lola.tyalexandermedia.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Compare', item: 'https://lola.tyalexandermedia.com/vs' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Compare', item: `${SITE_ORIGIN}/vs` },
           { '@type': 'ListItem', position: 3, name: `Lola vs ${c.name}`, item: url },
         ],
       },
@@ -593,31 +595,32 @@ export default function VsPage({ slug }: { slug: string }) {
       document.head.appendChild(t);
       return t;
     });
-    // Also patch <title> + meta description for this route. The SPA shell
-    // gives us the homepage's static title otherwise.
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = c.metaTitle;
-    if (desc) desc.setAttribute('content', c.metaDescription);
+    // The <title> and description are NOT set here. They come from
+    // usePageMeta below, which reads the same PAGE_META table the prerenderer
+    // writes into the static HTML.
+    //
+    // This block used to assign c.metaTitle, which meant the prerendered head
+    // and the client-side head disagreed on every /vs page — and the config
+    // titles run to 62-78 characters, past the 60-char limit the checker
+    // enforces. The checker only reads built HTML, so it could never have
+    // caught the client-side value. The metaTitle/metaDescription fields stay
+    // on the config as reference copy for now.
 
     track('vs_page_viewed', { competitor: c.slug });
 
     return () => {
       tags.forEach((t) => t.parentNode?.removeChild(t));
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, [c]);
 
   if (!c) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-32 text-center">
-        <h2 className="text-2xl font-semibold text-[#ECECEF]">Comparison not found.</h2>
-        <p className="mt-3 max-w-md text-base text-[#9AA0A6]">
+        <h2 className="text-2xl font-semibold text-ink">Comparison not found.</h2>
+        <p className="mt-3 max-w-md text-base text-ink-3">
           We compare Lola to a short list of direct competitors. See the homepage to find Lola.
         </p>
-        <a href="/" className="mt-8 text-[#D4AF37] underline-offset-2 hover:underline">
+        <a href="/" className="mt-8 text-gold underline-offset-2 hover:underline">
           Back to home →
         </a>
       </main>
@@ -640,59 +643,59 @@ export default function VsPage({ slug }: { slug: string }) {
           }}
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Honest Comparison
         </p>
 
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Lola SEO{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             vs {c.name}
           </span>
         </h1>
 
-        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           {c.oneLine} Here&apos;s an honest look at where {c.name} is the right pick — and where
           Lola is the better fit.
         </p>
 
-        <p className="mt-3 text-[12px] text-[#7A7F8A]">
+        <p className="mt-3 text-[12px] text-ink-4">
           No affiliate links · No bashing · Citations below
         </p>
       </section>
 
       {/* ── 60-SECOND ANSWER (TL;DR) ──────────────────────── */}
       <section className="mt-10 sm:mt-14">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           The 60-second answer
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           <div className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9AA0A6]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-3">
               Pick {c.name} if…
             </p>
             <ul className="mt-3 flex flex-col gap-2.5">
               {c.tldr.pickThemIf.map((row) => (
-                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-[#C5C5C8] sm:text-[15px]">
-                  <span aria-hidden className="mt-1 text-[#9AA0A6]">→</span>
+                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-ink-2 sm:text-[15px]">
+                  <span aria-hidden className="mt-1 text-ink-3">→</span>
                   <span>{row}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-[14px] border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.06] via-transparent to-transparent p-5 shadow-[0_0_24px_rgba(212,175,55,0.10)] sm:p-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          <div className="rounded-[14px] border border-gold/40 bg-gradient-to-br from-gold/[0.06] via-transparent to-transparent p-5 shadow-[0_0_24px_rgba(212,175,55,0.10)] sm:p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
               Pick Lola if…
             </p>
             <ul className="mt-3 flex flex-col gap-2.5">
               {c.tldr.pickLolaIf.map((row) => (
-                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-[#ECECEF] sm:text-[15px]">
-                  <span aria-hidden className="mt-1 text-[#D4AF37]">✓</span>
+                <li key={row} className="flex items-start gap-2 text-[14px] leading-[1.5] text-ink sm:text-[15px]">
+                  <span aria-hidden className="mt-1 text-gold">✓</span>
                   <span>{row}</span>
                 </li>
               ))}
@@ -703,11 +706,11 @@ export default function VsPage({ slug }: { slug: string }) {
 
       {/* ── AT-A-GLANCE TABLE ─────────────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           At a glance
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           The honest feature compare.
@@ -717,27 +720,27 @@ export default function VsPage({ slug }: { slug: string }) {
           <table className="w-full min-w-[600px] text-left text-[13px] sm:text-[14px]">
             <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.14em]">
               <tr>
-                <th className="px-4 py-3 text-[#8A8F98] sm:px-5 sm:py-4"></th>
-                <th className="border-l-2 border-[#D4AF37]/50 bg-[#D4AF37]/[0.06] px-4 py-3 text-[#D4AF37] sm:px-5 sm:py-4">
+                <th className="px-4 py-3 text-ink-3 sm:px-5 sm:py-4"></th>
+                <th className="border-l-2 border-gold/50 bg-gold/[0.06] px-4 py-3 text-gold sm:px-5 sm:py-4">
                   Lola
-                  <span className="block text-[10px] font-normal text-[#D4AF37]/85">{LOLA_PRICE}</span>
-                  <span className="block text-[10px] font-normal text-[#D4AF37]/70">{LOLA_MODEL}</span>
+                  <span className="block text-[10px] font-normal text-gold/85">{LOLA_PRICE}</span>
+                  <span className="block text-[10px] font-normal text-gold/70">{LOLA_MODEL}</span>
                 </th>
-                <th className="px-4 py-3 text-[#C5C5C8] sm:px-5 sm:py-4">
+                <th className="px-4 py-3 text-ink-2 sm:px-5 sm:py-4">
                   {c.name}
-                  <span className="block text-[10px] font-normal text-[#8A8F98]">{c.priceRange}</span>
-                  <span className="block text-[10px] font-normal text-[#8A8F98]">{c.category}</span>
+                  <span className="block text-[10px] font-normal text-ink-3">{c.priceRange}</span>
+                  <span className="block text-[10px] font-normal text-ink-3">{c.category}</span>
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
               {c.table.map((row) => (
                 <tr key={row.label}>
-                  <td className="px-4 py-3 text-[#C5C5C8] sm:px-5 sm:py-4">{row.label}</td>
-                  <td className={`border-l-2 ${row.lolaWin ? 'border-[#D4AF37]/50 bg-[#D4AF37]/[0.06] text-[#ECECEF]' : 'border-white/[0.06] text-[#C5C5C8]'} px-4 py-3 sm:px-5 sm:py-4`}>
+                  <td className="px-4 py-3 text-ink-2 sm:px-5 sm:py-4">{row.label}</td>
+                  <td className={`border-l-2 ${row.lolaWin ? 'border-gold/50 bg-gold/[0.06] text-ink' : 'border-white/[0.06] text-ink-2'} px-4 py-3 sm:px-5 sm:py-4`}>
                     {row.lola}
                   </td>
-                  <td className="px-4 py-3 text-[#C5C5C8] sm:px-5 sm:py-4">{row.them}</td>
+                  <td className="px-4 py-3 text-ink-2 sm:px-5 sm:py-4">{row.them}</td>
                 </tr>
               ))}
             </tbody>
@@ -747,11 +750,11 @@ export default function VsPage({ slug }: { slug: string }) {
 
       {/* ── WHERE THEY WIN (honest) ───────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Where {c.name} wins
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           Credit where it&apos;s due.
@@ -760,9 +763,9 @@ export default function VsPage({ slug }: { slug: string }) {
           {c.whereTheyWin.map((row) => (
             <li
               key={row}
-              className="flex items-start gap-3 rounded-[12px] border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]"
+              className="flex items-start gap-3 rounded-[12px] border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-[14px] leading-[1.55] text-ink-2 sm:text-[15px]"
             >
-              <span aria-hidden className="mt-0.5 text-[#9AA0A6]">→</span>
+              <span aria-hidden className="mt-0.5 text-ink-3">→</span>
               <span>{row}</span>
             </li>
           ))}
@@ -771,11 +774,11 @@ export default function VsPage({ slug }: { slug: string }) {
 
       {/* ── WHERE LOLA WINS ───────────────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Where Lola wins
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           The specifics — not adjectives.
@@ -784,9 +787,9 @@ export default function VsPage({ slug }: { slug: string }) {
           {c.whereLolaWins.map((row) => (
             <li
               key={row}
-              className="flex items-start gap-3 rounded-[12px] border border-[#D4AF37]/25 bg-[#D4AF37]/[0.04] px-5 py-3 text-[14px] leading-[1.55] text-[#ECECEF] sm:text-[15px]"
+              className="flex items-start gap-3 rounded-[12px] border border-gold/25 bg-gold/[0.04] px-5 py-3 text-[14px] leading-[1.55] text-ink sm:text-[15px]"
             >
-              <span aria-hidden className="mt-0.5 text-[#D4AF37]">✓</span>
+              <span aria-hidden className="mt-0.5 text-gold">✓</span>
               <span>{row}</span>
             </li>
           ))}
@@ -795,11 +798,11 @@ export default function VsPage({ slug }: { slug: string }) {
 
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Switch + compare FAQ
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.25rem)' }}
         >
           Straight answers.
@@ -809,18 +812,18 @@ export default function VsPage({ slug }: { slug: string }) {
           {c.faqs.map((f, i) => (
             <details
               key={i}
-              className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"
+              className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-gold/30 open:bg-white/[0.04]"
               onToggle={(e) => {
                 if ((e.currentTarget as HTMLDetailsElement).open) {
                   track('vs_faq_opened', { competitor: c.slug, question: f.q.slice(0, 40) });
                 }
               }}
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-[#ECECEF] sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 text-[15px] font-semibold text-ink sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
                 <span>{f.q}</span>
-                <span aria-hidden className="shrink-0 text-[18px] text-[#D4AF37] transition group-open:rotate-45">+</span>
+                <span aria-hidden className="shrink-0 text-[18px] text-gold transition group-open:rotate-45">+</span>
               </summary>
-              <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:px-6 sm:pb-6 sm:text-[15px]">
+              <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 text-[14px] leading-[1.65] text-ink-2 sm:px-6 sm:pb-6 sm:text-[15px]">
                 {f.a}
               </div>
             </details>
@@ -829,32 +832,32 @@ export default function VsPage({ slug }: { slug: string }) {
       </section>
 
       {/* ── DUAL CTA ──────────────────────────────────────── */}
-      <section className="mt-14 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-14 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           The honest move
         </p>
         <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
           See where you actually stand.
         </h2>
-        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
-          Run the free 60-second AI Visibility Grader — or just start. Either way you&apos;ll
+        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:text-[16px]">
+          Run the free 60-second Growth Score — or just start. Either way you&apos;ll
           know within a week whether Lola or {c.name} is the right fit.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
             href={startCtaHref}
             onClick={() => track('vs_cta_clicked', { competitor: c.slug, kind: 'start' })}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <a
-            href="/grader"
+            href="/growth-score"
             onClick={() => track('vs_cta_clicked', { competitor: c.slug, kind: 'grader' })}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/40 hover:bg-gold/[0.06] sm:h-16 sm:text-[15px]"
           >
             Get your free score
           </a>
@@ -862,19 +865,19 @@ export default function VsPage({ slug }: { slug: string }) {
       </section>
 
       {/* ── DISCLOSURE ────────────────────────────────────── */}
-      <section className="mt-10 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 text-[13px] leading-[1.6] text-[#9AA0A6] sm:p-6 sm:text-[14px]">
-        <p className="font-semibold text-[#ECECEF]">Honest disclosure.</p>
+      <section className="mt-10 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 text-[13px] leading-[1.6] text-ink-3 sm:p-6 sm:text-[14px]">
+        <p className="font-semibold text-ink">Honest disclosure.</p>
         <p className="mt-2">
           We don&apos;t take affiliate revenue from {c.name} or anyone in this category. We compete
           with them, which is exactly why we want to be fair about where they win.
-          {' '}<a href={c.url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">
+          {' '}<a href={c.url} target="_blank" rel="noopener noreferrer" className="text-gold underline-offset-2 hover:underline">
             Visit {c.name} ↗
           </a>{' '}— if they&apos;re the better fit, go win with them. If Lola is, {GUARANTEE.short.toLowerCase()}
         </p>
       </section>
 
       {/* Footer */}
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-16">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

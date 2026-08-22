@@ -152,12 +152,12 @@ export default function DiyAccess() {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-2.5 w-2.5 animate-sniff rounded-full bg-[#D4AF37]"
+              className="h-2.5 w-2.5 animate-sniff rounded-full bg-gold"
               style={{ animationDelay: `${i * 160}ms` }}
             />
           ))}
         </div>
-        <p className="mt-6 text-[14px] text-[#9AA0A6]">Confirming your purchase…</p>
+        <p className="mt-6 text-[14px] text-ink-3">Confirming your purchase…</p>
       </main>
     );
   }
@@ -173,7 +173,7 @@ export default function DiyAccess() {
               'radial-gradient(40% 52% at 24% 12%, rgba(111,155,255,0.10), transparent 70%), radial-gradient(46% 56% at 80% 6%, rgba(212,175,55,0.18), transparent 70%)',
           }}
         />
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           {unlocked ? '✓ Payment confirmed' : 'Retired · access page'}
         </p>
         <h1
@@ -186,7 +186,7 @@ export default function DiyAccess() {
             <>This kit is retired.</>
           )}
         </h1>
-        <p className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           {unlocked
             ? "Do these five in order. Each one is a move you can make this week — no agency, no jargon. We also texted and emailed you a copy so you have it on the truck."
             : "If you bought the fix kit, open the access link we texted and emailed you and it unlocks here. Otherwise there's one plan now, and I run all five of these steps for you."}
@@ -200,7 +200,7 @@ export default function DiyAccess() {
               <h2 className="text-[20px] font-bold text-white sm:text-[24px]">
                 Your four fixes, written for {paidAudit.business_name}.
               </h2>
-              <p className="mt-2 text-[14px] leading-[1.6] text-[#9CA3AF]">
+              <p className="mt-2 text-[14px] leading-[1.6] text-ink-3">
                 Paste each one where it says. Nothing to rewrite.
               </p>
               <div className="mt-6 flex flex-col gap-4">
@@ -210,12 +210,12 @@ export default function DiyAccess() {
                   { n: '3', label: 'Your first GBP post', where: 'GBP → Add update → Post', body: generateGbpPost(paidAudit) },
                   { n: '4', label: 'LocalBusiness schema', where: 'Site <head> → Structured Data', body: generateSchemaFallback(paidAudit) },
                 ].map((d) => (
-                  <div key={d.n} className="rounded-[14px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-6">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+                  <div key={d.n} className="rounded-[14px] border border-gold/25 bg-white/[0.02] p-5 sm:p-6">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
                       {d.n} · {d.label}
                     </p>
-                    <p className="mt-1 text-[12.5px] text-[#9CA3AF]">Paste into: {d.where}</p>
-                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-[10px] bg-[#0A0A0B] p-4 text-[13px] leading-[1.55] text-[#E8E4D8]">
+                    <p className="mt-1 text-[12.5px] text-ink-3">Paste into: {d.where}</p>
+                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-[10px] bg-on-gold p-4 text-[13px] leading-[1.55] text-ink-2">
 {d.body}
                     </pre>
                   </div>
@@ -231,23 +231,23 @@ export default function DiyAccess() {
                 className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7"
               >
                 <div className="flex items-baseline gap-3">
-                  <span className="text-[13px] font-bold text-[#D4AF37]/70">{s.n}</span>
+                  <span className="text-[13px] font-bold text-gold/70">{s.n}</span>
                   <h3 className="text-[18px] font-bold text-white sm:text-[20px]">{s.title}</h3>
                 </div>
-                <p className="mt-3 text-[14px] leading-[1.6] text-[#E8E4D8] sm:text-[15px]">{s.do_}</p>
-                <p className="mt-2 text-[13px] leading-[1.55] text-[#9CA3AF]">
-                  <span className="font-semibold text-[#D4AF37]">Why it works: </span>
+                <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">{s.do_}</p>
+                <p className="mt-2 text-[13px] leading-[1.55] text-ink-3">
+                  <span className="font-semibold text-gold">Why it works: </span>
                   {s.win}
                 </p>
               </div>
             ))}
           </section>
 
-          <section className="mx-auto mt-14 w-full max-w-[640px] rounded-2xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] p-7 text-center sm:mt-16 sm:p-9">
+          <section className="mx-auto mt-14 w-full max-w-[640px] rounded-2xl border border-gold/30 bg-gold/[0.05] p-7 text-center sm:mt-16 sm:p-9">
             <h2 className="text-[20px] font-bold text-white sm:text-[24px]">
               Rather we just handle it?
             </h2>
-            <p className="mx-auto mt-3 max-w-[520px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+            <p className="mx-auto mt-3 max-w-[520px] text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
               {PLAN.price}{PLAN.period}, done for you — your website designed and built (included
               free), your Google Business Profile managed, and your keywords picked with Ty in
               week 1. Backed by {GUARANTEE.title}.
@@ -255,7 +255,7 @@ export default function DiyAccess() {
             <a
               href={startHref()}
               onClick={() => track('diy_to_plan_cta')}
-              className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
+              className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold transition hover:scale-[1.02]"
             >
               {PLAN.cta} — {PLAN.price}{PLAN.period} →
             </a>
@@ -266,14 +266,14 @@ export default function DiyAccess() {
            label "One-time" — the retired DIY kit, repriced by the pricing sweep
            into a self-contradicting button. Nobody can buy this product, so the
            locked state stops selling it and points at the plan that exists. */
-        <section className="mx-auto mt-12 w-full max-w-[560px] rounded-2xl border border-[#D4AF37]/30 bg-white/[0.02] p-7 text-center sm:mt-16 sm:p-9">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <section className="mx-auto mt-12 w-full max-w-[560px] rounded-2xl border border-gold/30 bg-white/[0.02] p-7 text-center sm:mt-16 sm:p-9">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
             Nothing to unlock here
           </p>
           <h2 className="mt-4 text-[20px] font-bold leading-[1.2] text-white sm:text-[24px]">
             The self-serve kit isn&apos;t sold anymore.
           </h2>
-          <p className="mx-auto mt-4 max-w-[440px] text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+          <p className="mx-auto mt-4 max-w-[440px] text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
             If you bought it, your access link came by text and email — open that link and this
             page unlocks. If you&apos;re here looking for help, there&apos;s one plan now:{' '}
             {PLAN.price}{PLAN.period}, and I do all of it for you.
@@ -281,20 +281,20 @@ export default function DiyAccess() {
           <a
             href={startHref()}
             onClick={() => track('diy_locked_to_plan_cta')}
-            className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02]"
+            className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition hover:scale-[1.02]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
-          <p className="mt-4 text-[12px] text-[#7A7F8A]">
+          <p className="mt-4 text-[12px] text-ink-4">
             Website design included free ·{' '}
-            <a href="/pricing" className="text-[#D4AF37] underline-offset-2 hover:underline">
+            <a href="/pricing" className="text-gold underline-offset-2 hover:underline">
               see what&apos;s included
             </a>
           </p>
         </section>
       )}
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

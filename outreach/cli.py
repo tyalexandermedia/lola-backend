@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 # Load .env before importing modules that read env at import time
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
+from outreach.sender import UnsubscribeUnavailable  # noqa: E402
 from db.outreach import (  # noqa: E402
     init_outreach_tables,
     stats,
@@ -119,7 +120,13 @@ def main() -> int:
     p_preview.set_defaults(func=cmd_preview)
 
     args = parser.parse_args()
-    return asyncio.run(args.func(args))
+    try:
+        return asyncio.run(args.func(args))
+    except UnsubscribeUnavailable as e:
+        # One actionable line beats a stack trace. This is the guard that stops
+        # a cold batch going out with a dead unsubscribe link.
+        print(f"\n✗ Refusing to run: {e}\n", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

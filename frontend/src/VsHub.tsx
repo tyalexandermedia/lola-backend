@@ -15,7 +15,7 @@
 
 import { useEffect } from 'react';
 import { track } from './analytics';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { getCompetitorSlugs } from './VsPage';
 import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
@@ -57,14 +57,14 @@ export default function VsHub() {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Lola SEO Comparison Hub',
-      url: 'https://lola.tyalexandermedia.com/vs',
+      url: `${SITE_ORIGIN}/vs`,
       description: 'Lola vs the major local SEO + AI visibility alternatives.',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: CARDS.map((c, i) => ({
           '@type': 'ListItem',
           position: i + 1,
-          url: `https://lola.tyalexandermedia.com/vs/${c.slug}`,
+          url: `${SITE_ORIGIN}/vs/${c.slug}`,
           name: `Lola vs ${c.name}`,
         })),
       },
@@ -91,22 +91,22 @@ export default function VsHub() {
           className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[480px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.10)_0%,transparent_60%)] blur-2xl"
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Honest Comparisons
         </p>
 
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Lola vs{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             everyone else
           </span>
           .
         </h1>
 
-        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           Side-by-side breakdowns of how Lola compares to the major local SEO + AI visibility
           alternatives. Real pricing, honest fit cases, credit where credit&apos;s due. We don&apos;t
           take affiliate revenue from any of them.
@@ -121,26 +121,26 @@ export default function VsHub() {
               key={c.slug}
               href={`/vs/${c.slug}`}
               onClick={() => track('vs_hub_card_clicked', { competitor: c.slug })}
-              className="group relative flex flex-col rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 transition-all duration-200 hover:-translate-y-1 hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.04] sm:p-7"
+              className="group relative flex flex-col rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 transition-all duration-200 hover:-translate-y-1 hover:border-gold/40 hover:bg-gold/[0.04] sm:p-7"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/70">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold/70">
                   {c.category}
                 </p>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[#8A8F98]">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-ink-3">
                   {c.priceRange}
                 </p>
               </div>
 
-              <h2 className="mt-3 text-[22px] font-bold tracking-[-0.01em] text-[#ECECEF] sm:text-[26px]">
-                Lola vs <span className="text-[#D4AF37]">{c.name}</span>
+              <h2 className="mt-3 text-[22px] font-bold tracking-[-0.01em] text-ink sm:text-[26px]">
+                Lola vs <span className="text-gold">{c.name}</span>
               </h2>
 
-              <p className="mt-3 flex-1 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
+              <p className="mt-3 flex-1 text-[14px] leading-[1.55] text-ink-2 sm:text-[15px]">
                 {c.oneLine}
               </p>
 
-              <p className="mt-5 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] transition group-hover:translate-x-1">
+              <p className="mt-5 text-[13px] font-semibold uppercase tracking-[0.06em] text-gold transition group-hover:translate-x-1">
                 See the comparison →
               </p>
             </a>
@@ -149,17 +149,17 @@ export default function VsHub() {
       </section>
 
       {/* ── WHY WE PUBLISH THESE ──────────────────────────── */}
-      <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-16 rounded-2xl border border-gold/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Why we publish these
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           Coach Ty&apos;s rule: tell the truth, even when it costs us the close.
         </h2>
-        <p className="mt-4 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           If LocalIQ, BrightLocal, Scorpion, Podium, Yext, or Hibu is the better fit for your
           business — we&apos;ll tell you. Each page calls out exactly when the competitor wins and
           when Lola wins. No affiliate links, no shill, no fake screenshots. The honest play is
@@ -168,37 +168,37 @@ export default function VsHub() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="mt-16 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Faster than reading comparison pages
         </p>
         <h2
-          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
         >
           Get your AI Visibility Score in 60 seconds.
         </h2>
-        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:text-[16px]">
           See exactly where you stand on Google, ChatGPT, Perplexity, and Gemini —
           then fix it. No call, no pitch deck, no quote request.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href="/grader"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
+            href="/growth-score"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
           >
-            Run the free Grader →
+            Run the free Growth Score →
           </a>
           <a
             href={startHref()}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/40 hover:bg-gold/[0.06] sm:h-16 sm:text-[15px]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
         </div>
       </section>
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

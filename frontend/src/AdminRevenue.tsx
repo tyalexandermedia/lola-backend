@@ -200,24 +200,24 @@ export default function AdminRevenue({ slug }: { slug: string }) {
 
   return (
     <main className="mx-auto w-full max-w-6xl py-6 sm:py-10">
-      <header className="mb-6 border-b border-[#D4AF37]/20 pb-5">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4AF37]">Revenue Agent</p>
+      <header className="mb-6 border-b border-gold/20 pb-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Revenue Agent</p>
         <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">Revenue control room: {slug}</h1>
-            <p className="mt-2 text-sm text-[#9CA3AF]">Calls and leads become opportunities, estimates, won jobs, and follow-up actions.</p>
+            <p className="mt-2 text-sm text-ink-3">Calls and leads become opportunities, estimates, won jobs, and follow-up actions.</p>
           </div>
-          <button onClick={runAgent} disabled={!keyReady || !!busy || loading} className="h-11 rounded-md bg-[#D4AF37] px-5 text-sm font-bold text-black disabled:cursor-not-allowed disabled:opacity-50">
+          <button onClick={runAgent} disabled={!keyReady || !!busy || loading} className="h-11 rounded-md bg-gold px-5 text-sm font-bold text-black disabled:cursor-not-allowed disabled:opacity-50">
             {busy === 'run-agent' ? 'Running…' : 'Run agent'}
           </button>
         </div>
       </header>
 
-      <section className="mb-6 rounded-lg border border-white/10 bg-[#11121A] p-4">
-        <label className="text-xs font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">Admin key</label>
+      <section className="mb-6 rounded-lg border border-white/10 bg-surface-2 p-4">
+        <label className="text-xs font-bold uppercase tracking-[0.14em] text-ink-3">Admin key</label>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-          <input type="password" value={adminKey} onChange={(e) => setAdminKey(e.target.value)} className="min-h-11 flex-1 rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-[#D4AF37]" />
-          <button onClick={saveKey} disabled={!adminKey.trim()} className="h-11 rounded-md border border-[#D4AF37]/50 px-4 text-sm font-semibold text-[#F4D47C] disabled:opacity-50">Save for session</button>
+          <input type="password" value={adminKey} onChange={(e) => setAdminKey(e.target.value)} className="min-h-11 flex-1 rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-gold" />
+          <button onClick={saveKey} disabled={!adminKey.trim()} className="h-11 rounded-md border border-gold/50 px-4 text-sm font-semibold text-gold-bright disabled:opacity-50">Save for session</button>
           <button onClick={load} disabled={!keyReady || loading} className="h-11 rounded-md border border-white/15 px-4 text-sm font-semibold text-white disabled:opacity-50">{loading ? 'Loading…' : 'Refresh'}</button>
         </div>
       </section>
@@ -244,7 +244,7 @@ export default function AdminRevenue({ slug }: { slug: string }) {
 
         <Panel title="New estimate">
           <form onSubmit={createEstimate} className="space-y-3">
-            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#9CA3AF]">Opportunity</label>
+            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">Opportunity</label>
             <select value={estForm.opportunity_id} onChange={(e) => setEstForm({ ...estForm, opportunity_id: e.target.value })} className="min-h-11 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white">
               <option value="">Unlinked</option>
               {opportunities.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
@@ -291,23 +291,23 @@ export default function AdminRevenue({ slug }: { slug: string }) {
 }
 
 function Metric({ label, value }: { label: string; value: string | number }) {
-  return <div className="rounded-lg border border-white/10 bg-[#11121A] p-4"><p className="text-xs uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</p><p className="mt-2 text-2xl font-bold text-white">{value}</p></div>;
+  return <div className="rounded-lg border border-white/10 bg-surface-2 p-4"><p className="text-xs uppercase tracking-[0.12em] text-ink-3">{label}</p><p className="mt-2 text-2xl font-bold text-white">{value}</p></div>;
 }
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
-  return <section className="rounded-lg border border-white/10 bg-[#11121A] p-4"><h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-[#D4AF37]">{title}</h2>{children}</section>;
+  return <section className="rounded-lg border border-white/10 bg-surface-2 p-4"><h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-gold">{title}</h2>{children}</section>;
 }
 
 function Field({ label, value, onChange, type = 'text', required = false }: { label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean }) {
-  return <label className="block"><span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9CA3AF]">{label}</span><input required={required} type={type} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-[#D4AF37]" /></label>;
+  return <label className="block"><span className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">{label}</span><input required={required} type={type} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-gold" /></label>;
 }
 
 function Empty({ text }: { text: string }) {
-  return <p className="rounded-md border border-dashed border-white/10 p-4 text-sm text-[#9CA3AF]">{text}</p>;
+  return <p className="rounded-md border border-dashed border-white/10 p-4 text-sm text-ink-3">{text}</p>;
 }
 
 function Item({ title, meta, detail, children }: { title: string; meta: string; detail?: string; children?: ReactNode }) {
-  return <div className="mb-3 rounded-md border border-white/10 bg-black/20 p-3"><div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{title}</p><p className="mt-1 text-xs text-[#9CA3AF]">{meta}</p></div></div>{detail && <p className="mt-2 text-xs leading-5 text-[#C8C0B0]">{detail}</p>}{children}</div>;
+  return <div className="mb-3 rounded-md border border-white/10 bg-black/20 p-3"><div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{title}</p><p className="mt-1 text-xs text-ink-3">{meta}</p></div></div>{detail && <p className="mt-2 text-xs leading-5 text-ink-2">{detail}</p>}{children}</div>;
 }
 
 function QuickActions({ options, busy, prefix, onClick }: { options: string[]; busy: string | null; prefix: string; onClick: (status: string) => void }) {

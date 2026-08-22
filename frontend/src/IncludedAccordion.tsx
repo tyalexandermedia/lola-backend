@@ -23,14 +23,14 @@ export default function IncludedAccordion({
 }) {
   return (
     <section className="mt-16 sm:mt-20">
-      <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">{eyebrow}</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">{eyebrow}</p>
       <h2
         className="mt-3 max-w-[720px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
         style={{ fontSize: 'clamp(1.6rem, 3.4vw, 2.4rem)' }}
       >
         {title}
       </h2>
-      <p className="mt-4 max-w-[620px] text-[14px] leading-[1.6] text-[#9CA3AF] sm:text-[15px]">
+      <p className="mt-4 max-w-[620px] text-[14px] leading-[1.6] text-ink-3 sm:text-[15px]">
         Tap any line to see it — not a description of it.
       </p>
 
@@ -38,14 +38,14 @@ export default function IncludedAccordion({
         {items.map((item) => (
           <details
             key={item.title}
-            className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-[#D4AF37]/30 open:bg-white/[0.04]"
+            className="group rounded-[12px] border border-white/[0.08] bg-white/[0.02] open:border-gold/30 open:bg-white/[0.04]"
           >
             <summary className="flex cursor-pointer list-none items-center gap-3 p-5 text-[15px] font-semibold text-white sm:p-6 sm:text-[16px] [&::-webkit-details-marker]:hidden">
               <span aria-hidden className="text-[20px] leading-none">{item.icon}</span>
               <span className="flex-1">{item.title}</span>
               <span
                 aria-hidden
-                className="shrink-0 text-[20px] text-[#D4AF37] transition group-open:rotate-45"
+                className="shrink-0 text-[20px] text-gold transition group-open:rotate-45"
               >
                 +
               </span>
@@ -65,7 +65,7 @@ export default function IncludedAccordion({
                   {demoFor(item.demo)}
                 </div>
               )}
-              <p className="text-[14px] leading-[1.65] text-[#C5C5C8] sm:text-[15px]">
+              <p className="text-[14px] leading-[1.65] text-ink-2 sm:text-[15px]">
                 {item.detail}
               </p>
               {item.video && (

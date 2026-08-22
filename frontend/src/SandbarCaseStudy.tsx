@@ -15,6 +15,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import { SANDBAR_JOBS } from './lib/sandbarJobs';
@@ -22,20 +23,10 @@ import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
 
 export default function SandbarCaseStudy() {
+  usePageMeta('/case-studies/sandbar');
   useReveal();
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
-    const prevTitle = document.title;
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc?.getAttribute('content') || '';
-    document.title = 'Sandbar Soft Wash — Lola Local SEO Case Study | Palm Harbor, FL';
-    if (desc) {
-      desc.setAttribute(
-        'content',
-        'How Lola rebuilt local visibility for Sandbar Soft Wash — a 15+ year Palm Harbor pressure-washing business — with every move tracked on a live public dashboard.',
-      );
-    }
 
     const blocks: object[] = [
       {
@@ -44,21 +35,21 @@ export default function SandbarCaseStudy() {
         headline: 'Sandbar Soft Wash — Local Visibility Case Study',
         description: 'How Lola rebuilt local visibility for Sandbar Soft Wash in Palm Harbor, FL — tracked in the open on a live public dashboard.',
         author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
-        publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
+        publisher: { '@id': `${SITE_ORIGIN}/#business` },
         about: 'Sandbar Soft Wash',
         mentions: [
           { '@type': 'LocalBusiness', name: 'Sandbar Soft Wash', url: 'https://www.sandbarsoftwash.com', address: { '@type': 'PostalAddress', addressLocality: 'Palm Harbor', addressRegion: 'FL', addressCountry: 'US' } },
         ],
-        url: 'https://lola.tyalexandermedia.com/case-studies/sandbar',
+        url: `${SITE_ORIGIN}/case-studies/sandbar`,
         inLanguage: 'en-US',
       },
       {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://lola.tyalexandermedia.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Case Studies', item: 'https://lola.tyalexandermedia.com/case-studies' },
-          { '@type': 'ListItem', position: 3, name: 'Sandbar Soft Wash', item: 'https://lola.tyalexandermedia.com/case-studies/sandbar' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Case Studies', item: `${SITE_ORIGIN}/case-studies` },
+          { '@type': 'ListItem', position: 3, name: 'Sandbar Soft Wash', item: `${SITE_ORIGIN}/case-studies/sandbar` },
         ],
       },
     ];
@@ -75,8 +66,6 @@ export default function SandbarCaseStudy() {
 
     return () => {
       tags.forEach((t) => t.parentNode?.removeChild(t));
-      document.title = prevTitle;
-      if (desc) desc.setAttribute('content', prevDesc);
     };
   }, []);
 
@@ -94,7 +83,7 @@ export default function SandbarCaseStudy() {
           }}
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Case Study · Palm Harbor, FL · Pressure Washing
         </p>
         <h1
@@ -102,17 +91,17 @@ export default function SandbarCaseStudy() {
           style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}
         >
           Sandbar Soft Wash —{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             the business Lola was built for
           </span>
           .
         </h1>
-        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-[#C5C5C8] sm:text-[18px]">
+        <p className="mt-5 max-w-[720px] text-[16px] leading-[1.6] text-ink-2 sm:text-[18px]">
           The original proof story. Lola was built to fix Sandbar — Coach Ty&apos;s father&apos;s
           15+ year master-certified pressure-washing business in Palm Harbor, FL. Great
           work, dialed crew, near-invisible on Google. Here&apos;s what the playbook actually
           did. See the live site at{' '}
-          <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline-offset-2 hover:underline">sandbarsoftwash.com</a>.
+          <a href="https://www.sandbarsoftwash.com" target="_blank" rel="noreferrer" className="text-gold underline-offset-2 hover:underline">sandbarsoftwash.com</a>.
         </p>
 
         {/* Stat bar — verifiable business facts + the live tracker only.
@@ -125,11 +114,11 @@ export default function SandbarCaseStudy() {
             { v: '20+', l: 'cities served' },
             { v: '15+', l: 'years in business' },
           ].map((s) => (
-            <div key={s.l} className="rounded-[12px] border border-[#D4AF37]/20 bg-white/[0.02] p-5">
-              <p className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[28px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[34px]">
+            <div key={s.l} className="rounded-[12px] border border-gold/20 bg-white/[0.02] p-5">
+              <p className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[28px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[34px]">
                 {s.v}
               </p>
-              <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-[#C5C5C8] sm:text-[13px]">
+              <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-ink-2 sm:text-[13px]">
                 {s.l}
               </p>
             </div>
@@ -139,7 +128,7 @@ export default function SandbarCaseStudy() {
 
       {/* ── THE CLIENT ─────────────────────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           The client
         </p>
         <h2
@@ -151,26 +140,26 @@ export default function SandbarCaseStudy() {
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           <div className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
+            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-ink-3">
               Who they are
             </p>
-            <ul className="mt-3 flex flex-col gap-2.5 text-[14px] leading-[1.55] text-[#C5C5C8] sm:text-[15px]">
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Family-owned soft wash + pressure washing operation in Palm Harbor, FL</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Master certified · eco-friendly chemicals · fully insured</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Coach Ty&apos;s father&apos;s real business — the reason Lola exists</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Service area covers 20+ cities across Tampa Bay + Pinellas County</span></li>
+            <ul className="mt-3 flex flex-col gap-2.5 text-[14px] leading-[1.55] text-ink-2 sm:text-[15px]">
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Family-owned soft wash + pressure washing operation in Palm Harbor, FL</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Master certified · eco-friendly chemicals · fully insured</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Coach Ty&apos;s father&apos;s real business — the reason Lola exists</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Service area covers 20+ cities across Tampa Bay + Pinellas County</span></li>
             </ul>
           </div>
 
-          <div className="rounded-[14px] border border-[#D4AF37]/25 bg-[#D4AF37]/[0.04] p-5 sm:p-6">
-            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          <div className="rounded-[14px] border border-gold/25 bg-gold/[0.04] p-5 sm:p-6">
+            <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-gold">
               What was leaking
             </p>
             <ul className="mt-3 flex flex-col gap-2.5 text-[14px] leading-[1.55] text-white sm:text-[15px]">
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Word-of-mouth + referrals were the entire pipeline — no Google flow</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Google Business Profile underbuilt: thin categories, sparse photos, no posts</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Citation gaps and NAP inconsistency across the directories that actually move local rankings</span></li>
-              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-[#D4AF37]">→</span><span>Site had no LocalBusiness schema — AI agents had to guess what the business was</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Word-of-mouth + referrals were the entire pipeline — no Google flow</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Google Business Profile underbuilt: thin categories, sparse photos, no posts</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Citation gaps and NAP inconsistency across the directories that actually move local rankings</span></li>
+              <li className="flex items-start gap-2"><span aria-hidden className="mt-1 text-gold">→</span><span>Site had no LocalBusiness schema — AI agents had to guess what the business was</span></li>
             </ul>
           </div>
         </div>
@@ -178,7 +167,7 @@ export default function SandbarCaseStudy() {
 
       {/* ── THE PLAYBOOK ──────────────────────────────────── */}
       <section className="mt-14 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           What we did
         </p>
         <h2
@@ -217,17 +206,17 @@ export default function SandbarCaseStudy() {
           ].map((p) => (
             <div key={p.w} className="rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-7">
               <div className="flex flex-wrap items-baseline gap-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">{p.w}</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold/70">{p.w}</p>
                 <h3 className="text-[20px] font-bold text-white sm:text-[22px]">{p.h}</h3>
               </div>
-              <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+              <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
                 {p.body}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.moves.map((m) => (
                   <span
                     key={m}
-                    className="inline-flex items-center rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.05] px-3 py-1 text-[11px] font-medium text-[#D4AF37]"
+                    className="inline-flex items-center rounded-full border border-gold/25 bg-gold/[0.05] px-3 py-1 text-[11px] font-medium text-gold"
                   >
                     {m}
                   </span>
@@ -239,8 +228,8 @@ export default function SandbarCaseStudy() {
       </section>
 
       {/* ── THE RESULT ────────────────────────────────────── */}
-      <section className="mt-14 rounded-2xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.08] via-transparent to-transparent p-6 sm:mt-20 sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-14 rounded-2xl border border-gold/40 bg-gradient-to-br from-gold/[0.08] via-transparent to-transparent p-6 sm:mt-20 sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           The result
         </p>
         <h2
@@ -249,7 +238,7 @@ export default function SandbarCaseStudy() {
         >
           Same playbook every Lola client gets — tracked in the open.
         </h2>
-        <p className="mt-4 max-w-[720px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 max-w-[720px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           What we promised at the start of the engagement: <span className="text-white font-semibold">visibility, clicks, calls,
           form fills.</span> What the first month built: a Google Business Profile that
           finally looks like a 15-year operation, a clean citation footprint, schema AI
@@ -265,7 +254,7 @@ export default function SandbarCaseStudy() {
           photos ever render here (no stock, no third-party watermarks). */}
       {SANDBAR_JOBS.length > 0 && (
         <section className="mt-14 sm:mt-20">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
             The craft itself
           </p>
           <h2
@@ -278,7 +267,7 @@ export default function SandbarCaseStudy() {
             {SANDBAR_JOBS.map((j) => (
               <figure key={j.before}>
                 <BeforeAfterSlider before={j.before} after={j.after} alt={j.alt} />
-                <figcaption className="mt-2.5 text-[12px] uppercase tracking-[0.14em] text-[#9CA3AF]">
+                <figcaption className="mt-2.5 text-[12px] uppercase tracking-[0.14em] text-ink-3">
                   {j.label}
                 </figcaption>
               </figure>
@@ -299,7 +288,7 @@ export default function SandbarCaseStudy() {
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Live system
           </span>
-          <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
+          <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-ink-3">
             Not a screenshot
           </p>
         </div>
@@ -309,7 +298,7 @@ export default function SandbarCaseStudy() {
         >
           See Sandbar&apos;s live dashboard.
         </h2>
-        <p className="mt-3 max-w-[700px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-3 max-w-[700px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Sandbar runs on the exact dashboard every Lola client logs into — keyword
           ranking history, AI Share-of-Voice, and the week-by-week work-delivered feed,
           refreshed on a weekly cadence. No login, no sales screenshot. Open the real thing.
@@ -325,10 +314,10 @@ export default function SandbarCaseStudy() {
 
       {/* ── HONESTY NOTE ──────────────────────────────────── */}
       <section className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-7">
-        <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#9CA3AF]">
+        <p className="text-[12px] font-bold uppercase tracking-[0.18em] text-ink-3">
           Honest fine print
         </p>
-        <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+        <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
           Sandbar is Coach Ty&apos;s family business and the reason Lola was built — we
           have a clear conflict of interest in writing about them, so we&apos;re flagging it
           out loud. The only numbers on this page (20+ cities / 15+ years) are verifiable
@@ -339,8 +328,8 @@ export default function SandbarCaseStudy() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="mt-12 rounded-3xl border border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-[#0A0A0B] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-12 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Same playbook
         </p>
         <h2
@@ -349,27 +338,27 @@ export default function SandbarCaseStudy() {
         >
           Run the playbook on your business.
         </h2>
-        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mx-auto mt-4 max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:text-[16px]">
           Get your AI Visibility Score in 60 seconds — same five categories Sandbar
           ran against — then run the same playbook on yours.
         </p>
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
-            href="/grader"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
+            href="/growth-score"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_32px_rgba(212,175,55,0.55)] sm:h-16 sm:text-[15px]"
           >
-            Run the free Grader →
+            Run the free Growth Score →
           </a>
           <a
             href={startHref()}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/[0.06] sm:h-16 sm:text-[15px]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-7 text-[14px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/40 hover:bg-gold/[0.06] sm:h-16 sm:text-[15px]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
         </div>
       </section>
 
-      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-16">
+      <div className="mt-12 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-16">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>

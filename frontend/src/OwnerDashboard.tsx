@@ -27,12 +27,12 @@ interface Hq {
 
 function Stat({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
   return (
-    <div className="rounded-[14px] border border-[#D4AF37]/20 bg-white/[0.02] p-5">
-      <p className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[30px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[36px]">
+    <div className="rounded-[14px] border border-gold/20 bg-white/[0.02] p-5">
+      <p className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[30px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[36px]">
         {value}
       </p>
-      <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-[#C5C5C8]">{label}</p>
-      {sub && <p className="mt-1 text-[11px] text-[#8A8F98]">{sub}</p>}
+      <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-ink-2">{label}</p>
+      {sub && <p className="mt-1 text-[11px] text-ink-3">{sub}</p>}
     </div>
   );
 }
@@ -43,10 +43,10 @@ function Pill({ on, label }: { on: boolean; label: string }) {
       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] ${
         on
           ? 'border-[#28C840]/40 bg-[#28C840]/[0.08] text-[#28C840]'
-          : 'border-white/[0.1] bg-white/[0.02] text-[#8A8F98]'
+          : 'border-white/[0.1] bg-white/[0.02] text-ink-3'
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${on ? 'bg-[#28C840]' : 'bg-[#5A5F68]'}`} />
+      <span className={`h-1.5 w-1.5 rounded-full ${on ? 'bg-[#28C840]' : 'bg-ink-4'}`} />
       {label} {on ? 'on' : 'off'}
     </span>
   );
@@ -91,7 +91,7 @@ export default function OwnerDashboard() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-24 text-center">
         <h1 className="text-2xl font-bold text-white">Lola HQ</h1>
-        <p className="mt-2 text-sm text-[#9CA3AF]">Enter your admin key.</p>
+        <p className="mt-2 text-sm text-ink-3">Enter your admin key.</p>
         <div className="mt-6 flex gap-2">
           <input
             type="password"
@@ -99,11 +99,11 @@ export default function OwnerDashboard() {
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') saveKey(); }}
             placeholder="admin key"
-            className="h-11 rounded-[10px] border border-white/[0.15] bg-white/[0.03] px-4 text-white outline-none focus:border-[#D4AF37]/50"
+            className="h-11 rounded-[10px] border border-white/[0.15] bg-white/[0.03] px-4 text-white outline-none focus:border-gold/50"
           />
           <button
             onClick={saveKey}
-            className="h-11 rounded-[10px] bg-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+            className="h-11 rounded-[10px] bg-gold px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold"
           >
             Enter
           </button>
@@ -121,12 +121,12 @@ export default function OwnerDashboard() {
     <main className="flex flex-1 flex-col py-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Lola HQ</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">Lola HQ</p>
           <h1 className="mt-1 text-[26px] font-bold text-white sm:text-[32px]">Your whole funnel, one screen.</h1>
         </div>
         <button
           onClick={() => void load()}
-          className="h-10 rounded-[10px] border border-white/[0.15] bg-white/[0.03] px-4 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:border-[#D4AF37]/40"
+          className="h-10 rounded-[10px] border border-white/[0.15] bg-white/[0.03] px-4 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition hover:border-gold/40"
         >
           {loading ? 'Refreshing…' : 'Refresh'}
         </button>
@@ -137,8 +137,8 @@ export default function OwnerDashboard() {
       {data && (
         <>
           {/* Launch readiness — your live go-live checklist */}
-          <div className="mt-6 rounded-[14px] border border-[#D4AF37]/25 bg-white/[0.02] p-4 sm:p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          <div className="mt-6 rounded-[14px] border border-gold/25 bg-white/[0.02] p-4 sm:p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
               Launch readiness
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -149,7 +149,7 @@ export default function OwnerDashboard() {
               <Pill on={data.ready.ai_visibility} label="AI visibility" />
             </div>
             {!data.ready.stripe && (
-              <p className="mt-3 text-[12px] leading-[1.5] text-[#F4D47C]">
+              <p className="mt-3 text-[12px] leading-[1.5] text-gold-bright">
                 ⚡ Most important next step: set <span className="font-semibold">Stripe</span> keys +
                 links so you can take payment. See <span className="font-mono">docs/GO-LIVE.md</span>.
               </p>
@@ -176,31 +176,31 @@ export default function OwnerDashboard() {
 
           {/* Funnel */}
           <div className="mt-4 rounded-[14px] border border-white/[0.08] bg-white/[0.02] p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Funnel</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-[#C5C5C8]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">Funnel</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
               <span className="font-semibold text-white">{data.scores_run}</span> scores
-              <span className="text-[#5A5F68]">→</span>
+              <span className="text-ink-4">→</span>
               <span className="font-semibold text-white">{data.leads.total}</span> leads
-              <span className="text-[#8A8F98]">({leadPct}%)</span>
-              <span className="text-[#5A5F68]">→</span>
+              <span className="text-ink-3">({leadPct}%)</span>
+              <span className="text-ink-4">→</span>
               <span className="font-semibold text-white">{data.nurture.purchased}</span> converted
-              <span className="text-[#8A8F98]">({convPct}% of leads)</span>
+              <span className="text-ink-3">({convPct}% of leads)</span>
             </div>
           </div>
 
           {/* Clients */}
           <div className="mt-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Clients</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">Clients</p>
             {data.clients.list.length === 0 ? (
-              <p className="mt-2 text-[13px] text-[#8A8F98]">No active clients yet.</p>
+              <p className="mt-2 text-[13px] text-ink-3">No active clients yet.</p>
             ) : (
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {data.clients.list.map((c) => (
                   <div key={c.slug} className="flex items-center justify-between rounded-[10px] border border-white/[0.08] bg-white/[0.02] px-4 py-3">
                     <span className="text-[14px] font-semibold text-white">{c.name || c.slug}</span>
                     <span className="flex gap-3 text-[12px]">
-                      <a href={`/r/client/${c.slug}`} className="text-[#D4AF37] hover:underline">dashboard ↗</a>
-                      <a href={`/admin/revenue/${c.slug}`} className="text-[#9CA3AF] hover:text-[#D4AF37]">revenue</a>
+                      <a href={`/r/client/${c.slug}`} className="text-gold hover:underline">dashboard ↗</a>
+                      <a href={`/admin/revenue/${c.slug}`} className="text-ink-3 hover:text-gold">revenue</a>
                     </span>
                   </div>
                 ))}
@@ -210,10 +210,10 @@ export default function OwnerDashboard() {
 
           {/* Recent leads */}
           <div className="mt-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">Recent Growth Scores</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">Recent Growth Scores</p>
             <div className="mt-3 overflow-x-auto rounded-[12px] border border-white/[0.08]">
               <table className="w-full min-w-[520px] text-left text-[13px]">
-                <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.12em] text-[#8A8F98]">
+                <thead className="bg-white/[0.03] text-[11px] uppercase tracking-[0.12em] text-ink-3">
                   <tr>
                     <th className="px-4 py-3">Business</th>
                     <th className="px-4 py-3">City</th>
@@ -225,20 +225,20 @@ export default function OwnerDashboard() {
                   {data.recent_leads.map((l) => (
                     <tr key={l.id}>
                       <td className="px-4 py-3 font-medium text-white">{l.business_name || '—'}</td>
-                      <td className="px-4 py-3 text-[#C5C5C8]">{l.city || '—'}</td>
-                      <td className="px-4 py-3 text-center font-bold text-[#D4AF37]">{l.total_score ?? '—'}</td>
-                      <td className="px-4 py-3 text-[#8A8F98]">{(l.created_at || '').slice(0, 10)}</td>
+                      <td className="px-4 py-3 text-ink-2">{l.city || '—'}</td>
+                      <td className="px-4 py-3 text-center font-bold text-gold">{l.total_score ?? '—'}</td>
+                      <td className="px-4 py-3 text-ink-3">{(l.created_at || '').slice(0, 10)}</td>
                     </tr>
                   ))}
                   {data.recent_leads.length === 0 && (
-                    <tr><td colSpan={4} className="px-4 py-6 text-center text-[#8A8F98]">No scores run yet.</td></tr>
+                    <tr><td colSpan={4} className="px-4 py-6 text-center text-ink-3">No scores run yet.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[11px] text-[#5A5F68]">
+          <p className="mt-6 text-center text-[11px] text-ink-4">
             Revenue truth lives in Stripe · deeper client data on each dashboard ↗
           </p>
         </>

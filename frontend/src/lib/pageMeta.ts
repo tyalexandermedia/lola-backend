@@ -42,7 +42,25 @@
 import { FOUNDER } from './lola';
 import { PLAN, GUARANTEE } from './pricing';
 
-export const SITE_ORIGIN = 'https://lola.tyalexandermedia.com';
+/**
+ * Canonical origin — ONE definition for the whole frontend.
+ *
+ * 2026-08-20: migrated from lola.tyalexandermedia.com to www.coachtyalexander.com.
+ *
+ * Env-overridable rather than a hardcoded literal, deliberately. A domain move
+ * is the change most likely to need reverting under time pressure, and a
+ * find-replace across 28 files is not something you want to be doing while the
+ * site is serving the wrong canonical. Set VITE_SITE_ORIGIN in Vercel to point
+ * everything — canonicals, og:url, every schema @id, the sitemap — somewhere
+ * else in one variable, then redeploy.
+ *
+ * NOTE the www. It is canonical, and the apex must 301 to it. Serving both is
+ * duplicate content; picking one and redirecting the other is the whole job.
+ */
+export const SITE_ORIGIN = (
+  (import.meta.env.VITE_SITE_ORIGIN as string | undefined)?.trim() ||
+  'https://www.coachtyalexander.com'
+).replace(/\/$/, '');
 export const SITE_NAME = 'Lola Leads';
 export const LEGAL_NAME = 'Ty Alexander Media';
 
@@ -262,6 +280,30 @@ export const PAGE_META: Record<string, PageMeta> = {
       'Tell Coach Ty about your business and he takes it from there. Done-for-you local SEO and AI search visibility for Tampa Bay service businesses, $397/month.',
     path: '/apply',
     breadcrumb: [{ name: 'Get Started', path: '/apply' }],
+  },
+  '/start': {
+    title: 'Start Local SEO — $397/mo, Website Included',
+    description:
+      'Start done-for-you local SEO for your service business: $397/month, website design included free, no setup fee. One tap, no sales call. 90-Day Promise.',
+    path: '/start',
+    breadcrumb: [{ name: 'Start', path: '/start' }],
+  },
+  '/case-studies/sandbar': {
+    title: 'Sandbar Soft Wash — Local SEO Case Study',
+    description:
+      'How Lola rebuilt local visibility for a 15-year Palm Harbor pressure-washing business, tracked in the open on a live public dashboard anyone can check.',
+    path: '/case-studies/sandbar',
+    breadcrumb: [
+      { name: 'Case Studies', path: '/case-studies' },
+      { name: 'Sandbar Soft Wash', path: '/case-studies/sandbar' },
+    ],
+  },
+  '/case-studies': {
+    title: 'Local SEO Case Studies — Tampa Bay Contractors',
+    description:
+      'How Lola rebuilt local visibility for real Tampa Bay service businesses, tracked in the open on live public dashboards rather than in a sales deck.',
+    path: '/case-studies',
+    breadcrumb: [{ name: 'Case Studies', path: '/case-studies' }],
   },
   '/vs': {
     title: 'Lola vs Local SEO Agencies & Tools — Compared',

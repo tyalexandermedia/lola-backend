@@ -12,6 +12,7 @@ import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
 import { PLAN, GUARANTEE, EXCLUSIVITY } from './lib/pricing';
 import { startHref, startSmsHref } from './lib/checkout';
+import { SITE_ORIGIN } from './lib/pageMeta';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
 export { API_URL };
@@ -249,7 +250,7 @@ export default function AuditFlow() {
       setAudit(data);
       setStage('results');
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : 'Unable to run the audit');
+      setApiError(err instanceof Error ? err.message : 'Unable to run the Growth Score');
       setStage('error');
     }
   };
@@ -329,7 +330,7 @@ function ProgressBar({ total, current }: { total: number; current: number }) {
       aria-valuenow={current + 1}
     >
       <div
-        className="h-full rounded-[2px] bg-gradient-to-r from-[#FFD166] via-[#F4B942] to-[#E09E23] transition-[width] duration-[400ms] ease-out"
+        className="h-full rounded-[2px] bg-gradient-to-r from-gold-hi via-gold-deep to-gold-deep transition-[width] duration-[400ms] ease-out"
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -376,7 +377,7 @@ function QuestionStage({
 
       <div key={question.key} className="animate-slide-up mt-4 sm:mt-6">
         <p
-          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#FFD166] sm:text-[12px]"
+          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-hi sm:text-[12px]"
           aria-live="polite"
         >
           Step {stepIndex + 1} of {totalSteps}
@@ -386,7 +387,7 @@ function QuestionStage({
           {question.prompt}
         </h1>
 
-        <p className="mt-2 text-[15px] leading-[1.55] text-[#9AA0A6] sm:mt-3 sm:text-[17px] sm:leading-[1.6]">{question.lola}</p>
+        <p className="mt-2 text-[15px] leading-[1.55] text-ink-3 sm:mt-3 sm:text-[17px] sm:leading-[1.6]">{question.lola}</p>
 
         <div className="mt-5 sm:mt-8">
           {question.options ? (
@@ -400,7 +401,7 @@ function QuestionStage({
                     onClick={() => onChange(opt.value)}
                     className={`rounded-[14px] border px-5 py-4 text-left text-[16px] font-medium transition-all duration-200 ${
                       active
-                        ? 'border-[#FFD166] bg-[#FFD166]/[0.12] text-white shadow-[0_0_0_3px_rgba(255,193,7,0.16)]'
+                        ? 'border-gold-hi bg-gold-hi/[0.12] text-white shadow-[0_0_0_3px_rgba(255,193,7,0.16)]'
                         : 'border-white/[0.08] bg-white/[0.03] text-slate-200 hover:border-white/[0.18] hover:bg-white/[0.05]'
                     }`}
                   >
@@ -430,10 +431,10 @@ function QuestionStage({
                     onAdvance();
                   }
                 }}
-                className={`h-16 w-full rounded-[14px] border bg-white/[0.03] px-6 text-[18px] font-medium text-white caret-[#D4AF37] outline-none transition-all duration-200 placeholder:text-[#6A6F78] sm:h-[60px] ${
+                className={`h-16 w-full rounded-[14px] border bg-white/[0.03] px-6 text-[18px] font-medium text-white caret-gold outline-none transition-all duration-200 placeholder:text-ink-4 sm:h-[60px] ${
                   error
                     ? 'border-[#E5A95B] focus:border-[#E5A95B] focus:shadow-[0_0_0_4px_rgba(229,169,91,0.1)]'
-                    : 'border-white/[0.08] focus:border-[#D4AF37] focus:shadow-[0_0_0_4px_rgba(212,175,55,0.1)]'
+                    : 'border-white/[0.08] focus:border-gold focus:shadow-[0_0_0_4px_rgba(212,175,55,0.1)]'
                 } ${shaking ? 'animate-shake' : ''}`}
               />
             </>
@@ -449,8 +450,8 @@ function QuestionStage({
         {/* Heads-up note: only on the last step, below the email input.
             Informational, not action-blocking — keeps CTA above the fold. */}
         {isLastStep && (
-          <p className="mt-4 text-[12px] leading-[1.5] text-[#7A7F8A]">
-            Heads up: if any external data source is syncing, your audit still runs —
+          <p className="mt-4 text-[12px] leading-[1.5] text-ink-4">
+            Heads up: if any external data source is syncing, your Growth Score still runs —
             partial data shows as "pending" and populates within 24 hours.
           </p>
         )}
@@ -463,7 +464,7 @@ function QuestionStage({
           type="button"
           onClick={onBack}
           disabled={stepIndex === 0}
-          className="inline-flex h-14 w-full items-center justify-center rounded-[12px] border border-white/[0.1] bg-transparent px-6 text-[15px] font-medium text-[#9AA0A6] transition-all duration-200 hover:border-white/[0.2] hover:text-white disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto"
+          className="inline-flex h-14 w-full items-center justify-center rounded-[12px] border border-white/[0.1] bg-transparent px-6 text-[15px] font-medium text-ink-3 transition-all duration-200 hover:border-white/[0.2] hover:text-white disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto"
           aria-label="Back"
         >
           ← Back
@@ -472,10 +473,10 @@ function QuestionStage({
         <button
           type="button"
           onClick={onAdvance}
-          className="group inline-flex h-14 w-full items-center justify-center gap-1.5 rounded-[12px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] px-8 text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25 sm:w-auto"
-          aria-label={isLastStep ? 'Run the audit' : 'Next'}
+          className="group inline-flex h-14 w-full items-center justify-center gap-1.5 rounded-[12px] bg-gradient-to-br from-gold-hi via-gold-deep to-gold-deep px-8 text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-gold-hi/25 sm:w-auto"
+          aria-label={isLastStep ? 'Run my Growth Score' : 'Next'}
         >
-          <span>{isLastStep ? 'Run the audit' : 'Next'}</span>
+          <span>{isLastStep ? 'Run my Growth Score' : 'Next'}</span>
           <span aria-hidden className="inline-block transition-transform duration-200 group-hover:translate-x-1">
             →
           </span>
@@ -489,9 +490,9 @@ function SniffingStage({ line }: { line: string }) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center text-center">
       <div className="flex items-center gap-3">
-        <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '0ms' }} />
-        <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '180ms' }} />
-        <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '360ms' }} />
+        <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '0ms' }} />
+        <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '180ms' }} />
+        <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '360ms' }} />
       </div>
       <h2 className="mt-8 text-2xl font-semibold text-white">Lola is on it.</h2>
       <p key={line} className="mt-3 max-w-md animate-fade-in text-base text-slate-400">
@@ -521,7 +522,7 @@ function ErrorStage({
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-2xl bg-gradient-to-r from-[#FFD166] via-[#F4B942] to-[#E09E23] px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25"
+          className="rounded-2xl bg-gradient-to-r from-gold-hi via-gold-deep to-gold-deep px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-gold-hi/25"
         >
           Try again
         </button>
@@ -608,7 +609,8 @@ export function ResultsStage({
       <div className="print-only print-header">
         <span className="print-brand">🐾 LOLA OS — Growth Score Report</span>
         <span className="print-meta">
-          {businessTypeDisplay ? `${businessTypeDisplay} · ` : ''}lola.tyalexandermedia.com
+          {businessTypeDisplay ? `${businessTypeDisplay} · ` : ''}
+          {SITE_ORIGIN.replace(/^https?:\/\/(www\.)?/, '')}
         </span>
       </div>
 
@@ -625,7 +627,7 @@ export function ResultsStage({
           className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[480px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.10)_0%,transparent_60%)] blur-2xl"
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Audit Complete
         </p>
 
@@ -638,7 +640,7 @@ export function ResultsStage({
           {audit.business_name}
         </h1>
 
-        <p className="mt-3 text-[15px] text-[#D4AF37]/85 sm:text-[17px]">
+        <p className="mt-3 text-[15px] text-gold/85 sm:text-[17px]">
           {audit.city}{businessTypeDisplay ? ` · ${businessTypeDisplay}` : ''}
         </p>
 
@@ -651,11 +653,11 @@ export function ResultsStage({
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Score */}
           <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">Score</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-3">Score</p>
             <p className={`mt-3 text-[44px] font-extrabold leading-none ${scoreTone}`}>
               {audit.total_score < 0 ? '—' : audit.total_score}
             </p>
-            <p className="mt-2 text-[13px] text-[#A0A5AE]">
+            <p className="mt-2 text-[13px] text-ink-3">
               {audit.grade} — {audit.grade_label}
             </p>
           </div>
@@ -670,13 +672,13 @@ export function ResultsStage({
 
           {/* Annual at stake — DOMINANT */}
           <div
-            className={`relative rounded-[12px] border-2 border-[#D4AF37]/55 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.08),0_0_28px_rgba(212,175,55,0.10)]`}
+            className={`relative rounded-[12px] border-2 border-gold/55 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-transparent p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.08),0_0_28px_rgba(212,175,55,0.10)]`}
           >
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gold">
               Annual at stake
             </p>
             <p
-              className={`mt-3 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text font-extrabold leading-[0.95] tracking-[-0.025em] text-transparent ${
+              className={`mt-3 bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text font-extrabold leading-[0.95] tracking-[-0.025em] text-transparent ${
                 isHighLeak
                   ? 'text-[56px] sm:text-[72px] lg:text-[80px]'
                   : 'text-[48px] sm:text-[64px] lg:text-[72px]'
@@ -684,7 +686,7 @@ export function ResultsStage({
             >
               ${formatNumber(annualAtStake)}
             </p>
-            <p className="mt-2 text-[13px] text-[#D4AF37]/80">/ year at risk</p>
+            <p className="mt-2 text-[13px] text-gold/80">/ year at risk</p>
           </div>
         </div>
 
@@ -695,14 +697,14 @@ export function ResultsStage({
           onClick={() => {
             trackClick('start_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
           }}
-          className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#D4AF37] sm:mt-10 sm:h-16 sm:text-[16px]"
+          className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-gold sm:mt-10 sm:h-16 sm:text-[16px]"
         >
           <span>Plug the leak — {PLAN.price}{PLAN.period}</span>
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
         </a>
 
         {/* Micro-benefits — single row on desktop, stacked on mobile */}
-        <ul className="mt-5 flex flex-col gap-2 text-[13px] text-[#C5C5C8] sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-2">
+        <ul className="mt-5 flex flex-col gap-2 text-[13px] text-ink-2 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-2">
           <li className="flex items-center gap-2">
             <CheckIcon /> Website build included free
           </li>
@@ -715,7 +717,7 @@ export function ResultsStage({
         </ul>
 
         {/* Scroll cue — desktop only */}
-        <p className="mt-10 hidden animate-bounce-slow text-center text-[12px] uppercase tracking-[0.22em] text-[#D4AF37]/70 sm:block">
+        <p className="mt-10 hidden animate-bounce-slow text-center text-[12px] uppercase tracking-[0.22em] text-gold/70 sm:block">
           ↓ Full breakdown below
         </p>
       </section>
@@ -723,14 +725,14 @@ export function ResultsStage({
       {/* Share + download — relocated below the hero, smaller, doesn't compete.
           no-print so neither button appears in the saved PDF. */}
       <div className="no-print mt-10 flex flex-col gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 sm:flex-row sm:items-center sm:justify-between">
-        <span className="truncate text-[12px] text-[#8A8F98]">
+        <span className="truncate text-[12px] text-ink-3">
           {shareUrl ?? 'Your Growth Score scorecard'}
         </span>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => { try { track('scorecard_download_clicked'); } catch { /* noop */ } window.print(); }}
-            className="flex h-11 min-w-[150px] items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-4 text-[12px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] transition hover:brightness-105"
+            className="flex h-11 min-w-[150px] items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-gold via-gold-bright to-gold px-4 text-[12px] font-bold uppercase tracking-[0.04em] text-on-gold transition hover:brightness-105"
           >
             ⬇ Save as PDF
           </button>
@@ -738,7 +740,7 @@ export function ResultsStage({
             <button
               type="button"
               onClick={copyShareLink}
-              className="flex h-11 min-w-[140px] items-center justify-center rounded-xl bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+              className="flex h-11 min-w-[140px] items-center justify-center rounded-xl bg-white/[0.05] px-4 text-[12px] font-semibold text-ink-2 transition hover:bg-white/[0.10]"
             >
               {copied ? 'Copied ✓' : 'Copy share link'}
             </button>
@@ -808,13 +810,13 @@ export function ResultsStage({
       {/* Who's capturing your customers — top 3 competitors from search results */}
       {Array.isArray(audit.competitors) && audit.competitors.length > 0 && (
         <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
             Who's capturing your customers
           </p>
           <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
             Top businesses Google's putting in front of {audit.city} buyers
           </h3>
-          <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+          <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
             Pulled live from Google's top results for "{audit.business_type} {audit.city}".
             These are the businesses showing up before you on the queries that matter.
           </p>
@@ -827,9 +829,9 @@ export function ResultsStage({
               return (
                 <li
                   key={`${title}-${i}`}
-                  className="flex items-center gap-3 rounded-[12px] border border-white/[0.06] bg-[#0A0A0B]/40 p-4"
+                  className="flex items-center gap-3 rounded-[12px] border border-white/[0.06] bg-on-gold/40 p-4"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[14px] font-bold text-[#D4AF37]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-[14px] font-bold text-gold">
                     #{rank}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -837,7 +839,7 @@ export function ResultsStage({
                       {title}
                     </p>
                     {url && (
-                      <p className="mt-0.5 truncate text-[11px] text-[#7A7F8A]">
+                      <p className="mt-0.5 truncate text-[11px] text-ink-4">
                         {url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
                       </p>
                     )}
@@ -847,7 +849,7 @@ export function ResultsStage({
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[12px] font-semibold text-[#D4AF37] underline-offset-2 hover:underline"
+                      className="text-[12px] font-semibold text-gold underline-offset-2 hover:underline"
                     >
                       Visit →
                     </a>
@@ -855,22 +857,22 @@ export function ResultsStage({
                 </li>
               );
             })}
-            <li className="mt-1 flex items-center gap-3 rounded-[12px] border-2 border-[#D4AF37]/45 bg-[#D4AF37]/[0.06] p-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[12px] font-bold text-[#0A0A0B]">
+            <li className="mt-1 flex items-center gap-3 rounded-[12px] border-2 border-gold/45 bg-gold/[0.06] p-4">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-[12px] font-bold text-on-gold">
                 YOU
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[14px] font-semibold text-white sm:text-[15px]">
                   {audit.business_name}
                 </p>
-                <p className="mt-0.5 text-[11px] text-[#D4AF37]/85">
+                <p className="mt-0.5 text-[11px] text-gold/85">
                   Score {audit.total_score}/100 — currently not on page 1 for this query
                 </p>
               </div>
             </li>
           </ol>
 
-          <div className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] p-4 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
+          <div className="mt-5 rounded-xl border border-gold/20 bg-gold/[0.04] p-4 text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">
             <p className="font-semibold text-white">
               From what Lola sees on local business audits: top-3 takes most of the clicks.
               The rest fight over the scraps.
@@ -903,7 +905,7 @@ export function ResultsStage({
           </span>
           <span
             aria-hidden
-            className="shrink-0 text-[#D4AF37] transition-transform group-open:rotate-180"
+            className="shrink-0 text-gold transition-transform group-open:rotate-180"
           >
             ▾
           </span>
@@ -1063,13 +1065,13 @@ function DataFreshnessAccordion() {
         }
       }}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between text-[12px] text-[#8A8F98] [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-[12px] text-ink-3 [&::-webkit-details-marker]:hidden">
         <span>ⓘ About data freshness</span>
         <span aria-hidden className="text-[10px] opacity-60 transition group-open:rotate-180">▾</span>
       </summary>
-      <p className="mt-3 text-[13px] leading-[1.6] text-[#A0A5AE]">
+      <p className="mt-3 text-[13px] leading-[1.6] text-ink-3">
         Some external data sources are temporarily syncing. Partial data may show as "pending" and
-        will populate within 24 hours. The audit score above reflects only the signals Lola could
+        will populate within 24 hours. The Growth Score above reflects only the signals Lola could
         confirm directly with Google.
       </p>
     </details>
@@ -1086,7 +1088,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       return (
         <>
           Your SEO is strong — but{' '}
-          <span className="text-[#FFD166]">${formatNumber(leak)}/month</span> is still up for grabs.
+          <span className="text-gold-hi">${formatNumber(leak)}/month</span> is still up for grabs.
         </>
       );
     }
@@ -1094,13 +1096,13 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       return (
         <>
           You're leaving{' '}
-          <span className="text-[#FFD166]">${formatNumber(leak)}/month</span> on the table.
+          <span className="text-gold-hi">${formatNumber(leak)}/month</span> on the table.
         </>
       );
     }
     return (
       <>
-        There's <span className="text-[#FFD166]">${formatNumber(leak)}/month</span> worth of fixes waiting.
+        There's <span className="text-gold-hi">${formatNumber(leak)}/month</span> worth of fixes waiting.
       </>
     );
   })();
@@ -1120,12 +1122,12 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       {/* SECTION 1 — Primary CTA (biggest visual weight; fade-up on render) */}
       <section
         aria-label={`Start the ${PLAN.price}${PLAN.period} plan`}
-        className="animate-slide-up relative mt-12 overflow-hidden rounded-3xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.06] to-[#0A0A0B] p-7 shadow-[0_0_60px_rgba(212,175,55,0.12)] sm:p-12"
+        className="animate-slide-up relative mt-12 overflow-hidden rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.06] to-on-gold p-7 shadow-[0_0_60px_rgba(212,175,55,0.12)] sm:p-12"
       >
         <h2 className="text-[28px] font-bold leading-[1.12] text-white sm:text-[44px]">
           {headline}
         </h2>
-        <p className="mt-5 max-w-[640px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[17px]">
+        <p className="mt-5 max-w-[640px] text-[15px] leading-[1.6] text-ink-2 sm:text-[17px]">
           Most owners don't fix this — they grind harder.
           <br className="hidden sm:inline" />{' '}
           Smart ones plug the leak.
@@ -1134,14 +1136,14 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
         <a
           href={strategyHref}
           onClick={onBookClick}
-          className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[15px] font-bold uppercase tracking-[0.04em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_4px_18px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_8px_28px_rgba(212,175,55,0.5)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#D4AF37] sm:h-16 sm:text-[17px]"
+          className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-6 text-[15px] font-bold uppercase tracking-[0.04em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_4px_18px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_8px_28px_rgba(212,175,55,0.5)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-gold sm:h-16 sm:text-[17px]"
         >
           {PLAN.cta} — {PLAN.price}{PLAN.period}
         </a>
 
-        <p className="mt-3 text-center text-[12px] text-[#8A8F98]">
+        <p className="mt-3 text-center text-[12px] text-ink-3">
           🔒 Secure checkout · {PLAN.terms} ·{' '}
-          <a href={startSmsHref()} className="text-[#D4AF37] underline-offset-2 hover:underline">
+          <a href={startSmsHref()} className="text-gold underline-offset-2 hover:underline">
             or text Ty first
           </a>
         </p>
@@ -1161,7 +1163,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
-                className="mt-1 h-4 w-4 shrink-0 text-[#D4AF37]"
+                className="mt-1 h-4 w-4 shrink-0 text-gold"
               >
                 <polyline points="3 8 7 12 13 4" />
               </svg>
@@ -1173,7 +1175,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
 
       {/* SECTION 2 — Secondary CTAs for not-ready leads */}
       <section className="mt-10 sm:mt-14">
-        <p className="text-center text-[14px] font-medium text-[#8A8F98]">
+        <p className="text-center text-[14px] font-medium text-ink-3">
           Not ready yet?
         </p>
         <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-3">
@@ -1182,14 +1184,14 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             target="_blank"
             rel="noreferrer"
             onClick={onGuideClick}
-            className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
+            className="text-[14px] font-medium text-gold/75 transition hover:text-gold hover:underline"
           >
             → Get the full fix kit
           </a>
           <a
             href={CASE_STUDY_URL}
             onClick={onCaseStudyClick}
-            className="text-[14px] font-medium text-[#D4AF37]/75 transition hover:text-[#D4AF37] hover:underline"
+            className="text-[14px] font-medium text-gold/75 transition hover:text-gold hover:underline"
           >
             → See the playbook running on Sandbar Soft Wash — live dashboard
           </a>
@@ -1197,7 +1199,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             <a
               href={cta.href}
               onClick={() => trackClick('rerun_audit', { score })}
-              className="text-[12px] text-[#5A6068] transition hover:text-[#9AA0A6] hover:underline"
+              className="text-[12px] text-[#5A6068] transition hover:text-ink-3 hover:underline"
             >
               → {cta.label}
             </a>
@@ -1205,7 +1207,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
             <button
               type="button"
               onClick={onRerunClick}
-              className="text-[12px] text-[#5A6068] transition hover:text-[#9AA0A6] hover:underline"
+              className="text-[12px] text-[#5A6068] transition hover:text-ink-3 hover:underline"
             >
               → {cta.label}
             </button>
@@ -1214,7 +1216,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       </section>
 
       {/* SECTION 3 — Minimal footer */}
-      <div className="mx-auto mt-14 max-w-[640px] pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-20 sm:pb-14">
+      <div className="mx-auto mt-14 max-w-[640px] pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-20 sm:pb-14">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>
@@ -1244,13 +1246,13 @@ function LeakCard({
   return (
     <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-3">
           Monthly leak
         </p>
         <div
           role="tablist"
           aria-label="Leak display mode"
-          className="inline-flex rounded-full border border-white/[0.08] bg-[#0A0A0B] p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
+          className="inline-flex rounded-full border border-white/[0.08] bg-on-gold p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
         >
           <button
             role="tab"
@@ -1261,7 +1263,7 @@ function LeakCard({
               trackClick('leak_toggle', { mode: 'dollars' });
             }}
             className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
-              mode === 'dollars' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
+              mode === 'dollars' ? 'bg-gold text-on-gold' : 'text-ink-3 hover:text-white'
             }`}
           >
             💰 $
@@ -1275,7 +1277,7 @@ function LeakCard({
               trackClick('leak_toggle', { mode: 'calls' });
             }}
             className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
-              mode === 'calls' ? 'bg-[#D4AF37] text-[#0A0A0B]' : 'text-[#8A8F98] hover:text-white'
+              mode === 'calls' ? 'bg-gold text-on-gold' : 'text-ink-3 hover:text-white'
             }`}
           >
             📞 calls
@@ -1285,19 +1287,19 @@ function LeakCard({
 
       {mode === 'dollars' ? (
         <>
-          <p className="mt-3 bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
+          <p className="mt-3 bg-gradient-to-br from-gold to-gold-bright bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
             ${formatNumber(monthlyLeak)}
           </p>
-          <p className="mt-2 text-[13px] text-[#A0A5AE]">
+          <p className="mt-2 text-[13px] text-ink-3">
             {isIncomplete ? 'conservative estimate' : '/ month walking out the door'}
           </p>
         </>
       ) : (
         <>
-          <p className="mt-3 bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
+          <p className="mt-3 bg-gradient-to-br from-gold to-gold-bright bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
             ~{formatNumber(missedCalls)}
           </p>
-          <p className="mt-2 text-[13px] text-[#A0A5AE]">
+          <p className="mt-2 text-[13px] text-ink-3">
             missed calls / month{avgJobValue > 0 ? ` · ~$${formatNumber(avgJobValue)} avg job` : ''}
           </p>
         </>
@@ -1422,16 +1424,16 @@ function CopyCard({
   };
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">{eyebrow}</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{eyebrow}</p>
       <h4 className="mt-2 text-[16px] font-bold text-white sm:text-[17px]">{title}</h4>
-      <p className="mt-1.5 text-[12px] leading-[1.55] text-[#8A8F98]">{hint}</p>
-      <pre className="mt-4 max-h-[180px] overflow-auto whitespace-pre-wrap rounded-[10px] border border-white/[0.06] bg-[#0A0A0B] p-4 font-mono text-[12px] leading-[1.6] text-[#E8E4D8]">
+      <p className="mt-1.5 text-[12px] leading-[1.55] text-ink-3">{hint}</p>
+      <pre className="mt-4 max-h-[180px] overflow-auto whitespace-pre-wrap rounded-[10px] border border-white/[0.06] bg-on-gold p-4 font-mono text-[12px] leading-[1.6] text-ink-2">
         {body}
       </pre>
       <button
         type="button"
         onClick={onCopy}
-        className="mt-3 flex h-11 min-w-[140px] items-center justify-center rounded-[10px] bg-[#D4AF37]/[0.10] px-4 text-[12px] font-bold uppercase tracking-[0.06em] text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.18]"
+        className="mt-3 flex h-11 min-w-[140px] items-center justify-center rounded-[10px] bg-gold/[0.10] px-4 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition hover:bg-gold/[0.18]"
       >
         {copied ? '✓ Copied' : '📋 Copy'}
       </button>
@@ -1487,7 +1489,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
 
   return (
     <>
-      <section className="mt-5 rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#1A1408] via-[#0F0F12] to-[#0A0A0B] p-6 sm:p-7">
+      <section className="mt-5 rounded-3xl border border-gold/30 bg-gradient-to-br from-[#1A1408] via-surface to-on-gold p-6 sm:p-7">
         {/* THE FREE / PAID LINE.
             All four of these used to be free, pre-filled with the owner's own
             business details. That is the DIY product, given away — which left
@@ -1499,13 +1501,13 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
             One deliverable ships free and finished, because a locked box no one
             can see inside doesn't sell; you have to taste the cooking. The
             other three are what $397/month buys. */}
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
           Your fix kit
         </p>
         <h3 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[26px]">
           Here's the first one. Free, finished, yours.
         </h3>
-        <p className="mt-3 text-[14px] leading-[1.6] text-[#C5C5C8] sm:text-[15px]">
+        <p className="mt-3 text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
           Generated from {audit.business_name}'s actual audit — not a template. Paste it in and
           it works. The other three fixes are written the same way, and they're part of what the{' '}
           {PLAN.price}{PLAN.period} plan covers.
@@ -1541,15 +1543,15 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           ].map((d) => (
             <div
               key={d.n}
-              className="rounded-[14px] border border-[#D4AF37]/20 bg-[#0A0A0B]/60 p-4"
+              className="rounded-[14px] border border-gold/20 bg-on-gold/60 p-4"
             >
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A8F98]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 {d.n} · Locked
               </p>
               <p className="mt-1.5 text-[14px] font-semibold leading-[1.35] text-white">
                 {d.label}
               </p>
-              <p className="mt-1.5 text-[12.5px] leading-[1.45] text-[#9AA0A6]">{d.why}</p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.45] text-ink-3">{d.why}</p>
             </div>
           ))}
         </div>
@@ -1567,35 +1569,35 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
               window.localStorage.setItem('lolaLastAuditId', audit.audit_id || '');
             } catch { /* private mode — /diy falls back to the checklist */ }
           }}
-          className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#D4AF37] px-6 py-3 text-[14px] font-bold text-[#0A0A0B] transition hover:bg-[#F4D47C] sm:w-auto"
+          className="mt-5 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[12px] bg-gold px-6 py-3 text-[14px] font-bold text-on-gold transition hover:bg-gold-bright sm:w-auto"
         >
           Get all four done for you — {PLAN.price}{PLAN.period} →
         </a>
-        <p className="mt-2.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">
+        <p className="mt-2.5 text-[12.5px] leading-[1.5] text-ink-3">
           Website design is included too, and I do all of it — backed by
           the 90-Day Promise.
         </p>
       </section>
 
       {/* Lola's Take — signed closing block */}
-      <section className="mt-5 rounded-3xl border-2 border-[#D4AF37]/45 bg-gradient-to-br from-[#D4AF37]/[0.08] via-[#F4B942]/[0.04] to-[#0A0A0B] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <section className="mt-5 rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.08] via-gold-deep/[0.04] to-on-gold p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           🦴 Lola's quick take on {audit.business_name}
         </p>
         <div className="mt-4 space-y-3 text-[15px] leading-[1.65] text-white sm:text-[16px]">
           <p>
-            Your foundation is <strong className="text-[#D4AF37]">{assessment}</strong>. (Score:{' '}
+            Your foundation is <strong className="text-gold">{assessment}</strong>. (Score:{' '}
             <strong>{score}/100 — {audit.grade}</strong>)
           </p>
           <p>
             <strong className="text-white">Fastest win:</strong> {topFix}. That alone could move
-            you <strong className="text-[#D4AF37]">{movementHint}</strong> in 30 days.
+            you <strong className="text-gold">{movementHint}</strong> in 30 days.
           </p>
           {monthlyLeak > 0 && (
             <p>
               <strong className="text-white">Biggest leak:</strong> The gap between where{' '}
               {businessFirst} ranks today and where it could rank. That's about{' '}
-              <strong className="text-[#D4AF37]">${formatNumber(monthlyLeak)}/mo</strong> on the
+              <strong className="text-gold">${formatNumber(monthlyLeak)}/mo</strong> on the
               table.
             </p>
           )}
@@ -1607,21 +1609,21 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           <a
             href="/pricing"
             onClick={() => trackClick('roadmap_cta_clicked', { from: 'lolas_take' })}
-            className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+            className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-gold via-gold-bright to-gold px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold"
           >
             See pricing →
           </a>
           <a
             href="/apply"
             onClick={() => trackClick('roadmap_apply_clicked', { from: 'lolas_take' })}
-            className="inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-white/[0.02] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37]"
+            className="inline-flex h-12 items-center justify-center rounded-[10px] border border-gold/40 bg-white/[0.02] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-gold"
           >
             Apply (Coach Ty reviews every one)
           </a>
         </div>
-        <p className="mt-5 text-[13px] text-[#D4AF37]">
+        <p className="mt-5 text-[13px] text-gold">
           — Coach Ty
-          <span className="ml-2 text-[12px] text-[#8A8F98]">
+          <span className="ml-2 text-[12px] text-ink-3">
             Ty Alexander Traufield · Founder, Lola Leads · Ty Alexander Media · St. Pete, FL ·
             @tyalexandermedia
           </span>
@@ -1631,14 +1633,14 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
       {/* Share row — only rendered when we have a real audit_id to link to */}
       {hasShareableId && (
       <section className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-          📸 Share your audit score
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
+          📸 Share your Growth Score
         </p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={onShareCopy}
-            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] bg-white/[0.05] px-4 text-[12px] font-semibold text-[#C5C5C8] transition hover:bg-white/[0.10]"
+            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] bg-white/[0.05] px-4 text-[12px] font-semibold text-ink-2 transition hover:bg-white/[0.10]"
           >
             {shareCopied ? '✓ Link copied' : 'Copy share link'}
           </button>
@@ -1647,7 +1649,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackClick('audit_shared', { channel: 'instagram' })}
-            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-4 text-[12px] font-semibold text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.12]"
+            className="flex h-11 min-w-[160px] items-center justify-center rounded-[10px] border border-gold/30 bg-gold/[0.06] px-4 text-[12px] font-semibold text-gold transition hover:bg-gold/[0.12]"
           >
             Tag @tyalexandermedia on IG
           </a>
@@ -1758,11 +1760,11 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
 
   if (status === 'loading' || status === 'pending') {
     return (
-      <section className="mt-5 rounded-3xl border border-[#D4AF37]/20 bg-white/[0.02] p-6 sm:p-7">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+      <section className="mt-5 rounded-3xl border border-gold/20 bg-white/[0.02] p-6 sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
           🦴 Lola's enhanced opportunity report
         </p>
-        <p className="mt-3 text-[14px] text-[#8A8F98]">
+        <p className="mt-3 text-[14px] text-ink-3">
           {status === 'pending' ? 'Generating your business-specific report…' : 'Loading deeper analysis…'}
         </p>
       </section>
@@ -1772,8 +1774,8 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
   if (!payload) return null;
 
   return (
-    <section className="mt-5 rounded-3xl border-2 border-[#D4AF37]/40 bg-gradient-to-br from-[#D4AF37]/[0.06] via-[#0F0F12] to-[#0A0A0B] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
-      <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+    <section className="mt-5 rounded-3xl border-2 border-gold/40 bg-gradient-to-br from-gold/[0.06] via-surface to-on-gold p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+      <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
         🦴 Lola's enhanced opportunity report
       </p>
       <h2 className="mt-3 text-[24px] font-bold leading-tight text-white sm:text-[30px]">
@@ -1781,30 +1783,30 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
       </h2>
 
       {payload.executive_summary && (
-        <p className="mt-4 text-[14px] leading-[1.65] text-[#C5C5C8] sm:text-[15px]">
+        <p className="mt-4 text-[14px] leading-[1.65] text-ink-2 sm:text-[15px]">
           {payload.executive_summary}
         </p>
       )}
 
       {/* Revenue leak headline */}
       {payload.revenue_leak && typeof payload.revenue_leak.monthly_dollars === 'number' && (
-        <div className="mt-6 rounded-2xl border border-[#D4AF37]/30 bg-[#0A0A0B] p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+        <div className="mt-6 rounded-2xl border border-gold/30 bg-on-gold p-5 sm:p-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">
             Revenue leak — Lola's deeper read
           </p>
           <p className="mt-3">
-            <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-[36px] font-extrabold leading-none text-transparent sm:text-[44px]">
+            <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[36px] font-extrabold leading-none text-transparent sm:text-[44px]">
               ${formatNumber(payload.revenue_leak.monthly_dollars)}
             </span>
-            <span className="ml-2 text-[14px] text-[#A0A5AE]">/month</span>
+            <span className="ml-2 text-[14px] text-ink-3">/month</span>
           </p>
           {payload.revenue_leak.annual_dollars ? (
-            <p className="mt-1 text-[13px] text-[#A0A5AE]">
+            <p className="mt-1 text-[13px] text-ink-3">
               ${formatNumber(payload.revenue_leak.annual_dollars)}/year at stake
             </p>
           ) : null}
           {payload.revenue_leak.explanation && (
-            <p className="mt-3 text-[13px] leading-[1.6] text-[#C5C5C8] sm:text-[14px]">
+            <p className="mt-3 text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">
               {payload.revenue_leak.explanation}
             </p>
           )}
@@ -1815,7 +1817,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
       {Array.isArray(payload.service_specific_findings) &&
         payload.service_specific_findings.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+            <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-gold">
               Service-specific findings ({audit.business_type})
             </h3>
             <div className="mt-3 flex flex-col gap-3">
@@ -1828,30 +1830,30 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
                     <p className="text-[14px] font-bold text-white sm:text-[15px]">{f.finding}</p>
                   )}
                   {f.whats_broken && (
-                    <p className="mt-2 text-[13px] leading-[1.55] text-[#C5C5C8]">
+                    <p className="mt-2 text-[13px] leading-[1.55] text-ink-2">
                       <span className="font-semibold text-[#E5A95B]">Broken:</span> {f.whats_broken}
                     </p>
                   )}
                   {f.why_it_matters && (
-                    <p className="mt-1.5 text-[13px] leading-[1.55] text-[#C5C5C8]">
+                    <p className="mt-1.5 text-[13px] leading-[1.55] text-ink-2">
                       <span className="font-semibold text-[#4CAF80]">Why:</span> {f.why_it_matters}
                     </p>
                   )}
                   {Array.isArray(f.how_to_fix) && f.how_to_fix.length > 0 && (
-                    <ul className="mt-2 ml-4 list-disc text-[13px] leading-[1.55] text-[#C5C5C8]">
+                    <ul className="mt-2 ml-4 list-disc text-[13px] leading-[1.55] text-ink-2">
                       {f.how_to_fix.map((step, j) => (
                         <li key={j}>{step}</li>
                       ))}
                     </ul>
                   )}
-                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[#8A8F98]">
+                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-ink-3">
                     {f.time_to_implement && (
                       <span className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5">
                         ⏱ {f.time_to_implement}
                       </span>
                     )}
                     {f.expected_result && (
-                      <span className="rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-2 py-0.5 text-[#D4AF37]">
+                      <span className="rounded-full border border-gold/20 bg-gold/[0.06] px-2 py-0.5 text-gold">
                         → {f.expected_result}
                       </span>
                     )}
@@ -1865,7 +1867,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
       {/* Quick wins */}
       {Array.isArray(payload.quick_wins) && payload.quick_wins.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-gold">
             Quick wins (under 24 hours each)
           </h3>
           <ul className="mt-3 flex flex-col gap-2">
@@ -1874,7 +1876,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
                 key={i}
                 className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D4AF37]/15 text-[11px] font-bold text-[#D4AF37]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold/15 text-[11px] font-bold text-gold">
                   {i + 1}
                 </span>
                 <div className="flex-1">
@@ -1882,10 +1884,10 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
                     <p className="text-[14px] font-semibold text-white sm:text-[15px]">{q.title}</p>
                   )}
                   {q.action && (
-                    <p className="mt-1 text-[13px] leading-[1.55] text-[#C5C5C8]">{q.action}</p>
+                    <p className="mt-1 text-[13px] leading-[1.55] text-ink-2">{q.action}</p>
                   )}
                   {q.time && (
-                    <p className="mt-1.5 text-[11px] text-[#8A8F98]">⏱ {q.time}</p>
+                    <p className="mt-1.5 text-[11px] text-ink-3">⏱ {q.time}</p>
                   )}
                 </div>
               </li>
@@ -1897,7 +1899,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
       {/* 90-Day roadmap */}
       {payload.roadmap && (
         <div className="mt-6">
-          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-[#D4AF37]">
+          <h3 className="text-[16px] font-bold uppercase tracking-[0.14em] text-gold">
             Your 90-day roadmap
           </h3>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -1910,10 +1912,10 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
                 key={col.label}
                 className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4"
               >
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
                   {col.label}
                 </p>
-                <ul className="mt-2 ml-4 list-disc text-[12px] leading-[1.5] text-[#C5C5C8]">
+                <ul className="mt-2 ml-4 list-disc text-[12px] leading-[1.5] text-ink-2">
                   {col.items.map((it, i) => (
                     <li key={i}>{it}</li>
                   ))}
@@ -1933,7 +1935,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick('enhancement_diy_cta', { from: 'enhancement_block' })}
-              className="inline-flex flex-1 items-center justify-center rounded-[12px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:bg-[#D4AF37]/[0.12]"
+              className="inline-flex flex-1 items-center justify-center rounded-[12px] border border-gold/40 bg-gold/[0.06] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-gold transition hover:bg-gold/[0.12]"
             >
               {payload.ctas.diy_label || "See what's included"}
             </a>
@@ -1942,7 +1944,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
             <a
               href={payload.ctas.dfy_url}
               onClick={() => trackClick('enhancement_dfy_cta', { from: 'enhancement_block' })}
-              className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] transition hover:scale-[1.02]"
+              className="inline-flex flex-1 items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-5 py-4 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold transition hover:scale-[1.02]"
             >
               {payload.ctas.dfy_label || `${PLAN.cta} — ${PLAN.price}${PLAN.period}`}
             </a>
@@ -1963,7 +1965,7 @@ function CheckIcon({ muted = false }: { muted?: boolean }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className={`h-4 w-4 shrink-0 ${muted ? 'text-[#D4AF37]/60' : 'text-[#D4AF37]'}`}
+      className={`h-4 w-4 shrink-0 ${muted ? 'text-gold/60' : 'text-gold'}`}
     >
       <polyline points="3 8 7 12 13 4" />
     </svg>

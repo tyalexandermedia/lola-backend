@@ -105,7 +105,7 @@ export default function AdminLeads() {
           <button
             type="button"
             onClick={saveKey}
-            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-[#FFD166] via-[#F4B942] to-[#E09E23] px-5 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25"
+            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-gold-hi via-gold-deep to-gold-deep px-5 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-gold-hi/25"
           >
             Unlock
           </button>

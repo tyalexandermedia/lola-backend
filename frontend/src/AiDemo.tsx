@@ -181,7 +181,7 @@ export default function AiDemo({ bizName, trade }: { bizName?: string; trade?: s
 
   return (
     <section ref={ref} className="mt-16 sm:mt-20">
-      <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
         See it work
       </p>
       <h2
@@ -194,27 +194,27 @@ export default function AiDemo({ bizName, trade }: { bizName?: string; trade?: s
       <div className="mx-auto mt-8 grid max-w-[860px] grid-cols-1 gap-4 sm:grid-cols-[1fr_auto] sm:items-stretch sm:gap-5">
         {/* Chat card */}
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-          <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-[#D4AF37]/[0.12] px-4 py-2 text-right text-[14px] text-[#E8E4D8]">
+          <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-gold/[0.12] px-4 py-2 text-right text-[14px] text-ink-2">
             {content.prompt}
           </div>
           <div className="mt-4 flex items-start gap-3">
             <span
               aria-hidden
-              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] text-[14px]"
+              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-bright text-[14px]"
             >
               🐾
             </span>
             <p className="min-h-[3.5em] text-[15px] leading-[1.55] text-white">
               {before}
-              <span className="font-bold text-[#D4AF37]">{namePart}</span>
+              <span className="font-bold text-gold">{namePart}</span>
               {after}
-              {typing && <span className="ml-0.5 inline-block h-[1.1em] w-[2px] animate-pulse bg-[#D4AF37] align-middle" />}
+              {typing && <span className="ml-0.5 inline-block h-[1.1em] w-[2px] animate-pulse bg-gold align-middle" />}
             </p>
           </div>
         </div>
 
         {/* Score ring */}
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-[#D4AF37]/25 bg-[#D4AF37]/[0.04] p-6 text-center sm:w-[200px]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-gold/25 bg-gold/[0.04] p-6 text-center sm:w-[200px]">
           <div className="relative h-[92px] w-[92px]">
             <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
               <circle cx="40" cy="40" r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="7" />
@@ -235,14 +235,14 @@ export default function AiDemo({ bizName, trade }: { bizName?: string; trade?: s
               <span className="text-[26px] font-extrabold text-white tabular-nums">{score}</span>
             </div>
           </div>
-          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
+          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
             Growth Score
           </p>
-          <p className="mt-1 text-[12px] leading-[1.5] text-[#9CA3AF]">Your number, live in 60 seconds.</p>
+          <p className="mt-1 text-[12px] leading-[1.5] text-ink-3">Your number, live in 60 seconds.</p>
         </div>
       </div>
 
-      <p className="mx-auto mt-5 max-w-[560px] text-center text-[13px] leading-[1.6] text-[#8A8F98]">
+      <p className="mx-auto mt-5 max-w-[560px] text-center text-[13px] leading-[1.6] text-ink-3">
         That&apos;s the whole game now — showing up on Google <em>and</em> being the name ChatGPT,
         Perplexity, and Gemini hand your next customer. Your free Growth Score shows where you stand.
       </p>

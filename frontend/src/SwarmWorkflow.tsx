@@ -115,15 +115,15 @@ export default function SwarmWorkflow() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold text-white sm:text-4xl">Lola SEO Swarm</h1>
-            <p className="mt-2 text-[15px] text-[#C5C5C8]">
-              Unified workflow: <span className="text-[#F4D47C]">Audit → Report → Lead Gen → Outreach → Learning</span>.
+            <p className="mt-2 text-[15px] text-ink-2">
+              Unified workflow: <span className="text-gold-bright">Audit → Report → Lead Gen → Outreach → Learning</span>.
               One Claude Opus call. <span className="text-emerald-300">~$0.10 per execute</span> — admin-gated.
             </p>
           </div>
           {adminKey && (
             <button
               onClick={clearKey}
-              className="rounded-[8px] border border-white/10 px-3 py-1.5 text-[12px] font-medium text-[#9AA0A6] transition hover:border-white/20 hover:text-white"
+              className="rounded-[8px] border border-white/10 px-3 py-1.5 text-[12px] font-medium text-ink-3 transition hover:border-white/20 hover:text-white"
             >
               Sign out admin
             </button>
@@ -136,12 +136,12 @@ export default function SwarmWorkflow() {
       ) : !result ? (
         <form
           onSubmit={handleExecute}
-          className="rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8"
+          className="rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8"
         >
           <div className="grid grid-cols-1 gap-5">
             <label className="block">
-              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-[#C5C5C8]">
-                Business URL <span className="text-[#D4AF37]">*</span>
+              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-2">
+                Business URL <span className="text-gold">*</span>
               </span>
               <input
                 type="text"
@@ -149,27 +149,27 @@ export default function SwarmWorkflow() {
                 value={businessUrl}
                 onChange={(e) => setBusinessUrl(e.target.value)}
                 required
-                className="w-full rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-[#C5C5C8]">
-                Business Name <span className="text-[#6B7280]">(optional)</span>
+              <span className="mb-2 block text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-2">
+                Business Name <span className="text-ink-4">(optional)</span>
               </span>
               <input
                 type="text"
                 placeholder="e.g., Sandbar Soft Wash"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-[12px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-14 w-full items-center justify-center gap-3 rounded-[12px] bg-gradient-to-br from-gold-hi via-gold-deep to-gold-deep text-[16px] font-bold text-slate-950 shadow-[0_18px_40px_rgba(255,193,7,0.22)] transition-all duration-200 hover:shadow-[0_22px_44px_rgba(255,193,7,0.32)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <><Spinner /> Running unified workflow… (~10s)</>
@@ -195,10 +195,10 @@ function AdminKeyPrompt({
   draftKey, setDraftKey, saveKey,
 }: { draftKey: string; setDraftKey: (v: string) => void; saveKey: () => void }) {
   return (
-    <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#11121A] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
+    <div className="rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
       <h2 className="mb-2 text-xl font-bold text-white">Admin key required</h2>
-      <p className="mb-5 text-[14px] text-[#C5C5C8]">
-        This endpoint costs real money per call (~$0.10). Enter your <span className="font-mono text-[#F4D47C]">LOLA_SECRET_ADMIN_KEY</span> to unlock. Stored in this browser session only.
+      <p className="mb-5 text-[14px] text-ink-2">
+        This endpoint costs real money per call (~$0.10). Enter your <span className="font-mono text-gold-bright">LOLA_SECRET_ADMIN_KEY</span> to unlock. Stored in this browser session only.
       </p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
@@ -208,12 +208,12 @@ function AdminKeyPrompt({
           value={draftKey}
           onChange={(e) => setDraftKey(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') saveKey(); }}
-          className="flex-1 rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 font-mono text-[14px] text-white placeholder-[#6B7280] focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30"
+          className="flex-1 rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 font-mono text-[14px] text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
         />
         <button
           onClick={saveKey}
           disabled={!draftKey.trim()}
-          className="rounded-[10px] bg-gradient-to-br from-[#FFD166] via-[#F4B942] to-[#E09E23] px-6 py-3 text-[14px] font-bold text-slate-950 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[10px] bg-gradient-to-br from-gold-hi via-gold-deep to-gold-deep px-6 py-3 text-[14px] font-bold text-slate-950 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Unlock
         </button>
@@ -270,7 +270,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
       </Card>
 
       <Card title="Report Summary" accent="#10B981">
-        {report.summary && <p className="text-[14px] leading-[1.6] text-[#E5E7EB]">{report.summary}</p>}
+        {report.summary && <p className="text-[14px] leading-[1.6] text-ink">{report.summary}</p>}
         {report.actions && report.actions.length > 0 && (
           <div className="mt-4">
             <Label>Top Actions</Label>
@@ -280,7 +280,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {report.plan_30day && (
           <div className="mt-4">
             <Label>30-Day Plan</Label>
-            <p className="text-[14px] leading-[1.6] text-[#E5E7EB]">{report.plan_30day}</p>
+            <p className="text-[14px] leading-[1.6] text-ink">{report.plan_30day}</p>
           </div>
         )}
       </Card>
@@ -289,7 +289,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {leadGen.landing_headline && (
           <div className="mb-4">
             <Label>Landing Headline</Label>
-            <p className="rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 text-[15px] font-semibold text-white">
+            <p className="rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-[15px] font-semibold text-white">
               {leadGen.landing_headline}
             </p>
           </div>
@@ -310,7 +310,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
           <div>
             <Label>Testimonial Placeholders</Label>
             <BulletList items={leadGen.testimonials} mono />
-            <p className="mt-2 text-[12px] italic text-[#9AA0A6]">Fill these in with real customer quotes — never publish placeholders.</p>
+            <p className="mt-2 text-[12px] italic text-ink-3">Fill these in with real customer quotes — never publish placeholders.</p>
           </div>
         </div>
       </Card>
@@ -319,13 +319,13 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {outreach.subject && (
           <div className="mb-3">
             <Label>Subject</Label>
-            <p className="rounded-[10px] border border-white/10 bg-[#0A0A0B] px-4 py-3 font-mono text-[14px] text-white">{outreach.subject}</p>
+            <p className="rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 font-mono text-[14px] text-white">{outreach.subject}</p>
           </div>
         )}
         {outreach.body && (
           <div>
             <Label>Body</Label>
-            <pre className="whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-[#0A0A0B] p-4 font-mono text-[13px] leading-[1.6] text-[#E5E7EB]">
+            <pre className="whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-on-gold p-4 font-mono text-[13px] leading-[1.6] text-ink">
               {outreach.body}
             </pre>
           </div>
@@ -342,14 +342,14 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {learning.next_recommendation && (
           <div className="mt-4">
             <Label>Next Recommendation</Label>
-            <p className="text-[14px] leading-[1.6] text-[#E5E7EB]">{learning.next_recommendation}</p>
+            <p className="text-[14px] leading-[1.6] text-ink">{learning.next_recommendation}</p>
           </div>
         )}
       </Card>
 
       <button
         onClick={onReset}
-        className="w-full rounded-[12px] border border-white/10 bg-[#11121A] py-3 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/40 hover:text-white"
+        className="w-full rounded-[12px] border border-white/10 bg-surface-2 py-3 text-[14px] font-semibold text-ink-2 transition hover:border-gold/40 hover:text-white"
       >
         Run Another
       </button>
@@ -360,7 +360,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
 function Card({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
   return (
     <section
-      className="rounded-2xl border bg-[#11121A] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.25)] sm:p-8"
+      className="rounded-2xl border bg-surface-2 p-6 shadow-[0_12px_28px_rgba(0,0,0,0.25)] sm:p-8"
       style={{ borderColor: `${accent}33` }}
     >
       <h3 className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em]" style={{ color: accent }}>
@@ -373,19 +373,19 @@ function Card({ title, accent, children }: { title: string; accent: string; chil
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9AA0A6]">{children}</p>
+    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3">{children}</p>
   );
 }
 
 function BulletList({ items, mono }: { items?: string[]; mono?: boolean }) {
   if (!items || items.length === 0) {
-    return <p className="text-[13px] italic text-[#6B7280]">—</p>;
+    return <p className="text-[13px] italic text-ink-4">—</p>;
   }
   return (
     <ul className="space-y-1.5">
       {items.map((it, i) => (
-        <li key={i} className={`flex gap-2 text-[14px] leading-[1.55] text-[#E5E7EB] ${mono ? 'font-mono text-[13px]' : ''}`}>
-          <span className="text-[#D4AF37]">→</span>
+        <li key={i} className={`flex gap-2 text-[14px] leading-[1.55] text-ink ${mono ? 'font-mono text-[13px]' : ''}`}>
+          <span className="text-gold">→</span>
           <span>{it}</span>
         </li>
       ))}
@@ -397,8 +397,8 @@ function ScorePill({ label, value }: { label: string; value?: number }) {
   const v = typeof value === 'number' ? value : null;
   const color = v === null ? '#6B7280' : v >= 75 ? '#10B981' : v >= 50 ? '#F59E0B' : '#EF4444';
   return (
-    <div className="rounded-[10px] border border-white/10 bg-[#0A0A0B] px-3 py-2 text-center">
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#9AA0A6]">{label}</p>
+    <div className="rounded-[10px] border border-white/10 bg-on-gold px-3 py-2 text-center">
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">{label}</p>
       <p className="mt-1 text-[18px] font-bold" style={{ color }}>{v ?? '—'}</p>
     </div>
   );

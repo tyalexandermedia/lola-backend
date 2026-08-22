@@ -21,7 +21,7 @@
  *   • RECURRING at $397/month — not one-time. Stripe prices are immutable, so
  *     a one-time price cannot be converted later; the link gets rebuilt.
  *   • Redirecting on success to:
- *       https://lola.tyalexandermedia.com/start?session_id={CHECKOUT_SESSION_ID}
+ *       https://www.coachtyalexander.com/start?session_id={CHECKOUT_SESSION_ID}
  *     /start branches on that parameter to show "You're in" and the intake,
  *     instead of selling to someone who just paid.
  *
@@ -29,7 +29,7 @@
  *   • Enable Apple Pay / Google Pay / Link — the one-tap path is most of the
  *     conversion win on a phone, and it is a checkbox.
  *   • Set the success redirect to:
- *       https://lola.tyalexandermedia.com/start?session_id={CHECKOUT_SESSION_ID}
+ *       https://www.coachtyalexander.com/start?session_id={CHECKOUT_SESSION_ID}
  *
  * If the constant is ever emptied, checkoutUrl() returns null and every caller
  * falls back to /apply — the site degrades to lead capture rather than

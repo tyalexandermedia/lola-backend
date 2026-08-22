@@ -31,6 +31,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
+/** Same origin the prerenderer writes. One env var moves both. */
+const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyalexander.com').replace(/\/$/, '');
+
 const TITLE_MAX = 60;
 const DESC_MAX = 155;
 
@@ -95,7 +98,7 @@ async function main() {
     const ogUrl = first(html, /<meta\s+property="og:url"\s+content="([\s\S]*?)"/i);
     const h1 = countOf(html, /<h1[\s>]/gi);
     const nCanon = countOf(html, /rel="canonical"/gi);
-    const expected = `https://lola.tyalexandermedia.com${route === '/' ? '/' : route}`;
+    const expected = `${SITE}${route === "/" ? "/" : route}`;
 
     if (!title) failures.push(`${route}: no <title>`);
     if (title.length > TITLE_MAX) failures.push(`${route}: title ${title.length} > ${TITLE_MAX} — "${title}"`);
@@ -141,6 +144,39 @@ async function main() {
     }
 
     rows.push({ route, t: title.length, d: desc.length, h1, schema: [...new Set(types)].length });
+  }
+
+  // ── sitemap cross-check ────────────────────────────────────────────────
+  // Three real bugs shipped here before this existed: /grader stayed listed
+  // after it became a 301, /case-studies was listed twice, and
+  // /vs/local-service-ads — one of the highest-intent pages on the site — was
+  // never listed at all. Search Console reports the first as "Page with
+  // redirect" instead of coverage, and simply never discovers the third.
+  const sitemapPath = path.join(DIST, 'sitemap.xml');
+  if (existsSync(sitemapPath)) {
+    const xml = await readFile(sitemapPath, 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    const paths = locs.map((u) => u.replace(SITE, '') || '/');
+
+    const dupes = paths.filter((v, i) => paths.indexOf(v) !== i);
+    for (const d of [...new Set(dupes)]) failures.push(`sitemap: ${d} listed more than once`);
+
+    const redirected = new Set();
+    const vercelPath = path.join(ROOT, 'vercel.json');
+    if (existsSync(vercelPath)) {
+      const vercel = JSON.parse(await readFile(vercelPath, 'utf8'));
+      for (const r of vercel.redirects || []) redirected.add(r.source);
+    }
+    for (const p2 of paths) {
+      if (redirected.has(p2)) failures.push(`sitemap: ${p2} is a redirect source — submitting it reports as "Page with redirect"`);
+    }
+
+    // Every prerendered marketing route should be discoverable.
+    const listed = new Set(paths.map((p2) => p2.replace(/\/$/, '') || '/'));
+    for (const r of ROUTES) {
+      if (!listed.has(r)) failures.push(`sitemap: ${r} is prerendered but not listed`);
+    }
+    console.log(`[check-seo] sitemap: ${paths.length} URLs (${paths.filter((p2) => !p2.startsWith('/lp/')).length} app + ${paths.filter((p2) => p2.startsWith('/lp/')).length} /lp)`);
   }
 
   const pad = (s, n) => String(s).padEnd(n);

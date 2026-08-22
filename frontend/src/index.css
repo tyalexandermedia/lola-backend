@@ -2,6 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════════════════
+   Before this existed the components carried 722 hardcoded uses of #D4AF37,
+   and six different mid-greys (#C5C5C8 #9CA3AF #9AA0A6 #8A8F98 #6B7280
+   #5A5F68) doing one job. tailwind.config.js meanwhile defined a `gold`
+   palette in a DIFFERENT gold (#FFD166/#F4B942) that almost nothing used — so
+   the one place a designer would look to change the brand colour was the one
+   place that wouldn't change it.
+
+   Values are raw RGB channels, not hex, so Tailwind can compose them with an
+   alpha: `text-gold/70` compiles to rgb(var(--gold) / 0.7). Hex would force a
+   separate token per opacity.
+
+   ── The ink scale is set by measured contrast, not by eye ──────────────────
+   Against the #101116 ground:
+
+     ink    #ECECEF  15.99:1   headings, primary copy
+     ink-2  #C5C5C8  10.95:1   body copy
+     ink-3  #9CA3AF   7.43:1   secondary / captions
+     ink-4  #7C828C   4.87:1   footers, legal — the floor that still passes AA
+
+   ink-4 replaces #6B7280 (3.90:1) and #5A5F68 (2.94:1). Both failed WCAG AA
+   for normal text, and #5A5F68 is the footer grey Lighthouse was flagging as a
+   colour-contrast failure on every page. Nothing in the palette now sits below
+   4.5:1, so the failure can't be reintroduced by picking the "next grey down".
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --gold: 212 175 55;          /* #D4AF37 — the accent, 8.97:1 on ground */
+  --gold-bright: 244 212 124;  /* #F4D47C — gradient highlight, hover */
+  --gold-hi: 255 209 102;      /* #FFD166 — warmest stop */
+
+  /* Ground and surfaces */
+  --ground: 16 17 22;          /* #101116 — body */
+  --surface: 15 15 18;         /* #0F0F12 — cards */
+  --surface-2: 17 18 26;       /* #11121A — raised */
+  --on-gold: 10 10 11;         /* #0A0A0B — text ON gold, 9.41:1 */
+
+  /* Ink */
+  --ink: 236 236 239;
+  --ink-2: 197 197 200;
+  --ink-3: 156 163 175;
+  --ink-4: 124 130 140;
+
+  /* Semantic status. `ok` is the only green in the system; it was #4ADE80 in
+     35 places with no name attached to it. */
+  --ok: 74 222 128;            /* #4ADE80 — 11.5:1 on ground */
+  --gold-deep: 244 185 66;     /* #F4B942 — the warm end of gold gradients */
+
+  /* Radius scale */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+
+  /* Elevation. `lift` is the card default; `glow` is the gold CTA only —
+     used anywhere else it reads as decoration rather than emphasis. */
+  --shadow-lift: 0 24px 60px -24px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 6px 20px rgba(212, 175, 55, 0.32);
+
+  /* Vertical rhythm between page sections. One value, so section spacing is a
+     decision made once rather than re-typed as mt-14/mt-16/mt-12 per file. */
+  --section-y: 3.5rem;
+}
+
+@media (min-width: 640px) {
+  :root { --section-y: 5rem; }
+}
+
 :root {
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -20,8 +90,8 @@ body {
      here fixes every surface at once rather than class by class.
      NOTE: #0A0A0B survives all over the components as the TEXT colour on gold
      buttons — those are correct and must not be swept. */
-  background: #101116;
-  color: #E9E9EC;
+  background: rgb(var(--ground));
+  color: rgb(var(--ink));
 }
 
 ::selection {

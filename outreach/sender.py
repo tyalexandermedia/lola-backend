@@ -37,7 +37,7 @@ OUTREACH_FROM_EMAIL = os.getenv(
     "OUTREACH_FROM_EMAIL",
     os.getenv("AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>"),
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
 ADMIN_KEY = os.getenv("LOLA_SECRET_ADMIN_KEY", "").encode("utf-8")
 
 JITTER_MIN_SEC = int(os.getenv("OUTREACH_JITTER_MIN_SEC", "30"))
@@ -49,10 +49,28 @@ JITTER_MAX_SEC = int(os.getenv("OUTREACH_JITTER_MAX_SEC", "90"))
 OUTREACH_REPLY_DOMAIN = os.getenv("OUTREACH_REPLY_DOMAIN", "").strip()
 
 
+class UnsubscribeUnavailable(RuntimeError):
+    """Raised when a working unsubscribe link cannot be produced."""
+
+
 def make_unsub_token(email: str) -> str:
-    """HMAC of email with admin key — prevents enumeration."""
+    """HMAC of email with admin key — prevents enumeration.
+
+    Raises rather than returning "" when LOLA_SECRET_ADMIN_KEY is unset.
+
+    It used to return an empty string, which rendered as
+    `/unsubscribe?email=x&token=` — a dead link at the bottom of every cold
+    email. Gmail and Yahoo require a working one-click unsubscribe from bulk
+    senders, and a broken one is both a deliverability problem and a CAN-SPAM
+    exposure. On a domain already carrying a phishing incident that is the
+    last thing to get wrong, so this fails closed the way the Stripe webhook
+    does: no key, no send.
+    """
     if not ADMIN_KEY:
-        return ""
+        raise UnsubscribeUnavailable(
+            "LOLA_SECRET_ADMIN_KEY is unset, so the unsubscribe link would be "
+            "dead. Set it before sending — refusing to send instead."
+        )
     return hmac.new(ADMIN_KEY, email.lower().encode("utf-8"), hashlib.sha256).hexdigest()[:16]
 
 
@@ -69,23 +87,34 @@ def make_reply_alias(email: str) -> Optional[str]:
     return f"reply+{token}@{OUTREACH_REPLY_DOMAIN}"
 
 
-def audit_link_for(variant: VariantKey, email: str) -> str:
-    qs = urllib.parse.urlencode(
-        {
-            "utm_source": "agent4",
-            "utm_medium": "email",
-            "utm_campaign": "fl_contractors",
-            "utm_content": f"variant_{variant}",
-            "lead": email,
-        }
-    )
-    return f"{PUBLIC_APP_URL}/?{qs}"
+def audit_link_for(variant: VariantKey, email: str, business_name: str = "") -> str:
+    """Deep-link to the Growth Score, with the business name prefilled.
+
+    This used to return the HOMEPAGE (`{PUBLIC_APP_URL}/?...`). Every variant
+    ends with "Free Growth Score for <business>:" followed by this link, so the
+    reader was promised a score and handed the front page to go hunt for it —
+    the most expensive click in the whole sequence, spent on navigation.
+
+    `biz` is a real parameter: GrowthScore.tsx reads it, prefills the business
+    name and fires the Places lookup, which fills the website and city too. So
+    a cold lead lands with most of the form already answered.
+    """
+    params = {
+        "utm_source": "agent4",
+        "utm_medium": "email",
+        "utm_campaign": "fl_contractors",
+        "utm_content": f"variant_{variant}",
+        "lead": email,
+    }
+    if business_name:
+        params["biz"] = business_name
+    return f"{PUBLIC_APP_URL}/growth-score?{urllib.parse.urlencode(params)}"
 
 
 def unsub_link_for(email: str) -> str:
     token = make_unsub_token(email)
     qs = urllib.parse.urlencode({"email": email, "token": token})
-    return f"{PUBLIC_APP_URL.replace('lola.tyalexandermedia.com', '')}/unsubscribe?{qs}" if False else f"{PUBLIC_APP_URL}/unsubscribe?{qs}"
+    return f"{PUBLIC_APP_URL}/unsubscribe?{qs}"
 
 
 def render_unsub_footer(email: str) -> str:
@@ -106,7 +135,7 @@ async def send_one(
         "first_name": (lead.owner_first_name or "there").split(" ")[0],
         "business_name": lead.business_name or "your business",
         "city": lead.city or "",
-        "audit_link": audit_link_for(variant, lead.email),
+        "audit_link": audit_link_for(variant, lead.email, lead.business_name or ""),
         "unsub_link": render_unsub_footer(lead.email),
     }
     # Tier 3 hook: LLM variants when enabled, static otherwise. Same signature.

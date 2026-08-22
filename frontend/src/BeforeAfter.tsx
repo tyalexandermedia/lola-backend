@@ -44,10 +44,10 @@ export default function BeforeAfter() {
         <h3 className="font-display text-[22px] font-bold leading-[1.15] tracking-[-0.02em] text-white sm:text-[26px]">
           Same business. Same 15 years of work.
         </h3>
-        <span className="text-[12px] text-[#8A8F98]">Drag to compare</span>
+        <span className="text-[12px] text-ink-3">Drag to compare</span>
       </div>
 
-      <div className="relative mt-4 select-none overflow-hidden rounded-xl border border-[#D4AF37]/25 bg-[#0B0B0D] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9)]">
+      <div className="relative mt-4 select-none overflow-hidden rounded-xl border border-gold/25 bg-[#0B0B0D] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9)]">
         {/* AFTER sits underneath at full width; BEFORE is clipped over the top,
             so dragging left reveals more of the new site. */}
         <img
@@ -76,19 +76,19 @@ export default function BeforeAfter() {
         {/* seam */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 w-[2px] bg-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.8)]"
+          className="pointer-events-none absolute inset-y-0 w-[2px] bg-gold shadow-[0_0_16px_rgba(212,175,55,0.8)]"
           style={{ left: `${pos}%` }}
         >
-          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#D4AF37] bg-[#0A0A0B] text-[12px] text-[#D4AF37]">
+          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gold bg-on-gold text-[12px] text-gold">
             ⇄
           </span>
         </div>
 
         {/* labels */}
-        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#C5C5C8] backdrop-blur-sm">
+        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-2 backdrop-blur-sm">
           Before · Wix
         </span>
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-[#4ADE80]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#0A0A0B]">
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-ok/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-on-gold">
           After · built by Ty
         </span>
 
@@ -104,11 +104,11 @@ export default function BeforeAfter() {
         />
       </div>
 
-      <p className="mt-3 text-[13px] leading-[1.55] text-[#8A8F98]">
+      <p className="mt-3 text-[13px] leading-[1.55] text-ink-3">
         Screenshots of the real site, before and after.{' '}
         <a
           href="/r/client/sandbar"
-          className="text-[#D4AF37] underline-offset-4 hover:underline"
+          className="text-gold underline-offset-4 hover:underline"
         >
           The numbers are on the live dashboard
         </a>{' '}

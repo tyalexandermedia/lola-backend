@@ -65,7 +65,7 @@ export default function AiVisibility({
 
   return (
     <section className="mx-auto mt-12 w-full max-w-[760px] px-1 sm:mt-16">
-      <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+      <p className="text-center text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
         What AI says about you
       </p>
       <h2
@@ -77,7 +77,7 @@ export default function AiVisibility({
 
       <div className="mx-auto mt-7 max-w-[600px] rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
         {/* The question */}
-        <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-[#D4AF37]/[0.12] px-4 py-2 text-right text-[14px] text-[#E8E4D8]">
+        <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-gold/[0.12] px-4 py-2 text-right text-[14px] text-ink-2">
           {q}
         </div>
 
@@ -85,17 +85,17 @@ export default function AiVisibility({
         <div className="mt-4 flex items-start gap-3">
           <span
             aria-hidden
-            className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F4D47C] text-[14px]"
+            className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-bright text-[14px]"
           >
             🐾
           </span>
           {phase === 'loading' ? (
-            <p className="flex items-center gap-2 text-[14px] text-[#9AA0A6]">
+            <p className="flex items-center gap-2 text-[14px] text-ink-3">
               <span className="inline-flex gap-1">
                 {[0, 1, 2].map((i) => (
                   <span
                     key={i}
-                    className="inline-block h-1.5 w-1.5 animate-sniff rounded-full bg-[#D4AF37]"
+                    className="inline-block h-1.5 w-1.5 animate-sniff rounded-full bg-gold"
                     style={{ animationDelay: `${i * 160}ms` }}
                   />
                 ))}
@@ -118,7 +118,7 @@ export default function AiVisibility({
           className={`mx-auto mt-5 max-w-[600px] rounded-2xl border p-5 text-center sm:p-6 ${
             named
               ? 'border-emerald-400/30 bg-emerald-400/[0.05]'
-              : 'border-[#D4AF37]/40 bg-[#D4AF37]/[0.06]'
+              : 'border-gold/40 bg-gold/[0.06]'
           }`}
         >
           {named ? (
@@ -126,7 +126,7 @@ export default function AiVisibility({
               <p className="text-[15px] font-semibold text-emerald-300">
                 ✓ You&apos;re already on AI&apos;s radar.
               </p>
-              <p className="mx-auto mt-2 max-w-[460px] text-[13px] leading-[1.6] text-[#C5C5C8]">
+              <p className="mx-auto mt-2 max-w-[460px] text-[13px] leading-[1.6] text-ink-2">
                 Now let&apos;s make sure you&apos;re the <em>top</em> pick — and that Google agrees.
                 The $397/month plan locks it in.
               </p>
@@ -136,9 +136,9 @@ export default function AiVisibility({
               <p className="text-[15px] font-semibold text-white">
                 That&apos;s the gap — and it&apos;s costing you jobs.
               </p>
-              <p className="mx-auto mt-2 max-w-[480px] text-[13px] leading-[1.6] text-[#C5C5C8]">
+              <p className="mx-auto mt-2 max-w-[480px] text-[13px] leading-[1.6] text-ink-2">
                 When your next customer asks AI for a {trade || 'business'} in {city}, you want to be
-                the name it gives. The <span className="font-semibold text-[#D4AF37]">$397/month Full
+                the name it gives. The <span className="font-semibold text-gold">$397/month Full
                 Build</span> gets you found — on Google and in AI answers — backed by our 90-Day Promise
                 Guarantee.
               </p>
@@ -146,14 +146,14 @@ export default function AiVisibility({
           )}
           <a
             href="/pricing"
-            className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
+            className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
           >
             See the monthly →
           </a>
         </div>
       )}
 
-      <p className="mx-auto mt-3 max-w-[520px] text-center text-[11px] leading-[1.5] text-[#5A5F68]">
+      <p className="mx-auto mt-3 max-w-[520px] text-center text-[11px] leading-[1.5] text-ink-4">
         Live check via ChatGPT/Claude-class models. AI answers change over time — that&apos;s exactly
         why staying visible is ongoing work.
       </p>

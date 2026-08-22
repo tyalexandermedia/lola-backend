@@ -62,9 +62,9 @@ export default function SharedReport({ auditId }: { auditId: string }) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center text-center">
         <div className="flex items-center gap-3">
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '0ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '180ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#FFD166]" style={{ animationDelay: '360ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '0ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '180ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold-hi" style={{ animationDelay: '360ms' }} />
         </div>
         <p className="mt-6 text-sm text-slate-400">Fetching this audit…</p>
       </main>
@@ -78,7 +78,7 @@ export default function SharedReport({ auditId }: { auditId: string }) {
         <p className="mt-3 max-w-md text-base text-slate-400">{error ?? 'Growth Score not available.'}</p>
         <a
           href="/"
-          className="mt-8 rounded-2xl bg-gradient-to-r from-[#FFD166] via-[#F4B942] to-[#E09E23] px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-[#FFD166]/25"
+          className="mt-8 rounded-2xl bg-gradient-to-r from-gold-hi via-gold-deep to-gold-deep px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_16px_32px_rgba(255,193,7,0.24)] transition duration-150 hover:brightness-110 active:scale-[0.98] active:duration-75 focus:outline-none focus:ring-4 focus:ring-gold-hi/25"
         >
           Run your own Growth Score
         </a>

@@ -133,10 +133,10 @@ export default function ApplyPage() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-24 text-center">
         <div className="text-[44px]">🐾</div>
-        <h1 className="mt-6 text-[28px] font-bold text-[#ECECEF] sm:text-[34px]">
+        <h1 className="mt-6 text-[28px] font-bold text-ink sm:text-[34px]">
           {paid ? "That's everything I need." : "Got it. Coach Ty's on it."}
         </h1>
-        <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-ink-2 sm:text-[16px]">
           {paid
             ? "I start on your build today. You'll get your dashboard link as soon as the first work lands — no call needed, and you can text me any time."
             : "I read every one of these myself and will reply within 24 hours. If you'd rather not wait, you can start right now — same thing, minus the waiting."}
@@ -145,7 +145,7 @@ export default function ApplyPage() {
           {paid ? (
             <a
               href={`sms:${FOUNDER.phone}`}
-              className="inline-flex h-12 items-center justify-center rounded-[10px] border border-[#D4AF37]/40 bg-[#D4AF37]/[0.06] px-6 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#D4AF37] hover:bg-[#D4AF37]/[0.12]"
+              className="inline-flex h-12 items-center justify-center rounded-[10px] border border-gold/40 bg-gold/[0.06] px-6 text-[13px] font-semibold uppercase tracking-[0.05em] text-gold hover:bg-gold/[0.12]"
             >
               Text Ty — {FOUNDER.phoneDisplay}
             </a>
@@ -156,11 +156,11 @@ export default function ApplyPage() {
                   on the site at this exact moment; send them somewhere. */}
               <a
                 href={startHref(true)}
-                className="inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_6px_20px_rgba(212,175,55,0.32)]"
+                className="inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_6px_20px_rgba(212,175,55,0.32)]"
               >
                 Start now — {PLAN.price}{PLAN.period} →
               </a>
-              <a href="/" className="text-[13px] text-[#8A8F98] underline-offset-4 hover:text-[#D4AF37] hover:underline">
+              <a href="/" className="text-[13px] text-ink-3 underline-offset-4 hover:text-gold hover:underline">
                 Or keep looking around
               </a>
             </>
@@ -182,14 +182,14 @@ export default function ApplyPage() {
         }}
       />
 
-      <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">Apply</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">Apply</p>
       <h1
         className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-white"
         style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)' }}
       >
         Tell me about your business.
       </h1>
-      <p className="mt-5 max-w-[640px] text-[15px] leading-[1.55] text-[#C5C5C8] sm:text-[17px]">
+      <p className="mt-5 max-w-[640px] text-[15px] leading-[1.55] text-ink-2 sm:text-[17px]">
         Coach Ty reviews every application personally and reaches out within 24 hours.{' '}
         <span className="font-semibold text-white">No payment required to apply.</span>
       </p>
@@ -243,7 +243,7 @@ export default function ApplyPage() {
 
         {/* Revenue band */}
         <fieldset>
-          <legend className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85">
+          <legend className="text-[12px] font-bold uppercase tracking-[0.18em] text-gold/85">
             Monthly revenue
           </legend>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
@@ -252,8 +252,8 @@ export default function ApplyPage() {
                 key={b.value}
                 className={`flex min-h-[52px] cursor-pointer items-center justify-center rounded-[10px] border px-3 text-[13px] font-semibold transition ${
                   monthly_revenue === b.value
-                    ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-white'
-                    : 'border-white/[0.10] bg-white/[0.02] text-[#C5C5C8] hover:border-white/[0.25]'
+                    ? 'border-gold bg-gold/[0.12] text-white'
+                    : 'border-white/[0.10] bg-white/[0.02] text-ink-2 hover:border-white/[0.25]'
                 }`}
               >
                 <input
@@ -274,7 +274,7 @@ export default function ApplyPage() {
         <div>
           <label
             htmlFor="apply-trade"
-            className="block text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85"
+            className="block text-[12px] font-bold uppercase tracking-[0.18em] text-gold/85"
           >
             Business type
           </label>
@@ -282,7 +282,7 @@ export default function ApplyPage() {
             id="apply-trade"
             value={trade}
             onChange={(e) => setTrade(e.target.value)}
-            className="mt-3 block w-full appearance-none rounded-[12px] border border-white/[0.10] bg-[#0F0F12] px-4 py-3.5 text-[15px] font-medium text-white outline-none transition focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
+            className="mt-3 block w-full appearance-none rounded-[12px] border border-white/[0.10] bg-surface px-4 py-3.5 text-[15px] font-medium text-white outline-none transition focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
             style={{
               backgroundImage:
                 "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%23D4AF37' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>\")",
@@ -305,10 +305,10 @@ export default function ApplyPage() {
         <div>
           <label
             htmlFor="apply-frustration"
-            className="block text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85"
+            className="block text-[12px] font-bold uppercase tracking-[0.18em] text-gold/85"
           >
             What's your biggest SEO frustration right now?{' '}
-            <span className="text-[10px] font-medium text-[#7A7F8A]">(optional)</span>
+            <span className="text-[10px] font-medium text-ink-4">(optional)</span>
           </label>
           <textarea
             id="apply-frustration"
@@ -317,13 +317,13 @@ export default function ApplyPage() {
             rows={4}
             maxLength={2000}
             placeholder="e.g. We rank #3 for our main keyword but the top 2 are taking all the calls…"
-            className="mt-3 block w-full resize-y rounded-[12px] border border-white/[0.10] bg-[#0F0F12] px-4 py-3 text-[14px] text-white outline-none transition placeholder:text-[#5A5F68] focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
+            className="mt-3 block w-full resize-y rounded-[12px] border border-white/[0.10] bg-surface px-4 py-3 text-[14px] text-white outline-none transition placeholder:text-ink-4 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
           />
         </div>
 
         {/* Tier */}
         <fieldset>
-          <legend className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85">
+          <legend className="text-[12px] font-bold uppercase tracking-[0.18em] text-gold/85">
             Where do you want to start?
           </legend>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-3">
@@ -332,8 +332,8 @@ export default function ApplyPage() {
                 key={t.value}
                 className={`flex flex-1 min-h-[52px] cursor-pointer items-center justify-center rounded-[10px] border px-4 text-[13px] font-semibold transition ${
                   tier === t.value
-                    ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-white'
-                    : 'border-white/[0.10] bg-white/[0.02] text-[#C5C5C8] hover:border-white/[0.25]'
+                    ? 'border-gold bg-gold/[0.12] text-white'
+                    : 'border-white/[0.10] bg-white/[0.02] text-ink-2 hover:border-white/[0.25]'
                 }`}
               >
                 <input
@@ -362,18 +362,18 @@ export default function ApplyPage() {
         <button
           type="submit"
           disabled={!valid || submitting}
-          className="mt-2 flex min-h-[60px] w-full items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition hover:bg-right disabled:cursor-not-allowed disabled:opacity-50 sm:text-[15px]"
+          className="mt-2 flex min-h-[60px] w-full items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition hover:bg-right disabled:cursor-not-allowed disabled:opacity-50 sm:text-[15px]"
         >
           {submitting ? 'Submitting…' : 'Submit my application'}
         </button>
 
-        <p className="text-center text-[12px] leading-[1.5] text-[#7A7F8A]">
+        <p className="text-center text-[12px] leading-[1.5] text-ink-4">
           Coach Ty reviews every application personally and reaches out within 24 hours.
           No payment required to apply.
         </p>
       </form>
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68]">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4">
         <p>Ty Alexander Media · Tampa Bay</p>
       </div>
     </main>
@@ -402,7 +402,7 @@ function FieldText({
   const id = `apply-${label.toLowerCase().replace(/\s+/g, '-')}`;
   return (
     <div>
-      <label htmlFor={id} className="block text-[12px] font-bold uppercase tracking-[0.18em] text-[#D4AF37]/85">
+      <label htmlFor={id} className="block text-[12px] font-bold uppercase tracking-[0.18em] text-gold/85">
         {label}
       </label>
       <input
@@ -414,7 +414,7 @@ function FieldText({
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="mt-3 block h-12 w-full rounded-[12px] border border-white/[0.10] bg-[#0F0F12] px-4 text-[15px] text-white outline-none transition placeholder:text-[#5A5F68] focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
+        className="mt-3 block h-12 w-full rounded-[12px] border border-white/[0.10] bg-surface px-4 text-[15px] text-white outline-none transition placeholder:text-ink-4 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]"
       />
     </div>
   );

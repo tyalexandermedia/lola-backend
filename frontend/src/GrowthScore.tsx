@@ -24,7 +24,7 @@ import { usePageMeta } from './lib/seo';
 import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import AnswerBlock from './AnswerBlock';
-import { SCORE_QA } from './lib/pageMeta';
+import { SITE_ORIGIN, SCORE_QA } from './lib/pageMeta';
 
 const TRADE_TO_SERVICE: Record<string, string> = {
   'Soft Wash / Pressure Wash': 'soft wash',
@@ -158,9 +158,9 @@ export default function GrowthScore() {
         name: 'LOLA OS Growth Score',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
-        url: 'https://lola.tyalexandermedia.com/growth-score',
+        url: `${SITE_ORIGIN}/growth-score`,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        provider: { '@id': 'https://lola.tyalexandermedia.com/#business' },
+        provider: { '@id': `${SITE_ORIGIN}/#business` },
       },
       {
         '@context': 'https://schema.org',
@@ -346,15 +346,15 @@ export default function GrowthScore() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
         <div className="flex items-center gap-3">
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '0ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '180ms' }} />
-          <span className="h-3 w-3 animate-sniff rounded-full bg-[#D4AF37]" style={{ animationDelay: '360ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '0ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '180ms' }} />
+          <span className="h-3 w-3 animate-sniff rounded-full bg-gold" style={{ animationDelay: '360ms' }} />
         </div>
-        <h2 className="mt-8 text-[26px] font-bold text-[#ECECEF] sm:text-[32px]">Calculating your Growth Score…</h2>
-        <p key={scoringLine} className="mt-4 max-w-md animate-fade-in text-[15px] text-[#9AA0A6] sm:text-[16px]">
+        <h2 className="mt-8 text-[26px] font-bold text-ink sm:text-[32px]">Calculating your Growth Score…</h2>
+        <p key={scoringLine} className="mt-4 max-w-md animate-fade-in text-[15px] text-ink-3 sm:text-[16px]">
           {scoringLine}
         </p>
-        <p className="mt-10 text-[11px] uppercase tracking-[0.28em] text-[#5A5F68]">Usually 10–20 seconds</p>
+        <p className="mt-10 text-[11px] uppercase tracking-[0.28em] text-ink-4">Usually 10–20 seconds</p>
       </main>
     );
   }
@@ -362,13 +362,13 @@ export default function GrowthScore() {
   if (phase === 'error') {
     return (
       <main className="flex flex-1 flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-[26px] font-bold text-[#ECECEF]">Lola lost the scent.</h2>
-        <p className="mt-3 max-w-md text-[15px] text-[#9AA0A6]">{apiError}</p>
+        <h2 className="text-[26px] font-bold text-ink">Lola lost the scent.</h2>
+        <p className="mt-3 max-w-md text-[15px] text-ink-3">{apiError}</p>
         <div className="mt-8 flex gap-3">
           <button
             type="button"
             onClick={() => { setPhase('idle'); setApiError(null); }}
-            className="inline-flex h-12 items-center justify-center rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+            className="inline-flex h-12 items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold"
           >
             Try again
           </button>
@@ -392,7 +392,7 @@ export default function GrowthScore() {
           }}
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Free Tool · 60 Seconds · No Signup
         </p>
 
@@ -400,18 +400,18 @@ export default function GrowthScore() {
             pushing the live question below the fold on a phone. Shrink it once
             they're moving. */}
         <h1
-          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-4 font-bold leading-[1.05] tracking-[-0.02em] text-ink"
           style={{ fontSize: step === 0 ? 'clamp(2.25rem, 5vw, 4rem)' : 'clamp(1.5rem, 3vw, 2rem)' }}
         >
           What&apos;s your{' '}
-          <span className="bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
             Growth Score
           </span>
           ?
         </h1>
 
         {step === 0 && (
-          <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-[#C5C5C8] sm:text-[18px]">
+          <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-ink-2 sm:text-[18px]">
             One number, 0–100, across the six things that actually grow a local business —
             and the one move that lifts it fastest. You&apos;re not behind. You just haven&apos;t
             seen the map yet.
@@ -422,11 +422,11 @@ export default function GrowthScore() {
             goNext() calls score() itself once the last question is answered. */}
         <form
           onSubmit={(e) => { e.preventDefault(); goNext(); }}
-          className="mt-8 rounded-[16px] border border-[#D4AF37]/25 bg-white/[0.02] p-5 sm:p-7"
+          className="mt-8 rounded-[16px] border border-gold/25 bg-white/[0.02] p-5 sm:p-7"
         >
           {lookup === 'searching' && (
-            <p className="mb-4 flex items-center gap-2 text-[12px] text-[#D4AF37]">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#D4AF37]" />
+            <p className="mb-4 flex items-center gap-2 text-[12px] text-gold">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-gold" />
               Looking up your business on Google…
             </p>
           )}
@@ -437,7 +437,7 @@ export default function GrowthScore() {
             </p>
           )}
           {lookup === 'no_match' && (
-            <p className="mb-4 text-[12px] text-[#7A7F8A]">
+            <p className="mb-4 text-[12px] text-ink-4">
               No Google match — fill the fields manually and we&apos;ll still score you.
             </p>
           )}
@@ -445,14 +445,14 @@ export default function GrowthScore() {
           {/* Progress — makes the end visible from step one. */}
           <div className="mb-6">
             <div className="flex items-baseline justify-between">
-              <p className="text-[12px] font-semibold text-[#D4AF37]">
+              <p className="text-[12px] font-semibold text-gold">
                 Question {step + 1} of {STEPS.length}
               </p>
-              <p className="text-[12px] text-[#8A8F98]">about 60 seconds</p>
+              <p className="text-[12px] text-ink-3">about 60 seconds</p>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]">
               <div
-                className="h-full rounded-full bg-[#D4AF37] transition-[width] duration-300 ease-out"
+                className="h-full rounded-full bg-gold transition-[width] duration-300 ease-out"
                 style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
               />
             </div>
@@ -508,8 +508,8 @@ export default function GrowthScore() {
                       }}
                       className={`inline-flex min-h-[56px] items-center gap-3 rounded-[12px] border px-4 py-3 text-left text-[15px] font-medium transition ${
                         selected
-                          ? 'border-[#D4AF37] bg-[#D4AF37]/[0.12] text-[#ECECEF]'
-                          : 'border-[#D4AF37]/25 bg-[#0F0F12] text-[#C5C5C8] hover:border-[#D4AF37]/60 hover:text-[#ECECEF]'
+                          ? 'border-gold bg-gold/[0.12] text-ink'
+                          : 'border-gold/25 bg-surface text-ink-2 hover:border-gold/60 hover:text-ink'
                       }`}
                     >
                       {t.label}
@@ -563,9 +563,9 @@ export default function GrowthScore() {
                     setConsent(e.target.checked);
                     if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
                   }}
-                  className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-[#D4AF37]/40 bg-[#0F0F12] accent-[#D4AF37]"
+                  className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-gold/40 bg-surface accent-gold"
                 />
-                <span className="text-[13px] leading-[1.5] text-[#C5C5C8]">
+                <span className="text-[13px] leading-[1.5] text-ink-2">
                   OK to text and email me about my results.
                 </span>
               </label>
@@ -579,8 +579,8 @@ export default function GrowthScore() {
                   ['Website', form.website],
                 ].map(([label, value]) => (
                   <div key={label} className="flex items-baseline justify-between gap-3">
-                    <dt className="text-[12px] text-[#8A8F98]">{label}</dt>
-                    <dd className="truncate text-right text-[13px] text-[#C5C5C8]">{value || '—'}</dd>
+                    <dt className="text-[12px] text-ink-3">{label}</dt>
+                    <dd className="truncate text-right text-[13px] text-ink-2">{value || '—'}</dd>
                   </div>
                 ))}
               </dl>
@@ -592,20 +592,20 @@ export default function GrowthScore() {
               <button
                 type="button"
                 onClick={goBack}
-                className="inline-flex min-h-[52px] items-center justify-center rounded-[12px] border border-white/15 px-5 text-[14px] font-semibold text-[#C5C5C8] transition hover:border-[#D4AF37]/50 hover:text-[#ECECEF]"
+                className="inline-flex min-h-[52px] items-center justify-center rounded-[12px] border border-white/15 px-5 text-[14px] font-semibold text-ink-2 transition hover:border-gold/50 hover:text-ink"
               >
                 Back
               </button>
             )}
             <button
               type="submit"
-              className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] bg-[length:200%_100%] bg-left px-7 py-3 text-[14px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right active:scale-[0.98] sm:text-[15px]"
+              className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-7 py-3 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:bg-right active:scale-[0.98] sm:text-[15px]"
             >
               {isLast ? 'Get my free Growth Score →' : 'Next →'}
             </button>
           </div>
 
-          <p className="mt-4 text-center text-[12px] text-[#7A7F8A]">
+          <p className="mt-4 text-center text-[12px] text-ink-4">
             Your score lands by text + email within 24 hours · No spam · Reply STOP to opt out
           </p>
         </form>
@@ -613,16 +613,16 @@ export default function GrowthScore() {
 
       {/* ── THE SIX DIMENSIONS — the signature visual ─────────────── */}
       <section className="mt-16 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           What the score measures
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
           Six dimensions. One number. A clear next step.
         </h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Your Growth Score rolls these six up into a single 0–100 — so it doesn&apos;t just grade
           you, it tells you exactly what to fix to get more calls and leads.
         </p>
@@ -632,13 +632,13 @@ export default function GrowthScore() {
             const d = DIMENSION_DETAIL[dim];
             return (
               <div key={dim} className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-                <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/70">
+                <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-gold/70">
                   {String(i + 1).padStart(2, '0')}
                 </p>
-                <p className="mt-2 text-[18px] font-bold text-[#ECECEF] sm:text-[20px]">{dim}</p>
-                <p className="mt-2 text-[14px] leading-[1.55] text-[#C5C5C8]">{d?.measures}</p>
+                <p className="mt-2 text-[18px] font-bold text-ink sm:text-[20px]">{dim}</p>
+                <p className="mt-2 text-[14px] leading-[1.55] text-ink-2">{d?.measures}</p>
                 {d?.stage && (
-                  <p className="mt-3 inline-block rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#D4AF37]">
+                  <p className="mt-3 inline-block rounded-full border border-gold/30 bg-gold/[0.06] px-3 py-1 text-[11px] font-semibold text-gold">
                     {d.stage}
                   </p>
                 )}
@@ -650,16 +650,16 @@ export default function GrowthScore() {
 
       {/* ── AFTER YOUR SCORE — two ways to act ─────────────────────── */}
       <section className="mt-16 sm:mt-20">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           After your score
         </p>
         <h2
-          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-[#ECECEF]"
+          className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
           See it, then fix it — yourself or with us.
         </h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Your score shows exactly where you&apos;re losing calls. From there you pick one: do it
           yourself, or have us build it and rank it.
         </p>
@@ -669,15 +669,15 @@ export default function GrowthScore() {
             <div
               key={t.id}
               className={`rounded-[14px] border p-5 sm:p-6 ${
-                false ? 'border-[#D4AF37] bg-[#D4AF37]/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
+                false ? 'border-gold bg-gold/[0.05]' : 'border-white/[0.10] bg-white/[0.02]'
               }`}
             >
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{t.tagline}</p>
-              <p className="mt-2 text-[18px] font-bold text-[#ECECEF]">{t.name}</p>
-              <p className="mt-1 text-[15px] font-extrabold text-[#D4AF37]">
-                {t.price}<span className="text-[12px] font-medium text-[#9CA3AF]"> {t.period}</span>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">{t.tagline}</p>
+              <p className="mt-2 text-[18px] font-bold text-ink">{t.name}</p>
+              <p className="mt-1 text-[15px] font-extrabold text-gold">
+                {t.price}<span className="text-[12px] font-medium text-ink-3"> {t.period}</span>
               </p>
-              <p className="mt-3 text-[13px] leading-[1.5] text-[#C5C5C8]">
+              <p className="mt-3 text-[13px] leading-[1.5] text-ink-2">
                 {false
                   ? 'Your full Growth Score plus a simple 5-step fix-it checklist. Fix it on your own time.'
                   : 'We build the site and get you found on Google and in AI answers. Backed by the 90-Day Promise.'}
@@ -688,28 +688,28 @@ export default function GrowthScore() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
-      <section className="mt-16 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
-        <h2 className="text-[22px] font-bold leading-[1.15] text-[#ECECEF] sm:text-[28px]">
+      <section className="mt-16 rounded-2xl border border-gold/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
+        <h2 className="text-[22px] font-bold leading-[1.15] text-ink sm:text-[28px]">
           Get your number first. Your score lands within 24 hours.
         </h2>
-        <p className="mt-3 text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">
+        <p className="mt-3 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Run your free Growth Score above — we send it by text and email within 24 hours. Or skip the
-          wait and start now: one plan, <span className="font-semibold text-[#ECECEF]">{PLAN.price}{PLAN.period}</span>,
+          wait and start now: one plan, <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span>,
           website build included free. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
-          <a href="/#founder" className="text-[#D4AF37] underline underline-offset-2 decoration-[#D4AF37]/50 hover:decoration-[#D4AF37]">
+          <a href="/#founder" className="text-gold underline underline-offset-2 decoration-gold/50 hover:decoration-gold">
             Who&apos;s behind it →
           </a>
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
             href={startHref()}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#D4AF37] via-[#F4D47C] to-[#D4AF37] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B] shadow-[0_4px_16px_rgba(212,175,55,0.3)] transition hover:scale-[1.02]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_4px_16px_rgba(212,175,55,0.3)] transition hover:scale-[1.02]"
           >
             {PLAN.cta} — {PLAN.price}{PLAN.period}
           </a>
           <a
             href="/pricing"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#ECECEF] transition hover:border-white/[0.3]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-ink transition hover:border-white/[0.3]"
           >
             See what&apos;s included
           </a>
@@ -727,9 +727,14 @@ export default function GrowthScore() {
         items={SCORE_QA}
         kicker="Common questions"
         heading="What a Growth Score is, and how you get found"
+        // Collapsed: this page's job is the form above it, and open these were
+        // the tallest section on the page — 240 words of supporting copy
+        // between the reader and the footer. The answers stay in the HTML, so
+        // nothing is lost for search or AI citation.
+        collapsible
       />
 
-      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-[#5A5F68] sm:mt-24">
+      <div className="mt-16 pb-10 text-center text-[12px] leading-[1.6] text-ink-4 sm:mt-24">
         <p>Ty Alexander Media · Tampa Bay</p>
         <p className="mt-1">© 2026 · Built with Lola 🐾</p>
       </div>
@@ -745,8 +750,8 @@ function StepShell({
 }: { question: string; hint: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-[21px] font-bold leading-[1.25] text-[#ECECEF] sm:text-[24px]">{question}</h2>
-      <p className="mt-1.5 text-[14px] leading-[1.5] text-[#8A8F98]">{hint}</p>
+      <h2 className="text-[21px] font-bold leading-[1.25] text-ink sm:text-[24px]">{question}</h2>
+      <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-3">{hint}</p>
       <div className="mt-5">{children}</div>
     </div>
   );
@@ -763,7 +768,7 @@ function Field({
 }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/85">
+      <label className="block text-[11px] font-bold uppercase tracking-[0.22em] text-gold/85">
         {label}
       </label>
       <div className="mt-2">{children}</div>
@@ -786,9 +791,9 @@ function extractCity(address: string): string {
 
 function inputCls(hasError: boolean): string {
   return [
-    'block w-full rounded-[12px] border bg-[#0F0F12] px-4 py-3 text-[15px] font-medium text-[#ECECEF] outline-none transition',
+    'block w-full rounded-[12px] border bg-surface px-4 py-3 text-[15px] font-medium text-ink outline-none transition',
     hasError
       ? 'border-[#E5A95B] focus:border-[#E5A95B] focus:shadow-[0_0_0_3px_rgba(229,169,91,0.12)]'
-      : 'border-[#D4AF37]/25 focus:border-[#D4AF37] focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
+      : 'border-gold/25 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
   ].join(' ');
 }

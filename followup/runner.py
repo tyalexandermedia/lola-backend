@@ -40,7 +40,7 @@ from db import followups
 from reviews.sms import send_sms, twilio_enabled
 
 # ── Config (env-overridable; hours) ───────────────────────────────────────
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
 # Checkout, not a calendar. These emails used to point at a Google Calendar
 # booking link; Ty doesn't sell on calls, and a booking form is a slower, lossier
 # ask than the Payment Link the rest of the site now uses.

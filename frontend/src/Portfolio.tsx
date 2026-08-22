@@ -44,7 +44,7 @@ function BrowserBar({ host, compact = false }: { host: string; compact?: boolean
           <span key={c} className="h-2.5 w-2.5 rounded-full" style={{ background: c }} />
         ))}
       </div>
-      <div className="ml-1 flex-1 truncate rounded-md bg-[#0A0A0B] px-3 py-1 text-center text-[11px] text-[#8A8F98]">
+      <div className="ml-1 flex-1 truncate rounded-md bg-on-gold px-3 py-1 text-center text-[11px] text-ink-3">
         {host}
       </div>
     </div>
@@ -55,10 +55,10 @@ function BrandedTile({ name, host }: { name: string; host: string }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
       <span aria-hidden className="text-[26px]">🐾</span>
-      <span className="bg-gradient-to-br from-[#FFD166] to-[#D4AF37] bg-clip-text text-[18px] font-bold text-transparent">
+      <span className="bg-gradient-to-br from-gold-hi to-gold bg-clip-text text-[18px] font-bold text-transparent">
         {name}
       </span>
-      <span className="text-[11px] uppercase tracking-[0.16em] text-[#8A8F98]">{host}</span>
+      <span className="text-[11px] uppercase tracking-[0.16em] text-ink-3">{host}</span>
     </div>
   );
 }
@@ -78,7 +78,7 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-[14px] border border-white/[0.08] bg-white/[0.02] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/40 hover:shadow-[0_10px_32px_rgba(0,0,0,0.4)]">
+    <div className="group flex flex-col overflow-hidden rounded-[14px] border border-white/[0.08] bg-white/[0.02] transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-[0_10px_32px_rgba(0,0,0,0.4)]">
       <BrowserBar host={host} />
 
       <button
@@ -106,25 +106,25 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
           />
         )}
 
-        <span className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1.5 bg-gradient-to-t from-[#0A0A0B]/90 to-transparent py-3 text-[12px] font-bold uppercase tracking-[0.08em] text-[#D4AF37] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <span className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1.5 bg-gradient-to-t from-on-gold/90 to-transparent py-3 text-[12px] font-bold uppercase tracking-[0.08em] text-gold opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           {shotOk ? '▶ Scroll through it' : 'Visit live site ↗'}
         </span>
       </button>
 
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-center gap-2">
-          <span className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
+          <span className="rounded-full border border-gold/25 bg-gold/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold">
             {site.vertical}
           </span>
-          {site.location && <span className="text-[11px] text-[#8A8F98]">{site.location}</span>}
+          {site.location && <span className="text-[11px] text-ink-3">{site.location}</span>}
         </div>
         <p className="mt-2 text-[16px] font-bold text-white">{site.name}</p>
-        {site.blurb && <p className="mt-1 text-[13px] leading-[1.5] text-[#C5C5C8]">{site.blurb}</p>}
+        {site.blurb && <p className="mt-1 text-[13px] leading-[1.5] text-ink-2">{site.blurb}</p>}
         <div className="mt-4 flex items-center gap-4 pt-1">
           <button
             type="button"
             onClick={handleClick}
-            className="text-[13px] font-bold uppercase tracking-[0.05em] text-[#D4AF37] transition hover:text-[#F4D47C]"
+            className="text-[13px] font-bold uppercase tracking-[0.05em] text-gold transition hover:text-gold-bright"
           >
             {shotOk ? 'Preview →' : 'Visit site ↗'}
           </button>
@@ -133,7 +133,7 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('portfolio_open_live', { site: site.name, where: 'card' })}
-            className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#8A8F98] underline-offset-2 transition hover:text-[#D4AF37] hover:underline"
+            className="text-[12px] font-semibold uppercase tracking-[0.05em] text-ink-3 underline-offset-2 transition hover:text-gold hover:underline"
           >
             Open live ↗
           </a>
@@ -162,7 +162,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex flex-col bg-[#0A0A0B]/92 p-3 backdrop-blur-[6px] sm:p-6"
+      className="fixed inset-0 z-[80] flex flex-col bg-on-gold/92 p-3 backdrop-blur-[6px] sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={`Preview of ${site.name}`}
@@ -174,7 +174,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
       >
         <div className="min-w-0">
           <p className="truncate text-[15px] font-bold text-white">{site.name}</p>
-          <p className="truncate text-[12px] text-[#8A8F98]">{host}</p>
+          <p className="truncate text-[12px] text-ink-3">{host}</p>
         </div>
         <div className="flex items-center gap-2">
           <a
@@ -182,7 +182,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('portfolio_open_live', { site: site.name, where: 'modal' })}
-            className="inline-flex h-9 items-center rounded-[10px] bg-gradient-to-r from-[#D4AF37] to-[#F4D47C] px-4 text-[12px] font-bold uppercase tracking-[0.05em] text-[#0A0A0B]"
+            className="inline-flex h-9 items-center rounded-[10px] bg-gradient-to-r from-gold to-gold-bright px-4 text-[12px] font-bold uppercase tracking-[0.05em] text-on-gold"
           >
             Open live ↗
           </a>
@@ -190,7 +190,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
             type="button"
             onClick={onClose}
             aria-label="Close preview"
-            className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.1] bg-white/[0.03] text-[18px] text-[#C5C5C8] transition hover:border-[#D4AF37]/40 hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.1] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-white"
           >
             ✕
           </button>
@@ -246,14 +246,14 @@ export default function Portfolio({
     <section id="work" className={`scroll-mt-24 ${showHeader ? 'mt-16 sm:mt-24' : 'mt-8'}`}>
       {showHeader && (
         <>
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#D4AF37]">{eyebrow}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">{eyebrow}</p>
           <h2
             className="mt-3 max-w-[760px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
             style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
           >
             {title}
           </h2>
-          <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[#C5C5C8] sm:text-[16px]">{subhead}</p>
+          <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">{subhead}</p>
         </>
       )}
 
