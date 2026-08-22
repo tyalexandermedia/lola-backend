@@ -105,6 +105,24 @@ Host: _dmarc   Type: TXT   Value: v=DMARC1; p=reject; rua=mailto:dmarc@tyalexand
 than queue and retry. And with nothing legitimate to break, `p=reject` is
 strictly better than `p=quarantine` here.
 
+**Correction — the `rua=` above is cross-domain and needs authorising.** The
+report address is `@tyalexandermedia.com` while the policy is on
+`coachtyalexander.com`, and RFC 7489 §7.1 requires the *receiving* domain to
+opt in. Without it most reporters silently drop the aggregate reports, so you'd
+believe reporting works while nothing ever arrives. Add this in the
+**tyalexandermedia.com** zone:
+
+```
+Host:  coachtyalexander.com._report._dmarc
+Type:  TXT
+Value: v=DMARC1
+```
+
+Or, simpler: drop `rua=` from the record entirely. Enforcement does not depend
+on it — `p=reject` blocks spoofing either way, and reports on a domain that
+sends no mail are close to empty by definition. Only keep `rua=` if you'll
+actually read them.
+
 Now that this domain is the public face of the business, that matters more than
 it did when it was parked: a spoofed `ty@coachtyalexander.com` invoice is the
 exact attack the root domain already ate once.
