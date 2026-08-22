@@ -83,6 +83,35 @@ disappearance. Skipping it is the difference between weeks and months.
 GoHighLevel campaigns · your Instagram bio · email signature · the Stripe
 Payment Link's own branding · Google Business Profile · any printed collateral.
 
+### Lock the new domain against spoofing
+
+`coachtyalexander.com` sends no mail — no MX, no SPF, no DKIM. It does carry
+`_dmarc` at `p=quarantine`.
+
+That is not a gap. For a domain that never sends, a DMARC policy with nothing
+behind it is exactly right: it tells receivers to distrust anything claiming to
+be from `@coachtyalexander.com`, and nothing legitimate is affected because
+nothing legitimate sends. The only thing missing is making the "sends no mail"
+part explicit, which is the RFC-recommended posture:
+
+```
+Host: @        Type: TXT   Value: v=spf1 -all
+Host: @        Type: MX    Value: .            Priority: 0
+Host: _dmarc   Type: TXT   Value: v=DMARC1; p=reject; rua=mailto:dmarc@tyalexandermedia.com
+```
+
+`v=spf1 -all` says no server is authorised to send as this domain. The null MX
+(`.` with priority 0) says it receives no mail either — receivers reject rather
+than queue and retry. And with nothing legitimate to break, `p=reject` is
+strictly better than `p=quarantine` here.
+
+Now that this domain is the public face of the business, that matters more than
+it did when it was parked: a spoofed `ty@coachtyalexander.com` invoice is the
+exact attack the root domain already ate once.
+
+**Only do this while the domain genuinely sends no mail.** The day you add a
+mailbox or send from it, this has to be rebuilt properly first.
+
 ### Reverting
 
 `VITE_SITE_ORIGIN` overrides the default everywhere — frontend, prerenderer,
