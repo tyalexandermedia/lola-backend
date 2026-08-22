@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Blocks a commit that stages credential material. See scripts/secret_guard.py.
+#
+# Enable once per clone (hooks are not versioned by git itself):
+#     git config core.hooksPath .githooks
+#
+# Bypass with `git commit --no-verify` when it's genuinely wrong — then add the
+# path to ALLOWLIST so the exception is reviewed instead of invisible.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/secret_guard.py" --staged
