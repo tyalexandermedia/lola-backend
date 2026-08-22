@@ -46,14 +46,14 @@ def _case_study_from_client_config(slug: str) -> CaseStudy:
 
 
 CASE_STUDIES: dict[str, CaseStudy] = {
-    # Clean client-facing slug → share https://lola.tyalexandermedia.com/r/client/sandbar
+    # Clean client-facing slug → share https://www.coachtyalexander.com/r/client/sandbar
     # Tracks the whole Sandbar business (not just the roof-cleaning page).
     # Renders the dashboard shell immediately; ranking lines + AI Share of
     # Voice populate after the first snapshot:
     #   POST /admin/case-study/sandbar/run   (X-Admin-Key header)
     "sandbar": _case_study_from_client_config("sandbar"),
     # Separate client-facing dashboard for Tampa Bay Power Clean.
-    # Share: https://lola.tyalexandermedia.com/r/client/tampa-bay-power-clean
+    # Share: https://www.coachtyalexander.com/r/client/tampa-bay-power-clean
     # Admin snapshot:
     #   POST /admin/case-study/tampa-bay-power-clean/run   (X-Admin-Key header)
     "tampa-bay-power-clean": _case_study_from_client_config("tampa-bay-power-clean"),

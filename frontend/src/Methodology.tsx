@@ -14,7 +14,7 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 
 export default function Methodology() {
   usePageMeta('/methodology');
@@ -32,8 +32,8 @@ export default function Methodology() {
         headline: 'How the Lola Local Growth Score Scores',
         description: 'Full methodology for the 0-100 Local AI Visibility Score: 5 categories, weighting, and how each signal is measured.',
         author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
-        publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
-        url: 'https://lola.tyalexandermedia.com/methodology',
+        publisher: { '@id': `${SITE_ORIGIN}/#business` },
+        url: `${SITE_ORIGIN}/methodology`,
         about: ['Local SEO', 'AI Search Visibility', 'Google Business Profile', 'AEO', 'GEO'],
         inLanguage: 'en-US',
       },
@@ -41,8 +41,8 @@ export default function Methodology() {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://lola.tyalexandermedia.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Methodology', item: 'https://lola.tyalexandermedia.com/methodology' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Methodology', item: `${SITE_ORIGIN}/methodology` },
         ],
       },
     ];

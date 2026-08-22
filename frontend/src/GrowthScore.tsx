@@ -24,7 +24,7 @@ import { usePageMeta } from './lib/seo';
 import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import AnswerBlock from './AnswerBlock';
-import { SCORE_QA } from './lib/pageMeta';
+import { SITE_ORIGIN, SCORE_QA } from './lib/pageMeta';
 
 const TRADE_TO_SERVICE: Record<string, string> = {
   'Soft Wash / Pressure Wash': 'soft wash',
@@ -158,9 +158,9 @@ export default function GrowthScore() {
         name: 'LOLA OS Growth Score',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
-        url: 'https://lola.tyalexandermedia.com/growth-score',
+        url: `${SITE_ORIGIN}/growth-score`,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        provider: { '@id': 'https://lola.tyalexandermedia.com/#business' },
+        provider: { '@id': `${SITE_ORIGIN}/#business` },
       },
       {
         '@context': 'https://schema.org',

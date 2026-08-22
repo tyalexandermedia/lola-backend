@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { startHref } from './lib/checkout';
 import { GUARANTEE, PLAN } from './lib/pricing';
 
@@ -136,10 +136,10 @@ export default function Grader() {
         name: 'Lola Local AI Visibility Grader',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
-        url: 'https://lola.tyalexandermedia.com/grader',
+        url: `${SITE_ORIGIN}/grader`,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
         aggregateRating: undefined, // omit until we have real reviews
-        provider: { '@id': 'https://lola.tyalexandermedia.com/#business' },
+        provider: { '@id': `${SITE_ORIGIN}/#business` },
       },
       {
         '@context': 'https://schema.org',

@@ -69,7 +69,7 @@ FIELD_MASK = ",".join(
     ]
 )
 
-UA = "LolaLeadsBot/1.0 (+https://lola.tyalexandermedia.com; ty@tyalexandermedia.com)"
+UA = "LolaLeadsBot/1.0 (+https://www.coachtyalexander.com; ty@tyalexandermedia.com)"
 
 # Pages worth trying after the home page. Ordered by how often a small
 # contractor site puts an address on them.

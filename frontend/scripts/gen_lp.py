@@ -27,13 +27,16 @@ Design notes
 
 import html
 import json
+import os
 from pathlib import Path
 
 # --------------------------------------------------------------------------- #
 # Constants / brand facts (single source of truth)
 # --------------------------------------------------------------------------- #
 
-BASE_URL = "https://lola.tyalexandermedia.com"
+# Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts and the
+# VITE_SITE_ORIGIN the build scripts read, so the whole site moves together.
+BASE_URL = os.getenv("VITE_SITE_ORIGIN", "https://www.coachtyalexander.com").rstrip("/")
 # The live $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts.
 # These pages used to point three gold CTAs at a Google Calendar booking link,
 # which is the call path Ty removed. A Payment Link is a public URL, not a
@@ -758,8 +761,8 @@ def render_page(svc_slug, svc, city_slug, city):
         f'<div class="footer-links">{other_cities}</div>'
         f'<p class="footer-links-h">Start here</p>'
         f'<div class="footer-links">'
-        f'<a href="https://lola.tyalexandermedia.com/growth-score">&#128202; Free Growth Score</a>'
-        f'<a href="https://lola.tyalexandermedia.com/roadmap">See the roadmap</a>'
+        f'<a href="{BASE_URL}/growth-score">&#128202; Free Growth Score</a>'
+        f'<a href="{BASE_URL}/roadmap">See the roadmap</a>'
         f'<a href="/lp/industries">All industries &amp; cities</a>'
         f'</div>'
         '</div>'
@@ -799,7 +802,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <p class="sub">{esc(svc["sub"](city))}</p>
 <p class="sub" style="font-size:15px;opacity:.78">Serving {METRO_CITIES} &mdash; and the service areas around them.</p>
 <a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <h2>Not this. This.</h2>
 <div class="row row-2">
@@ -828,7 +831,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h2>One plan. One price.</h2>
 <p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. Or skip the wait — it's <strong>$397/month</strong>, and your website design is included free. No setup fee, no build charge, cancel anytime after the first 3 months. Backed by the 90-Day Promise.</p>
 <a class="cta" href="{esc(primary_cta)}">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <div class="divider"></div>
 
@@ -839,7 +842,7 @@ def render_page(svc_slug, svc, city_slug, city):
 {faq_details}
 
 <a class="cta" href="{esc(primary_cta)}" style="margin-top:40px">Start my monthly &mdash; $397/month &rarr;</a>
-<a class="cta-secondary" href="https://lola.tyalexandermedia.com/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
+<a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 {footer_links}
 
@@ -1005,8 +1008,8 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.08)">
 <a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{esc(cta)}">Start my monthly</a>
-<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/growth-score">Get your free Growth Score</a>
-<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="https://lola.tyalexandermedia.com/pricing">See pricing</a>
+<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{BASE_URL}/growth-score">Get your free Growth Score</a>
+<a style="font-size:13px;padding:6px 12px;border:1px solid rgba(212,175,55,0.2);border-radius:6px" href="{BASE_URL}/pricing">See pricing</a>
 </div>
 
 <div class="foot">

@@ -217,7 +217,7 @@ _REQUIRED_ORIGINS = {
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
-    "https://lola.tyalexandermedia.com",
+    "https://www.coachtyalexander.com",
 }
 _env_origins = {
     o.strip()
@@ -295,7 +295,7 @@ AUDIT_FROM_EMAIL = os.getenv(
 AUDIT_REPLY_TO_EMAIL = os.getenv(
     "AUDIT_REPLY_TO_EMAIL", "ty@tyalexandermedia.com"
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
 
 # The one live Payment Link — $397/month, matching the frontend's
 # DEFAULT_MONTHLY_URL. Env-overridable so a test-mode link can be swapped in
@@ -2771,7 +2771,7 @@ def _client_ip(request: Request) -> str:
 
 @app.get("/t/c/{slug}")
 async def track_call(slug: str, request: Request, to: str = "", source: str = "gbp"):
-    """Click-to-call tracker. Put https://lola.tyalexandermedia.com/t/c/<slug>?to=tel:+1727...
+    """Click-to-call tracker. Put https://www.coachtyalexander.com/t/c/<slug>?to=tel:+1727...
     behind the client's 'Call' button. Logs a call event, 302s to the tel: link."""
     await log_event(slug, "call", source=source, ip=_client_ip(request),
                     meta={"to": to[:64]})

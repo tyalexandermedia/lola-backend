@@ -2,8 +2,12 @@ import { useEffect } from 'react';
 
 import { PAGE_META, canonicalFor } from './pageMeta';
 
-/** Canonical production origin — single source for canonical + OG URLs. */
-export const SITE_ORIGIN = 'https://lola.tyalexandermedia.com';
+/**
+ * Re-exported, not redeclared. This file used to define its own copy of
+ * SITE_ORIGIN, so the codebase had two constants that were only equal by
+ * coincidence — and a domain migration would have moved one and left the other.
+ */
+export { SITE_ORIGIN } from './pageMeta';
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string): void {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);

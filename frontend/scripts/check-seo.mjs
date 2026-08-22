@@ -31,6 +31,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
+/** Same origin the prerenderer writes. One env var moves both. */
+const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyalexander.com').replace(/\/$/, '');
+
 const TITLE_MAX = 60;
 const DESC_MAX = 155;
 
@@ -95,7 +98,7 @@ async function main() {
     const ogUrl = first(html, /<meta\s+property="og:url"\s+content="([\s\S]*?)"/i);
     const h1 = countOf(html, /<h1[\s>]/gi);
     const nCanon = countOf(html, /rel="canonical"/gi);
-    const expected = `https://lola.tyalexandermedia.com${route === '/' ? '/' : route}`;
+    const expected = `${SITE}${route === "/" ? "/" : route}`;
 
     if (!title) failures.push(`${route}: no <title>`);
     if (title.length > TITLE_MAX) failures.push(`${route}: title ${title.length} > ${TITLE_MAX} — "${title}"`);
@@ -153,7 +156,7 @@ async function main() {
   if (existsSync(sitemapPath)) {
     const xml = await readFile(sitemapPath, 'utf8');
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    const paths = locs.map((u) => u.replace('https://lola.tyalexandermedia.com', '') || '/');
+    const paths = locs.map((u) => u.replace(SITE, '') || '/');
 
     const dupes = paths.filter((v, i) => paths.indexOf(v) !== i);
     for (const d of [...new Set(dupes)]) failures.push(`sitemap: ${d} listed more than once`);

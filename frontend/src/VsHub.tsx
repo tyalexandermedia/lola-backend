@@ -15,7 +15,7 @@
 
 import { useEffect } from 'react';
 import { track } from './analytics';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { getCompetitorSlugs } from './VsPage';
 import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
@@ -57,14 +57,14 @@ export default function VsHub() {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Lola SEO Comparison Hub',
-      url: 'https://lola.tyalexandermedia.com/vs',
+      url: `${SITE_ORIGIN}/vs`,
       description: 'Lola vs the major local SEO + AI visibility alternatives.',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: CARDS.map((c, i) => ({
           '@type': 'ListItem',
           position: i + 1,
-          url: `https://lola.tyalexandermedia.com/vs/${c.slug}`,
+          url: `${SITE_ORIGIN}/vs/${c.slug}`,
           name: `Lola vs ${c.name}`,
         })),
       },

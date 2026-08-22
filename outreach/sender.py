@@ -37,7 +37,7 @@ OUTREACH_FROM_EMAIL = os.getenv(
     "OUTREACH_FROM_EMAIL",
     os.getenv("AUDIT_FROM_EMAIL", "LOLA SEO <lola@tyalexandermedia.com>"),
 ).strip()
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://lola.tyalexandermedia.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
 ADMIN_KEY = os.getenv("LOLA_SECRET_ADMIN_KEY", "").encode("utf-8")
 
 JITTER_MIN_SEC = int(os.getenv("OUTREACH_JITTER_MIN_SEC", "30"))

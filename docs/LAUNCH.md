@@ -17,6 +17,76 @@ Exit 0 = nothing critical outstanding. Exit 1 = a buyer or a domain is at risk.
 
 ---
 
+## 0 · Domain migration — do this FIRST
+
+`lola.tyalexandermedia.com` → **`www.coachtyalexander.com`**
+
+The code side is done. Every canonical, `og:url`, schema `@id`, the sitemap,
+robots.txt and all 48 `/lp` pages now say `www.coachtyalexander.com`. **Until
+the DNS and redirects are in place, the site is telling Google to index a
+hostname that doesn't answer** — so this goes before everything else.
+
+### Why now is the right time
+
+- The site has essentially **no rankings yet**, so the cost of moving is close
+  to zero. This is the cheapest this migration will ever be.
+- `tyalexandermedia.com` carries the **August authenticated phishing incident**.
+  `coachtyalexander.com` is clean. Moving is a reputation *upgrade*, not just a
+  rename.
+- Doing it **before** the outreach ramp means every cold-email link points at
+  the final domain instead of collecting a redirect hop.
+
+### The steps, in order
+
+**1 · Vercel → Project → Domains**
+Add both `coachtyalexander.com` and `www.coachtyalexander.com`.
+Set **`www` as primary**; the apex should redirect to it. Serving both is
+duplicate content — picking one and redirecting the other is the whole job.
+
+**2 · GoDaddy DNS**
+Point both at Vercel. Vercel prints the exact A / CNAME records when you add
+each domain — use those, not remembered values.
+
+**3 · The redirect that actually matters**
+In Vercel, set `lola.tyalexandermedia.com` to **redirect to**
+`www.coachtyalexander.com`. Vercel does this **path-for-path**, which is the
+point: `/pricing` → `/pricing`, `/lp/roofing-seo-tampa` → `/lp/roofing-seo-tampa`.
+
+> A blanket redirect to the homepage is the classic way to lose a migration.
+> Every URL that had any equity dumps it on `/` and Google treats the rest as
+> soft-404s. Path-for-path preserves it.
+
+**Leave these 301s up permanently.** Not 30 days — permanently.
+
+**4 · Stripe**
+Success URL →
+`https://www.coachtyalexander.com/start?session_id={CHECKOUT_SESSION_ID}`
+
+It works either way once the redirect is live, but a buyer shouldn't eat an
+extra hop on the one page that confirms their money went through.
+
+**5 · Google Search Console**
+- Verify `www.coachtyalexander.com` as a new property
+- Submit `https://www.coachtyalexander.com/sitemap.xml`
+- On the OLD property, run **Settings → Change of Address**
+
+The Change of Address tool is what tells Google this was a move rather than a
+disappearance. Skipping it is the difference between weeks and months.
+
+**6 · Anywhere else the old URL is written down**
+GoHighLevel campaigns · your Instagram bio · email signature · the Stripe
+Payment Link's own branding · Google Business Profile · any printed collateral.
+
+### Reverting
+
+`VITE_SITE_ORIGIN` overrides the default everywhere — frontend, prerenderer,
+SEO checker and the `/lp` generator all read it. Set it in Vercel and redeploy
+to point the whole site somewhere else in one variable. That is deliberate: a
+domain move is the change most likely to need undoing in a hurry, and a
+find-replace across 28 files is not what you want to be doing at that moment.
+
+---
+
 ## 1 · Take money — 10 minutes
 
 **Stripe → Developers → Webhooks → Add endpoint**
@@ -230,11 +300,15 @@ not a traffic source.
 
 | # | do | why |
 |---|---|---|
+| 0 | §0 Domain migration | The code already serves the new domain. Until DNS and the 301s land, canonicals point at a host that doesn't answer. |
 | 1 | §1 Stripe + Resend | 10 min. Insures the first sale. |
 | 2 | §2 DMARC + sending subdomain | Unblocks §3 and protects the inbox you actually work from. |
 | 3 | §3 Outreach ramp | **The only item here that produces revenue in weeks.** SEO takes months; the site is done and has no traffic. |
 | 4 | §4 Sandbar reviews | Biggest ranking lever, and the proof that makes §3 close. |
 | 5 | §5 Your own GBP | Long lag. Start it, then ignore it. |
 
-Steps 2 and 3 are where the return is. Nothing in 1, 4 or 5 gets you a
-customer this month.
+Step 0 is a prerequisite, not a return in itself — but everything downstream
+points at the wrong host until it's done.
+
+Steps 2 and 3 are where the return is. Nothing in 1, 4 or 5 gets you a customer
+this month.

@@ -142,6 +142,31 @@ def build_checks() -> list:
         "         domain and number — not yours. Full order in docs/LAUNCH.md §4.",
     ))
 
+    # ── domain migration ────────────────────────────────────────────────────
+    origin = val("VITE_SITE_ORIGIN")
+    checks.append(Check(
+        "Domain migration  (manual)", CRITICAL, False,
+        "The code now serves www.coachtyalexander.com everywhere — canonicals, "
+        "og:url, every schema @id, the sitemap, all 48 /lp pages. Until the "
+        "domain is attached in Vercel and the OLD host 301s to it, the site is "
+        "telling Google to index a hostname that doesn't answer.",
+        "1. Vercel -> Project -> Domains: add coachtyalexander.com AND\n"
+        "         www.coachtyalexander.com; set www as PRIMARY.\n"
+        "      2. GoDaddy DNS: point them at Vercel (Vercel shows the exact\n"
+        "         A / CNAME records when you add each domain).\n"
+        "      3. Set lola.tyalexandermedia.com to REDIRECT to\n"
+        "         www.coachtyalexander.com. Vercel 301s path-for-path, which is\n"
+        "         what carries the equity — a blanket redirect to the homepage\n"
+        "         throws it away.\n"
+        "      4. Stripe: success URL ->\n"
+        "         https://www.coachtyalexander.com/start?session_id={CHECKOUT_SESSION_ID}\n"
+        "      5. Search Console: verify the new property, submit\n"
+        "         /sitemap.xml, then run Change of Address on the old one.\n"
+        "      Leave the 301s up permanently. Full steps: docs/LAUNCH.md 0.\n"
+        "      (VITE_SITE_ORIGIN overrides the default if you need to revert.)"
+        + (f"\n      Currently overridden to: {origin}" if origin else ""),
+    ))
+
     # ── the site's own credibility ──────────────────────────────────────────
     checks.append(Check(
         "VITE_GBP_URL", LATER, has("VITE_GBP_URL"),

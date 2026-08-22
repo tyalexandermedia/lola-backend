@@ -21,7 +21,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import { startHref } from './lib/checkout';
 import { GUARANTEE, PLAN } from './lib/pricing';
@@ -566,7 +566,7 @@ export default function VsPage({ slug }: { slug: string }) {
   // Cleaned up on unmount so navigating away doesn't leave stale schema.
   useEffect(() => {
     if (typeof document === 'undefined' || !c) return;
-    const url = `https://lola.tyalexandermedia.com/vs/${c.slug}`;
+    const url = `${SITE_ORIGIN}/vs/${c.slug}`;
     const blocks: object[] = [
       {
         '@context': 'https://schema.org',
@@ -581,8 +581,8 @@ export default function VsPage({ slug }: { slug: string }) {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://lola.tyalexandermedia.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Compare', item: 'https://lola.tyalexandermedia.com/vs' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Compare', item: `${SITE_ORIGIN}/vs` },
           { '@type': 'ListItem', position: 3, name: `Lola vs ${c.name}`, item: url },
         ],
       },

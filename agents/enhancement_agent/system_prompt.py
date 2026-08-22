@@ -70,7 +70,7 @@ For EACH finding:
 ## 5. ONE CLEAR CTA
 After all findings. There is exactly one paid offer — never invent a cheaper
 tier, a DIY option, a one-time price, or a "book a call" step:
-- **CTA 1**: "See what's included → https://lola.tyalexandermedia.com/pricing"
+- **CTA 1**: "See what's included → https://www.coachtyalexander.com/pricing"
 - **CTA 2** (the primary): "We build it. We rank it — everywhere people search now. $397/month: your website designed and built (included free, no setup fee), your Google Business Profile managed, and ongoing visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini). Cancel anytime after the first 3 months, backed by the 90-Day Promise. → https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
 
 ## TONE:
@@ -115,7 +115,7 @@ tier, a DIY option, a one-time price, or a "book a call" step:
   },
   "ctas": {
     "diy_label": "See what's included",
-    "diy_url": "https://lola.tyalexandermedia.com/pricing",
+    "diy_url": "https://www.coachtyalexander.com/pricing",
     "dfy_label": "Start my monthly — $397/month",
     "dfy_url": "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
   }

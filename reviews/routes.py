@@ -76,7 +76,7 @@ def require_admin_key(
 
 def _public_base_url() -> str:
     return os.getenv(
-        "REVIEWS_PUBLIC_BASE_URL", "https://lola.tyalexandermedia.com"
+        "REVIEWS_PUBLIC_BASE_URL", "https://www.coachtyalexander.com"
     ).rstrip("/")
 
 

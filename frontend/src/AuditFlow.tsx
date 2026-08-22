@@ -12,6 +12,7 @@ import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
 import { PLAN, GUARANTEE, EXCLUSIVITY } from './lib/pricing';
 import { startHref, startSmsHref } from './lib/checkout';
+import { SITE_ORIGIN } from './lib/pageMeta';
 // Re-export retained for any external consumer; new code should import from
 // './api' directly so AuditFlow can stay lazy-loaded.
 export { API_URL };
@@ -608,7 +609,8 @@ export function ResultsStage({
       <div className="print-only print-header">
         <span className="print-brand">🐾 LOLA OS — Growth Score Report</span>
         <span className="print-meta">
-          {businessTypeDisplay ? `${businessTypeDisplay} · ` : ''}lola.tyalexandermedia.com
+          {businessTypeDisplay ? `${businessTypeDisplay} · ` : ''}
+          {SITE_ORIGIN.replace(/^https?:\/\/(www\.)?/, '')}
         </span>
       </div>
 

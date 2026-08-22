@@ -42,7 +42,25 @@
 import { FOUNDER } from './lola';
 import { PLAN, GUARANTEE } from './pricing';
 
-export const SITE_ORIGIN = 'https://lola.tyalexandermedia.com';
+/**
+ * Canonical origin — ONE definition for the whole frontend.
+ *
+ * 2026-08-20: migrated from lola.tyalexandermedia.com to www.coachtyalexander.com.
+ *
+ * Env-overridable rather than a hardcoded literal, deliberately. A domain move
+ * is the change most likely to need reverting under time pressure, and a
+ * find-replace across 28 files is not something you want to be doing while the
+ * site is serving the wrong canonical. Set VITE_SITE_ORIGIN in Vercel to point
+ * everything — canonicals, og:url, every schema @id, the sitemap — somewhere
+ * else in one variable, then redeploy.
+ *
+ * NOTE the www. It is canonical, and the apex must 301 to it. Serving both is
+ * duplicate content; picking one and redirecting the other is the whole job.
+ */
+export const SITE_ORIGIN = (
+  (import.meta.env.VITE_SITE_ORIGIN as string | undefined)?.trim() ||
+  'https://www.coachtyalexander.com'
+).replace(/\/$/, '');
 export const SITE_NAME = 'Lola Leads';
 export const LEGAL_NAME = 'Ty Alexander Media';
 

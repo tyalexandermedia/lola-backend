@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 import IncludedAccordion from './IncludedAccordion';
 import { checkoutUrl, startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
-import { PRICING_QA } from './lib/pageMeta';
+import { SITE_ORIGIN, PRICING_QA } from './lib/pageMeta';
 import { AFTER_YOU_START, EXCLUSIVITY, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED, trialLine } from './lib/pricing';
 import { usePageMeta } from './lib/seo';
 import { useReveal } from './lib/useReveal';
@@ -51,14 +51,14 @@ export default function PricingPage() {
         provider: {
           '@type': 'Organization',
           name: 'Lola Leads — Ty Alexander Media',
-          url: 'https://lola.tyalexandermedia.com',
+          url: SITE_ORIGIN,
         },
         areaServed: { '@type': 'Country', name: 'United States' },
         offers: {
           '@type': 'Offer',
           price: amount,
           priceCurrency: 'USD',
-          url: 'https://lola.tyalexandermedia.com/pricing',
+          url: `${SITE_ORIGIN}/pricing`,
           availability: 'https://schema.org/InStock',
           priceSpecification: {
             '@type': 'UnitPriceSpecification',

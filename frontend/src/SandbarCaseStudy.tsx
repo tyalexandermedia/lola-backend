@@ -15,7 +15,7 @@
 
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 import { track } from './analytics';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import { SANDBAR_JOBS } from './lib/sandbarJobs';
@@ -35,21 +35,21 @@ export default function SandbarCaseStudy() {
         headline: 'Sandbar Soft Wash — Local Visibility Case Study',
         description: 'How Lola rebuilt local visibility for Sandbar Soft Wash in Palm Harbor, FL — tracked in the open on a live public dashboard.',
         author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
-        publisher: { '@id': 'https://lola.tyalexandermedia.com/#business' },
+        publisher: { '@id': `${SITE_ORIGIN}/#business` },
         about: 'Sandbar Soft Wash',
         mentions: [
           { '@type': 'LocalBusiness', name: 'Sandbar Soft Wash', url: 'https://www.sandbarsoftwash.com', address: { '@type': 'PostalAddress', addressLocality: 'Palm Harbor', addressRegion: 'FL', addressCountry: 'US' } },
         ],
-        url: 'https://lola.tyalexandermedia.com/case-studies/sandbar',
+        url: `${SITE_ORIGIN}/case-studies/sandbar`,
         inLanguage: 'en-US',
       },
       {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://lola.tyalexandermedia.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Case Studies', item: 'https://lola.tyalexandermedia.com/case-studies' },
-          { '@type': 'ListItem', position: 3, name: 'Sandbar Soft Wash', item: 'https://lola.tyalexandermedia.com/case-studies/sandbar' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Case Studies', item: `${SITE_ORIGIN}/case-studies` },
+          { '@type': 'ListItem', position: 3, name: 'Sandbar Soft Wash', item: `${SITE_ORIGIN}/case-studies/sandbar` },
         ],
       },
     ];

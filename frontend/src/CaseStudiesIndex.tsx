@@ -15,7 +15,7 @@
 import { useEffect } from 'react';
 import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
-import { usePageMeta } from './lib/seo';
+import { SITE_ORIGIN, usePageMeta } from './lib/seo';
 
 // D-014: the Sandbar case-study page is held until the ranking tracker has
 // verified day-0 → day-30 receipts. Flip VITE_SHOW_SANDBAR_CASE_STUDY=true
@@ -33,14 +33,14 @@ export default function CaseStudiesIndex() {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Lola Local AI Visibility — Case Studies',
-      url: 'https://lola.tyalexandermedia.com/case-studies',
+      url: `${SITE_ORIGIN}/case-studies`,
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: [
           {
             '@type': 'ListItem',
             position: 1,
-            url: 'https://lola.tyalexandermedia.com/case-studies/sandbar',
+            url: `${SITE_ORIGIN}/case-studies/sandbar`,
             name: 'Sandbar Soft Wash — Palm Harbor, FL',
           },
         ],

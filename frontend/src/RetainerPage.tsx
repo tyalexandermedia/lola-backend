@@ -25,7 +25,7 @@ import { useReveal } from './lib/useReveal';
 import { track } from './analytics';
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import { BUILD, HALF_BACK_GUARANTEE, BUILD_INCLUDED } from './lib/pricing';
-import { useSeo } from './lib/seo';
+import { SITE_ORIGIN, useSeo } from './lib/seo';
 import { checkoutUrl } from './lib/checkout';
 import Portfolio from './Portfolio';
 import IncludedAccordion from './IncludedAccordion';
@@ -95,14 +95,14 @@ export default function RetainerPage() {
         serviceType: 'Local SEO + AI search visibility website build',
         description:
           'A custom website built for you, 30 days of visibility work across Google and AI answer engines (ChatGPT, Perplexity, Gemini), Google Business Profile optimization, and direct access to Ty — backed by the 90-Day Promise.',
-        provider: { '@type': 'Organization', name: 'Lola — Ty Alexander Media', url: 'https://lola.tyalexandermedia.com' },
+        provider: { '@type': 'Organization', name: 'Lola — Ty Alexander Media', url: SITE_ORIGIN },
         areaServed: { '@type': 'Country', name: 'United States' },
         offers: {
           '@type': 'Offer',
           price: amount,
           priceCurrency: 'USD',
           category: 'OneTimePayment',
-          url: 'https://lola.tyalexandermedia.com/retainer',
+          url: `${SITE_ORIGIN}/retainer`,
           availability: 'https://schema.org/InStock',
         },
       },

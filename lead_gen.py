@@ -1511,7 +1511,7 @@ async def finalize_dashboard(
     except Exception as e:
         out["steps"]["import_all"] = {"ok": False, "detail": f"{type(e).__name__}: {e}"[:200]}
 
-    out["dashboard"] = f"https://lola.tyalexandermedia.com/r/client/{slug}"
+    out["dashboard"] = f"https://www.coachtyalexander.com/r/client/{slug}"
     return out
 
 
@@ -1574,7 +1574,7 @@ async def inject_test_call(
 
     Steps to test the full pipeline:
       1. POST /lead-gen/test-call/sandbar  (X-Admin-Key header)
-      2. Open https://lola.tyalexandermedia.com/r/client/sandbar
+      2. Open https://www.coachtyalexander.com/r/client/sandbar
       3. You should see call count increment in the Tracking row
     """
     _check_admin_key(x_admin_key)
@@ -1625,7 +1625,7 @@ async def inject_test_call(
         "call_sid": test_sid,
         "event_id": eid,
         "ga4": ga4_res,
-        "dashboard": f"https://lola.tyalexandermedia.com/r/client/sandbar",
+        "dashboard": f"https://www.coachtyalexander.com/r/client/sandbar",
     }
 
 
