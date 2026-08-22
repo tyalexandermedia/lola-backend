@@ -1,0 +1,127 @@
+# Security — what's free, what matters, in order
+
+Written after the 2026-08-22 audit found live credentials in a `.env` committed
+to a **public** repository on 2026-07-03 and left at the tip of the `gh-pages`
+branch. Everything below is free. It is ordered by how much risk each step
+removes per minute spent.
+
+## Enable the guard (30 seconds, once per clone)
+
+```
+git config core.hooksPath .githooks
+```
+
+`scripts/secret_guard.py` then reads staged **content** before every commit and
+refuses anything matching a credential shape — Google, Stripe, Resend,
+SendGrid, Brevo, Anthropic, OpenAI, GitHub, Twilio, GHL, AWS, Slack, private
+key blocks, and webhook URLs for Make / Zapier / Slack.
+
+`.gitignore` already listed `.env` when the leak happened. **It did not help**:
+`git add -f`, `git add -A` from the wrong directory, and agents that stage
+explicit paths all walk straight past an ignore rule. An ignore rule is a
+default. This is a control.
+
+It never prints the matched value — a scanner that echoes the secret into your
+scrollback and CI logs has widened the exposure it was built to catch.
+
+Audit history any time:
+
+```
+python3 scripts/secret_guard.py --history
+```
+
+## 1 · Rotate what leaked — before anything else
+
+A blob pushed to a public repo stays fetchable **by SHA** even after the branch
+is deleted. Assume every one of these is known:
+
+| credential | where |
+|---|---|
+| 4 × Google API keys | Google Cloud Console → APIs & Services → Credentials |
+| `LOLA_SECRET_ADMIN_KEY` | regenerate, set in Railway |
+| Make webhook URL | Make → the scenario → regenerate the hook |
+
+**Deleting the branch is cleanup, not a fix.** Rotation is the fix.
+
+While you're in Google Cloud: put **restrictions** on the new keys — HTTP
+referrer for browser keys, IP allowlist for server keys. A restricted key that
+leaks is close to worthless, and it's the single highest-leverage free control
+in this whole document.
+
+## 2 · Make the repository private
+
+It is public today. That means the full backend — admin endpoints, client
+references, business logic — is readable by anyone, and always was.
+
+One tradeoff, stated honestly: GitHub's **secret scanning and push protection
+are free on public repos** and require paid Advanced Security on private ones.
+You lose that by going private. The guard above replaces it locally, and
+private-with-a-local-guard beats public-with-scanning by a wide margin — the
+scanner tells you after the fact; the guard stops it happening.
+
+## 3 · Turn on 2FA everywhere, today
+
+GitHub · Vercel · Google Workspace · GoDaddy · Stripe · Resend · GoHighLevel.
+
+Free, ten minutes total, and it defeats the entire class of attack that starts
+with a reused or phished password. Given August, this is not optional.
+
+## 4 · Clean up after the email incident — the step people skip
+
+Rotating a key does nothing about **persistence**. An attacker who had access
+to a mailbox usually leaves a way back in. In Google Workspace, check:
+
+- **Forwarding rules** — Settings → Forwarding and POP/IMAP. An auto-forward to
+  an address you don't recognise is the classic one.
+- **Filters** — a rule that archives or deletes anything matching "invoice" or
+  "password" hides the attacker's own traffic from you.
+- **App passwords** — Google Account → Security. These bypass 2FA entirely.
+  Delete any you didn't create.
+- **Third-party OAuth grants** — Security → Your connections. Revoke anything
+  unfamiliar. This is how a "revoked" key stays alive.
+- **Login history** — Admin console → Reports → Audit → Login, for unfamiliar
+  locations around the incident.
+- **Send-as / delegates** — an added "send mail as" address lets someone send
+  from your domain without your password.
+
+Also: **check Make's execution history** around the incident date. A leaked
+webhook URL is a bearer credential, and a Make scenario that sends email turns
+that URL into a sending capability without any email key being stolen.
+
+## 5 · Finish the DMARC work
+
+`tyalexandermedia.com` is still at `p=none`, which observes and enforces
+nothing — on the domain that was actually used in the phishing blast.
+
+```
+Host:  _dmarc
+Type:  TXT
+Value: v=DMARC1; p=quarantine; pct=100; adkim=s; aspf=s; rua=mailto:dmarc@tyalexandermedia.com
+```
+
+Two weeks at `p=quarantine`, read the reports, then `p=reject`.
+
+`coachtyalexander.com` is already done — `v=spf1 -all`, null MX, `p=reject`.
+That domain cannot be spoofed.
+
+## 6 · Branch protection on `main`
+
+Settings → Branches → add a rule for `main`: require a pull request, and block
+force pushes. Free on public repos and on private repos for individual
+accounts. It means nothing lands on the deployed branch without passing through
+a diff you can read.
+
+---
+
+## What this does not cover
+
+Reading the actual environment-variable **values** in Railway and Vercel
+requires console access no tool here has. Two things worth doing by hand:
+
+- **List every var in both** and delete anything you don't recognise or no
+  longer use. Unused credentials are pure liability — `SENDGRID_*` and Brevo
+  both appear in this codebase alongside Resend, which means up to three
+  authorised senders for one job.
+- **Check Vercel deploy hooks** (Settings → Git → Deploy Hooks) and **GitHub
+  webhooks** (Settings → Webhooks). Both are URLs that trigger action when
+  called, and neither was inspectable from here.
