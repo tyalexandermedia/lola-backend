@@ -48,6 +48,32 @@ referrer for browser keys, IP allowlist for server keys. A restricted key that
 leaks is close to worthless, and it's the single highest-leverage free control
 in this whole document.
 
+## 1b · Cap the bill, not just the blast radius
+
+Restricting a key to a single API contains *what* a leaked key can call. It
+does **not** cap *how much* it can spend, and Places Text Search / Place
+Details run $17–32 per 1,000 calls — so an API-restricted Places key, leaked
+and hammered, is a contained incident with an uncapped invoice.
+
+Three ten-minute additions in Google Cloud Console close that:
+
+1. **Per-API daily quota caps** — APIs & Services → the API → Quotas. Set the
+   ceiling to ~2–3× real daily volume. This is the money-stop; the key
+   restriction is the scope-stop. You need both.
+2. **A billing budget alert** on the project at a threshold you'd notice.
+3. **One key per API**, never one key with three APIs enabled. Then rotation
+   after a leak is surgical — kill the one key — instead of a full outage
+   across every service that shared it.
+
+On deployment shape: these keys are called **server-side from Railway**, whose
+Hobby tier has **no static outbound IP** (Pro's are shared and load-balanced
+across three addresses, so even paying wouldn't buy a real allowlist — it would
+buy an outage risk). Per Google's own guidance, **API restriction is the
+correct control for server-side keys without a static IP** — not a downgrade
+from IP restriction, the right tool for this shape. Google's console will still
+show a yellow "unrestricted application" triangle; it is cosmetic here. Ignore
+it.
+
 ## 2 · Make the repository private
 
 It is public today. That means the full backend — admin endpoints, client
