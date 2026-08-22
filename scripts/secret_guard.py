@@ -60,7 +60,10 @@ PATTERNS: list[tuple[str, str]] = [
     ("GoHighLevel token",   r"\bpit-[0-9a-f]{8}-[0-9a-f]{4}"),
     ("AWS access key",      r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b"),
     ("Slack token",         r"\bxox[baprs]-[0-9A-Za-z\-]{10,}"),
-    ("Private key block",   r"-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----"),
+    # Requires real key material after the header, not just the literal string.
+    # The bare header appears in crypto libraries (jose's importPKCS8 etc.) as a
+    # comparison target — matching it flagged library source on every run.
+    ("Private key block",   r"-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=]{40,}"),
     # Webhook URLs are bearer credentials: anyone holding the URL can POST to
     # it. The Make webhook in the leaked .env is exactly this shape, and a Make
     # scenario that sends email turns a leaked URL into a sending capability.
