@@ -17,7 +17,7 @@ import { track } from './analytics';
 import { startHref } from './lib/checkout';
 import { PLAN } from './lib/pricing';
 import { FOUNDER } from './lib/lola';
-import { useSeo } from './lib/seo';
+import { usePageMeta } from './lib/seo';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
 type TierInterest = 'monthly';
@@ -71,11 +71,7 @@ export default function ApplyPage() {
       Boolean(new URLSearchParams(window.location.search).get('session_id')),
   );
 
-  useSeo({
-    title: 'Apply to Work With Lola | Local AI Visibility for Service Businesses',
-    description:
-      'Apply to work with Lola. Coach Ty reviews every application personally and reaches out within 24 hours. No payment required to apply — start with a free roadmap call.',
-  });
+  usePageMeta('/apply');
 
   // Match a host with at least one dot + a real TLD (>=2 alpha). Accepts
   // "mybiz.com", "mybiz.com/path", "https://mybiz.com". Rejects "mybiz" alone.

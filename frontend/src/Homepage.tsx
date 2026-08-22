@@ -31,12 +31,14 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
+import AnswerBlock from './AnswerBlock';
+import { HOME_QA } from './lib/pageMeta';
 import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
 import BeforeAfter from './BeforeAfter';
-import { useSeo } from './lib/seo';
+import { usePageMeta } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
 // Sample Growth Score — an honest, representative scorecard (labelled SAMPLE),
@@ -79,11 +81,7 @@ const SAMPLE_DIMENSIONS = GROWTH_SCORE_DIMENSIONS.map((name, i) => ({
 }));
 
 export default function Homepage() {
-  useSeo({
-    title: 'Did you show up? Get found on Google & AI — Lola Leads, Tampa Bay',
-    description:
-      "Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then the $397/month plan, backed by the 90-Day Promise.",
-  });
+  usePageMeta('/');
   useReveal();
 
   return (
@@ -678,7 +676,12 @@ function ProofSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function StorySection() {
   return (
-    <section className="mt-14 sm:mt-20">
+    // id="founder" gives the founder story a stable, linkable address. It is
+    // the one section other pages want to point at ("who you're working with")
+    // and the only part of the site with no URL of its own — /pricing and
+    // /growth-score both link here now. A standalone /about page would be
+    // better still; this is the version that doesn't need a new route.
+    <section id="founder" className="scroll-mt-24 mt-14 sm:mt-20">
       <SectionHead kicker="Who you're dealing with" />
       {/* Three grid children so mobile can read photo → letter → résumé.
           Keeping the résumé glued under the photo pushed the first line of the
@@ -1121,60 +1124,19 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
 /* ─────────────────────────────────────────────────────────────────────────
    FAQ — mirrors the FAQPage JSON-LD in index.html. Pure <details>, SSR-safe.
    ───────────────────────────────────────────────────────────────────────── */
-const FAQ: { q: string; a: string }[] = [
-  {
-    q: 'What kinds of businesses does Lola work with?',
-    a: 'Local service businesses of all kinds — pressure washing, plumbing, HVAC, roofing, pool care, cleaning, and other local trades. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you.',
-  },
-  {
-    q: 'How much does Lola cost?',
-    a: 'One plan: $397/month, all-inclusive. Your website design is included — no setup fee, no build charge — then I manage your Google Business Profile and keep you visible on Google and in AI answers. Cancel anytime after the first 3 months. Backed by the 90-Day Promise. Start with the free Growth Score.',
-  },
-  {
-    q: 'Is there a guarantee?',
-    a: "Yes — the 90-Day Promise. We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print.",
-  },
-  {
-    q: 'Can you actually guarantee leads?',
-    a: "No — and we won't pretend to. We guarantee visibility: that you're found and clickable on Google and in AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The 90-Day Promise is on the ranking we control: pick 5 money keywords together in week 1, and if we don't get at least 1 to page 1 or the map pack within 30 days, you get half back.",
-  },
-  {
-    q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
-    a: "Yes — that's the whole point. Lola optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews), because that's increasingly where buyers ask for a recommendation.",
-  },
-  {
-    q: 'Why is it $397/month when agencies quote $5,000 a month?',
-    a: "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. The monthly is $397/month, no contract, and if I don't get you ranking in 90 days, your next 2 months are free. Same job, without the overhead you were funding.",
-  },
-  {
-    q: 'Who is behind Lola?',
-    a: 'Ty Alexander Traufield — “Coach Ty” — based in St. Petersburg and serving all of Tampa Bay. He’s a group strength & conditioning coach and a full-time GM who trains for HYROX, and he built Lola to fix the local visibility of his father’s real business, Sandbar Soft Wash. He now runs that same system for other local service businesses, does the work himself, and answers his own phone.',
-  },
-  {
-    q: 'Why is it called Lola?',
-    a: "Lola is Ty's dog — born in 2018, and the reason the whole thing exists. The goal behind the business is simple: help enough local businesses win to buy her the backyard she deserves. When you win, so does she.",
-  },
-];
-
 function FaqSection() {
+  // HOME_QA is the same array src/lib/pageMeta.ts turns into this route's
+  // FAQPage, so the schema and the rendered copy cannot drift. The three
+  // demand questions ("how do I get found on Google and AI", "how much does
+  // local SEO cost", "how long does it take") lead, because those are the
+  // queries an answer engine is actually resolving when it cites a page.
   return (
-    <section className="mt-14 sm:mt-20">
-      <SectionHead kicker="Straight answers" />
-      {/* Every other section is labelled by an h2; without this the FAQ is
-          unreachable by screen-reader heading navigation. */}
-      <h2 className="sr-only">Straight answers</h2>
-      <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
-        {FAQ.map((item, i) => (
-          <details key={i} className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[16px] font-semibold text-[#ECECEF] [&::-webkit-details-marker]:hidden">
-              <span>{item.q}</span>
-              <span aria-hidden className="shrink-0 text-[20px] text-[#D4AF37] transition-transform group-open:rotate-45">+</span>
-            </summary>
-            <p className="pb-6 pr-8 text-[15px] leading-[1.65] text-[#C5C5C8]">{item.a}</p>
-          </details>
-        ))}
-      </div>
-    </section>
+    <AnswerBlock
+      items={HOME_QA}
+      heading="Straight answers"
+      kicker="Straight answers"
+      collapsible
+    />
   );
 }
 

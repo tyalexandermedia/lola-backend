@@ -38,7 +38,14 @@
     <!-- Theme color (matches dark hero) -->
     <meta name="theme-color" content="#0A0A0B" />
 
-    <link rel="icon" href="/favicon.svg" />
+    <!-- Icons. The SVG is the primary (crisp at any size, ~200 bytes); the PNGs
+         exist because iOS home-screen and Android install prompts don't accept
+         SVG. All four are rendered from the same mark as favicon.svg, so the
+         set can't drift into two different logos. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png" sizes="192x192" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- ───────── JSON-LD: ProfessionalService (provider) ───────── -->
     <!-- Crawlable in the static shell so Google + AI agents resolve the entity

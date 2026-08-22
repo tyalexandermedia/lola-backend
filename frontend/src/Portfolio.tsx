@@ -94,8 +94,13 @@ function Card({ site, onOpen }: { site: PortfolioSite; onOpen: (s: PortfolioSite
         {shotOk && (
           <img
             src={shot}
-            alt={`${site.name} website`}
+            alt={`Screenshot of the ${site.name} website built by Lola`}
             loading="lazy"
+            // Intrinsic size of the card's 16:10 screenshot slot. Without this
+            // the browser reserves no space and the card jumps when the image
+            // arrives — the layout shift Core Web Vitals measures as CLS.
+            width={1280}
+            height={800}
             onError={() => setShotOk(false)}
             className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
           />
@@ -197,7 +202,14 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
         <div className="flex w-full flex-col overflow-hidden rounded-[14px] border border-white/[0.12] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
           <BrowserBar host={host} compact />
           <div className="flex-1 overflow-y-auto overscroll-contain bg-white">
-            <img src={shot} alt={`${site.name} — full page`} className="block w-full" />
+            <img
+              src={shot}
+              alt={`Full-page screenshot of the ${site.name} website`}
+              width={1280}
+              height={4000}
+              loading="lazy"
+              className="block h-auto w-full"
+            />
           </div>
         </div>
       </div>

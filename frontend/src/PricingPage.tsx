@@ -18,45 +18,26 @@ import { useEffect } from 'react';
 import IncludedAccordion from './IncludedAccordion';
 import { checkoutUrl, startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
+import { PRICING_QA } from './lib/pageMeta';
 import { AFTER_YOU_START, EXCLUSIVITY, GUARANTEE, LEAD_MAGNET, PLAN, PLAN_INCLUDED, trialLine } from './lib/pricing';
-import { useSeo } from './lib/seo';
+import { usePageMeta } from './lib/seo';
 import { useReveal } from './lib/useReveal';
 
-// Each entry powers the visible accordion AND the FAQPage JSON-LD, which Google
-// requires to match the rendered copy.
-const PRICING_FAQS: ReadonlyArray<{ q: string; a: string }> = [
-  { q: 'What if you don’t rank me?', a: GUARANTEE.faqAnswer },
-  {
-    q: 'Is the website really included?',
-    a: "Yes — designed, built, and kept current, with no setup fee and no build charge. Most shops bill $3,000 or more for the build and then charge you monthly on top. Here it's part of the monthly, and you review it before it goes live.",
-  },
-  {
-    q: 'What makes it an “AI website”?',
-    a: "Your customers have stopped scrolling ten blue links — they ask ChatGPT or Google's AI for a company like yours and take the answer. Those tools can only recommend a business they can actually read, and most websites are invisible to them. Yours is written so they can read it, and name you.",
-  },
-  {
-    q: 'Am I locked in?',
-    a: 'Cancel anytime after the first 3 months. I ask for three because that’s honestly how long this takes to land — anything shorter can’t be judged fairly, in either direction.',
-  },
-  {
-    q: 'What do I have to do?',
-    a: 'A 2-minute intake after checkout, and pick your money keywords with me in week 1. After that you run your business — everything else is mine.',
-  },
-  {
-    q: 'Do I have to get on a call?',
-    a: "No. Start from this page in one tap — no call, no sales pitch, no waiting on my calendar. If you want to ask something first, text me and I'll answer myself.",
-  },
-];
+// The accordion renders PRICING_QA from lib/pageMeta, which is the same array
+// the prerenderer turns into this route's FAQPage — Google requires the schema
+// to match the rendered copy, and one array is the only way to guarantee it.
 
 export default function PricingPage() {
   useReveal();
-  useSeo({
-    title: `Pricing — ${PLAN.price}/month, website included | Lola Leads`,
-    description: `One all-inclusive plan at ${PLAN.price}/month for local service businesses: website design included free, Google Business Profile managed, and visibility work across Google and AI answers. ${GUARANTEE.short}`,
-  });
+  usePageMeta('/pricing');
 
-  // Route-specific Offer + FAQPage schema, built from the same constants the
-  // page renders so the two can't drift. Cleaned up on unmount.
+  // Route-specific Offer schema, built from the same constants the page
+  // renders so the two can't drift. Cleaned up on unmount.
+  //
+  // The FAQPage that used to live here is gone: scripts/prerender.mjs now
+  // writes this route's FAQPage into the static HTML from pageMeta, so keeping
+  // this one would put two FAQPage nodes on one URL — and only the prerendered
+  // one is visible to a crawler that doesn't run JS.
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const amount = PLAN.price.replace(/[^0-9]/g, '');
@@ -87,15 +68,6 @@ export default function PricingPage() {
             unitCode: 'MON',
           },
         },
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: PRICING_FAQS.map((f) => ({
-          '@type': 'Question',
-          name: f.q,
-          acceptedAnswer: { '@type': 'Answer', text: f.a },
-        })),
       },
     ];
     const tags = blocks.map((b) => {
@@ -200,7 +172,7 @@ export default function PricingPage() {
           </p>
           <p className="mt-2 text-[12.5px] leading-[1.5] text-[#C5C5C8]">
             <span className="font-semibold text-[#ECECEF]">{EXCLUSIVITY.short}.</span>{' '}
-            {EXCLUSIVITY.why}
+            {EXCLUSIVITY.why}{' '}<a href="/#founder" className="text-[#D4AF37] underline underline-offset-2 decoration-[#D4AF37]/50 hover:decoration-[#D4AF37]">Who you&apos;re working with →</a>
           </p>
           <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8A8F98]">{PLAN.terms}</p>
         </div>
@@ -310,7 +282,7 @@ export default function PricingPage() {
           Straight answers
         </h2>
         <div className="mx-auto mt-8 max-w-[760px] divide-y divide-white/10 border-y border-white/10">
-          {PRICING_FAQS.map((f) => (
+          {PRICING_QA.map((f) => (
             <details key={f.q} className="group py-4">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-[16px] font-semibold text-[#ECECEF]">
                 {f.q}

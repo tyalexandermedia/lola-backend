@@ -46,36 +46,73 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ROUTES } from './routes.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const INDEX = path.join(DIST, 'index.html');
 const ROOT_DIV = '<div id="root"></div>';
+/** Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts. */
+const SITE = 'https://lola.tyalexandermedia.com';
 
 /**
- * Marketing routes worth making crawlable. Deliberately excludes anything
- * private or per-user — /r/<id> reports, /r/client/<slug> dashboards and the
- * admin screens are noindex by design and have no business in a static build.
+ * Rewrite the shared <head> for one route.
+ *
+ * The template's head is the HOMEPAGE's head. Before this existed, every route
+ * file got it verbatim: one title, one description, one og:url across all 14
+ * pages, no canonical anywhere, and the homepage's FAQPage schema claimed on
+ * pages that never render those questions. A JS-executing crawler eventually
+ * saw the right tags via useSeo; GPTBot / ClaudeBot / PerplexityBot, which
+ * mostly don't run JS, never did.
+ *
+ * Everything here comes from src/lib/pageMeta.ts, which useSeo also reads, so
+ * the static HTML and the client-side tags cannot disagree.
  */
-const ROUTES = [
-  '/',
-  '/pricing',
-  '/work',
-  '/growth-score',
-  '/methodology',
-  '/vs',
-  '/apply',
-  // The individual comparisons are the pages that actually rank — "<vendor> vs
-  // Lola" and "are Local Service Ads worth it" are the high-intent queries.
-  // Prerendering only the hub would leave every one of them uncrawlable.
-  '/vs/local-service-ads',
-  '/vs/localiq',
-  '/vs/brightlocal',
-  '/vs/scorpion',
-  '/vs/podium',
-  '/vs/yext',
-  '/vs/hibu',
-];
+function renderHead(template, route, meta, schemaBlocks) {
+  const canonical = route === '/' ? `${SITE}/` : `${SITE}${route}`;
+  let html = template;
+
+  const esc = (s) =>
+    String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  // <title>
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(meta.title)}</title>`);
+
+  // Replace a meta tag by name/property, whatever its attribute order or
+  // line wrapping. The template writes description across three lines.
+  const setMeta = (attr, key, value) => {
+    const re = new RegExp(`<meta\\s+${attr}="${key}"[\\s\\S]*?/?>`, 'i');
+    const tag = `<meta ${attr}="${key}" content="${esc(value)}" />`;
+    html = re.test(html) ? html.replace(re, tag) : html.replace('</head>', `    ${tag}\n  </head>`);
+  };
+
+  setMeta('name', 'description', meta.description);
+  setMeta('property', 'og:title', meta.title);
+  setMeta('property', 'og:description', meta.description);
+  setMeta('property', 'og:url', canonical);
+  setMeta('name', 'twitter:title', meta.title);
+  setMeta('name', 'twitter:description', meta.description);
+
+  // Self-referencing canonical. Absent from every page before this.
+  html = html.replace(/\s*<link\s+rel="canonical"[\s\S]*?>/gi, '');
+  html = html.replace('</head>', `    <link rel="canonical" href="${canonical}" />\n  </head>`);
+
+  // Swap the template's hand-written JSON-LD for this route's graph. The
+  // template blocks were sitewide copies; these are per-route and include the
+  // FAQPage only where the questions actually render.
+  html = html.replace(/\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
+  const ld = schemaBlocks
+    .map((b) => `    <script type="application/ld+json">\n${JSON.stringify(b, null, 2)}\n    </script>`)
+    .join('\n');
+  html = html.replace('</head>', `${ld}\n  </head>`);
+
+  return html;
+}
 
 async function main() {
   if (!existsSync(INDEX)) {
@@ -104,6 +141,7 @@ async function main() {
   let skipped = 0;
   try {
     const { render } = await vite.ssrLoadModule('/src/entry-server.tsx');
+    const { PAGE_META, schemaFor } = await vite.ssrLoadModule('/src/lib/pageMeta.ts');
 
     for (const route of ROUTES) {
       let appHtml;
@@ -124,7 +162,16 @@ async function main() {
         continue;
       }
 
-      const html = template.replace(ROOT_DIV, `<div id="root">${appHtml}</div>`);
+      const meta = PAGE_META[route];
+      if (!meta) {
+        // A route with no metadata entry would ship the homepage's head, which
+        // is the exact bug this step exists to fix. Refuse rather than write it.
+        console.warn(`[prerender] ${route} — no PAGE_META entry; skipping so it can't ship duplicate metadata.`);
+        skipped += 1;
+        continue;
+      }
+      const head = renderHead(template, route, meta, schemaFor(route));
+      const html = head.replace(ROOT_DIV, `<div id="root">${appHtml}</div>`);
       const outFile =
         route === '/' ? INDEX : path.join(DIST, route.replace(/^\//, ''), 'index.html');
       await mkdir(path.dirname(outFile), { recursive: true });
