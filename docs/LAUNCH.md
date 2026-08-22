@@ -56,7 +56,13 @@ point: `/pricing` → `/pricing`, `/lp/roofing-seo-tampa` → `/lp/roofing-seo-t
 > Every URL that had any equity dumps it on `/` and Google treats the rest as
 > soft-404s. Path-for-path preserves it.
 
-**Leave these 301s up permanently.** Not 30 days — permanently.
+**Leave these redirects up permanently.** Not 30 days — permanently.
+
+Vercel issues **308**, not 301. That is correct and nothing to fix: 308 is the
+permanent redirect that also preserves the request method, and Google treats
+301 and 308 identically for ranking-signal transfer. Vercel domain redirects
+preserve the **path and the query string**, so UTM-tagged links to the old
+hostname arrive intact.
 
 **4 · Stripe**
 Success URL →
