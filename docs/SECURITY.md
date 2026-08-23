@@ -240,6 +240,10 @@ that URL into a sending capability without any email key being stolen.
 `tyalexandermedia.com` is still at `p=none`, which observes and enforces
 nothing — on the domain that was actually used in the phishing blast.
 
+Its DNS is managed at **Wix** (nameservers `NS10`/`NS11.WIXDNS.NET`) — edit this
+record in the Wix DNS panel, **not** GoDaddy. GoDaddy holds `coachtyalexander.com`;
+the two domains live in different registrars' DNS, which is easy to trip on.
+
 ```
 Host:  _dmarc
 Type:  TXT
