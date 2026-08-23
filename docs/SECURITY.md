@@ -145,9 +145,13 @@ Reading the actual environment-variable **values** in Railway and Vercel
 requires console access no tool here has. Two things worth doing by hand:
 
 - **List every var in both** and delete anything you don't recognise or no
-  longer use. Unused credentials are pure liability — `SENDGRID_*` and Brevo
-  both appear in this codebase alongside Resend, which means up to three
-  authorised senders for one job.
+  longer use. Two email senders are wired for one job: **Resend** (Lola's own
+  mail) and **Brevo** (the reporting agent, `agents/reporting_agent/`). SendGrid
+  is fully retired — no code, no config — but its keys were in the leaked `.env`,
+  so if a `SENDGRID_*` var still exists in Railway or Vercel, delete it: it's a
+  credential for a sender nothing uses. Two authorised senders for one domain is
+  already one more attack surface than the job needs; decide if Brevo earns its
+  place or if the reporting agent should move to Resend too.
 - **Check Vercel deploy hooks** (Settings → Git → Deploy Hooks) and **GitHub
   webhooks** (Settings → Webhooks). Both are URLs that trigger action when
   called, and neither was inspectable from here.
