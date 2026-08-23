@@ -71,8 +71,16 @@ That reframes the priorities:
    stops an authorised-looking sender the mailbox never touched.
 2. **Audit GHL**: what sending domains and sub-accounts are configured, and
    confirm the Aug-2 token is dead and its replacement is scoped tight.
-3. The Gmail mailbox is not the hole. Rotating its password (§0) matters for
-   the *open door*, not for *this* incident.
+3. The Gmail mailbox is not the hole, and the Google account was not breached
+   (§0c). Rotating its password (§0) matters for the *open door*, not for *this*
+   incident.
+
+**Whole incident, end to end:** the public repo leaked `.env` (§1) →
+credentials for the domain's GoHighLevel sending pipe were exposed → mail went
+out through GHL's authorised, DKIM-signed path → it passed because DMARC was
+`p=none`. One vector, fully explained. The fix is: rotate the leaked
+credentials, audit GHL, and enforce DMARC. Not a mailbox cleanup — there is
+nothing in the mailbox to clean.
 
 ## 0c · OAuth apps that can send as you — triage
 
@@ -93,15 +101,17 @@ granted in the July–August window**, so none is a freshly planted foothold —
 
 Two anchors to identify, neither a mail foothold but both worth explaining:
 
-- 🚩 **`yogateq.firebaseapp.com` / `project-1087598015333`** — an unnamed
-  Firebase OAuth client granted **Jul 19 at the exact minute** of a "new iPhone
-  17 Pro sign-in" alert, present in active sessions. Profile-only scope, so it
-  can't touch mail — but it is the anchor of that July 19 event. If you did not
-  sign into something yoga-related that night, treat it as hostile and revoke.
-- 🚩 **Windows — Colorado — Jun 16** — the only non-Florida session on the
-  account, with OpenAI and **GitHub** access. Predates the window, but if you
-  have never used a Windows machine in Colorado, this is the earliest intrusion
-  candidate — and GitHub access from it is notable given the repo leak.
+- ✅ **`yogateq.firebaseapp.com`** (Jul 19) — CLEARED. Owner-confirmed: a
+  beach-town yoga app he signed into that night. Not hostile.
+- ✅ **Windows — Colorado — Jun 16** — CLEARED. Owner-confirmed his own login.
+  Not an intrusion.
+
+**Conclusion: the Google account was never breached.** No forwarding, no
+filter, no delegate, no unfamiliar OAuth grant, no unfamiliar session or device
+— and the two anchors that looked suspicious are both the owner. There is no
+human intruder to evict inside Google. The account-hygiene items in §0 (2SV off,
+stale password, no recovery) are an *open door to close as prevention*, not
+evidence of a break-in.
 
 ## 1 · Rotate what leaked — before anything else
 
