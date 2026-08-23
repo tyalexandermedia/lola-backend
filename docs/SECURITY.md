@@ -149,11 +149,12 @@ human intruder to evict inside Google. The account-hygiene items in §0 (2SV off
 stale password, no recovery) are an *open door to close as prevention*, not
 evidence of a break-in.
 
-## 0d · The DNS read confirmed it — a second SendGrid account is the pipe
+## 0d · The DNS read + SendGrid audit — exposure found, no exploitation
 
 The 2026-08-23 read-only DNS audit of `tyalexandermedia.com` (Wix confirmed
-authoritative — `ns10`/`ns11.wixdns.net`, separate Wix login from Sandbar) found
-the sending pipe.
+authoritative — `ns10`/`ns11.wixdns.net`, separate Wix login from Sandbar)
+mapped a wide, unmonitored sending-authorisation surface — and led to the
+SendGrid audit that **cleared** the account which looked like the pipe.
 
 **The apex SPF is a decoy.** Apex is `v=spf1 include:_spf.google.com ~all` —
 Google only. But three *subdomains* carry their own SPF, and DMARC alignment
@@ -164,50 +165,70 @@ defaults to **relaxed**, so a subdomain counts as aligned to the apex `From:`:
 - **`em6980.` → `include:sendgrid.net` — a SECOND, INDEPENDENT SendGrid account
   (`u59341807`, cluster `wl058`).** The `emXXXX` CNAME is the fingerprint of
   SendGrid's own Domain-Authentication wizard: someone authenticated this domain
-  **directly on SendGrid, outside Wix.** This is almost certainly the account
-  whose API key was in the leaked `.env`.
+  **directly on SendGrid, outside Wix.** Its key was in the leaked `.env` — but
+  the SendGrid audit below found the domain auth was **never verified** and the
+  account **sent zero mail all year**, so this was exposure, not the pipe.
 - `send.` → `include:amazonses.com` — Resend (it sends via Amazon SES), with
   `send.` MX → `feedback-smtp.us-east-1.amazonses.com`.
 
 **DKIM: six selectors, four ESPs, all live** — SendGrid (`s1`/`s2`), Wix Ascend
 (`sel1`), Brevo (`brevo1`/`brevo2`), Resend (`resend`). **Four senders beyond
-Google can put DMARC-passing mail in an inbox as `ty@tyalexandermedia.com` right
-now.**
+Google are authorised to put DMARC-passing mail in an inbox as
+`ty@tyalexandermedia.com`.**
 
-**How the blast passed with no trace:** mail from `u59341807`, envelope-from
-`bounces@em6980.tyalexandermedia.com`, `From: ty@tyalexandermedia.com` → SPF
-passes on the subdomain → relaxed alignment → **DMARC PASS**, inbox delivery, no
-DKIM even required. Not Gmail's send path (no bounces), not GHL (zero sends),
-valid alignment. Every earlier observation fits.
+**The vulnerability this creates:** any mail with envelope-from a
+`*.tyalexandermedia.com` subdomain an ESP is authorised for, plus
+`From: ty@tyalexandermedia.com` → SPF passes on the subdomain → relaxed
+alignment → **DMARC PASS**, inbox delivery, no aligned DKIM even required. That
+is the open door `p=none` + relaxed alignment leaves — for Wix Ascend, Brevo,
+and Resend too, not just the SendGrid subdomain. Whether anyone actually walked
+through it is answered by the channel audits below: so far, no.
 
 **Why you never saw a DMARC report:** `_dmarc` is a **CNAME to
 `_dmarc.wixemails.com`** — Wix's shared `p=none` policy, `rua` pointing at Wix's
 vendor (`vali.email`), not you. You don't control the record and never received
-a report. That is the visibility gap that let Aug 2–4 leave no trail.
+a report. That is the visibility gap that let Aug 2–4 leave no trail either way.
 
-### The fix, in order
-1. **Get into SendGrid account `u59341807` and capture Aug 2–4 NOW.** Its
-   activity feed confirms the blast and its recipients — SendGrid retention is
-   ~30 days, so the incident window has **~10 days left** before it ages out.
-   Screenshot it first (evidence), then **disable every API key** in that
-   account. Nothing legit uses SendGrid (retired in code), so revoking breaks
-   nothing.
-2. **Strip its DNS** at Wix: remove the `em6980.` SPF TXT and its
-   `emXXXX._domainkey` / CNAME records. Kill the pipe at the domain, not just the
-   account.
-3. **Take DMARC away from Wix.** A name can't hold a CNAME *and* a TXT, so
-   **delete the `_dmarc` CNAME** and create your own TXT so you control policy
-   and receive the reports:
-   `v=DMARC1; p=quarantine; rua=mailto:dmarc@<an inbox you actually read>`. Two
-   weeks reading reports, then `p=reject`.
-4. **Prune the other ESPs to what you actually use.** Brevo and Resend both have
-   live keys authenticated here. Keep only the ones in real use, rotate their
-   keys, remove the DNS for the rest. Wix Ascend's `sg.`/`sel1` plumbing is Wix's
-   own — leave it if you use Wix email, otherwise turn it off inside Wix.
-5. **Then enforce alignment.** Once only real senders remain, `aspf=s adkim=s`
-   (strict) in the DMARC record slams the subdomain-spoofing door for good —
-   Google is apex-aligned, so Workspace still passes. Set strict only *after*
-   step 4, or you'll block a sender you actually use.
+### SendGrid audited and cleared — and what it means
+
+The account that looked like the pipe (`u59341807`) was audited directly and
+**sent zero mail in all of 2026** (Global Stats, Jan 1 – Aug 23: 0 requests, 0
+bounces, 0 spam). Its `em6980` domain auth was **never verified — status
+Pending** — so the pipe was never usable. Both API keys are now **deleted** (a
+key and its all-caps duplicate; the spare is what leaked). No unknown teammates.
+The per-message feed had already aged out — retention is **3 days, not 30** — but
+the aggregate counter, which persists, is conclusive.
+
+So all three audited channels — **Gmail** (0 bounces, normal Sent), **GHL** (0
+sends, no dedicated domain), **SendGrid** (0 sends all year) — are clean. **No
+evidence of an actual authenticated send exists anywhere we have looked.** The
+exposure was real; the exploitation is not in evidence. Two possibilities remain:
+
+1. **External spoofing** — a forged `From:` with no account access, which
+   `p=none` waves straight through. If so there is no pipe to find, and DMARC
+   enforcement is the entire fix.
+2. **An unaudited ESP** — Brevo, Resend, or Wix Ascend, each holding a live
+   domain-aligned key here. A look at each send log for Aug 2–4 closes it.
+
+Choosing between them needs the original signal — bounce-backs, a recipient's
+report, spam from your own address in your own inbox, or a tool alert. Until
+that's pinned down the remediation is identical, and **none of it is urgent**
+(real exposure, no evidence of exploitation):
+
+1. **Rotate every secret from the leaked `.env`, not just SendGrid** — the
+   Google keys, `LOLA_SECRET_ADMIN_KEY`, the Make webhook, and the Brevo/Resend
+   keys. A public `.env` rarely holds one credential; treat them all as burned
+   (§1).
+2. **Strip the `em6980` records at Wix** and **take DMARC off the Wix CNAME**
+   onto your own `p=quarantine` TXT with reports coming to you. This is the one
+   control that actually stops domain spoofing — worth doing regardless of
+   attribution.
+3. **Check Brevo + Resend send logs for Aug 2–4, and rotate their keys.**
+4. **Prune to what you use, then `aspf=s adkim=s` and `p=reject`.** Google is
+   apex-aligned, so Workspace still passes; set strict only *after* the prune, or
+   you'll block a real sender.
+5. **Delete SendGrid account `u59341807`.** Key-less now, but a dormant account
+   holding a domain-auth entry for your subdomain is liability with no upside.
 
 ## 1 · Rotate what leaked — before anything else
 
