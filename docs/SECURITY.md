@@ -30,6 +30,79 @@ Audit history any time:
 python3 scripts/secret_guard.py --history
 ```
 
+## 0 · The account is wide open RIGHT NOW — fix this before the incident
+
+The 2026-08-23 Workspace audit found that `ty@tyalexandermedia.com` is, today,
+in worse shape than the incident itself:
+
+- **2-Step Verification is OFF.**
+- **The Google password was last changed Jan 13** — it was *never rotated*
+  after the August incident.
+- **No recovery phone and no recovery email** on the account.
+
+That is a live, open door independent of anything the attacker did. Turn on
+2SV, rotate the password, and add recovery — before the API-key work below.
+Everything else is remediation; this is an unlocked front door.
+
+## 0b · Revised incident theory — the mail did NOT go through Gmail
+
+The mailbox forensics change the picture. In the incident window: **zero**
+bounce-backs or delivery-failure messages, and only 19 sent threads — all
+recognisable business mail. **The unauthorized email did not leave through this
+Gmail mailbox's send path.**
+
+Where it almost certainly did go: **GoHighLevel's dedicated-domain sending.**
+Three facts line up on the same days:
+
+- Sent folder shows GHL support threads titled *"Enable sending on dedicated
+  domain"* on **Aug 2 and Aug 4**.
+- The GHL Private Integration token was **revoked Aug 2** (see
+  `services/build_review_segment.py`, which halts on it).
+- The original incident was described as an *authenticated* blast with **valid
+  DKIM/SPF** — which is exactly what mail sent through an authorised platform
+  like GHL looks like, and exactly what mail forged from a random mailbox does
+  NOT.
+
+So the vector was most likely a **compromised GHL credential sending through the
+domain's authorised GHL pipe**, which passed DMARC because DMARC was `p=none`.
+That reframes the priorities:
+
+1. **DMARC enforcement (§5) is the actual fix**, not a nice-to-have — it is what
+   stops an authorised-looking sender the mailbox never touched.
+2. **Audit GHL**: what sending domains and sub-accounts are configured, and
+   confirm the Aug-2 token is dead and its replacement is scoped tight.
+3. The Gmail mailbox is not the hole. Rotating its password (§0) matters for
+   the *open door*, not for *this* incident.
+
+## 0c · OAuth apps that can send as you — triage
+
+The audit found **four** third-party apps holding `gmail.send` on this account:
+Brevo, OpenAI (ChatGPT), Perplexity Connector, and Claude for Gmail. **None was
+granted in the July–August window**, so none is a freshly planted foothold — but:
+
+- **Brevo** holds Gmail read/compose/send (granted May 4). The reporting agent
+  uses Brevo's *own API* (`BREVO_API_KEY`), not this Gmail grant — so the
+  `gmail.send` scope is very likely **unnecessary and revocable**. It is an
+  email platform with a live send path on the domain that had a sending
+  incident; revoke the Gmail grant unless something genuinely uses it.
+- **OpenAI** and **Perplexity** hold `gmail.send` *plus* very broad scopes
+  (full Drive, Docs, Sheets, Calendar, Contacts, directory). Legitimate only if
+  you actively use those connectors; the scope is large enough to be worth a
+  hard look.
+- **Claude for Gmail** is first-party and expected if you use it.
+
+Two anchors to identify, neither a mail foothold but both worth explaining:
+
+- 🚩 **`yogateq.firebaseapp.com` / `project-1087598015333`** — an unnamed
+  Firebase OAuth client granted **Jul 19 at the exact minute** of a "new iPhone
+  17 Pro sign-in" alert, present in active sessions. Profile-only scope, so it
+  can't touch mail — but it is the anchor of that July 19 event. If you did not
+  sign into something yoga-related that night, treat it as hostile and revoke.
+- 🚩 **Windows — Colorado — Jun 16** — the only non-Florida session on the
+  account, with OpenAI and **GitHub** access. Predates the window, but if you
+  have never used a Windows machine in Colorado, this is the earliest intrusion
+  candidate — and GitHub access from it is notable given the repo leak.
+
 ## 1 · Rotate what leaked — before anything else
 
 A blob pushed to a public repo stays fetchable **by SHA** even after the branch
