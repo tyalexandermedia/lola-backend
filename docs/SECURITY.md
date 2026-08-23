@@ -149,6 +149,66 @@ human intruder to evict inside Google. The account-hygiene items in §0 (2SV off
 stale password, no recovery) are an *open door to close as prevention*, not
 evidence of a break-in.
 
+## 0d · The DNS read confirmed it — a second SendGrid account is the pipe
+
+The 2026-08-23 read-only DNS audit of `tyalexandermedia.com` (Wix confirmed
+authoritative — `ns10`/`ns11.wixdns.net`, separate Wix login from Sandbar) found
+the sending pipe.
+
+**The apex SPF is a decoy.** Apex is `v=spf1 include:_spf.google.com ~all` —
+Google only. But three *subdomains* carry their own SPF, and DMARC alignment
+defaults to **relaxed**, so a subdomain counts as aligned to the apex `From:`:
+
+- `sg.` → `include:sendgrid.net` — Wix Ascend's own SendGrid plumbing (account
+  `u59301223`, cluster `wl224`). Expected.
+- **`em6980.` → `include:sendgrid.net` — a SECOND, INDEPENDENT SendGrid account
+  (`u59341807`, cluster `wl058`).** The `emXXXX` CNAME is the fingerprint of
+  SendGrid's own Domain-Authentication wizard: someone authenticated this domain
+  **directly on SendGrid, outside Wix.** This is almost certainly the account
+  whose API key was in the leaked `.env`.
+- `send.` → `include:amazonses.com` — Resend (it sends via Amazon SES), with
+  `send.` MX → `feedback-smtp.us-east-1.amazonses.com`.
+
+**DKIM: six selectors, four ESPs, all live** — SendGrid (`s1`/`s2`), Wix Ascend
+(`sel1`), Brevo (`brevo1`/`brevo2`), Resend (`resend`). **Four senders beyond
+Google can put DMARC-passing mail in an inbox as `ty@tyalexandermedia.com` right
+now.**
+
+**How the blast passed with no trace:** mail from `u59341807`, envelope-from
+`bounces@em6980.tyalexandermedia.com`, `From: ty@tyalexandermedia.com` → SPF
+passes on the subdomain → relaxed alignment → **DMARC PASS**, inbox delivery, no
+DKIM even required. Not Gmail's send path (no bounces), not GHL (zero sends),
+valid alignment. Every earlier observation fits.
+
+**Why you never saw a DMARC report:** `_dmarc` is a **CNAME to
+`_dmarc.wixemails.com`** — Wix's shared `p=none` policy, `rua` pointing at Wix's
+vendor (`vali.email`), not you. You don't control the record and never received
+a report. That is the visibility gap that let Aug 2–4 leave no trail.
+
+### The fix, in order
+1. **Get into SendGrid account `u59341807` and capture Aug 2–4 NOW.** Its
+   activity feed confirms the blast and its recipients — SendGrid retention is
+   ~30 days, so the incident window has **~10 days left** before it ages out.
+   Screenshot it first (evidence), then **disable every API key** in that
+   account. Nothing legit uses SendGrid (retired in code), so revoking breaks
+   nothing.
+2. **Strip its DNS** at Wix: remove the `em6980.` SPF TXT and its
+   `emXXXX._domainkey` / CNAME records. Kill the pipe at the domain, not just the
+   account.
+3. **Take DMARC away from Wix.** A name can't hold a CNAME *and* a TXT, so
+   **delete the `_dmarc` CNAME** and create your own TXT so you control policy
+   and receive the reports:
+   `v=DMARC1; p=quarantine; rua=mailto:dmarc@<an inbox you actually read>`. Two
+   weeks reading reports, then `p=reject`.
+4. **Prune the other ESPs to what you actually use.** Brevo and Resend both have
+   live keys authenticated here. Keep only the ones in real use, rotate their
+   keys, remove the DNS for the rest. Wix Ascend's `sg.`/`sel1` plumbing is Wix's
+   own — leave it if you use Wix email, otherwise turn it off inside Wix.
+5. **Then enforce alignment.** Once only real senders remain, `aspf=s adkim=s`
+   (strict) in the DMARC record slams the subdomain-spoofing door for good —
+   Google is apex-aligned, so Workspace still passes. Set strict only *after*
+   step 4, or you'll block a sender you actually use.
+
 ## 1 · Rotate what leaked — before anything else
 
 A blob pushed to a public repo stays fetchable **by SHA** even after the branch
@@ -243,6 +303,12 @@ nothing — on the domain that was actually used in the phishing blast.
 Its DNS is managed at **Wix** (nameservers `NS10`/`NS11.WIXDNS.NET`) — edit this
 record in the Wix DNS panel, **not** GoDaddy. GoDaddy holds `coachtyalexander.com`;
 the two domains live in different registrars' DNS, which is easy to trip on.
+
+**Read §0d first** — the DNS audit found `_dmarc` is currently a **CNAME to
+Wix's shared policy**, not a record you own. You must delete that CNAME before a
+TXT of your own will resolve, and the real hole is relaxed alignment on rogue
+subdomains, not the apex. The record below is the destination; §0d is the full
+sequence.
 
 ```
 Host:  _dmarc
