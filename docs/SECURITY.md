@@ -44,43 +44,79 @@ That is a live, open door independent of anything the attacker did. Turn on
 2SV, rotate the password, and add recovery — before the API-key work below.
 Everything else is remediation; this is an unlocked front door.
 
-## 0b · Revised incident theory — the mail did NOT go through Gmail
+## 0b · Revised incident theory — NOT Gmail, and NOT GoHighLevel either
 
-The mailbox forensics change the picture. In the incident window: **zero**
-bounce-backs or delivery-failure messages, and only 19 sent threads — all
-recognisable business mail. **The unauthorized email did not leave through this
-Gmail mailbox's send path.**
+Two forensic passes have now *removed* the two most obvious senders.
 
-Where it almost certainly did go: **GoHighLevel's dedicated-domain sending.**
-Three facts line up on the same days:
+**Gmail is not the pipe.** In the incident window: zero bounce-backs, only 19
+sent threads, all recognisable business mail. The blast did not leave through
+this mailbox's send path.
 
-- Sent folder shows GHL support threads titled *"Enable sending on dedicated
-  domain"* on **Aug 2 and Aug 4**.
-- The GHL Private Integration token was **revoked Aug 2** (see
-  `services/build_review_segment.py`, which halts on it).
-- The original incident was described as an *authenticated* blast with **valid
-  DKIM/SPF** — which is exactly what mail sent through an authorised platform
-  like GHL looks like, and exactly what mail forged from a random mailbox does
-  NOT.
+**GoHighLevel is not the pipe either** — this is the correction, from the
+2026-08-23 read-only GHL audit of the `tyalexandermedia.com` sub-account. An
+earlier draft of this section fingered GHL's dedicated-domain sending. The audit
+disproves it:
 
-So the vector was most likely a **compromised GHL credential sending through the
-domain's authorised GHL pipe**, which passed DMARC because DMARC was `p=none`.
-That reframes the priorities:
+- **Zero sends, ever.** Email Analytics across 2026-05-24 → 08-23 (fully
+  covering Aug 2–4): Sent 0, Delivered 0, Bounced 0, Complained 0. A blast
+  leaves a trace in its own sender's analytics. There is none.
+- **No dedicated domain.** The sub-account sends on GHL's shared pool
+  (`mg.msgsndr.biz`) at warm-up "Stage 1" — never configured to send as
+  `tyalexandermedia.com`. The Aug 2/4 *"enable sending on dedicated domain"*
+  support threads were an attempt that **never completed**; no dedicated domain
+  exists on the account.
+- **No API tokens, no installed apps, no Make.com app.** Nothing dated, nothing
+  created on/after Aug 1. The Aug-2 token is gone, not relabeled — both token
+  lists render zero rows.
+- **Audit log ends Jul 12**, every entry actioned by Ty. Reactivation restored
+  nothing — no key, no domain, no automation.
 
-1. **DMARC enforcement (§5) is the actual fix**, not a nice-to-have — it is what
-   stops an authorised-looking sender the mailbox never touched.
-2. **Audit GHL**: what sending domains and sub-accounts are configured, and
-   confirm the Aug-2 token is dead and its replacement is scoped tight.
-3. The Gmail mailbox is not the hole, and the Google account was not breached
-   (§0c). Rotating its password (§0) matters for the *open door*, not for *this*
-   incident.
+So both platforms are cleared. What remains is the one authenticated-sender
+candidate that fits *all* the evidence: **a leaked ESP credential from the
+public `.env`, authorised in the domain's DNS.**
 
-**Whole incident, end to end:** the public repo leaked `.env` (§1) →
-credentials for the domain's GoHighLevel sending pipe were exposed → mail went
-out through GHL's authorised, DKIM-signed path → it passed because DMARC was
-`p=none`. One vector, fully explained. The fix is: rotate the leaked
-credentials, audit GHL, and enforce DMARC. Not a mailbox cleanup — there is
-nothing in the mailbox to clean.
+**SendGrid is the prime suspect.** Its keys were in the leaked `.env` (see
+§"What this does not cover"). SendGrid is an ESP that DKIM-signs mail *as your
+domain* once its DNS records are added — which is exactly what an "authenticated
+blast with valid DKIM/SPF" looks like when sent by someone holding the key, with
+the mailbox and GHL never touched. It passed because DMARC was `p=none`.
+
+**Whole incident, corrected:** the public repo leaked `.env` (§1) → it held an
+ESP key (SendGrid most likely; Brevo and Resend are also live senders) → that
+ESP was authorised in `tyalexandermedia.com`'s DNS → mail went out DKIM-signed
+through the ESP's pipe → it passed because DMARC was `p=none`. Not Gmail, not
+GHL.
+
+This moves the investigation exactly where the auditor said it would — **your
+DNS, your registrar, and the ESP's own send logs.** Priorities now:
+
+1. **Read `tyalexandermedia.com`'s SPF + DKIM records.** Every `include:` in the
+   SPF record and every DKIM selector is an ESP authorised to send as you.
+   Anything you don't actively use — SendGrid above all — is an open,
+   authenticated pipe. Remove it from DNS.
+2. **Kill SendGrid entirely** — delete the account/keys AND remove its SPF
+   `include` and DKIM CNAMEs. It is retired in code; retire its authorisation in
+   DNS too.
+3. **Check the ESP send logs for Aug 2–4** — SendGrid's Activity feed, Brevo's
+   logs. This is where the actual blast will show, if it is anywhere.
+4. **Rotate Brevo + Resend keys** — both are live, both authorised to send.
+5. **DMARC enforcement (§5) is still the backstop** — it stops an
+   authorised-looking sender regardless of which key leaked.
+
+**Two GHL housekeeping items** from the same audit, neither incident-related:
+
+- `team@sandbarsoftwash.com` is a **shared role mailbox holding ACCOUNT-ADMIN**
+  on the Sandbar sub-account — anyone with that inbox has admin there (no access
+  to the Ty Alexander Media sub-account). Decide whether Eli should hold a named
+  personal login instead. Not urgent.
+- **10 of the 13 workflows were not verified for webhook nodes** — those live
+  only on the canvas, which the audit kept closed. All 10 are Draft with 0
+  enrolled, so none can send. Fastest way to close the gap: check **Make.com's
+  execution history** for Aug 1–6 — if the scenario never fired, the GHL side is
+  moot.
+
+The GHL account was clean. Pausing it was reasonable containment, but it can
+return to normal use once those two items are handled — it was never the hole.
 
 ## 0c · OAuth apps that can send as you — triage
 
@@ -123,6 +159,8 @@ is deleted. Assume every one of these is known:
 | 4 × Google API keys | Google Cloud Console → APIs & Services → Credentials |
 | `LOLA_SECRET_ADMIN_KEY` | regenerate, set in Railway |
 | Make webhook URL | Make → the scenario → regenerate the hook |
+| **SendGrid API key** | **the prime incident suspect (§0b). Delete the key AND remove SendGrid's SPF include + DKIM from DNS — it is retired in code but may still be authorised to send as your domain.** |
+| Brevo + Resend keys | live senders; rotate and confirm each is still needed (§0b) |
 
 **Deleting the branch is cleanup, not a fix.** Rotation is the fix.
 
