@@ -38,6 +38,7 @@ const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
 const WorkPage = lazy(() => import('./WorkPage'));
+const LolaLeads = lazy(() => import('./LolaLeads'));
 
 type Route =
   | { name: 'home' }
@@ -50,6 +51,7 @@ type Route =
   | { name: 'vs-hub' }
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
+  | { name: 'lola-leads' }
   | { name: 'work' }
   | { name: 'diy' }
   | { name: 'apply' }
@@ -95,6 +97,7 @@ function parseRoute(pathname: string): Route {
   // the CDN as fetchable JS. The files stay in the repo for reference.
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'pricing' };
   if (pathname === '/managed' || pathname === '/managed/') return { name: 'pricing' };
+  if (pathname === '/lolaleads' || pathname === '/lolaleads/') return { name: 'lola-leads' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
   // /build was the old post-purchase page, and it is now a third onboarding
@@ -131,6 +134,7 @@ function canonicalPathForRoute(route: Route): string | null {
   switch (route.name) {
     case 'home': return '/';
     case 'pricing': return '/pricing';
+    case 'lola-leads': return '/lolaleads';
     case 'work': return '/work';
     // No canonical for /diy: DiyAccess sets robots:noindex (it is an access
     // page for the retired fix kit), and publishing a canonical on a page
@@ -192,7 +196,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
   const containerCls =
     route.name === 'report' || route.name === 'admin' || route.name === 'admin-hq' || route.name === 'admin-calls' || route.name === 'admin-revenue'
       ? 'max-w-[1280px] pt-8 sm:pt-12'
-      : route.name === 'home' || route.name === 'pricing' || route.name === 'work'
+      : route.name === 'home' || route.name === 'pricing' || route.name === 'work' || route.name === 'lola-leads'
       ? 'max-w-[1120px] pt-8 sm:pt-12'
       : route.name === 'growth-score'
       ? 'max-w-[820px] pt-6 sm:pt-10'
@@ -238,6 +242,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
           {route.name === 'vs' && <VsPage slug={route.slug} />}
           {route.name === 'vs-hub' && <VsHub />}
           {route.name === 'pricing' && <PricingPage />}
+          {route.name === 'lola-leads' && <LolaLeads />}
           {route.name === 'work' && <WorkPage />}
           {route.name === 'diy' && <DiyAccess />}
           {route.name === 'apply' && <ApplyPage />}
@@ -347,6 +352,7 @@ function SiteFooter({ route }: { route: Route }) {
         </div>
 
         <FooterCol title="Get found">
+          <FooterLink href="/lolaleads">Lola Leads — overview</FooterLink>
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/pricing">Pricing — $397/month</FooterLink>
           <FooterLink href="/pricing">The $397/month plan</FooterLink>

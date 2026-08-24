@@ -260,6 +260,13 @@ export const PAGE_META: Record<string, PageMeta> = {
     breadcrumb: [{ name: 'Growth Score', path: '/growth-score' }],
     faq: SCORE_QA,
   },
+  '/lolaleads': {
+    title: 'Lola Leads — Local SEO & AI Visibility, $397/mo',
+    description:
+      'Done-for-you local SEO and AI search visibility for home-service contractors. Free Growth Score, then $397/month with your website design included.',
+    path: '/lolaleads',
+    breadcrumb: [{ name: 'Lola Leads', path: '/lolaleads' }],
+  },
   '/work': {
     title: 'Local Business Websites We Built & Rank',
     description:

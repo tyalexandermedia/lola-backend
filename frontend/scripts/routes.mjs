@@ -14,6 +14,7 @@
 export const ROUTES = [
   '/',
   '/pricing',
+  '/lolaleads',
   '/work',
   '/growth-score',
   '/methodology',
