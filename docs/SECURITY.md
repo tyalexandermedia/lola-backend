@@ -259,12 +259,26 @@ in a day is the shape of a leaked credential in use. **But it could also be a
 forgotten outreach batch Ty ran himself** — Lola's own outreach sends through
 Resend. The Aug-11 recipient list is what tells those two apart.
 
-**Also flagged, unconfirmed:** Brevo security alerts on Aug 14 — two API calls
-from two IPs in one San Jose `/24` (`152.55.176.115`, `152.55.176.93`) on key
-`xkeysib-…tHw5w5`. Ty is in Dunedin. The subnet looks like a cloud-function
-region — plausibly his own Vercel deploy — but it is unverified.
+**Brevo — read directly from the mailbox, and it changes the read.** The key
+`xkeysib-…tHw5w5` was **marked inactive on Aug 5** (Brevo auto-deactivates unused
+keys), then on Aug 14/15 Brevo flagged **two API calls from never-before-seen
+IPs** in one San Jose `/24` (`152.55.176.115`, `.93`), an hour apart, on that
+same key — verbatim: *"Someone tried to use your organization account and make an
+API call with an IP address you have never used before."* A **dormant** key —
+one that sat in the leaked `.env` — poked from an unfamiliar cloud IP is the
+signature of **someone testing a leaked credential**, not Ty's own infra (which
+would have kept the key active). It was likely blunted because the key was
+already inactive, the same way Resend's 100/day cap blunted Aug 11. Confirm the
+IP against your own Vercel/Railway egress before calling it hostile — but until
+then, treat every leaked key as **in hostile hands**.
 
 ### What actually closes this
+
+The Brevo probe shows leaked keys are being *tried* by an outside party, so
+credential rotation is no longer "hygiene on your own schedule" — do it now.
+The protective limits (Resend's quota, Brevo's inactivity) appear to have
+contained the damage, but the keys are known. In order:
+
 1. **Resend → Logs → Aug 11.** Recipient domains, subjects, which key. If the
    recipients are Ty's contractor outreach list, it was a forgotten batch. If
    they're unrelated, the exposed key was abused. This is the decisive check.
