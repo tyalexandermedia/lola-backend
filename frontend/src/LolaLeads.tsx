@@ -20,6 +20,24 @@ import { useReveal } from './lib/useReveal';
 
 const START = startHref();
 
+/**
+ * Every Lola Leads sub-page, surfaced from the one door. When the homepage
+ * re-leads with Coach Ty, this is what keeps the whole product reachable in a
+ * single hop — nothing gets stranded. These pages keep their own URLs (they're
+ * what rank); /lolaleads just indexes them. /growth-score is the free check
+ * that /audit and /grader both 301 to.
+ */
+const SUBPAGES: ReadonlyArray<{ href: string; label: string; blurb: string }> = [
+  { href: '/growth-score', label: 'Free Growth Score', blurb: 'The 60-second visibility check. No call, no card.' },
+  { href: '/pricing', label: 'Pricing & what’s included', blurb: `Everything in the ${PLAN.price}${PLAN.period} plan, in full.` },
+  { href: '/work', label: 'Sites we’ve built', blurb: 'Live sites Lola designed and ranks.' },
+  { href: '/methodology', label: 'How the scoring works', blurb: 'The exact method behind the score — no black box.' },
+  { href: '/vs', label: 'Lola vs agencies & tools', blurb: 'Honest comparisons with real pricing.' },
+  { href: '/case-studies', label: 'Case studies', blurb: 'Real clients, tracked on live public dashboards.' },
+  { href: '/apply', label: 'Apply for a slot', blurb: 'One client per trade, per city.' },
+  { href: '/start', label: `Start — ${PLAN.price}${PLAN.period}`, blurb: 'One tap. No sales call required.' },
+];
+
 // One gold treatment for the primary CTAs — mirrors Homepage's GOLD_CTA so the
 // button reads identically to the rest of the site.
 const GOLD_CTA =
@@ -161,6 +179,33 @@ export default function LolaLeads() {
             </p>
           </a>
         </div>
+      </section>
+
+      {/* ── EVERYTHING UNDER LOLA LEADS (sub-page index) ───────── */}
+      <section className="reveal mt-14 sm:mt-20">
+        <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
+          Everything under Lola Leads
+        </h2>
+        <p className="mt-3 max-w-[620px] text-[15.5px] leading-[1.6] text-ink-2">
+          The whole product, one hop away. Each page keeps its own address —
+          this is just the front door to all of them.
+        </p>
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {SUBPAGES.map((p) => (
+            <li key={p.href}>
+              <a
+                href={p.href}
+                className="group flex items-start justify-between gap-3 rounded-lg border border-white/[0.08] bg-white/[0.02] px-4 py-3.5 transition-colors hover:border-gold/40 hover:bg-gold/[0.04]"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-semibold text-ink">{p.label}</span>
+                  <span className="mt-0.5 block text-[13.5px] leading-[1.45] text-ink-3">{p.blurb}</span>
+                </span>
+                <span aria-hidden className="mt-0.5 shrink-0 text-gold transition-transform group-hover:translate-x-0.5">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ── FINAL CTA ──────────────────────────────────────────── */}
