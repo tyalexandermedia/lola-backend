@@ -91,9 +91,12 @@ magnet, your creator audience is on IG, and outbound is gated. So the order is
    screen when §1 is satisfied — check both **Messenger** and **Instagram**.
 2. **Settings → Conversation AI / Channels** → confirm Instagram + Messenger now
    show "Connected."
-3. **Web chat:** Sites → Chat Widget → build → copy the embed snippet. It goes
-   on `coachtyalexander.com` (one `<script>` in the site head — a frontend task
-   in `lola-seo` if you want it site-wide; say the word and I'll wire it in).
+3. **Web chat:** the code is **already wired into the site** (`frontend/`,
+   dormant by default). Sites → Chat Widget → build/style → *Copy embed code* →
+   take the `data-widget-id` value → set it as **`VITE_GHL_CHAT_WIDGET_ID`** in
+   Vercel → redeploy. The bubble then appears site-wide and every conversation
+   lands in Conversations. No id set = no bubble, no third-party script (same
+   safe-by-default posture as the GHL webhook and Twilio). Nothing else to build.
 4. **Phone/SMS:** Settings → Phone Numbers — the LC Phone number for *this*
    sub-account. Leave workflows that auto-send **off** (guardrail §0.1).
 5. **Send one test DM** to `coachtyrellalexander` from another account and
