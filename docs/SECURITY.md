@@ -200,9 +200,11 @@ The per-message feed had already aged out — retention is **3 days, not 30** �
 the aggregate counter, which persists, is conclusive.
 
 So all three audited channels — **Gmail** (0 bounces, normal Sent), **GHL** (0
-sends, no dedicated domain), **SendGrid** (0 sends all year) — are clean. **No
-evidence of an actual authenticated send exists anywhere we have looked.** The
-exposure was real; the exploitation is not in evidence. Two possibilities remain:
+sends, no dedicated domain), **SendGrid** (0 sends all year) — are clean. When
+written, that read as "exposure but no exploitation." **It was incomplete: a
+later mailbox search found the real send in a fourth channel — Resend, on Aug 11
+(see §0e) — and the incident date had been a week off.** The two hypotheses below
+were the right fork; §0e resolves it to the second one.
 
 1. **External spoofing** — a forged `From:` with no account access, which
    `p=none` waves straight through. If so there is no pipe to find, and DMARC
@@ -229,6 +231,53 @@ that's pinned down the remediation is identical, and **none of it is urgent**
    you'll block a real sender.
 5. **Delete SendGrid account `u59341807`.** Key-less now, but a dormant account
    holding a domain-auth entry for your subdomain is liability with no upside.
+
+## 0e · Found it — Resend, Aug 11 (the incident date was a week off)
+
+The mailbox search that resolved this looked for the *alert*, not the mail — and
+the alert was never a leaked-key notice or a blocklist. It was **Resend's own
+quota warnings, dated Aug 11, 2026**:
+
+- Resend → "80% of your daily quota" → "100%" → **"200% of your daily quota of
+  100 emails — your requests won't be processed anymore"**, all on Aug 11.
+- **200+ send attempts through Resend in one day.** Real mail moved. Resend's
+  100/day cap cut it off before volume was high enough for a reputation hit —
+  which is exactly why no blocklist or Postmaster alert ever fired. The rate
+  limit protected the domain.
+
+**The date was wrong by a week, which is why every earlier search came up empty.**
+The Aug 2–4 "enable sending on dedicated domain" threads that pointed at
+GoHighLevel were Ty's own Sandbar work (an Aug 2 deliverability test, an Aug 4
+GHL ticket for `mail.sandbarsoftwash.com`) — legitimate and unrelated. That is
+why GHL and SendGrid were clean: the incident was never in that window or those
+tools.
+
+**The mechanism fits the exposure.** A Resend API key was **hardcoded in the
+`lola-seo` repo** — a bot opened PR #13 on Jul 5 to move it to an env var — and
+Resend keys were in the leaked `.env` too. An exposed Resend key plus 200 sends
+in a day is the shape of a leaked credential in use. **But it could also be a
+forgotten outreach batch Ty ran himself** — Lola's own outreach sends through
+Resend. The Aug-11 recipient list is what tells those two apart.
+
+**Also flagged, unconfirmed:** Brevo security alerts on Aug 14 — two API calls
+from two IPs in one San Jose `/24` (`152.55.176.115`, `152.55.176.93`) on key
+`xkeysib-…tHw5w5`. Ty is in Dunedin. The subnet looks like a cloud-function
+region — plausibly his own Vercel deploy — but it is unverified.
+
+### What actually closes this
+1. **Resend → Logs → Aug 11.** Recipient domains, subjects, which key. If the
+   recipients are Ty's contractor outreach list, it was a forgotten batch. If
+   they're unrelated, the exposed key was abused. This is the decisive check.
+2. **Rotate the Resend key now, either way** — it was in the repo. Coordinate:
+   regenerate in Resend → update `RESEND_API_KEY` in Railway → verify. It's a
+   live key; don't just delete it.
+3. **Check the Brevo Aug-14 IPs** against your own Vercel/Railway egress before
+   assuming hostile; rotate that Brevo key regardless (same coordinated dance).
+4. **Rotate the four Google keys regardless.** No Google alert ≠ no exposure —
+   Google only scans public GitHub. If the `.env` leaked via a build artifact,
+   preview deploy, or shared folder, Google never sees it and never emails you.
+   Silence is not clearance (§1, §1b).
+5. **Finish DMARC** — correct regardless of which way the Aug-11 log reads (§5).
 
 ## 1 · Rotate what leaked — before anything else
 
