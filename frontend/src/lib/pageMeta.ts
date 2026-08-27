@@ -260,6 +260,13 @@ export const PAGE_META: Record<string, PageMeta> = {
     breadcrumb: [{ name: 'Growth Score', path: '/growth-score' }],
     faq: SCORE_QA,
   },
+  '/about': {
+    title: 'About Coach Ty Alexander — Founder of Lola Leads',
+    description:
+      'Coach Ty Alexander — St. Pete strength coach turned local-SEO founder. He built Lola Leads to get Tampa Bay contractors found on Google and AI answers.',
+    path: '/about',
+    breadcrumb: [{ name: 'About', path: '/about' }],
+  },
   '/lolaleads': {
     title: 'Lola Leads — Local SEO & AI Visibility, $397/mo',
     description:
@@ -427,12 +434,22 @@ export function personSchema() {
     alternateName: FOUNDER.knownAs,
     jobTitle: FOUNDER.title,
     worksFor: { '@id': ORG_ID },
-    url: `${SITE_ORIGIN}/`,
+    // The entity's canonical home is the /about page, not the site root — that
+    // page is now the single, crawlable answer to "who is Coach Ty Alexander."
+    url: `${SITE_ORIGIN}/about`,
     email: FOUNDER.email,
     telephone: FOUNDER.phone,
     address: POSTAL,
-    knowsAbout: ['Local SEO', 'Google Business Profile optimization', 'AI search visibility'],
-    sameAs: ['https://www.instagram.com/tyalexandermedia'],
+    knowsAbout: [
+      'Local SEO',
+      'Google Business Profile optimization',
+      'AI search visibility',
+      'Strength and conditioning coaching',
+    ],
+    sameAs: [
+      'https://www.instagram.com/tyalexandermedia',
+      'https://www.instagram.com/coachtyrellalexander',
+    ],
   };
 }
 

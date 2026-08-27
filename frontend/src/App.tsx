@@ -39,6 +39,7 @@ const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
 const WorkPage = lazy(() => import('./WorkPage'));
 const LolaLeads = lazy(() => import('./LolaLeads'));
+const About = lazy(() => import('./About'));
 
 type Route =
   | { name: 'home' }
@@ -52,6 +53,7 @@ type Route =
   | { name: 'vs'; slug: string }
   | { name: 'pricing' }
   | { name: 'lola-leads' }
+  | { name: 'about' }
   | { name: 'work' }
   | { name: 'diy' }
   | { name: 'apply' }
@@ -98,6 +100,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'pricing' };
   if (pathname === '/managed' || pathname === '/managed/') return { name: 'pricing' };
   if (pathname === '/lolaleads' || pathname === '/lolaleads/') return { name: 'lola-leads' };
+  if (pathname === '/about' || pathname === '/about/') return { name: 'about' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
   if (pathname === '/diy' || pathname === '/diy/') return { name: 'diy' };
   // /build was the old post-purchase page, and it is now a third onboarding
@@ -135,6 +138,7 @@ function canonicalPathForRoute(route: Route): string | null {
     case 'home': return '/';
     case 'pricing': return '/pricing';
     case 'lola-leads': return '/lolaleads';
+    case 'about': return '/about';
     case 'work': return '/work';
     // No canonical for /diy: DiyAccess sets robots:noindex (it is an access
     // page for the retired fix kit), and publishing a canonical on a page
@@ -202,7 +206,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
-      : route.name === 'methodology'
+      : route.name === 'methodology' || route.name === 'about'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'lola-os'
       ? 'max-w-[1120px] pt-6 sm:pt-10'
@@ -243,6 +247,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
           {route.name === 'vs-hub' && <VsHub />}
           {route.name === 'pricing' && <PricingPage />}
           {route.name === 'lola-leads' && <LolaLeads />}
+          {route.name === 'about' && <About />}
           {route.name === 'work' && <WorkPage />}
           {route.name === 'diy' && <DiyAccess />}
           {route.name === 'apply' && <ApplyPage />}
@@ -521,6 +526,12 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
         <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
           {/* Work — desktop only, so the mobile header stays uncluttered
               (mobile reaches /work via the footer + homepage section). */}
+          <a
+            href="/about"
+            className="hidden min-h-[44px] items-center px-2.5 py-3 text-ink-2 transition hover:text-gold sm:flex sm:px-3"
+          >
+            About
+          </a>
           <a
             href="/work"
             className="hidden min-h-[44px] items-center px-2.5 py-3 text-ink-2 transition hover:text-gold sm:flex sm:px-3"
