@@ -37,6 +37,35 @@ RETAINER_PRICE = MONTHLY_PRICE  # the monthly IS the offer now — no separate r
 
 PRICE_RANGE = "$397/month"
 
+# ── The offer in Ty's words (verbatim) ────────────────────────────
+# Canonical in docs/PRICING.md ("The offer in Ty's words"); mirrored here so
+# backend copy (emails, reports, API) tells the offer in the same voice as the
+# site. The price reads from MONTHLY_PRICE so there is one source for the number.
+OFFER_FULL = (
+    f"For ${MONTHLY_PRICE}/month — about $13 a day, and one new job covers "
+    "months — I design and build your website for free (no setup fee, the thing "
+    "most shops charge $3,000+ for), then I get you found: it's written so Google "
+    "and AI tools like ChatGPT can actually read it and name you when someone asks "
+    "for a company like yours. Every month I manage your Google Business Profile so "
+    "you land in the map pack neighbors actually tap, write every fix by hand for "
+    "your trade and your town, and run the systems that turn traffic into booked "
+    "work — missed-call text-back so a lead you can't answer doesn't ring out to "
+    "the next guy, an automatic review engine, and text-and-email follow-up so "
+    "nothing goes cold while you're in the field. You watch all of it on a live "
+    "dashboard and text me, Ty, directly — never an account manager. It starts "
+    "with a free Growth Score (a 60-second scan of how you show up on Google and "
+    "in AI answers), I only take one client per trade, per city, and it's backed "
+    "by my 90-Day Promise: we pick your money keywords in week one, and if I don't "
+    "get you on page one or in the map pack within 90 days, your next two months "
+    "are free."
+)
+
+OFFER_ONE_LINER = (
+    "That's the whole offer in one breath: free website + AI visibility + Google "
+    f"Business + the follow-up systems, ${MONTHLY_PRICE}/mo, one client per market, "
+    "ranking guarantee."
+)
+
 # ── Signup counter ────────────────────────────────────────────────
 # Retained for import compatibility with main.py. Kept as a simple counter.
 FOUNDING_CAP = 10

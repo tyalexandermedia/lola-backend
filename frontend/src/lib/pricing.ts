@@ -57,6 +57,37 @@ export const PLAN: Plan = {
   cta: 'Start my monthly',
 };
 
+/**
+ * The whole offer in Coach Ty's own voice — one flowing statement. Canonical in
+ * docs/PRICING.md ("The offer in Ty's words"). Use it where the offer is told as
+ * a story rather than a bullet list (the /lolaleads front door, email). The
+ * price reads from PLAN so there is still one source of truth for the number;
+ * "$3,000+" and "$13 a day" are fixed anchors, matching the hero.
+ */
+export const OFFER_FULL =
+  `For ${PLAN.price}${PLAN.period} — about $13 a day, and one new job covers ` +
+  `months — I design and build your website for free (no setup fee, the thing ` +
+  `most shops charge $3,000+ for), then I get you found: it's written so Google ` +
+  `and AI tools like ChatGPT can actually read it and name you when someone asks ` +
+  `for a company like yours. Every month I manage your Google Business Profile so ` +
+  `you land in the map pack neighbors actually tap, write every fix by hand for ` +
+  `your trade and your town, and run the systems that turn traffic into booked ` +
+  `work — missed-call text-back so a lead you can't answer doesn't ring out to ` +
+  `the next guy, an automatic review engine, and text-and-email follow-up so ` +
+  `nothing goes cold while you're in the field. You watch all of it on a live ` +
+  `dashboard and text me, Ty, directly — never an account manager. It starts ` +
+  `with a free Growth Score (a 60-second scan of how you show up on Google and ` +
+  `in AI answers), I only take one client per trade, per city, and it's backed ` +
+  `by my 90-Day Promise: we pick your money keywords in week one, and if I don't ` +
+  `get you on page one or in the map pack within 90 days, your next two months ` +
+  `are free.`;
+
+/** The whole offer compressed to one line. Canonical in docs/PRICING.md. */
+export const OFFER_ONE_LINER =
+  `That's the whole offer in one breath: free website + AI visibility + Google ` +
+  `Business + the follow-up systems, ${PLAN.price}/mo, one client per market, ` +
+  `ranking guarantee.`;
+
 /** What happens immediately after checkout — shown next to the button. */
 export const AFTER_YOU_START: ReadonlyArray<{ step: string; detail: string }> = [
   { step: 'Checkout', detail: 'One tap — Apple Pay or card.' },

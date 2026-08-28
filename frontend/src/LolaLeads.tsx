@@ -13,7 +13,7 @@
  * nothing here is hand-authored copy that could drift from docs/PRICING.md.
  */
 
-import { PLAN, MONTHLY_AT_A_GLANCE, GUARANTEE, EXCLUSIVITY, LEAD_MAGNET } from './lib/pricing';
+import { PLAN, MONTHLY_AT_A_GLANCE, GUARANTEE, EXCLUSIVITY, LEAD_MAGNET, OFFER_FULL, OFFER_ONE_LINER } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import { usePageMeta } from './lib/seo';
 import { useReveal } from './lib/useReveal';
@@ -112,6 +112,19 @@ export default function LolaLeads() {
             See everything included →
           </a>
         </div>
+      </section>
+
+      {/* ── THE WHOLE OFFER, IN TY'S WORDS ─────────────────────── */}
+      <section className="reveal mt-14 sm:mt-20">
+        <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
+          The whole offer, straight from Ty
+        </h2>
+        <p className="mt-6 max-w-[68ch] text-[16px] leading-[1.7] text-ink-2 sm:text-[17px]">
+          {OFFER_FULL}
+        </p>
+        <p className="mt-6 max-w-[68ch] border-l-2 border-gold pl-4 text-[16px] font-semibold leading-[1.6] text-ink">
+          {OFFER_ONE_LINER}
+        </p>
       </section>
 
       {/* ── WHAT LANDS EVERY MONTH ─────────────────────────────── */}
