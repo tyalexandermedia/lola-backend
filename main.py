@@ -236,8 +236,15 @@ app.add_middleware(
 )
 
 
+from db.gsc import init_gsc_tables  # noqa: E402
+from api_clients import gsc as gsc_client  # noqa: E402
+
+
 @app.on_event("startup")
 async def startup_event():
+    # Fail loud NOW if GSC_SERVICE_ACCOUNT_JSON is set but malformed, rather than
+    # letting it surface as a confusing 500 on the first Search Console request.
+    gsc_client.validate_credentials_at_startup()
     await init_db()
     await init_leads_table()
     await init_pricing_table()
@@ -250,6 +257,7 @@ async def startup_event():
     await init_reviews_tables()
     await init_case_studies_table()
     await init_reporting_tables()
+    await init_gsc_tables()
     await init_enhancements_table()
     await init_swarm_tables()
     await init_followups_table()
@@ -264,6 +272,10 @@ async def startup_event():
 
 
 app.include_router(reviews_router)
+
+from gsc.routes import router as gsc_router  # noqa: E402
+
+app.include_router(gsc_router)
 
 from lead_gen import router as lead_gen_router  # noqa: E402
 

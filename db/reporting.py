@@ -210,6 +210,18 @@ async def get_client_by_slug(slug: str) -> Optional[dict]:
             return _hydrate_client_row(row)
 
 
+async def get_client_by_id(client_id: int) -> Optional[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM reporting_clients WHERE id = ?", (client_id,)
+        ) as cur:
+            row = await cur.fetchone()
+            if not row:
+                return None
+            return _hydrate_client_row(row)
+
+
 async def upsert_client(
     slug: str,
     client_name: str,
