@@ -166,82 +166,67 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
+          {/* RE-LED HERO (personal-brand restructure): the page leads with Ty
+              the person and branches into two doors — Grow (the business) and
+              Train (the coach). The Lola price + full offer machinery now drops
+              one screen down (VSL, offer card) and lives in full on /lolaleads,
+              so the hero stays about who you're dealing with, not the SKU. */}
           <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
-            Your next customer already searched for you.
-            <span className="mt-2 block text-gold">Did you show up?</span>
+            Hey — I'm Coach Ty.
+            <span className="mt-2 block text-gold">I do the work myself.</span>
           </h1>
 
-          {/* ONE line, not four.
-              This used to open with "Every day, customers pick a competitor from
-              a Google or AI result you never knew existed" — four lines of setup
-              that pushed the button off a phone screen, and that ProblemSection
-              already makes better two scrolls down. The headline is the punch;
-              this only has to land the promise and get out of the way. */}
-          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
-            Lola makes sure you're the one they find —{' '}
-            <span className="font-semibold text-ink">and the one they choose.</span>
+          <p className="mt-5 max-w-[540px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
+            I get Tampa Bay contractors found on Google and AI —{' '}
+            <span className="font-semibold text-ink">and I coach people who train hard.</span>{' '}
+            Two ways to work with me:
           </p>
 
-          {/* VALUE ANCHOR, not a sentence.
-              As prose, "included free ... most shops charge $3,000+" made the
-              reader do the arithmetic themselves, and most won't. Struck price
-              beside "Included" does it for them in one glance — the $397 lands
-              against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
-            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
-              <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
-              <span className="flex shrink-0 items-baseline gap-2">
-                <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
-                <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-ok">
-                  Included
-                </span>
+          {/* THE TWO DOORS. Grow is primary (gold) — it's the live business.
+              Train points at /about for now; it becomes /train once that page
+              has real content. Both are honest: the Train blurb is Ty's real
+              athletic identity (HYROX, strength & conditioning), no invented
+              programs or results. */}
+          <div className="mt-6 grid max-w-[540px] grid-cols-1 gap-3 sm:grid-cols-2">
+            <a
+              href="/lolaleads"
+              className="group flex flex-col rounded-xl border border-gold/40 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] p-4 transition-colors hover:border-gold/70"
+            >
+              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">Grow</span>
+              <span className="mt-1 text-[16px] font-bold text-ink">Get my business found</span>
+              <span className="mt-1 text-[13px] leading-[1.5] text-ink-3">
+                Lola Leads — done-for-you local SEO &amp; AI visibility. From {PLAN.price}{PLAN.period}.
               </span>
-            </div>
-            <div className="flex items-center justify-between gap-3 px-4 py-3">
-              <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
-              <span className="shrink-0 text-[17px] font-bold text-ink">
-                {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
+              <span className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-gold">
+                Explore Lola Leads
+                <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
               </span>
-            </div>
+            </a>
+            <a
+              href="/about"
+              className="group flex flex-col rounded-xl border border-white/[0.1] bg-white/[0.02] p-4 transition-colors hover:border-gold/40 hover:bg-gold/[0.04]"
+            >
+              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-3">Train</span>
+              <span className="mt-1 text-[16px] font-bold text-ink">Train with Ty</span>
+              <span className="mt-1 text-[13px] leading-[1.5] text-ink-3">
+                Hybrid athlete, HYROX, strength &amp; conditioning — the coach behind Lola.
+              </span>
+              <span className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-gold">
+                Meet Coach Ty
+                <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+              </span>
+            </a>
           </div>
-          {/* One line. The struck $3,000+ above already makes the comparison —
-              spelling it out again in two more lines was the reader doing the
-              same arithmetic twice. */}
-          <p className="mt-2.5 text-[13px] leading-[1.5] text-ink-3">
-            No setup fee. Most shops charge that up front.
-          </p>
 
-          {/* flex-wrap guards the shrink-0 buttons: at narrow desktop widths the
-              second one drops to its own row instead of overflowing the column. */}
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          {/* Cold traffic that isn't ready to pick a door still gets the free
+              lead magnet one tap away, plus the guarantee as reassurance. */}
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
             <a
               href="/growth-score"
-              className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}
+              className="inline-flex items-center gap-1 font-semibold text-ink-2 underline-offset-4 transition hover:text-gold hover:underline"
             >
-              Run my free Growth Score
-              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+              New here? Run your free 60-second Growth Score →
             </a>
-            <a
-              href={START}
-              // Hidden on mobile: the sticky bar carries "START — $397/MO"
-              // permanently at the bottom of the screen, so this rendered the
-              // same ask twice within one thumb-reach — and the lower copy was
-              // clipped by the bar duplicating it.
-              className="hidden min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-gold/35 px-5 py-3 text-[14px] font-semibold text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08] sm:inline-flex"
-            >
-              Start — {PLAN.price}{PLAN.period}
-            </a>
-          </div>
-
-          {/* "No setup fee" was here too — it now sits directly above the
-              buttons, and saying it twice in 60px of screen reads as filler. */}
-          {/* The only honest urgency here. No counter — "3 spots left in Tampa"
-              converts better and is invented, which is the exact thing this
-              business is positioned against. */}
-          <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
-            {trialLine() && <span className="text-ok">{trialLine()}</span>}
-            {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
-            <span>Free 60-second Growth Score</span>
             <span aria-hidden className="text-ink-4">/</span>
             <span className="text-gold">Ranking in 90 days or 2 months free</span>
           </p>
