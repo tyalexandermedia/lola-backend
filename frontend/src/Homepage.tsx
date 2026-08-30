@@ -166,69 +166,76 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          {/* RE-LED HERO (personal-brand restructure): the page leads with Ty
-              the person and branches into two doors — Grow (the business) and
-              Train (the coach). The Lola price + full offer machinery now drops
-              one screen down (VSL, offer card) and lives in full on /lolaleads,
-              so the hero stays about who you're dealing with, not the SKU. */}
+          {/* HERO LEADS WITH THE SERVICE. Lola / marketing is the main business;
+              Ty's coaching + athletic side is NOT a second door — it's indirect
+              proof of character (the "ethics behind the service"), surfaced as a
+              single ethos link to /about, not a competing offer. */}
           <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
-            Hey — I'm Coach Ty.
-            <span className="mt-2 block text-gold">I do the work myself.</span>
+            Your next customer already searched for you.
+            <span className="mt-2 block text-gold">Did you show up?</span>
           </h1>
 
-          <p className="mt-5 max-w-[540px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
-            I get Tampa Bay contractors found on Google and AI —{' '}
-            <span className="font-semibold text-ink">and I coach people who train hard.</span>{' '}
-            Two ways to work with me:
+          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
+            Lola makes sure you're the one they find —{' '}
+            <span className="font-semibold text-ink">and the one they choose.</span>
           </p>
 
-          {/* THE TWO DOORS. Grow is primary (gold) — it's the live business.
-              Train points at /about for now; it becomes /train once that page
-              has real content. Both are honest: the Train blurb is Ty's real
-              athletic identity (HYROX, strength & conditioning), no invented
-              programs or results. */}
-          <div className="mt-6 grid max-w-[540px] grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* VALUE ANCHOR — struck price beside "Included" does the arithmetic
+              for the reader in one glance: $397 lands against $3,000, not zero. */}
+          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
+              <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
+              <span className="flex shrink-0 items-baseline gap-2">
+                <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
+                <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-ok">
+                  Included
+                </span>
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
+              <span className="shrink-0 text-[17px] font-bold text-ink">
+                {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
+              </span>
+            </div>
+          </div>
+          <p className="mt-2.5 text-[13px] leading-[1.5] text-ink-3">
+            No setup fee. Most shops charge that up front.
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
-              href="/lolaleads"
-              className="group flex flex-col rounded-xl border border-gold/40 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] p-4 transition-colors hover:border-gold/70"
+              href="/growth-score"
+              className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}
             >
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">Grow</span>
-              <span className="mt-1 text-[16px] font-bold text-ink">Get my business found</span>
-              <span className="mt-1 text-[13px] leading-[1.5] text-ink-3">
-                Lola Leads — done-for-you local SEO &amp; AI visibility. From {PLAN.price}{PLAN.period}.
-              </span>
-              <span className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-gold">
-                Explore Lola Leads
-                <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
-              </span>
+              Run my free Growth Score
+              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
             <a
-              href="/about"
-              className="group flex flex-col rounded-xl border border-white/[0.1] bg-white/[0.02] p-4 transition-colors hover:border-gold/40 hover:bg-gold/[0.04]"
+              href={START}
+              className="hidden min-h-[56px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-gold/35 px-5 py-3 text-[14px] font-semibold text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08] sm:inline-flex"
             >
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-3">Train</span>
-              <span className="mt-1 text-[16px] font-bold text-ink">Train with Ty</span>
-              <span className="mt-1 text-[13px] leading-[1.5] text-ink-3">
-                Hybrid athlete, HYROX, strength &amp; conditioning — the coach behind Lola.
-              </span>
-              <span className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-gold">
-                Meet Coach Ty
-                <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
-              </span>
+              Start — {PLAN.price}{PLAN.period}
             </a>
           </div>
 
-          {/* Cold traffic that isn't ready to pick a door still gets the free
-              lead magnet one tap away, plus the guarantee as reassurance. */}
-          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
-            <a
-              href="/growth-score"
-              className="inline-flex items-center gap-1 font-semibold text-ink-2 underline-offset-4 transition hover:text-gold hover:underline"
-            >
-              New here? Run your free 60-second Growth Score →
-            </a>
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
+            {trialLine() && <span className="text-ok">{trialLine()}</span>}
+            {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
+            <span>Free 60-second Growth Score</span>
             <span aria-hidden className="text-ink-4">/</span>
             <span className="text-gold">Ranking in 90 days or 2 months free</span>
+          </p>
+
+          {/* Ethos, not a second offer: the discipline behind the work. Fitness
+              is character proof for the service, surfaced as one quiet link. */}
+          <p className="mt-3 text-[12.5px] text-ink-3">
+            <a
+              href="/about"
+              className="inline-flex items-center gap-1 underline-offset-4 transition hover:text-gold hover:underline"
+            >
+              Why a strength coach does your SEO — the discipline behind the work →
+            </a>
           </p>
 
           {/* PROOF ABOVE THE FOLD.
