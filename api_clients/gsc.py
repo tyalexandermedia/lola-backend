@@ -319,6 +319,28 @@ def top_pages(site_url: str, days: int = 28, row_limit: int = GSC_MAX_ROWS_PER_P
     }
 
 
+def daily_metrics(
+    site_url: str, days: int = 84, row_limit: int = GSC_MAX_ROWS_PER_PAGE
+) -> Dict[str, Any]:
+    """Per-day time series for the Growth Timeline: one row per date carrying
+    clicks / impressions / ctr / position, over a `days`-day window ending
+    GSC_LAG_DAYS ago — the same lag and no_data semantics as top_queries /
+    top_pages.
+
+    Rows come back in ascending date order so a caller can bucket them into
+    weeks without re-sorting. Zero rows is a valid "no impressions yet" state,
+    surfaced as no_data=True, never an exception.
+    """
+    start, end = default_range(days)
+    result = query(site_url, ["date"], start, end, row_limit=row_limit)
+    rows = sorted(result["rows"], key=lambda r: r.get("date", ""))
+    return {
+        "rows": rows,
+        "no_data": result["no_data"],
+        "date_range": {"start": start, "end": end, "days": days},
+    }
+
+
 def sitemaps(site_url: str) -> List[Dict[str, Any]]:
     """Submitted sitemaps: [{path, last_submitted, submitted, indexed, errors, warnings, is_pending}]."""
     resp = _execute(get_service().sitemaps().list(siteUrl=site_url))

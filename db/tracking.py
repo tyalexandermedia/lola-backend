@@ -325,6 +325,28 @@ async def recent_events(slug: str, limit: int = 50) -> List[dict]:
             return [dict(r) for r in await cur.fetchall()]
 
 
+async def leads_by_date(slug: str, start: str, end: str) -> List[dict]:
+    """Daily count of the client's own website leads over [start, end]
+    (inclusive ISO dates) — the leads series for the Growth Timeline.
+
+    A "lead" is an event_type='lead' row, exactly what the lead_gen form webhook
+    (POST /lead-gen/webhook/form) writes via log_event(slug, "lead", ...). Leads
+    associate to a client by `slug` — the same key the webhook writes under — so
+    no new column is needed. Returns [{date, count}] in ascending date order;
+    dates with zero leads are simply absent (the caller buckets into weeks).
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT date(created_at) AS d, COUNT(*) AS c
+               FROM tracked_events
+               WHERE slug = ? AND event_type = 'lead'
+                 AND date(created_at) BETWEEN ? AND ?
+               GROUP BY d ORDER BY d ASC""",
+            (slug.strip().lower(), start, end),
+        ) as cur:
+            return [{"date": r[0], "count": int(r[1] or 0)} for r in await cur.fetchall()]
+
+
 # ── Call tracking (Twilio-backed caller ID + duration) ────────────
 
 

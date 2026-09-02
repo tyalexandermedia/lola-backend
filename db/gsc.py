@@ -121,6 +121,26 @@ async def latest_snapshot(client_id: int, dimension: Optional[str] = None) -> Op
     return _hydrate(row) if row else None
 
 
+async def list_snapshots(client_id: int, dimension: str) -> List[Dict[str, Any]]:
+    """Every cached snapshot for one dimension, oldest data window first.
+
+    The Growth Timeline's query-movers diff reuses this: element [0] is the
+    earliest captured snapshot and [-1] the latest, so we can show which queries
+    climbed WITHOUT re-hitting the GSC API. Ordered by the window end date (then
+    capture time), so "earliest vs latest" is by DATA age, not by when a row
+    happened to be written.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM gsc_snapshots WHERE client_id=? AND dimension=? "
+            "ORDER BY date_range_end ASC, captured_at ASC",
+            (client_id, dimension),
+        ) as cur:
+            rows = await cur.fetchall()
+    return [_hydrate(r) for r in rows]
+
+
 async def delete_snapshots(client_id: int, dimension: Optional[str] = None) -> None:
     """Bust the cache for a client (all dimensions, or one). Used by /refresh."""
     q = "DELETE FROM gsc_snapshots WHERE client_id=?"

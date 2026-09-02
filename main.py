@@ -277,6 +277,10 @@ from gsc.routes import router as gsc_router  # noqa: E402
 
 app.include_router(gsc_router)
 
+from growth.routes import router as growth_router  # noqa: E402
+
+app.include_router(growth_router)
+
 from lead_gen import router as lead_gen_router  # noqa: E402
 
 app.include_router(lead_gen_router)
