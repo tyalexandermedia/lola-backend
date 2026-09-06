@@ -7,7 +7,7 @@ LOLA_SECRET_ADMIN_KEY), the same pattern as /api/clients/{id}/gsc/*.
   GET /api/clients/{id}/growth-timeline?weeks=12          the fused timeline
   GET /api/clients/{id}/growth-timeline?weeks=12&refresh=1  force a GSC re-pull
 
-Search visibility is served from the gsc_snapshots cache; the Google API is hit
+Search visibility is served from the gsc_client_snapshots cache; the Google API is hit
 only on a cache miss or ?refresh=1. Leads and work-done read live from their own
 stores (cheap local queries). Every response echoes the actual date range used.
 

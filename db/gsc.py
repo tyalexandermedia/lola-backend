@@ -2,8 +2,17 @@
 Lola — SQLite cache for Google Search Console pulls.
 
 GSC's quota is real and audits will hammer it, so every /queries and /pages read
-is served from gsc_snapshots. We only hit the Google API on a cache miss or an
+is served from gsc_client_snapshots. We only hit the Google API on a cache miss or an
 explicit refresh.
+
+The table is named gsc_client_snapshots, NOT gsc_snapshots, on purpose: db/
+tracking.py already owns a legacy table called gsc_snapshots (slug-keyed, one
+blob per client) that feeds the public dashboard and the reporting agent, and it
+is created lazily — so it already exists in production. Two CREATE TABLE IF NOT
+EXISTS statements for the same name silently share ONE schema (whichever ran
+first), and the loser's queries then fail with "no such column" — which crashed
+init_gsc_tables() at boot. Keeping the names distinct is what lets both caches
+coexist. Do not rename this back.
 
 Snapshots are unique on (client_id, dimension, date_range_end). Because default
 ranges always end GSC_LAG_DAYS ago, that end date is stable within a day: the
@@ -26,7 +35,7 @@ DB_PATH = os.getenv("DB_PATH", "lola.db")
 
 
 CREATE_SNAPSHOTS = """
-CREATE TABLE IF NOT EXISTS gsc_snapshots (
+CREATE TABLE IF NOT EXISTS gsc_client_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     client_id INTEGER NOT NULL,
     captured_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -39,8 +48,8 @@ CREATE TABLE IF NOT EXISTS gsc_snapshots (
 """
 
 CREATE_IDX = (
-    "CREATE INDEX IF NOT EXISTS idx_gsc_snapshots_client_dim "
-    "ON gsc_snapshots(client_id, dimension, date_range_end DESC);"
+    "CREATE INDEX IF NOT EXISTS idx_gsc_client_snapshots_client_dim "
+    "ON gsc_client_snapshots(client_id, dimension, date_range_end DESC);"
 )
 
 
@@ -77,7 +86,7 @@ async def get_snapshot(client_id: int, dimension: str, date_range_end: str) -> O
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            "SELECT * FROM gsc_snapshots WHERE client_id=? AND dimension=? AND date_range_end=?",
+            "SELECT * FROM gsc_client_snapshots WHERE client_id=? AND dimension=? AND date_range_end=?",
             (client_id, dimension, date_range_end),
         ) as cur:
             row = await cur.fetchone()
@@ -94,7 +103,7 @@ async def save_snapshot(
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """
-            INSERT INTO gsc_snapshots
+            INSERT INTO gsc_client_snapshots
               (client_id, captured_at, date_range_start, date_range_end, dimension, payload)
             VALUES (?, datetime('now'), ?, ?, ?, ?)
             ON CONFLICT(client_id, dimension, date_range_end) DO UPDATE SET
@@ -108,7 +117,7 @@ async def save_snapshot(
 
 
 async def latest_snapshot(client_id: int, dimension: Optional[str] = None) -> Optional[Dict[str, Any]]:
-    q = "SELECT * FROM gsc_snapshots WHERE client_id=?"
+    q = "SELECT * FROM gsc_client_snapshots WHERE client_id=?"
     args: List[Any] = [client_id]
     if dimension:
         q += " AND dimension=?"
@@ -133,7 +142,7 @@ async def list_snapshots(client_id: int, dimension: str) -> List[Dict[str, Any]]
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            "SELECT * FROM gsc_snapshots WHERE client_id=? AND dimension=? "
+            "SELECT * FROM gsc_client_snapshots WHERE client_id=? AND dimension=? "
             "ORDER BY date_range_end ASC, captured_at ASC",
             (client_id, dimension),
         ) as cur:
@@ -143,7 +152,7 @@ async def list_snapshots(client_id: int, dimension: str) -> List[Dict[str, Any]]
 
 async def delete_snapshots(client_id: int, dimension: Optional[str] = None) -> None:
     """Bust the cache for a client (all dimensions, or one). Used by /refresh."""
-    q = "DELETE FROM gsc_snapshots WHERE client_id=?"
+    q = "DELETE FROM gsc_client_snapshots WHERE client_id=?"
     args: List[Any] = [client_id]
     if dimension:
         q += " AND dimension=?"

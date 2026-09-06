@@ -9,7 +9,7 @@ LOLA_SECRET_ADMIN_KEY), matching the pattern used by /reviews.
   GET  /api/clients/{id}/gsc/pages?days=28   top pages (cached)
   POST /api/clients/{id}/gsc/refresh         force a re-pull, bust the cache
 
-Reads are served from gsc_snapshots; the Google API is only hit on a cache miss
+Reads are served from gsc_client_snapshots; the Google API is only hit on a cache miss
 or an explicit refresh. Every response echoes the ACTUAL date range used, so the
 frontend can show "Aug 1 - Aug 26" instead of implying live data.
 
