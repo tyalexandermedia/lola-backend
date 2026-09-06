@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { API_URL } from './api';
+import GrowthTimeline from './GrowthTimeline';
 
 const STORAGE_KEY = 'lola.adminKey';
 
@@ -16,7 +17,7 @@ interface Hq {
   leads: { total: number; hot: number; warm: number; cool: number; cold: number };
   nurture: { total: number; active: number; purchased: number; done: number };
   mctb: { texts_sent: number; clients_enabled: number };
-  clients: { active: number; list: Array<{ slug: string; name: string; site: string }> };
+  clients: { active: number; list: Array<{ id?: number; slug: string; name: string; site: string }> };
   recent_leads: Array<{
     id: string; business_name: string; city: string; total_score: number;
     grade: string; created_at: string;
@@ -60,6 +61,7 @@ export default function OwnerDashboard() {
   const [data, setData] = useState<Hq | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [openGrowth, setOpenGrowth] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!key) return;
@@ -196,12 +198,27 @@ export default function OwnerDashboard() {
             ) : (
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {data.clients.list.map((c) => (
-                  <div key={c.slug} className="flex items-center justify-between rounded-[10px] border border-white/[0.08] bg-white/[0.02] px-4 py-3">
-                    <span className="text-[14px] font-semibold text-white">{c.name || c.slug}</span>
-                    <span className="flex gap-3 text-[12px]">
-                      <a href={`/r/client/${c.slug}`} className="text-[#D4AF37] hover:underline">dashboard ↗</a>
-                      <a href={`/admin/revenue/${c.slug}`} className="text-[#9CA3AF] hover:text-[#D4AF37]">revenue</a>
-                    </span>
+                  <div key={c.slug} className="rounded-[10px] border border-white/[0.08] bg-white/[0.02]">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <span className="text-[14px] font-semibold text-white">{c.name || c.slug}</span>
+                      <span className="flex gap-3 text-[12px]">
+                        {c.id != null && (
+                          <button
+                            onClick={() => setOpenGrowth((s) => (s === c.slug ? null : c.slug))}
+                            className="text-[#9CA3AF] hover:text-[#D4AF37]"
+                          >
+                            {openGrowth === c.slug ? 'growth ▾' : 'growth ▸'}
+                          </button>
+                        )}
+                        <a href={`/r/client/${c.slug}`} className="text-[#D4AF37] hover:underline">dashboard ↗</a>
+                        <a href={`/admin/revenue/${c.slug}`} className="text-[#9CA3AF] hover:text-[#D4AF37]">revenue</a>
+                      </span>
+                    </div>
+                    {openGrowth === c.slug && c.id != null && (
+                      <div className="border-t border-white/[0.06] p-3">
+                        <GrowthTimeline clientId={c.id} clientName={c.name || c.slug} />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

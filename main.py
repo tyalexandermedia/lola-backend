@@ -1869,7 +1869,7 @@ async def admin_hq(x_admin_key: str = Header(..., alias="X-Admin-Key")):
         get_recent_leads(10),
     )
     client_list = [
-        {"slug": c.get("slug"), "name": c.get("client_name"), "site": c.get("site_url")}
+        {"id": c.get("id"), "slug": c.get("slug"), "name": c.get("client_name"), "site": c.get("site_url")}
         for c in (clients or [])
     ]
     return {
