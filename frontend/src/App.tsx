@@ -322,7 +322,11 @@ function SiteFooter({ route }: { route: Route }) {
   if (HIDE.has(route.name)) return null;
 
   return (
-    <footer className="no-print mt-12 border-t border-gold/15 bg-surface-2 pb-24 pt-12 sm:pb-12">
+    // Flush under the homepage's closing band: both are surface-2, and the
+    // default mt-12 left a strip of paper between two grey blocks — measured
+    // as a 233px void on a phone. Other routes end in a rounded card and keep
+    // the gap.
+    <footer className={`no-print ${route.name === 'home' ? 'mt-0' : 'mt-12'} border-t border-gold/15 bg-surface-2 pb-24 pt-10 sm:pb-12 sm:pt-12`}>
       <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
           {/* min-h-[44px]: measured 27px tall on a 390px viewport. */}
@@ -373,11 +377,11 @@ function SiteFooter({ route }: { route: Route }) {
         </FooterCol>
       </div>
 
-      <div className="mx-auto mt-10 max-w-[1120px] border-t border-white/[0.04] px-5 pt-6 text-center text-[11px] leading-[1.6] text-ink-4 sm:px-6">
+      {/* The copyright line only. A second line restating the offer ($397,
+          website included, "see pricing") was the fourth time the page said
+          it, one thumb-width above a sticky bar that says it permanently. */}
+      <div className="mx-auto mt-8 max-w-[1120px] border-t border-white/[0.04] px-5 pt-5 text-center text-[11px] leading-[1.6] text-ink-4 sm:px-6">
         <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
-        <p className="mt-1">
-          Get found on Google and in AI answers — $397/month, website design included. <a href="/pricing" className="text-gold underline-offset-2 hover:underline">See pricing</a>.
-        </p>
       </div>
     </footer>
   );

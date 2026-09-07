@@ -261,11 +261,12 @@ function Hero() {
           {/* The only honest urgency here. No counter — "3 spots left in Tampa"
               converts better and is invented, which is the exact thing this
               business is positioned against. */}
+          {/* "Free 60-second Growth Score" was here too — the button directly
+              above already says it, so the line is the one thing the button
+              doesn't: the promise. */}
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
             {trialLine() && <span className="text-ok">{trialLine()}</span>}
             {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
-            <span>Free 60-second Growth Score</span>
-            <span aria-hidden className="text-ink-4">/</span>
             <span className="text-gold">Ranking in 90 days or 2 months free</span>
           </p>
 
@@ -321,8 +322,10 @@ function Hero() {
         </div>
       </div>
 
-      {/* Full-bleed hairline under the hero. */}
-      <div aria-hidden className="mt-14 h-px w-full bg-gradient-to-r from-gold/40 via-white/10 to-transparent sm:mt-20" />
+      {/* Full-bleed hairline under the hero. mt-10, not the section-standard
+          mt-14: the next section brings its own mt-14, and the two stacked to
+          a 112px void on a phone — the widest gap on the page. */}
+      <div aria-hidden className="mt-10 h-px w-full bg-gradient-to-r from-gold/40 via-white/10 to-transparent sm:mt-20" />
     </section>
   );
 }
@@ -759,9 +762,8 @@ function ProofSection() {
             Sandbar Soft Wash — 15 years of great work. Almost zero Google.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
-            A real Palm Harbor business serving 20+ cities across Tampa Bay, that nobody
-            could find online. The whole rebuild is in the open — every move, timestamped,
-            for anyone to check.
+            A real Palm Harbor business serving 20+ cities across Tampa Bay that nobody
+            could find online. The whole rebuild is in the open.
           </p>
           <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-gold">
             Open the dashboard
@@ -974,12 +976,13 @@ function StorySection() {
               three more paragraphs — the brief asks for warm and credible, and
               a fourth paragraph of prose is neither. Every one is checkable or
               is a promise already published elsewhere on the site. */}
+          {/* Three chips, all about the person. A fourth ("The 90-Day
+              Promise") restated the callout line directly above it. */}
           <ul className="mt-5 flex flex-wrap gap-2">
             {[
               'Hybrid athlete · trains HYROX',
               'Faith and family first',
               'Started with my dad\u2019s crew',
-              GUARANTEE.title,
             ].map((chip) => (
               <li
                 key={chip}
@@ -1243,7 +1246,7 @@ function OfferSection() {
     // A warm gold-tinted band (the feature section's band is grey, the closing
     // one darker): the page now alternates paper / band / paper, and the one
     // section that asks for money is the one that visibly changes surface.
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-y border-gold/25 bg-gold/[0.05] py-12 sm:mt-20 sm:py-16">
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-y border-gold/25 bg-gold/[0.05] py-10 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
       <SectionHead kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
@@ -1273,10 +1276,9 @@ function OfferSection() {
         <TierCard tier={PLAN} href={START} featured />
       </div>
 
-      <p className="mt-5 text-[12px] leading-[1.6] text-ink-3">
-        Website design included · $0 setup · cancel after 3 months · {GUARANTEE.emoji}{' '}
-        {GUARANTEE.title}.
-      </p>
+      {/* A one-line footnote used to restate the card above it (website
+          included, $0 setup, cancel after 3 months, the promise) — all four
+          are lines of the card. Fourth repetition of the offer on the page. */}
       </div>
     </section>
   );
@@ -1356,14 +1358,22 @@ function FaqSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function FinalCta() {
   return (
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-black py-14 sm:mt-20 sm:py-16">
+    // bg-surface-2 (was bg-black, remapped): the footer is the same surface and
+    // sits flush beneath this on the homepage, so the two read as one closing
+    // block instead of grey / a strip of paper / grey.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-surface-2 py-12 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
         <p className="text-[11px] uppercase tracking-[0.1em] text-gold">Your next customer is searching right now</p>
         <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[48px]">
           Make sure the answer is you.
         </h2>
         <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
-          See where you stand in 60 seconds — free, no card. Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
+          See where you stand in 60 seconds — free, no card.
+          {/* Desktop only: this sentence describes the Start button, which
+              phones don't show here (the sticky bar carries it). */}
+          <span className="hidden sm:inline">
+            {' '}Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
+          </span>
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a

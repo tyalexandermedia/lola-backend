@@ -95,7 +95,10 @@ export default function FeatureShowcase() {
     // as one block gives the eye a place to rest between the letter and the
     // proof, and the white cards read as cards again instead of floating on
     // the same paper as everything else.
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen bg-surface-2 py-12 sm:mt-20 sm:py-16">
+    // py-10 on phones: a band's own padding stacks on the normal section gap,
+    // and at py-12 that made a 108px void above the label where every other
+    // section has 60. Same on the offer band.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen bg-surface-2 py-10 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
       {/* Same label as every other section head on the page (paw + a plainly
           readable label) — this was the one uppercase tag on the page. */}
@@ -107,8 +110,7 @@ export default function FeatureShowcase() {
         Everything below, every month.
       </h2>
       <p className="mt-4 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
-        One flat price. No setup fee, no add-ons, no contract. Here is exactly
-        what lands.
+        One flat price. No setup fee, no add-ons, no contract.
       </p>
 
       {/* Phones: a divided list — icon in the gutter, benefit and the one-line
