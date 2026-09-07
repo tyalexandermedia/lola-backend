@@ -225,7 +225,11 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
        working. Invisible on desktop — nothing overflows there. */
     <div className="min-h-screen scroll-smooth overflow-x-clip bg-ground text-ink">
       <Header bare={route.name === 'start'} />
-      <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
+      {/* pb-0 on the homepage: its last section is a full-bleed band that
+          runs straight into the footer (same surface), and the universal
+          pb-20 put an 80px strip of paper between two grey blocks. Every
+          other route ends in a card and keeps the padding. */}
+      <div className={`mx-auto flex flex-col px-5 ${route.name === 'home' ? 'pb-0' : 'pb-20'} sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
           {route.name === 'home' && <Homepage />}
           {route.name === 'growth-score' && <GrowthScore />}
