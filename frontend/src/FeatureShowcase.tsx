@@ -19,6 +19,7 @@
  * where a reader who wants the detailed walk-through goes deliberately.
  */
 
+import PawMark from './PawMark';
 import { PLAN } from './lib/pricing';
 
 /** What each of these systems is usually sold for ON ITS OWN. The "from"
@@ -96,10 +97,13 @@ export default function FeatureShowcase() {
     // the same paper as everything else.
     <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen bg-surface-2 py-12 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-gold">
-        What you get
-      </p>
-      <h2 className="mt-3 max-w-[720px] font-display text-[30px] font-bold leading-[1.1] tracking-[-0.02em] text-ink sm:text-[40px]">
+      {/* Same label as every other section head on the page (paw + a plainly
+          readable label) — this was the one uppercase tag on the page. */}
+      <div className="flex items-center gap-2.5">
+        <PawMark className="shrink-0 text-gold" />
+        <span className="text-[14px] font-semibold text-gold sm:text-[15px]">What you get</span>
+      </div>
+      <h2 className="mt-8 max-w-[720px] font-display text-[30px] font-bold leading-[1.1] tracking-[-0.02em] text-ink sm:text-[40px]">
         Everything below, every month.
       </h2>
       <p className="mt-4 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
@@ -117,7 +121,13 @@ export default function FeatureShowcase() {
             key={f.headline}
             className="flex gap-3.5 border-b border-black/[0.07] py-3.5 sm:block sm:rounded-xl sm:border sm:border-black/[0.08] sm:bg-surface sm:p-5 sm:transition-colors sm:hover:border-gold/30"
           >
-            <div className="w-8 shrink-0 pt-0.5 text-[24px] leading-none sm:w-auto sm:pt-0 sm:text-[26px]" aria-hidden>
+            {/* Emoji render differently on every phone; a fixed tinted disc
+                gives all seven the same footprint and weight, so the column
+                reads as a designed icon set rather than a row of stickers. */}
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/[0.10] text-[19px] leading-none sm:h-11 sm:w-11 sm:text-[21px]"
+              aria-hidden
+            >
               {f.icon}
             </div>
             <div className="min-w-0">

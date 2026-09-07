@@ -465,3 +465,10 @@ textarea::placeholder {
     background-image: none !important;
   }
 }
+
+/* ── Reading polish ─────────────────────────────────────────────────────────
+   Balanced headings (no one-word last lines) and "pretty" paragraphs (no
+   orphans) across the whole site in one rule. Progressive: browsers without
+   text-wrap support ignore it. The homepage h1 already opted in per element. */
+h1, h2, h3 { text-wrap: balance; }
+p, li, dd, summary { text-wrap: pretty; }

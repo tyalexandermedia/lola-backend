@@ -397,7 +397,10 @@ function ReportCard() {
             {/* what they type */}
             <div className="flex justify-end">
               <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
-                <p className="text-[12.5px] leading-[1.45] text-ink">
+                {/* Literal white, not text-white: the light theme remaps the
+                    text-white utility to ink, which put dark text on this
+                    blue at ~3:1. White on #3A62B8 is 5.9:1. */}
+                <p className="text-[12.5px] leading-[1.45] text-[#FFFFFF]">
                   who&apos;s the best soft wash company in Dunedin?
                 </p>
               </div>
@@ -565,17 +568,19 @@ function ProblemSection() {
           </p>
         </div>
 
-        {/* The cards do the explaining — competitor picked, on Google and in AI. */}
+        {/* The cards do the explaining — competitor picked, on Google and in AI.
+            Drawn as the surfaces themselves (a search box over a map pack; a
+            chat exchange) rather than described, for the same reason the hero
+            hook is a chat bubble: a reader recognises the shape before reading
+            a word, and on a phone this is the first thing after the letter
+            that isn't a paragraph. No invented names, ratings or counts — the
+            competitors are grey placeholder bars, which is the honest way to
+            draw "someone else". */}
         <div className="space-y-4">
-          <QueryCard
-            engine="Google"
-            query="best pressure washing company near me"
-            answer="Top 3 map results — your competitor, not you."
-          />
-          <QueryCard
-            engine="ChatGPT"
+          <SearchMock query="best pressure washing company near me" />
+          <ChatMock
             query="who should I hire to soft-wash my house in Tampa?"
-            answer={"“Based on reviews and local presence, I’d recommend…” — and it names someone else."}
+            answer="Based on reviews and local presence, I’d recommend"
           />
         </div>
       </div>
@@ -617,19 +622,94 @@ function ProblemSection() {
   );
 }
 
-function QueryCard({ engine, query, answer }: { engine: string; query: string; answer: string }) {
+/** Shared chrome for the two "what the customer sees" mocks. */
+function MockFrame({ engine, glyph, children }: { engine: string; glyph: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-white/10 bg-surface p-4 sm:p-5">
       <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
-        <span aria-hidden className="text-[11px] text-gold">⌕</span>
+        <span aria-hidden className="text-[11px] text-gold">{glyph}</span>
         <span className="text-[10px] uppercase tracking-[0.08em] text-ink-3">{engine}</span>
       </div>
-      <p className="mt-3 text-[15px] font-medium text-ink">"{query}"</p>
-      <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-ink-3">
-        <span aria-hidden className="mt-0.5 text-[#E5534B]">✗</span>
-        <span>{answer}</span>
-      </p>
+      {children}
     </div>
+  );
+}
+
+/** A Google search box over the map pack. Three grey rows stand for the
+ *  businesses that got the call; the fourth is the reader. Placeholder bars
+ *  rather than names or star counts so nothing here is a made-up statistic. */
+function SearchMock({ query }: { query: string }) {
+  return (
+    <MockFrame engine="Google" glyph="⌕">
+      <div className="mt-3 flex items-center gap-2.5 rounded-full border border-black/[0.12] bg-ground px-3.5 py-2.5">
+        <span aria-hidden className="text-[13px] text-ink-3">⌕</span>
+        {/* 12.5px at phone width so the whole query fits the pill; at 14px it
+            truncated to "…company ne…" and lost the words that matter. */}
+        <p className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink sm:text-[14px]">{query}</p>
+      </div>
+      <div className="mt-3 overflow-hidden rounded-lg border border-black/[0.08]">
+        <p className="border-b border-black/[0.06] bg-surface-2 px-3 py-1.5 text-[10px] uppercase tracking-[0.08em] text-ink-3">
+          Map results
+        </p>
+        <ol className="divide-y divide-black/[0.06]">
+          {[1, 2, 3].map((n) => (
+            <li key={n} className="flex items-center gap-3 px-3 py-2.5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-[10px] font-bold text-ink-3">
+                {n}
+              </span>
+              <span className="sr-only">A competitor</span>
+              <span className="flex-1 space-y-1.5" aria-hidden>
+                <span className="block h-2.5 w-[62%] rounded-full bg-black/[0.12]" />
+                <span className="block h-2 w-[38%] rounded-full bg-black/[0.07]" />
+              </span>
+              <span aria-hidden className="text-[10px] tracking-[0.05em] text-black/[0.18]">
+                ★★★★★
+              </span>
+            </li>
+          ))}
+          <li className="flex items-center gap-3 bg-[#FBEDEB] px-3 py-2.5">
+            <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center text-[12px] text-[#C7392F]">
+              ✗
+            </span>
+            <span className="text-[13px] font-semibold text-ink">You — not in the top 3</span>
+          </li>
+        </ol>
+      </div>
+    </MockFrame>
+  );
+}
+
+/** The same exchange as the hero hook, with the ending the reader is living
+ *  today: the assistant recommends a grey bar that isn't them. */
+function ChatMock({ query, answer }: { query: string; answer: string }) {
+  return (
+    <MockFrame engine="ChatGPT" glyph="✦">
+      <div className="mt-3 space-y-2">
+        <div className="flex justify-end">
+          <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
+            <p className="text-[13px] leading-[1.45] text-[#FFFFFF]">{query}</p>
+          </div>
+        </div>
+        <div className="flex justify-start">
+          <div className="max-w-[92%] rounded-2xl rounded-bl-sm border border-black/[0.10] bg-ground px-3.5 py-2.5">
+            <p className="text-[13px] leading-[1.5] text-ink-2">
+              <span aria-hidden className="mr-1.5 text-ok">✦</span>
+              {answer}{' '}
+              <span
+                role="img"
+                aria-label="a competitor's name"
+                className="inline-block h-2.5 w-[84px] translate-y-px rounded-full bg-black/[0.14] align-middle"
+              />
+              …
+            </p>
+          </div>
+        </div>
+      </div>
+      <p className="mt-3 flex items-start gap-2 text-[13px] leading-[1.55] text-ink-3">
+        <span aria-hidden className="mt-0.5 text-[#C7392F]">✗</span>
+        <span>And it names someone else.</span>
+      </p>
+    </MockFrame>
   );
 }
 
@@ -1153,7 +1233,11 @@ function BreakEvenRow({
    ───────────────────────────────────────────────────────────────────────── */
 function OfferSection() {
   return (
-    <section className="mt-14 sm:mt-20">
+    // A warm gold-tinted band (the feature section's band is grey, the closing
+    // one darker): the page now alternates paper / band / paper, and the one
+    // section that asks for money is the one that visibly changes surface.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-y border-gold/25 bg-gold/[0.05] py-12 sm:mt-20 sm:py-16">
+      <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
       <SectionHead kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
@@ -1162,7 +1246,7 @@ function OfferSection() {
       {/* free step */}
       <a
         href="/growth-score"
-        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-gold/[0.05] p-5 transition-colors hover:bg-gold/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-surface p-5 transition-colors hover:bg-gold/[0.06] sm:flex-row sm:items-center sm:justify-between sm:p-6"
       >
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-gold">00</span>
@@ -1186,6 +1270,7 @@ function OfferSection() {
         Website design included · $0 setup · cancel after 3 months · {GUARANTEE.emoji}{' '}
         {GUARANTEE.title}.
       </p>
+      </div>
     </section>
   );
 }
