@@ -223,7 +223,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
        oversized radial-glow elements on the hero sections. `clip` (not
        `hidden`) prevents a scroll container so the sticky header keeps
        working. Invisible on desktop — nothing overflows there. */
-    <div className="min-h-screen scroll-smooth overflow-x-clip bg-on-gold text-white">
+    <div className="min-h-screen scroll-smooth overflow-x-clip bg-ground text-ink">
       <Header bare={route.name === 'start'} />
       <div className={`mx-auto flex flex-col px-5 pb-20 sm:px-6 ${containerCls}`}>
         <Suspense fallback={<RouteFallback />}>
@@ -281,7 +281,7 @@ function BackToTop({ route }: { route: Route }) {
       type="button"
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })}
-      className="no-print fixed bottom-20 right-4 z-[55] flex h-11 w-11 items-center justify-center rounded-full border border-gold/40 bg-on-gold/90 text-gold shadow-[0_4px_16px_rgba(0,0,0,0.5)] backdrop-blur-[10px] transition hover:border-gold/70 hover:bg-gold/[0.12] sm:bottom-6"
+      className="no-print fixed bottom-20 right-4 z-[55] flex h-11 w-11 items-center justify-center rounded-full border border-gold/40 bg-surface/90 text-gold shadow-lift backdrop-blur-[10px] transition hover:border-gold/70 hover:bg-gold/[0.12] sm:bottom-6"
     >
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M12 19V5M5 12l7-7 7 7" />
@@ -322,7 +322,7 @@ function SiteFooter({ route }: { route: Route }) {
   if (HIDE.has(route.name)) return null;
 
   return (
-    <footer className="no-print mt-12 border-t border-gold/15 bg-on-gold pb-24 pt-12 sm:pb-12">
+    <footer className="no-print mt-12 border-t border-gold/15 bg-surface-2 pb-24 pt-12 sm:pb-12">
       <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
           {/* min-h-[44px]: measured 27px tall on a 390px viewport. */}
@@ -440,7 +440,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
     // most-tapped controls on the site underneath it. Falls back to the plain
     // padding everywhere the env() var resolves to 0.
     <div
-      className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-gold/30 bg-on-gold/95 px-3 pt-2.5 backdrop-blur-[14px] sm:hidden"
+      className="no-print fixed inset-x-0 bottom-0 z-50 border-t border-gold/30 bg-surface/95 px-3 pt-2.5 backdrop-blur-[14px] sm:hidden"
       style={{ paddingBottom: 'calc(0.625rem + env(safe-area-inset-bottom, 0px))' }}
     >
       <div className="mx-auto flex max-w-[640px] items-stretch gap-2">
@@ -489,7 +489,7 @@ function MobileStickyCTA({ route }: { route: Route }) {
  */
 function Header({ bare = false }: { bare?: boolean } = {}) {
   return (
-    <header className="no-print sticky top-0 z-40 border-b border-gold/20 bg-on-gold/85 backdrop-blur-[14px]">
+    <header className="no-print sticky top-0 z-40 border-b border-gold/20 bg-surface/85 backdrop-blur-[14px]">
       <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-5 sm:h-16 sm:px-6">
         {/* Logo — gold gradient wordmark + paw */}
         <a
@@ -546,7 +546,7 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
 function NotFound() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center py-32 text-center">
-      <h2 className="text-2xl font-semibold text-white">No trail here.</h2>
+      <h2 className="text-2xl font-semibold text-ink">No trail here.</h2>
       <p className="mt-3 max-w-md text-base text-ink-3">Lola couldn't find a page at this URL.</p>
       <a
         href="/"
