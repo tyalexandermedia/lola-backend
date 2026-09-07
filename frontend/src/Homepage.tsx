@@ -182,6 +182,20 @@ function Hero() {
             <span className="font-semibold text-ink">and the one they choose.</span>
           </p>
 
+          {/* MOBILE-ONLY primary CTA. Most visitors are on a phone, and with
+              the value card + note above the buttons, the free-score button
+              landed just below the first screen. Putting it directly under the
+              subhead keeps the one tap that matters inside the fold; the card
+              still follows for anyone who scrolls. Desktop keeps the original
+              order (card, then buttons) below — this is hidden there. */}
+          <a
+            href="/growth-score"
+            className={`${GOLD_CTA} mt-5 w-full px-6 py-3 sm:hidden`}
+          >
+            Run my free Growth Score
+            <span aria-hidden>→</span>
+          </a>
+
           {/* VALUE ANCHOR, not a sentence.
               As prose, "included free ... most shops charge $3,000+" made the
               reader do the arithmetic themselves, and most won't. Struck price
@@ -211,9 +225,11 @@ function Hero() {
             No setup fee. Most shops charge that up front.
           </p>
 
-          {/* flex-wrap guards the shrink-0 buttons: at narrow desktop widths the
-              second one drops to its own row instead of overflowing the column. */}
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          {/* Desktop-only now: on mobile the same free-score button already sits
+              under the subhead (above the value card), so rendering it again
+              here put the same ask twice on one phone screen. flex-wrap guards
+              the shrink-0 buttons at narrow desktop widths. */}
+          <div className="mt-6 hidden gap-3 sm:flex sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="/growth-score"
               className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}

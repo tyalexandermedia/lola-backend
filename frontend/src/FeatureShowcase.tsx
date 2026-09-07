@@ -19,6 +19,22 @@
  * where a reader who wants the detailed walk-through goes deliberately.
  */
 
+import { PLAN } from './lib/pricing';
+
+/** What each of these systems is usually sold for ON ITS OWN. The "from"
+ *  figures are typical à-la-carte prices when a shop buys them one at a time
+ *  from separate vendors — stated as floors, not precise market rates, so the
+ *  comparison stays honest. Nothing here is a Lola result or a Lola claim; it
+ *  is what the same systems cost elsewhere, so the one-number price reads as
+ *  what it is. Keep the sum in the closing line in step with these rows. */
+const ALA_CARTE: ReadonlyArray<{ label: string; price: string }> = [
+  { label: 'A website, designed and built', price: '$3,000+ one-time' },
+  { label: 'Missed-call text-back', price: 'from $500/mo' },
+  { label: 'Review automation', price: 'from $750/mo' },
+  { label: 'Lead follow-up system', price: 'from $1,500/mo' },
+  { label: 'Google Business Profile + AI visibility', price: 'included' },
+];
+
 /** Order is the argument: the two things no competitor sells lead. Each card is
  *  the plain benefit, the one reason it matters, and ONE line of how — the
  *  specific thing that gets done, in the trade's own words. The "how" lines are
@@ -49,19 +65,19 @@ const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; h
     icon: '📲',
     headline: 'Miss a call? It texts them back.',
     worth: 'Can cover the month',
-    how: "You're on a roof. The caller gets an instant text from your number, so the job doesn't go to whoever answers next.",
+    how: "You're on a roof. The caller gets a text from your number within a minute, so the job doesn't go to whoever answers next.",
   },
   {
     icon: '⭐',
     headline: 'Reviews, without you asking.',
     worth: 'What closes quotes',
-    how: 'Happy customers get asked for a Google review on their own — review count is the biggest lever in the map pack.',
+    how: 'Every completed job triggers an automatic Google review request — review count is the biggest lever in the map pack.',
   },
   {
     icon: '🔁',
     headline: 'No lead ever goes cold.',
     worth: 'Most jobs die in silence',
-    how: "Every new lead is followed up by text and email while you're in the field. Jobs are lost to silence, not price.",
+    how: "Every new lead gets a reply within a minute, then 3 follow-ups by text and email while you're in the field. Jobs are lost to silence, not price.",
   },
   {
     icon: '📊',
@@ -101,6 +117,39 @@ export default function FeatureShowcase() {
             <p className="mt-2.5 text-[14px] leading-[1.55] text-ink-3">{f.how}</p>
           </div>
         ))}
+      </div>
+
+      {/* ── The value anchor ──────────────────────────────────────────────
+          The grid says WHAT you get; this says what it is WORTH. The same
+          systems are widely sold one at a time, each on its own monthly bill —
+          so stating that beside one number is the most honest value frame
+          there is: no invented result, just what it costs elsewhere. Stacks on
+          mobile; total and price share a line where there's room. */}
+      <div className="mt-8 rounded-xl border border-gold/30 bg-surface p-5 sm:p-6">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-gold">
+          Bought one at a time
+        </p>
+        <p className="mt-2 max-w-[560px] text-[15px] leading-[1.55] text-ink-2">
+          These same systems are usually sold separately, each with its own
+          monthly bill.
+        </p>
+        <ul className="mt-4 divide-y divide-black/[0.06] text-[15px]">
+          {ALA_CARTE.map((r) => (
+            <li key={r.label} className="flex items-baseline justify-between gap-4 py-2.5">
+              <span className="text-ink-2">{r.label}</span>
+              <span className="shrink-0 font-semibold text-ink-3">{r.price}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex flex-col gap-3 border-t border-gold/25 pt-4 sm:flex-row sm:items-end sm:justify-between">
+          <p className="text-[14px] leading-[1.5] text-ink-3">
+            Bought separately:{' '}
+            <span className="font-semibold text-ink">$3,000+ up front, then $2,750+ a month.</span>
+          </p>
+          <p className="font-display text-[22px] font-bold leading-none text-ink">
+            Lola: <span className="text-gold">{PLAN.price}{PLAN.period}</span> — all of it.
+          </p>
+        </div>
       </div>
     </section>
   );
