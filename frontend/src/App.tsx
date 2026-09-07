@@ -346,17 +346,16 @@ function SiteFooter({ route }: { route: Route }) {
           </p>
         </div>
 
+        {/* One link per destination. This column had eight rows for five
+            pages — Free Growth Score twice, /pricing twice under different
+            labels, the Sandbar dashboard twice — which was three extra rows of
+            44px on every phone and read as padding. */}
         <FooterCol title="Get found">
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
           <FooterLink href="/pricing">Pricing — $397/month</FooterLink>
-          <FooterLink href="/pricing">The $397/month plan</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
-          {SHOW_SANDBAR_CASE_STUDY && (
-            <FooterLink href="/r/client/sandbar">Sandbar Soft Wash — live dashboard</FooterLink>
-          )}
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
-          <FooterLink href="/growth-score">Free Growth Score</FooterLink>
         </FooterCol>
 
         <FooterCol title="Compare">

@@ -89,7 +89,13 @@ const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; h
 
 export default function FeatureShowcase() {
   return (
-    <section className="mt-14 sm:mt-20">
+    // A full-bleed band (same trick as the closing section) on the site's
+    // second surface tone. This is the densest section on the page; framing it
+    // as one block gives the eye a place to rest between the letter and the
+    // proof, and the white cards read as cards again instead of floating on
+    // the same paper as everything else.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen bg-surface-2 py-12 sm:mt-20 sm:py-16">
+      <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
       <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-gold">
         What you get
       </p>
@@ -101,20 +107,26 @@ export default function FeatureShowcase() {
         what lands.
       </p>
 
-      <div className="mt-9 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Phones: a divided list — icon in the gutter, benefit and the one-line
+          "how" beside it — because seven boxed cards stacked into 2.8 screens
+          and the boxes were the height, not the words. Tablet and up: the
+          same seven as cards in a grid, where there is width to spend. */}
+      <div className="mt-6 grid grid-cols-1 border-t border-black/[0.07] sm:mt-9 sm:gap-4 sm:border-0 sm:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map((f) => (
           <div
             key={f.headline}
-            className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 transition-colors hover:border-gold/30"
+            className="flex gap-3.5 border-b border-black/[0.07] py-3.5 sm:block sm:rounded-xl sm:border sm:border-black/[0.08] sm:bg-surface sm:p-5 sm:transition-colors sm:hover:border-gold/30"
           >
-            <div className="text-[26px] leading-none" aria-hidden>
+            <div className="w-8 shrink-0 pt-0.5 text-[24px] leading-none sm:w-auto sm:pt-0 sm:text-[26px]" aria-hidden>
               {f.icon}
             </div>
-            <h3 className="mt-3 font-display text-[18px] font-bold leading-[1.25] text-ink">
-              {f.headline}
-            </h3>
-            <p className="mt-1.5 text-[13px] font-semibold text-gold">{f.worth}</p>
-            <p className="mt-2.5 text-[14px] leading-[1.55] text-ink-3">{f.how}</p>
+            <div className="min-w-0">
+              <h3 className="font-display text-[17px] font-bold leading-[1.25] text-ink sm:mt-3 sm:text-[18px]">
+                {f.headline}
+              </h3>
+              <p className="mt-1 text-[12.5px] font-semibold text-gold sm:mt-1.5 sm:text-[13px]">{f.worth}</p>
+              <p className="mt-1.5 text-[13.5px] leading-[1.45] text-ink-3 sm:mt-2.5 sm:text-[14px] sm:leading-[1.55]">{f.how}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -125,17 +137,19 @@ export default function FeatureShowcase() {
           so stating that beside one number is the most honest value frame
           there is: no invented result, just what it costs elsewhere. Stacks on
           mobile; total and price share a line where there's room. */}
-      <div className="mt-8 rounded-xl border border-gold/30 bg-surface p-5 sm:p-6">
+      <div className="mt-8 rounded-xl border border-gold/30 bg-surface p-4 sm:p-6">
         <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-gold">
           Bought one at a time
         </p>
-        <p className="mt-2 max-w-[560px] text-[15px] leading-[1.55] text-ink-2">
+        {/* Desktop only: on a phone the label above and the "Bought
+            separately" total below already say it, and the list is the proof. */}
+        <p className="mt-2 hidden max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:block">
           These same systems are usually sold separately, each with its own
           monthly bill.
         </p>
-        <ul className="mt-4 divide-y divide-black/[0.06] text-[15px]">
+        <ul className="mt-3 divide-y divide-black/[0.06] text-[14px] sm:mt-4 sm:text-[15px]">
           {ALA_CARTE.map((r) => (
-            <li key={r.label} className="flex items-baseline justify-between gap-4 py-2.5">
+            <li key={r.label} className="flex items-baseline justify-between gap-4 py-1.5 sm:py-2.5">
               <span className="text-ink-2">{r.label}</span>
               <span className="shrink-0 font-semibold text-ink-3">{r.price}</span>
             </li>
@@ -150,6 +164,7 @@ export default function FeatureShowcase() {
             Lola: <span className="text-gold">{PLAN.price}{PLAN.period}</span> — all of it.
           </p>
         </div>
+      </div>
       </div>
     </section>
   );
