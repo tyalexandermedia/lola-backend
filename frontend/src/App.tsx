@@ -511,8 +511,11 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
         </a>
 
         {/* Right nav — min-h-[44px] + py-3 ensures WCAG 2.5.5 touch target on mobile */}
+        {/* Plain sentence-case labels at a legible size — the previous nav was
+            12px UPPERCASE with letter-spacing, which reads as a tech product and
+            is harder to scan for the audience (busy owners on a phone). */}
         {bare ? null : (
-        <nav className="flex items-center gap-1 text-[12px] font-medium uppercase tracking-[0.1em] sm:gap-2 sm:text-[13px] sm:tracking-[0.12em]">
+        <nav className="flex items-center gap-0.5 text-[14px] font-medium sm:gap-1.5">
           {/* Work — desktop only, so the mobile header stays uncluttered
               (mobile reaches /work via the footer + homepage section). */}
           <a
@@ -529,7 +532,7 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
           </a>
           <a
             href="/pricing"
-            className="flex min-h-[44px] items-center rounded-[8px] border border-gold/40 bg-gold/[0.06] px-3 py-3 font-bold text-gold transition hover:border-gold/70 hover:bg-gold/[0.12]"
+            className="flex min-h-[44px] items-center rounded-lg border border-gold/40 bg-gold/[0.06] px-3.5 py-3 font-semibold text-gold transition hover:border-gold/70 hover:bg-gold/[0.12]"
           >
             Pricing
           </a>

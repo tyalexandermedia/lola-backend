@@ -233,6 +233,23 @@ textarea::placeholder {
 .demo-in > *:nth-child(4) { animation-delay: 0.27s; }
 .demo-in > *:nth-child(n + 5) { animation-delay: 0.34s; }
 
+/* ── Calmer by default ──────────────────────────────────────────────────────
+   The looping ambient animations (headline shimmer, drifting aurora glow, the
+   scroll-cue bounce, slow pulses, the paw "sniff") read as an AI-generated
+   landing page to the people this site is FOR: home-service and small-business
+   owners who want a clear, trustworthy local company — not a tech demo. They
+   are pinned to their resting, fully-visible state here, in ONE place, so the
+   page reads professional and still. The one-shot ENTRANCE animations
+   (fade-in, slide-up, section reveal) are kept — they settle once and stop,
+   which gives the page life without the constant motion. The @keyframes stay
+   defined above, so this whole decision reverts by deleting this block. */
+.animate-shimmer { animation: none; }
+.animate-aurora { animation: none; }
+.animate-scroll-cue { animation: none; }
+.animate-pulse-slow { animation: none; }
+.animate-sniff { animation: none; }
+.animate-bounce-slow { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   /* Kill every looping / entrance animation for users who ask for reduced
      motion. Each animation's end-state is the visible state, so disabling
