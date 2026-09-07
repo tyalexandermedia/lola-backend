@@ -19,16 +19,56 @@
  * where a reader who wants the detailed walk-through goes deliberately.
  */
 
-/** Order is the argument: the two things no competitor sells lead. Plain
- *  benefit + the one reason it matters, straight talk, no jargon. */
-const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string }> = [
-  { icon: '🤖', headline: 'Named when they ask AI.', worth: 'Nobody else does this' },
-  { icon: '🌐', headline: 'A $3,000 website, included.', worth: 'No setup fee' },
-  { icon: '📍', headline: 'First in the Google map.', worth: 'Half your local leads' },
-  { icon: '📲', headline: 'Miss a call? It texts them back.', worth: 'Can cover the month' },
-  { icon: '⭐', headline: 'Reviews, without you asking.', worth: 'What closes quotes' },
-  { icon: '🔁', headline: 'No lead ever goes cold.', worth: 'Most jobs die in silence' },
-  { icon: '📊', headline: 'Check my work any time.', worth: 'No report to wait for' },
+/** Order is the argument: the two things no competitor sells lead. Each card is
+ *  the plain benefit, the one reason it matters, and ONE line of how — the
+ *  specific thing that gets done, in the trade's own words. The "how" lines are
+ *  tightened from the canonical offer copy in lib/pricing.ts (PLAN_INCLUDED),
+ *  so the homepage can never describe a different product than /pricing sells.
+ *  That line is what separates "a list of features" from "someone who has
+ *  actually done this for a roofer". */
+const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; how: string }> = [
+  {
+    icon: '🤖',
+    headline: 'Named when they ask AI.',
+    worth: 'Nobody else does this',
+    how: "AI can only recommend a business it can actually read. Yours is written so ChatGPT, Gemini and Google's AI can — and name you.",
+  },
+  {
+    icon: '🌐',
+    headline: 'A $3,000 website, included.',
+    worth: 'No setup fee',
+    how: 'Fast, mobile-first, built around the jobs you actually want, with click-to-call and a quote form front and centre.',
+  },
+  {
+    icon: '📍',
+    headline: 'First in the Google map.',
+    worth: 'Half your local leads',
+    how: 'Right primary category, services, hours, photos and regular posts — the pin a neighbour actually taps.',
+  },
+  {
+    icon: '📲',
+    headline: 'Miss a call? It texts them back.',
+    worth: 'Can cover the month',
+    how: "You're on a roof. The caller gets an instant text from your number, so the job doesn't go to whoever answers next.",
+  },
+  {
+    icon: '⭐',
+    headline: 'Reviews, without you asking.',
+    worth: 'What closes quotes',
+    how: 'Happy customers get asked for a Google review on their own — review count is the biggest lever in the map pack.',
+  },
+  {
+    icon: '🔁',
+    headline: 'No lead ever goes cold.',
+    worth: 'Most jobs die in silence',
+    how: "Every new lead is followed up by text and email while you're in the field. Jobs are lost to silence, not price.",
+  },
+  {
+    icon: '📊',
+    headline: 'Check my work any time.',
+    worth: 'No report to wait for',
+    how: 'Calls, forms, rankings and what I shipped this month — on one page, whenever you want to look.',
+  },
 ];
 
 export default function FeatureShowcase() {
@@ -58,6 +98,7 @@ export default function FeatureShowcase() {
               {f.headline}
             </h3>
             <p className="mt-1.5 text-[13px] font-semibold text-gold">{f.worth}</p>
+            <p className="mt-2.5 text-[14px] leading-[1.55] text-ink-3">{f.how}</p>
           </div>
         ))}
       </div>

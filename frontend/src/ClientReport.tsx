@@ -1024,10 +1024,10 @@ function ShareOfVoiceCard({ sov }: { sov: ShareOfVoice }) {
  */
 function GbpCard({ g }: { g: NonNullable<DashboardPayload['gbp_performance']> }) {
   const tiles = [
-    { label: 'Calls from listing', val: g.calls, accent: '#6EE7B7' },
-    { label: 'Website clicks', val: g.website_clicks, accent: '#93C5FD' },
-    { label: 'Direction requests', val: g.direction_requests, accent: '#F4D47C' },
-    { label: 'Listing impressions', val: g.impressions, accent: '#D4AF37' },
+    { label: 'Calls from listing', val: g.calls, accent: '#15803D' },
+    { label: 'Website clicks', val: g.website_clicks, accent: '#1D4ED8' },
+    { label: 'Direction requests', val: g.direction_requests, accent: '#9B781A' },
+    { label: 'Listing impressions', val: g.impressions, accent: '#7A5F14' },
   ];
   return (
     <section className="mt-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-surface-2 via-surface-2 to-[#0A1410] p-5 sm:p-6">
@@ -1137,9 +1137,11 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
         Site health (Google PageSpeed) · {series.length} snapshot{series.length === 1 ? '' : 's'}
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        {metric('performance', 'Performance', '#6EE7B7')}
-        {metric('seo', 'SEO', '#F4D47C')}
-        {metric('accessibility', 'Accessibility', '#93C5FD')}
+        {/* Light-safe accents: the pastels were built for the dark ground and
+            fail contrast as text on white. Same hues, readable depth. */}
+        {metric('performance', 'Performance', '#15803D')}
+        {metric('seo', 'SEO', '#9B781A')}
+        {metric('accessibility', 'Accessibility', '#1D4ED8')}
       </div>
       <p className="mt-3 text-[11px] text-ink-4">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
     </section>
@@ -1163,10 +1165,10 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
   const cd = delta(g.clicks, g.clicks_prev);
   const idl = delta(g.impressions, g.impressions_prev);
   const tiles = [
-    { label: 'Clicks', val: g.clicks.toLocaleString(), d: cd, accent: '#6EE7B7' },
-    { label: 'Impressions', val: g.impressions.toLocaleString(), d: idl, accent: '#93C5FD' },
-    { label: 'CTR', val: `${g.ctr}%`, d: null, accent: '#F4D47C' },
-    { label: 'Avg position', val: g.position ? g.position.toFixed(1) : '—', d: null, accent: '#D4AF37', lowerBetter: true },
+    { label: 'Clicks', val: g.clicks.toLocaleString(), d: cd, accent: '#15803D' },
+    { label: 'Impressions', val: g.impressions.toLocaleString(), d: idl, accent: '#1D4ED8' },
+    { label: 'CTR', val: `${g.ctr}%`, d: null, accent: '#9B781A' },
+    { label: 'Avg position', val: g.position ? g.position.toFixed(1) : '—', d: null, accent: '#7A5F14', lowerBetter: true },
   ];
   return (
     <section className="mt-6 rounded-2xl border border-[#93C5FD]/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#0A1018] p-5 sm:p-6">
@@ -1265,9 +1267,9 @@ function CallQualityCard({ q }: { q: NonNullable<DashboardPayload['call_quality'
 function FunnelCard({ f }: { f: NonNullable<DashboardPayload['funnel']> }) {
   const steps = [
     { k: 'view', n: f.view, label: 'Views', accent: '#9CA3AF', rate: null as number | null },
-    { k: 'click', n: f.click, label: 'Clicks', accent: '#93C5FD', rate: f.click_rate },
-    { k: 'call', n: f.call, label: 'Calls', accent: '#6EE7B7', rate: f.call_rate },
-    { k: 'lead', n: f.lead, label: 'Leads', accent: '#F4D47C', rate: f.lead_rate },
+    { k: 'click', n: f.click, label: 'Clicks', accent: '#1D4ED8', rate: f.click_rate },
+    { k: 'call', n: f.call, label: 'Calls', accent: '#15803D', rate: f.call_rate },
+    { k: 'lead', n: f.lead, label: 'Leads', accent: '#9B781A', rate: f.lead_rate },
   ];
   return (
     <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
@@ -1340,9 +1342,9 @@ function TrackingRow({
   trends?: Record<string, { month: number; prev_month: number; delta: number; arrow: string }>;
 }) {
   const cells = [
-    { key: 'call', label: 'Calls', emoji: '📞', accent: '#6EE7B7' },
-    { key: 'lead', label: 'Leads', emoji: '📝', accent: '#F4D47C' },
-    { key: 'click', label: 'Clicks', emoji: '👆', accent: '#93C5FD' },
+    { key: 'call', label: 'Calls', emoji: '📞', accent: '#15803D' },
+    { key: 'lead', label: 'Leads', emoji: '📝', accent: '#9B781A' },
+    { key: 'click', label: 'Clicks', emoji: '👆', accent: '#1D4ED8' },
   ];
   const anyData = cells.some((c) => (tracking[c.key]?.lifetime || 0) > 0);
 

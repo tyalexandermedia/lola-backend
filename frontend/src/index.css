@@ -127,6 +127,17 @@
    any inline near-black shadow to the light-theme lift. */
 [class*="shadow-[0_"][class*="rgba(0,0,0,0.8)"],
 [class*="shadow-[0_"][class*="rgba(0,0,0,0.9)"] { box-shadow: var(--shadow-lift) !important; }
+/* The last few hardcoded light-on-dark accents the token migration didn't
+   reach (all in the client dashboard): mint stat numbers become the readable
+   green token, pale grey text becomes secondary ink. */
+[class*="text-[#6EE7B7]"] { color: rgb(var(--ok)) !important; }
+[class*="text-[#D1D5DB]"] { color: rgb(var(--ink-3)) !important; }
+[class*="border-[#6EE7B7]"] { border-color: rgb(var(--ok) / 0.45) !important; }
+/* Pastel Tailwind/brand text classes tuned for dark — readable equivalents. */
+[class*="text-[#93C5FD]"] { color: #1D4ED8 !important; }
+.text-emerald-300 { color: rgb(var(--ok)) !important; }
+.text-red-300 { color: #B91C1C !important; }
+.text-gold-bright { color: rgb(var(--gold)) !important; }
 
 html, body, #root {
   min-height: 100%;
