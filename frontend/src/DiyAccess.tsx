@@ -215,7 +215,7 @@ export default function DiyAccess() {
                       {d.n} · {d.label}
                     </p>
                     <p className="mt-1 text-[12.5px] text-ink-3">Paste into: {d.where}</p>
-                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-[10px] bg-on-gold p-4 text-[13px] leading-[1.55] text-ink-2">
+                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-[10px] bg-surface-2 p-4 text-[13px] leading-[1.55] text-ink-2">
 {d.body}
                     </pre>
                   </div>

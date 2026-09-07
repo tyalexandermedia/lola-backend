@@ -6,8 +6,15 @@
  * whether to keep reading is deciding about a person, not an argument.
  *
  * Design notes:
- *   • Editorial and asymmetric — solid black, one branded gold accent, real
- *     photos over icons. No pastel gradient blobs.
+ *   • Editorial and asymmetric — warm paper ground, ink text, one branded
+ *     gold accent, real photos over icons. No pastel gradient blobs. (The
+ *     site moved from black to light in Sept 2026; the palette lives in the
+ *     index.css tokens, never in this file.)
+ *   • Phones show each idea ONCE. Every word is in the prerendered HTML, but
+ *     below the desktop breakpoint a section hides what another section
+ *     already says (see the ReportCard, StorySection and RoiSection notes).
+ *     Measured at 390×844: 16.8 screens before that rule, ~12.6 after. Keep
+ *     it there — re-measure before adding anything above the fold.
  *   • Deliberately NOT "developer-looking": no monospace labels outside the
  *     one column of aligned digits, no "01 / 02" section numbers, no extreme
  *     letterspacing, rounded rather than hairline-sharp corners. The audience

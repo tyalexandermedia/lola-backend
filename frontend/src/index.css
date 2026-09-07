@@ -472,3 +472,15 @@ textarea::placeholder {
    text-wrap support ignore it. The homepage h1 already opted in per element. */
 h1, h2, h3 { text-wrap: balance; }
 p, li, dd, summary { text-wrap: pretty; }
+
+/* ── Light-theme coverage the first pass missed ─────────────────────────────
+   Found by a contrast scan of every prerendered route at phone width. */
+/* Row dividers: divide-white/… puts a white border between rows, which is
+   invisible on paper. Same hairline the border-white/… remap uses. */
+[class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(24, 26, 34, 0.10) !important; }
+/* Gold at 60–85% opacity was a soft label on black; on paper it lands at
+   2.3–3:1. Full-strength gold for all of them. */
+[class*="text-gold/"] { color: rgb(var(--gold)) !important; }
+/* Amber form warnings (#E5A95B) are 2.2:1 on white. */
+[class*="text-[#E5A95B]"] { color: #8A5A00 !important; }
+[class*="border-[#E5A95B]"] { border-color: #B8770A !important; }

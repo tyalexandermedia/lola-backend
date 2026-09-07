@@ -144,3 +144,29 @@ no-fabricated-proof rule on a real client with the family name on it.
 **Consequences.** Proof copy references only verifiable facts (15+ years,
 20+ cities, the live public dashboard). Claims return only with tracker
 receipts, by flipping the two flags above.
+
+## 2026-09-07 — D-015: Light theme; phones show each idea once
+
+**Decision.** The public site is light: warm paper ground, ink text, deep
+antique gold accents, defined once as tokens in `frontend/src/index.css`
+(`:root`) and never as hex in components. Below the desktop breakpoint every
+section displays each idea once — content another section already carries is
+`hidden`/`lg:block` or behind a state toggle — while every word stays in the
+prerendered HTML for search and AI crawlers. The 48 `/lp` pages are restyled
+only by an override block at the end of the generator's cascade
+(`frontend/scripts/gen_lp.py`); their URLs, schema and copy are untouched.
+
+**Why.** Dark + gold read as an AI/tech product to the audience — home-service
+and small-business owners, mostly on phones. Measured at 390×844 the homepage
+was 16.8 screens, 1,724 words and 41 tappable controls, with the same five
+things repeated three to five times; it is ~12.6 screens after the rule. A
+contrast scan of every prerendered route after the flip found dark-theme
+leftovers the central remap missed (`to-on-gold` gradients, `divide-white/`,
+`text-gold/70`, `hover:text-white`), so the rule is now written down.
+
+**Consequences.** New components use tokens (`bg-surface`, `bg-surface-2`,
+`text-ink-2`, `border-black/[0.08]`) — never `white/…` overlays, `on-gold` as a
+surface, or dark hex. `text-on-gold` is only ever text on a gold button.
+Re-measure the homepage at 390×844 before adding anything; keep it near 12
+screens. Re-run the route contrast scan after any palette change. The social
+image, `theme-color` and the web manifest are paper (`#FAF9F5`).

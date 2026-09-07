@@ -105,7 +105,7 @@ export default function LeadGenGenerator() {
                 value={businessUrl}
                 onChange={(e) => setBusinessUrl(e.target.value)}
                 required
-                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                className="w-full rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
@@ -118,7 +118,7 @@ export default function LeadGenGenerator() {
                 placeholder="e.g., Sandbar Soft Wash"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                className="w-full rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
@@ -131,7 +131,7 @@ export default function LeadGenGenerator() {
                 placeholder="e.g., roof cleaning, house washing, soft wash"
                 value={serviceType}
                 onChange={(e) => setServiceType(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                className="w-full rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
@@ -252,7 +252,7 @@ function Section({ title, content, sectionName, filename, copied, onCopy, onDown
           </button>
         </div>
       </div>
-      <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-on-gold p-4 font-mono text-[13px] leading-[1.6] text-ink">
+      <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-surface-2 p-4 font-mono text-[13px] leading-[1.6] text-ink">
         {content}
       </pre>
     </section>

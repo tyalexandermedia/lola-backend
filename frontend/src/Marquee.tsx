@@ -20,7 +20,7 @@ export default function Marquee() {
   // We render the stats list twice so the loop is seamless — when the first
   // copy scrolls fully off, the second copy is already in position.
   return (
-    <div className="group relative overflow-hidden border-y border-gold/15 bg-on-gold py-4">
+    <div className="group relative overflow-hidden border-y border-gold/15 bg-surface-2 py-4">
       <div
         className="flex w-max animate-marquee gap-8 whitespace-nowrap text-[12px] uppercase tracking-[0.18em] text-ink-2 sm:text-[13px] sm:tracking-[0.22em]"
         style={{ animationPlayState: 'running' }}

@@ -227,7 +227,7 @@ export default function RetainerPage() {
             </ul>
 
             {/* Price card — the ONLY place the price is shown */}
-            <div className="rounded-2xl border-[1.5px] border-gold/50 bg-gradient-to-br from-[#1A1408] via-surface to-on-gold p-7 text-center shadow-[0_0_28px_rgba(212,175,55,0.14)] sm:p-8">
+            <div className="rounded-2xl border-[1.5px] border-gold/50 bg-gradient-to-br from-[#1A1408] via-surface to-gold/[0.16] p-7 text-center shadow-[0_0_28px_rgba(212,175,55,0.14)] sm:p-8">
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-3">
                 The Full Build
               </p>
@@ -253,7 +253,7 @@ export default function RetainerPage() {
 
         {/* ── 3. HALF-BACK GUARANTEE (near the price) ──────────────────── */}
         <section className="mt-16 sm:mt-20">
-          <div className="relative overflow-hidden rounded-2xl border-[1.5px] border-gold/50 bg-on-gold p-7 shadow-[0_0_44px_rgba(212,175,55,0.12)] sm:p-9">
+          <div className="relative overflow-hidden rounded-2xl border-[1.5px] border-gold/50 bg-surface-2 p-7 shadow-[0_0_44px_rgba(212,175,55,0.12)] sm:p-9">
             <div
               aria-hidden
               className="pointer-events-none absolute left-1/2 top-1/4 h-[240px] w-[420px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.20)_0%,transparent_60%)] blur-2xl"
@@ -439,7 +439,7 @@ export default function RetainerPage() {
         />
 
         {/* ── 8. FINAL CTA ────────────────────────────────────────────── */}
-        <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
+        <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-gold/[0.16] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
             Last step
           </p>
@@ -487,7 +487,7 @@ export default function RetainerPage() {
       </main>
 
       {/* Sticky bottom CTA bar — mobile only */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gold/30 bg-on-gold/95 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.5)] backdrop-blur-[12px] sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gold/30 bg-ground/95 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.5)] backdrop-blur-[12px] sm:hidden">
         <a
           href={retainerHref}
           target="_blank"

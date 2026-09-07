@@ -308,7 +308,7 @@ function BuyScreen() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-10">
+      <section className="mx-auto mt-12 w-full max-w-[640px] rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-gold/[0.16] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-10">
         <h2
           className="font-display font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)' }}
