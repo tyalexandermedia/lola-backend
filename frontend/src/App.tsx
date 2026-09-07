@@ -330,8 +330,8 @@ function SiteFooter({ route }: { route: Route }) {
     // default mt-12 left a strip of paper between two grey blocks — measured
     // as a 233px void on a phone. Other routes end in a rounded card and keep
     // the gap.
-    <footer className={`no-print ${route.name === 'home' ? 'mt-0' : 'mt-12'} border-t border-gold/15 bg-surface-2 pb-24 pt-10 sm:pb-12 sm:pt-12`}>
-      <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-8 px-5 sm:grid-cols-4 sm:px-6">
+    <footer className={`no-print ${route.name === 'home' ? 'mt-0' : 'mt-12'} border-t border-gold/15 bg-surface-2 pb-24 pt-8 sm:pb-12 sm:pt-12`}>
+      <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-x-6 gap-y-6 px-5 sm:grid-cols-4 sm:gap-8 sm:px-6">
         <div className="col-span-2 sm:col-span-1">
           {/* min-h-[44px]: measured 27px tall on a 390px viewport. */}
           <a href="/" className="-mx-2 inline-flex min-h-[44px] items-center gap-2 px-2">
@@ -340,14 +340,14 @@ function SiteFooter({ route }: { route: Route }) {
               LOLA LEADS
             </span>
           </a>
-          <p className="mt-3 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
+          <p className="mt-2 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
             Done-for-you AI Leads + Local SEO for service businesses. Recommended on
             Google AND ChatGPT, Perplexity, and Gemini.
           </p>
           {/* #5A5F68 on #0A0A0B is 3.08:1 — below the 4.5:1 AA minimum for
               11px text. #8A8F98 is 6.09:1. Breaks are unconditional: hiding
               them on mobile only ran the three clauses together. */}
-          <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
+          <p className="mt-2 text-[11px] leading-[1.6] text-ink-3">
             Built and run by <span className="text-ink-2">Ty Alexander Traufield</span> — “Coach Ty.”
             <br /> Founder, Lola Leads · Ty Alexander Media
             <br /> St. Pete · serving all of Tampa Bay, FL
@@ -384,7 +384,7 @@ function SiteFooter({ route }: { route: Route }) {
       {/* The copyright line only. A second line restating the offer ($397,
           website included, "see pricing") was the fourth time the page said
           it, one thumb-width above a sticky bar that says it permanently. */}
-      <div className="mx-auto mt-8 max-w-[1120px] border-t border-white/[0.04] px-5 pt-5 text-center text-[11px] leading-[1.6] text-ink-4 sm:px-6">
+      <div className="mx-auto mt-6 max-w-[1120px] border-t border-white/[0.04] px-5 pt-4 text-center text-[11px] leading-[1.6] text-ink-4 sm:px-6">
         <p>© 2026 Ty Alexander Traufield · Ty Alexander Media · Built with Lola 🐾</p>
       </div>
     </footer>
@@ -395,7 +395,9 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
   return (
     <div>
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{title}</p>
-      <ul className="mt-3 flex flex-col gap-2">{children}</ul>
+      {/* gap-0.5 with 40px rows: the 44px rows + gap-2 read as a column of
+          loose lines on a phone; 40px is still a comfortable tap target. */}
+      <ul className="mt-1.5 flex flex-col gap-0.5">{children}</ul>
     </div>
   );
 }
@@ -410,7 +412,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
           the column heading despite the added padding. */}
       <a
         href={href}
-        className="-mx-2 inline-flex min-h-[44px] items-center px-2 text-[13px] text-ink-2 underline-offset-2 transition hover:text-gold hover:underline"
+        className="-mx-2 inline-flex min-h-[40px] items-center px-2 text-[13px] text-ink-2 underline-offset-2 transition hover:text-gold hover:underline"
       >
         {children}
       </a>

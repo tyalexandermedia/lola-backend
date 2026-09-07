@@ -128,7 +128,7 @@ export default function Homepage() {
    ───────────────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="relative pt-2 sm:pt-4">
+    <section className="relative pt-0 sm:pt-4">
       {/* Soft bloom behind the headline. The hero was flat black — correct as a
           palette, but with no imagery on a phone it read as a document rather
           than a designed page. Clipped by overflow so it can't widen the
@@ -159,7 +159,7 @@ function Hero() {
               // man and a dog at sunset rather than a face — the right warm
               // signal from the only photo that exists, but a real headshot
               // would be materially better here.
-              className="h-12 w-12 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
+              className="h-11 w-11 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
             />
             <span className="min-w-0">
               <span className="block text-[13.5px] font-semibold leading-tight text-ink">
@@ -173,7 +173,13 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
+          {/* 30px / 1.03 on phones (was 34 / 1.05) and mt-3 gaps down this
+              column. Measured against a real iPhone: Safari's chrome leaves
+              ~651pt visible, the sticky bar takes the bottom 76, and the value
+              card's price row sat under it — the first screen ended without
+              the price. The card's bottom must clear ~570px on a 390-wide
+              phone; re-measure before adding anything above it. */}
+          <h1 className="mt-3 text-balance font-display text-[30px] font-bold leading-[1.03] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
             Your next customer already searched for you.
             <span className="mt-2 block text-gold">Did you show up?</span>
           </h1>
@@ -184,7 +190,7 @@ function Hero() {
               that pushed the button off a phone screen, and that ProblemSection
               already makes better two scrolls down. The headline is the punch;
               this only has to land the promise and get out of the way. */}
-          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
+          <p className="mt-3 max-w-[520px] text-[16px] leading-[1.5] text-ink-2 sm:mt-5 sm:text-[18px]">
             Lola makes sure you're the one they find —{' '}
             <span className="font-semibold text-ink">and the one they choose.</span>
           </p>
@@ -197,7 +203,7 @@ function Hero() {
               order (card, then buttons) below — this is hidden there. */}
           <a
             href="/growth-score"
-            className={`${GOLD_CTA} mt-5 w-full px-6 py-3 sm:hidden`}
+            className={`${GOLD_CTA} mt-3 w-full px-6 py-3 sm:hidden`}
           >
             Run my free Growth Score
             <span aria-hidden>→</span>
@@ -208,8 +214,8 @@ function Hero() {
               reader do the arithmetic themselves, and most won't. Struck price
               beside "Included" does it for them in one glance — the $397 lands
               against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
-            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
+          <div className="mt-3 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-surface shadow-lift sm:mt-5">
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-2.5 sm:py-3">
               <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
@@ -218,7 +224,7 @@ function Hero() {
                 </span>
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
               <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
               <span className="shrink-0 text-[17px] font-bold text-ink">
                 {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
@@ -828,39 +834,28 @@ function StorySection() {
           letter ~660px down the page on a small phone. Desktop is unchanged:
           explicit row/column placement puts photo and résumé back in the left
           column with the letter spanning both rows on the right. */}
-      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[minmax(260px,340px)_1fr] sm:items-start sm:gap-x-14 sm:gap-y-5">
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-[minmax(240px,300px)_1fr] sm:items-start sm:gap-x-14">
         {/* Sticky on desktop. The letter is taller than the photo no matter how
             tight the copy gets, and a fixed photo left ~490px of dead black
             column beside the text — which is what read as "choppy". Sticking it
             means the portrait travels with the letter instead of abandoning it. */}
-        <figure className="order-1 sm:col-start-1 sm:row-start-1">
-          <div className="overflow-hidden rounded-xl border border-gold/25">
-            <img
-              src="/images/ty-lola-beach.jpg"
-              alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
-              loading="lazy"
-              width={600}
-              height={800}
-              // Square on phones: the 4:5 portrait at full width was 487px of
-              // sky and sand before the first line of the letter. The figures
-              // sit ~52% down the frame, so the crop stays on Ty and Lola.
-              className="aspect-square w-full object-cover [object-position:center_52%] sm:aspect-[4/5] sm:[object-position:center]"
-            />
-          </div>
-          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
-            Ty &amp; Lola · St. Pete, FL
-          </figcaption>
-        </figure>
+        {/* The full-width beach photo used to sit here. It is the same image
+            as the hero byline two screens up, and on a phone the second, larger
+            copy was a 390px square of sky before the first line of the letter
+            — redundant, and the tallest thing in the section. The signature
+            block below takes the photo's column on desktop instead, which is
+            where a signed letter puts the name anyway. If a real headshot or a
+            job-site photo arrives, this is where it goes. */}
 
 
         {/* the letter */}
-        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
+        <div className="order-2 sm:col-start-2 sm:row-start-1">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
-          <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-ink-2 sm:text-[17px]">
+          <div className="mt-5 max-w-[58ch] space-y-3.5 text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
             {/* The two halves of the dog ARE the two halves of the product, and
                 saying so is the cleanest way to explain what's software and
                 what's a person without using either word. Matches the hero
@@ -942,7 +937,7 @@ function StorySection() {
             face; and it fills the column the photo used to leave empty, which
             is what made this section read as choppy. On mobile the explicit
             order keeps the human sequence — photo, letter, then who signed it. */}
-        <div className="order-3 sm:col-start-1 sm:row-start-2 sm:-mt-1">
+        <div className="order-3 sm:sticky sm:top-24 sm:col-start-1 sm:row-start-1">
           <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
           <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-2">
             <span className="font-semibold text-ink">{FOUNDER.fullName}</span>
@@ -966,7 +961,7 @@ function StorySection() {
             href={GBP_URL || 'https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL'}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
+            className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
           >
             {GBP_URL ? '✓ Verified Google Business' : 'Find us on Google Maps'}{' '}
             <span aria-hidden>↗</span>
@@ -978,7 +973,7 @@ function StorySection() {
               is a promise already published elsewhere on the site. */}
           {/* Three chips, all about the person. A fourth ("The 90-Day
               Promise") restated the callout line directly above it. */}
-          <ul className="mt-5 flex flex-wrap gap-2">
+          <ul className="mt-3 flex flex-wrap gap-2">
             {[
               'Hybrid athlete · trains HYROX',
               'Faith and family first',
