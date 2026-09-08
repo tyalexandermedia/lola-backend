@@ -834,22 +834,38 @@ function StorySection() {
           letter ~660px down the page on a small phone. Desktop is unchanged:
           explicit row/column placement puts photo and résumé back in the left
           column with the letter spanning both rows on the right. */}
-      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-[minmax(240px,300px)_1fr] sm:items-start sm:gap-x-14">
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-[minmax(240px,300px)_1fr] sm:items-start sm:gap-x-14 sm:gap-y-5">
         {/* Sticky on desktop. The letter is taller than the photo no matter how
             tight the copy gets, and a fixed photo left ~490px of dead black
             column beside the text — which is what read as "choppy". Sticking it
             means the portrait travels with the letter instead of abandoning it. */}
-        {/* The full-width beach photo used to sit here. It is the same image
-            as the hero byline two screens up, and on a phone the second, larger
-            copy was a 390px square of sky before the first line of the letter
-            — redundant, and the tallest thing in the section. The signature
-            block below takes the photo's column on desktop instead, which is
-            where a signed letter puts the name anyway. If a real headshot or a
-            job-site photo arrives, this is where it goes. */}
 
+        {/* A real photo of Ty at work — coaching from the sideline, shirt on,
+            cap backwards — in the column a signed letter gives the portrait.
+            It replaced the beach shot, which was the same image as the hero
+            byline two screens up. Phones crop it 4:5 with the face high in the
+            frame; desktop shows the full frame, photographer's mark included.
+            The credit is in the caption at every size — the photo is used
+            with the photographer's okay, and the mark is never cropped away to
+            hide that. */}
+        <figure className="order-1 sm:col-start-1 sm:row-start-1">
+          <div className="overflow-hidden rounded-xl border border-gold/25">
+            <img
+              src="/images/ty-coaching-gym.jpg"
+              alt="Ty Alexander Traufield — Coach Ty — coaching from the sideline at a basketball gym in Florida"
+              loading="lazy"
+              width={547}
+              height={827}
+              className="aspect-[4/5] w-full object-cover [object-position:center_35%] sm:aspect-auto"
+            />
+          </div>
+          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
+            Coach Ty · Photo: Florida&apos;s Sports Coast
+          </figcaption>
+        </figure>
 
         {/* the letter */}
-        <div className="order-2 sm:col-start-2 sm:row-start-1">
+        <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
           <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
             Hey — I'm Ty.
           </h2>
@@ -937,7 +953,7 @@ function StorySection() {
             face; and it fills the column the photo used to leave empty, which
             is what made this section read as choppy. On mobile the explicit
             order keeps the human sequence — photo, letter, then who signed it. */}
-        <div className="order-3 sm:sticky sm:top-24 sm:col-start-1 sm:row-start-1">
+        <div className="order-3 sm:col-start-1 sm:row-start-2">
           <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
           <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-2">
             <span className="font-semibold text-ink">{FOUNDER.fullName}</span>
