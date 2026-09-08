@@ -115,6 +115,24 @@ details p{margin-top:14px;font-size:14px;color:#C8C0B0}
 .founding{padding:24px;border-radius:14px;border:1.5px solid rgba(212,175,55,0.55);background:linear-gradient(135deg,#1A1408,rgba(212,175,55,0.04));margin-top:24px}
 .founding .eyebrow{color:#D4AF37}
 .spots{display:inline-block;margin-top:14px;padding:8px 16px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.4);border-radius:999px;font-size:12px;font-weight:700;color:#D4AF37;letter-spacing:0.06em;text-transform:uppercase}
+/* ── Light theme ──────────────────────────────────────────────────────────
+   The main site moved to a warm light palette; these landing pages are the
+   highest-traffic entry points from Google and were still dark, so a visitor
+   got a jarring dark→light handoff on their first click. This block must stay
+   LAST in the cascade (add new rules ABOVE it) and only re-declares colours,
+   so every rule above keeps its layout, type and spacing — URLs, schema and
+   copy are untouched. */
+body{background:#FAF9F5;color:#33363D}
+a{color:#9B781A}
+.eyebrow,.founding .eyebrow,.spots,ul li::before,ul.no-arrow li::before,.pricing th,summary::after,.footer-links-h{color:#9B781A}
+h1,h2,h3,strong,summary,.pricing tr.featured td{color:#1A1B1F}
+p,.sub,ul li,details p{color:#33363D}
+.cta-secondary{background:rgba(24,26,34,0.02);color:#9B781A}
+.card,details{border-color:rgba(24,26,34,0.12);background:#FFFFFF}
+.card-gold,.founding{border-color:rgba(155,120,26,0.5);background:linear-gradient(135deg,rgba(212,175,55,0.10),#FFFFFF)}
+details[open]{border-color:rgba(155,120,26,0.4);background:rgba(24,26,34,0.03)}
+.footer{border-top-color:rgba(24,26,34,0.10);color:#747A84}
+.divider{background:rgba(24,26,34,0.10)}
 </style>"""
 
 # --------------------------------------------------------------------------- #

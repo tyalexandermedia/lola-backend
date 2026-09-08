@@ -92,7 +92,7 @@ export default function WatchExplainer({
 
       {open && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-on-gold/92 p-4 backdrop-blur-[6px] sm:p-6"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-ground/95 p-4 backdrop-blur-[6px] sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Demo video"
@@ -103,7 +103,7 @@ export default function WatchExplainer({
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close video"
-              className="absolute -top-11 right-0 flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.15] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-white"
+              className="absolute -top-11 right-0 flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.15] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-ink"
             >
               ✕
             </button>

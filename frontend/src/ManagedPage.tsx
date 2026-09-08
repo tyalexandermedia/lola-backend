@@ -149,7 +149,7 @@ export default function ManagedPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="mt-14 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
+      <section className="mt-14 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-gold/[0.16] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-16 sm:p-12">
         <h2
           className="mx-auto max-w-[600px] font-bold leading-[1.1] tracking-[-0.02em] text-white"
           style={{ fontSize: 'clamp(1.6rem, 3.6vw, 2.5rem)' }}

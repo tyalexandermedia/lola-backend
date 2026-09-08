@@ -92,7 +92,7 @@ export function Bubble({ side, children }: { side: 'them' | 'you'; children: Rea
       <div
         className={
           side === 'you'
-            ? 'max-w-[88%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3 py-2 text-[12px] leading-[1.45] text-ink'
+            ? 'max-w-[88%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3 py-2 text-[12px] leading-[1.45] text-[#FFFFFF]'
             : 'max-w-[88%] rounded-2xl rounded-bl-sm border border-white/[0.06] bg-surface-2 px-3 py-2 text-[12px] leading-[1.5] text-ink-2'
         }
       >

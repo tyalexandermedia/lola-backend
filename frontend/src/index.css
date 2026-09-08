@@ -30,27 +30,36 @@
    4.5:1, so the failure can't be reintroduced by picking the "next grey down".
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Brand */
-  --gold: 212 175 55;          /* #D4AF37 — the accent, 8.97:1 on ground */
-  --gold-bright: 244 212 124;  /* #F4D47C — gradient highlight, hover */
-  --gold-hi: 255 209 102;      /* #FFD166 — warmest stop */
+  /* ═══ LIGHT THEME ═══════════════════════════════════════════════════════
+     Flipped from the original dark palette so the site reads as a trustworthy
+     local business, not a dark-mode tech product. The values are still raw RGB
+     channels, so every `text-gold/70`, `bg-surface`, `text-ink-3` in the
+     components recomposes against light with no per-component edits. The
+     white-overlay elevation utilities the dark build leaned on are remapped to
+     dark hairlines just below (they'd vanish on a light ground). */
 
-  /* Ground and surfaces */
-  --ground: 16 17 22;          /* #101116 — body */
-  --surface: 15 15 18;         /* #0F0F12 — cards */
-  --surface-2: 17 18 26;       /* #11121A — raised */
-  --on-gold: 10 10 11;         /* #0A0A0B — text ON gold, 9.41:1 */
+  /* Brand. Gold does double duty (button fills AND text/labels), so it is a
+     deep antique gold that stays legible as bold text on the light ground while
+     the button gradient (gold → bright → gold) still reads as polished metal. */
+  --gold: 155 120 26;          /* #9B781A — deep gold, legible on light */
+  --gold-bright: 214 168 74;   /* #D6A84A — warm sheen in button gradients */
+  --gold-hi: 244 212 124;      /* #F4D47C — cream highlight */
 
-  /* Ink */
-  --ink: 236 236 239;
-  --ink-2: 197 197 200;
-  --ink-3: 156 163 175;
-  --ink-4: 124 130 140;
+  /* Ground and surfaces — warm off-white, white cards, subtle raised tint. */
+  --ground: 250 249 245;       /* #FAF9F5 — body, warm paper (not stark white) */
+  --surface: 255 255 255;      /* #FFFFFF — cards lift off the warm ground */
+  --surface-2: 243 242 236;    /* #F3F2EC — raised / tinted */
+  --on-gold: 26 20 4;          /* #1A1404 — near-black text ON gold buttons */
 
-  /* Semantic status. `ok` is the only green in the system; it was #4ADE80 in
-     35 places with no name attached to it. */
-  --ok: 74 222 128;            /* #4ADE80 — 11.5:1 on ground */
-  --gold-deep: 244 185 66;     /* #F4B942 — the warm end of gold gradients */
+  /* Ink — dark text on light, ordered by measured contrast on the ground. */
+  --ink: 26 27 31;             /* #1A1B1F — headings, ~14.6:1 */
+  --ink-2: 51 54 61;           /* #33363D — body, ~10.4:1 */
+  --ink-3: 88 93 102;          /* #585D66 — secondary, ~5.9:1 */
+  --ink-4: 116 122 132;        /* #747A84 — captions, ~4.5:1 AA floor */
+
+  /* Semantic status. */
+  --ok: 21 128 61;             /* #15803D — green, ~4.7:1 on light */
+  --gold-deep: 110 85 20;      /* #6E5514 — the deepest gold, pressed/emphasis */
 
   /* Radius scale */
   --r-sm: 8px;
@@ -58,10 +67,9 @@
   --r-lg: 16px;
   --r-xl: 24px;
 
-  /* Elevation. `lift` is the card default; `glow` is the gold CTA only —
-     used anywhere else it reads as decoration rather than emphasis. */
-  --shadow-lift: 0 24px 60px -24px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 6px 20px rgba(212, 175, 55, 0.32);
+  /* Elevation — softened for light: a diffuse grey lift, gold glow on CTAs. */
+  --shadow-lift: 0 18px 44px -20px rgba(30, 32, 44, 0.20);
+  --shadow-glow: 0 8px 22px rgba(155, 120, 26, 0.28);
 
   /* Vertical rhythm between page sections. One value, so section spacing is a
      decision made once rather than re-typed as mt-14/mt-16/mt-12 per file. */
@@ -73,9 +81,63 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+
+/* ── Dark-overlay remap for the light theme ─────────────────────────────────
+   The components were built on a dark ground, where subtle elevation is a
+   translucent WHITE film — border-white/[x] hairlines and bg-white/[x] fills,
+   ~240 of them. On the light ground those disappear, so remap the ones in use
+   to translucent BLACK here, in one place, instead of editing every component.
+   Borders become a visible hairline; fills a faint tint; chips a touch more. */
+[class*="border-white/"] { border-color: rgba(24, 26, 34, 0.12) !important; }
+.bg-white\/\[0\.01\], .bg-white\/\[0\.015\], .bg-white\/\[0\.02\], .bg-white\/\[0\.03\],
+.bg-white\/\[0\.04\], .bg-white\/\[0\.05\], .bg-white\/\[0\.06\], .bg-white\/\[0\.07\],
+.bg-white\/\[0\.08\], .bg-white\/\[0\.09\], .bg-white\/\[0\.1\], .bg-white\/\[0\.10\],
+.bg-white\/5, .bg-white\/10 {
+  background-color: rgba(24, 26, 34, 0.035) !important;
+}
+.bg-white\/\[0\.12\], .bg-white\/\[0\.15\], .bg-white\/\[0\.18\], .bg-white\/\[0\.2\],
+.bg-white\/\[0\.25\], .bg-white\/\[0\.3\], .bg-white\/12, .bg-white\/15, .bg-white\/20,
+.bg-white\/25, .bg-white\/35 {
+  background-color: rgba(24, 26, 34, 0.06) !important;
+}
+/* Bare white text was for the dark ground; on light it must be dark ink. The
+   text-on-gold buttons use text-on-gold, not text-white, so this doesn't touch
+   them. */
+.text-white { color: rgb(var(--ink)) !important; }
+
+/* Dark panels: the dark build used hardcoded near-black fills and gradients
+   (bg-[#0B0B0D], from-[#191A1F] to-[#141519], and friends) for cards, table
+   headers, device mockups and the closing CTA band. On the light theme they'd
+   be black rectangles, so flatten every VERY DARK arbitrary value (first hex
+   digit 0 or 1) to a light surface. Deliberately scoped to #0…/#1…: the blue
+   SMS bubble (#3A62B8), the gold gradients (from-gold), and any light arbitrary
+   colour (#F…) are all left alone. */
+[class*="bg-[#0"], [class*="bg-[#1"] { background-color: rgb(var(--surface)) !important; }
+[class*="from-[#0"], [class*="from-[#1"],
+[class*="via-[#0"], [class*="via-[#1"],
+[class*="to-[#0"], [class*="to-[#1"] {
+  background-image: none !important;
+  background-color: rgb(var(--surface)) !important;
+}
+.bg-black { background-color: rgb(var(--surface-2)) !important; }
+/* Heavy black drop-shadows tuned for a dark page read as dirt on white. Soften
+   any inline near-black shadow to the light-theme lift. */
+[class*="shadow-[0_"][class*="rgba(0,0,0,0.8)"],
+[class*="shadow-[0_"][class*="rgba(0,0,0,0.9)"] { box-shadow: var(--shadow-lift) !important; }
+/* The last few hardcoded light-on-dark accents the token migration didn't
+   reach (all in the client dashboard): mint stat numbers become the readable
+   green token, pale grey text becomes secondary ink. */
+[class*="text-[#6EE7B7]"] { color: rgb(var(--ok)) !important; }
+[class*="text-[#D1D5DB]"] { color: rgb(var(--ink-3)) !important; }
+[class*="border-[#6EE7B7]"] { border-color: rgb(var(--ok) / 0.45) !important; }
+/* Pastel Tailwind/brand text classes tuned for dark — readable equivalents. */
+[class*="text-[#93C5FD]"] { color: #1D4ED8 !important; }
+.text-emerald-300 { color: rgb(var(--ok)) !important; }
+.text-red-300 { color: #B91C1C !important; }
+.text-gold-bright { color: rgb(var(--gold)) !important; }
 
 html, body, #root {
   min-height: 100%;
@@ -233,6 +295,23 @@ textarea::placeholder {
 .demo-in > *:nth-child(4) { animation-delay: 0.27s; }
 .demo-in > *:nth-child(n + 5) { animation-delay: 0.34s; }
 
+/* ── Calmer by default ──────────────────────────────────────────────────────
+   The looping ambient animations (headline shimmer, drifting aurora glow, the
+   scroll-cue bounce, slow pulses, the paw "sniff") read as an AI-generated
+   landing page to the people this site is FOR: home-service and small-business
+   owners who want a clear, trustworthy local company — not a tech demo. They
+   are pinned to their resting, fully-visible state here, in ONE place, so the
+   page reads professional and still. The one-shot ENTRANCE animations
+   (fade-in, slide-up, section reveal) are kept — they settle once and stop,
+   which gives the page life without the constant motion. The @keyframes stay
+   defined above, so this whole decision reverts by deleting this block. */
+.animate-shimmer { animation: none; }
+.animate-aurora { animation: none; }
+.animate-scroll-cue { animation: none; }
+.animate-pulse-slow { animation: none; }
+.animate-sniff { animation: none; }
+.animate-bounce-slow { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   /* Kill every looping / entrance animation for users who ask for reduced
      motion. Each animation's end-state is the visible state, so disabling
@@ -386,3 +465,22 @@ textarea::placeholder {
     background-image: none !important;
   }
 }
+
+/* ── Reading polish ─────────────────────────────────────────────────────────
+   Balanced headings (no one-word last lines) and "pretty" paragraphs (no
+   orphans) across the whole site in one rule. Progressive: browsers without
+   text-wrap support ignore it. The homepage h1 already opted in per element. */
+h1, h2, h3 { text-wrap: balance; }
+p, li, dd, summary { text-wrap: pretty; }
+
+/* ── Light-theme coverage the first pass missed ─────────────────────────────
+   Found by a contrast scan of every prerendered route at phone width. */
+/* Row dividers: divide-white/… puts a white border between rows, which is
+   invisible on paper. Same hairline the border-white/… remap uses. */
+[class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(24, 26, 34, 0.10) !important; }
+/* Gold at 60–85% opacity was a soft label on black; on paper it lands at
+   2.3–3:1. Full-strength gold for all of them. */
+[class*="text-gold/"] { color: rgb(var(--gold)) !important; }
+/* Amber form warnings (#E5A95B) are 2.2:1 on white. */
+[class*="text-[#E5A95B]"] { color: #8A5A00 !important; }
+[class*="border-[#E5A95B]"] { border-color: #B8770A !important; }

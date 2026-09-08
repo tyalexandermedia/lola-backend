@@ -149,7 +149,7 @@ export default function SwarmWorkflow() {
                 value={businessUrl}
                 onChange={(e) => setBusinessUrl(e.target.value)}
                 required
-                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                className="w-full rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
@@ -162,7 +162,7 @@ export default function SwarmWorkflow() {
                 placeholder="e.g., Sandbar Soft Wash"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                className="w-full rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
 
@@ -208,7 +208,7 @@ function AdminKeyPrompt({
           value={draftKey}
           onChange={(e) => setDraftKey(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') saveKey(); }}
-          className="flex-1 rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 font-mono text-[14px] text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+          className="flex-1 rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 font-mono text-[14px] text-white placeholder-ink-4 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
         />
         <button
           onClick={saveKey}
@@ -289,7 +289,7 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {leadGen.landing_headline && (
           <div className="mb-4">
             <Label>Landing Headline</Label>
-            <p className="rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 text-[15px] font-semibold text-white">
+            <p className="rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 text-[15px] font-semibold text-white">
               {leadGen.landing_headline}
             </p>
           </div>
@@ -319,13 +319,13 @@ function ResultView({ result, onReset }: { result: WorkflowData; onReset: () => 
         {outreach.subject && (
           <div className="mb-3">
             <Label>Subject</Label>
-            <p className="rounded-[10px] border border-white/10 bg-on-gold px-4 py-3 font-mono text-[14px] text-white">{outreach.subject}</p>
+            <p className="rounded-[10px] border border-white/10 bg-surface-2 px-4 py-3 font-mono text-[14px] text-white">{outreach.subject}</p>
           </div>
         )}
         {outreach.body && (
           <div>
             <Label>Body</Label>
-            <pre className="whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-on-gold p-4 font-mono text-[13px] leading-[1.6] text-ink">
+            <pre className="whitespace-pre-wrap break-words rounded-[10px] border border-white/10 bg-surface-2 p-4 font-mono text-[13px] leading-[1.6] text-ink">
               {outreach.body}
             </pre>
           </div>
@@ -397,7 +397,7 @@ function ScorePill({ label, value }: { label: string; value?: number }) {
   const v = typeof value === 'number' ? value : null;
   const color = v === null ? '#6B7280' : v >= 75 ? '#10B981' : v >= 50 ? '#F59E0B' : '#EF4444';
   return (
-    <div className="rounded-[10px] border border-white/10 bg-on-gold px-3 py-2 text-center">
+    <div className="rounded-[10px] border border-white/10 bg-surface-2 px-3 py-2 text-center">
       <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">{label}</p>
       <p className="mt-1 text-[18px] font-bold" style={{ color }}>{v ?? '—'}</p>
     </div>

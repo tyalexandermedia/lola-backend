@@ -168,7 +168,7 @@ export default function VsHub() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-on-gold p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
+      <section className="mt-16 rounded-3xl border border-gold/40 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-gold/[0.16] p-7 text-center shadow-[0_0_44px_rgba(212,175,55,0.15)] sm:mt-20 sm:p-12">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           Faster than reading comparison pages
         </p>

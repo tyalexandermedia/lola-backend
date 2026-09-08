@@ -829,7 +829,7 @@ export function ResultsStage({
               return (
                 <li
                   key={`${title}-${i}`}
-                  className="flex items-center gap-3 rounded-[12px] border border-white/[0.06] bg-on-gold/40 p-4"
+                  className="flex items-center gap-3 rounded-[12px] border border-white/[0.06] bg-surface-2 p-4"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-[14px] font-bold text-gold">
                     #{rank}
@@ -1122,7 +1122,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
       {/* SECTION 1 — Primary CTA (biggest visual weight; fade-up on render) */}
       <section
         aria-label={`Start the ${PLAN.price}${PLAN.period} plan`}
-        className="animate-slide-up relative mt-12 overflow-hidden rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.06] to-on-gold p-7 shadow-[0_0_60px_rgba(212,175,55,0.12)] sm:p-12"
+        className="animate-slide-up relative mt-12 overflow-hidden rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.06] to-gold/[0.16] p-7 shadow-[0_0_60px_rgba(212,175,55,0.12)] sm:p-12"
       >
         <h2 className="text-[28px] font-bold leading-[1.12] text-white sm:text-[44px]">
           {headline}
@@ -1252,7 +1252,7 @@ function LeakCard({
         <div
           role="tablist"
           aria-label="Leak display mode"
-          className="inline-flex rounded-full border border-white/[0.08] bg-on-gold p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
+          className="inline-flex rounded-full border border-white/[0.08] bg-surface-2 p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
         >
           <button
             role="tab"
@@ -1427,7 +1427,7 @@ function CopyCard({
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{eyebrow}</p>
       <h4 className="mt-2 text-[16px] font-bold text-white sm:text-[17px]">{title}</h4>
       <p className="mt-1.5 text-[12px] leading-[1.55] text-ink-3">{hint}</p>
-      <pre className="mt-4 max-h-[180px] overflow-auto whitespace-pre-wrap rounded-[10px] border border-white/[0.06] bg-on-gold p-4 font-mono text-[12px] leading-[1.6] text-ink-2">
+      <pre className="mt-4 max-h-[180px] overflow-auto whitespace-pre-wrap rounded-[10px] border border-white/[0.06] bg-surface-2 p-4 font-mono text-[12px] leading-[1.6] text-ink-2">
         {body}
       </pre>
       <button
@@ -1489,7 +1489,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
 
   return (
     <>
-      <section className="mt-5 rounded-3xl border border-gold/30 bg-gradient-to-br from-[#1A1408] via-surface to-on-gold p-6 sm:p-7">
+      <section className="mt-5 rounded-3xl border border-gold/30 bg-gradient-to-br from-[#1A1408] via-surface to-gold/[0.16] p-6 sm:p-7">
         {/* THE FREE / PAID LINE.
             All four of these used to be free, pre-filled with the owner's own
             business details. That is the DIY product, given away — which left
@@ -1543,7 +1543,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           ].map((d) => (
             <div
               key={d.n}
-              className="rounded-[14px] border border-gold/20 bg-on-gold/60 p-4"
+              className="rounded-[14px] border border-gold/20 bg-surface-2 p-4"
             >
               <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">
                 {d.n} · Locked
@@ -1580,7 +1580,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
       </section>
 
       {/* Lola's Take — signed closing block */}
-      <section className="mt-5 rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.08] via-gold-deep/[0.04] to-on-gold p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+      <section className="mt-5 rounded-3xl border-2 border-gold/45 bg-gradient-to-br from-gold/[0.08] via-gold-deep/[0.04] to-gold/[0.16] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
           🦴 Lola's quick take on {audit.business_name}
         </p>
@@ -1774,7 +1774,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
   if (!payload) return null;
 
   return (
-    <section className="mt-5 rounded-3xl border-2 border-gold/40 bg-gradient-to-br from-gold/[0.06] via-surface to-on-gold p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
+    <section className="mt-5 rounded-3xl border-2 border-gold/40 bg-gradient-to-br from-gold/[0.06] via-surface to-gold/[0.16] p-6 shadow-[0_0_44px_rgba(212,175,55,0.10)] sm:p-7">
       <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
         🦴 Lola's enhanced opportunity report
       </p>
@@ -1790,7 +1790,7 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
 
       {/* Revenue leak headline */}
       {payload.revenue_leak && typeof payload.revenue_leak.monthly_dollars === 'number' && (
-        <div className="mt-6 rounded-2xl border border-gold/30 bg-on-gold p-5 sm:p-6">
+        <div className="mt-6 rounded-2xl border border-gold/30 bg-surface-2 p-5 sm:p-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">
             Revenue leak — Lola's deeper read
           </p>

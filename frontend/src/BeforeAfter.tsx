@@ -79,13 +79,15 @@ export default function BeforeAfter() {
           className="pointer-events-none absolute inset-y-0 w-[2px] bg-gold shadow-[0_0_16px_rgba(212,175,55,0.8)]"
           style={{ left: `${pos}%` }}
         >
-          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gold bg-on-gold text-[12px] text-gold">
+          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-gold bg-surface-2 text-[12px] text-gold">
             ⇄
           </span>
         </div>
 
         {/* labels */}
-        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-ink-2 backdrop-blur-sm">
+        {/* Literal white on the dark pill: text-ink-2 was dark-on-dark once the
+            light theme inverted the ink scale. */}
+        <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#FFFFFF] backdrop-blur-sm">
           Before · Wix
         </span>
         <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-ok/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-on-gold">

@@ -6,8 +6,15 @@
  * whether to keep reading is deciding about a person, not an argument.
  *
  * Design notes:
- *   • Editorial and asymmetric — solid black, one branded gold accent, real
- *     photos over icons. No pastel gradient blobs.
+ *   • Editorial and asymmetric — warm paper ground, ink text, one branded
+ *     gold accent, real photos over icons. No pastel gradient blobs. (The
+ *     site moved from black to light in Sept 2026; the palette lives in the
+ *     index.css tokens, never in this file.)
+ *   • Phones show each idea ONCE. Every word is in the prerendered HTML, but
+ *     below the desktop breakpoint a section hides what another section
+ *     already says (see the ReportCard, StorySection and RoiSection notes).
+ *     Measured at 390×844: 16.8 screens before that rule, ~12.6 after. Keep
+ *     it there — re-measure before adding anything above the fold.
  *   • Deliberately NOT "developer-looking": no monospace labels outside the
  *     one column of aligned digits, no "01 / 02" section numbers, no extreme
  *     letterspacing, rounded rather than hairline-sharp corners. The audience
@@ -121,7 +128,7 @@ export default function Homepage() {
    ───────────────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="relative pt-2 sm:pt-4">
+    <section className="relative pt-0 sm:pt-4">
       {/* Soft bloom behind the headline. The hero was flat black — correct as a
           palette, but with no imagery on a phone it read as a document rather
           than a designed page. Clipped by overflow so it can't widen the
@@ -152,7 +159,7 @@ function Hero() {
               // man and a dog at sunset rather than a face — the right warm
               // signal from the only photo that exists, but a real headshot
               // would be materially better here.
-              className="h-12 w-12 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
+              className="h-11 w-11 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
             />
             <span className="min-w-0">
               <span className="block text-[13.5px] font-semibold leading-tight text-ink">
@@ -166,7 +173,13 @@ function Hero() {
 
           {/* text-balance stops the last line orphaning a word ("up?") when the
               display face falls back to a wider system font. */}
-          <h1 className="mt-5 text-balance font-display text-[34px] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
+          {/* 30px / 1.03 on phones (was 34 / 1.05) and mt-3 gaps down this
+              column. Measured against a real iPhone: Safari's chrome leaves
+              ~651pt visible, the sticky bar takes the bottom 76, and the value
+              card's price row sat under it — the first screen ended without
+              the price. The card's bottom must clear ~570px on a 390-wide
+              phone; re-measure before adding anything above it. */}
+          <h1 className="mt-3 text-balance font-display text-[30px] font-bold leading-[1.03] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
             Your next customer already searched for you.
             <span className="mt-2 block text-gold">Did you show up?</span>
           </h1>
@@ -177,18 +190,32 @@ function Hero() {
               that pushed the button off a phone screen, and that ProblemSection
               already makes better two scrolls down. The headline is the punch;
               this only has to land the promise and get out of the way. */}
-          <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
+          <p className="mt-3 max-w-[520px] text-[16px] leading-[1.5] text-ink-2 sm:mt-5 sm:text-[18px]">
             Lola makes sure you're the one they find —{' '}
             <span className="font-semibold text-ink">and the one they choose.</span>
           </p>
+
+          {/* MOBILE-ONLY primary CTA. Most visitors are on a phone, and with
+              the value card + note above the buttons, the free-score button
+              landed just below the first screen. Putting it directly under the
+              subhead keeps the one tap that matters inside the fold; the card
+              still follows for anyone who scrolls. Desktop keeps the original
+              order (card, then buttons) below — this is hidden there. */}
+          <a
+            href="/growth-score"
+            className={`${GOLD_CTA} mt-3 w-full px-6 py-3 sm:hidden`}
+          >
+            Run my free Growth Score
+            <span aria-hidden>→</span>
+          </a>
 
           {/* VALUE ANCHOR, not a sentence.
               As prose, "included free ... most shops charge $3,000+" made the
               reader do the arithmetic themselves, and most won't. Struck price
               beside "Included" does it for them in one glance — the $397 lands
               against $3,000, not against nothing. Same claim, no new promises. */}
-          <div className="mt-5 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-gradient-to-b from-[#16161A] to-[#0B0B0D] shadow-[0_14px_40px_-18px_rgba(0,0,0,0.9)]">
-            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3">
+          <div className="mt-3 max-w-[440px] overflow-hidden rounded-xl border border-gold/30 bg-surface shadow-lift sm:mt-5">
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-2.5 sm:py-3">
               <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
@@ -197,7 +224,7 @@ function Hero() {
                 </span>
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
               <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
               <span className="shrink-0 text-[17px] font-bold text-ink">
                 {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
@@ -211,9 +238,11 @@ function Hero() {
             No setup fee. Most shops charge that up front.
           </p>
 
-          {/* flex-wrap guards the shrink-0 buttons: at narrow desktop widths the
-              second one drops to its own row instead of overflowing the column. */}
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          {/* Desktop-only now: on mobile the same free-score button already sits
+              under the subhead (above the value card), so rendering it again
+              here put the same ask twice on one phone screen. flex-wrap guards
+              the shrink-0 buttons at narrow desktop widths. */}
+          <div className="mt-6 hidden gap-3 sm:flex sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="/growth-score"
               className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}
@@ -238,11 +267,12 @@ function Hero() {
           {/* The only honest urgency here. No counter — "3 spots left in Tampa"
               converts better and is invented, which is the exact thing this
               business is positioned against. */}
+          {/* "Free 60-second Growth Score" was here too — the button directly
+              above already says it, so the line is the one thing the button
+              doesn't: the promise. */}
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
             {trialLine() && <span className="text-ok">{trialLine()}</span>}
             {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
-            <span>Free 60-second Growth Score</span>
-            <span aria-hidden className="text-ink-4">/</span>
             <span className="text-gold">Ranking in 90 days or 2 months free</span>
           </p>
 
@@ -256,7 +286,9 @@ function Hero() {
           <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.07] pt-5 text-[12.5px] text-ink-3">
             <a
               href="/r/client/sandbar"
-              className="inline-flex items-center gap-1.5 underline decoration-white/20 underline-offset-4 transition hover:text-gold hover:decoration-gold"
+              // min-h-[44px]: measured 20px tall on a 390px viewport — a
+              // text-size link is not a tap target.
+              className="inline-flex min-h-[44px] items-center gap-1.5 underline decoration-white/20 underline-offset-4 transition hover:text-gold hover:decoration-gold"
             >
               <span aria-hidden className="text-ok">●</span>
               See a real client's dashboard — no login
@@ -279,7 +311,7 @@ function Hero() {
                 Only the tail is underlined; the whole chip is the target. */}
             <a
               href={`sms:${FOUNDER.phone}?&body=${encodeURIComponent('Hi Ty — quick question about Lola.')}`}
-              className="group inline-flex items-center gap-1.5 py-0.5 transition hover:text-gold"
+              className="group inline-flex min-h-[44px] items-center gap-1.5 py-0.5 transition hover:text-gold"
             >
               <span aria-hidden className="text-ok">✓</span>
               Lola watches 24/7. Ty does the work.{' '}
@@ -296,8 +328,10 @@ function Hero() {
         </div>
       </div>
 
-      {/* Full-bleed hairline under the hero. */}
-      <div aria-hidden className="mt-14 h-px w-full bg-gradient-to-r from-gold/40 via-white/10 to-transparent sm:mt-20" />
+      {/* Full-bleed hairline under the hero. mt-10, not the section-standard
+          mt-14: the next section brings its own mt-14, and the two stacked to
+          a 112px void on a phone — the widest gap on the page. */}
+      <div aria-hidden className="mt-10 h-px w-full bg-gradient-to-r from-gold/40 via-white/10 to-transparent sm:mt-20" />
     </section>
   );
 }
@@ -325,9 +359,18 @@ function ReportCard() {
   // silently drop missed-call text-back off the card entirely.
 
   return (
-    <figure className="relative overflow-hidden rounded-xl border border-gold/25 bg-gradient-to-b from-[#191A1F] to-[#141519] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+    // PHONES SEE ONLY THE HOOK. Below the desktop breakpoint this card stacks
+    // under the hero copy, and everything in it after the AI-answer panel is
+    // said again further down the same page: the checklist is the feature
+    // grid, the website row is the value card, the score bars are the proof
+    // section, and both buttons live in the sticky bar. On a phone that made
+    // the hero alone 2.4 screens tall before the letter even started. The
+    // AI answer is the one visual nothing else on the page shows, so it stays;
+    // the rest is desktop-only, where the card sits beside the copy and has
+    // the room to be a full report. All of it is still in the prerendered HTML.
+    <figure className="relative overflow-hidden lg:rounded-xl lg:border lg:border-gold/25 lg:bg-surface lg:shadow-lift">
       {/* header band — names the offer and the price, not a product feature */}
-      <div className="flex items-center justify-between border-b border-white/10 bg-surface-2 px-5 py-3">
+      <div className="hidden items-center justify-between border-b border-white/10 bg-surface-2 px-5 py-3 lg:flex">
         <span className="text-[10px] uppercase tracking-[0.08em] text-gold">
           🐾 Lola · What you get
         </span>
@@ -337,7 +380,7 @@ function ReportCard() {
         </span>
       </div>
 
-      <div className="px-5 py-5 sm:px-6">
+      <div className="lg:px-6 lg:py-5">
         {/* ── THE HOOK: the AI answer, shown rather than described ──
             This led with missed-call text-back, which is the most visceral
             line in the plan but the wrong one to headline. Two reasons it
@@ -370,7 +413,10 @@ function ReportCard() {
             {/* what they type */}
             <div className="flex justify-end">
               <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
-                <p className="text-[12.5px] leading-[1.45] text-ink">
+                {/* Literal white, not text-white: the light theme remaps the
+                    text-white utility to ink, which put dark text on this
+                    blue at ~3:1. White on #3A62B8 is 5.9:1. */}
+                <p className="text-[12.5px] leading-[1.45] text-[#FFFFFF]">
                   who&apos;s the best soft wash company in Dunedin?
                 </p>
               </div>
@@ -394,6 +440,8 @@ function ReportCard() {
           </p>
         </div>
 
+        {/* Desktop only from here down — see the note on the <figure>. */}
+        <div className="hidden lg:block">
         {/* ── the rest of the monthly, as a plain checklist ── */}
         <p className="mt-5 text-[10px] uppercase tracking-[0.08em] text-gold">
           Every month, you also get
@@ -503,9 +551,10 @@ function ReportCard() {
             →
           </span>
         </a>
+        </div>
       </div>
 
-      <figcaption className="border-t border-white/10 bg-surface-2 px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-ink-3">
+      <figcaption className="hidden border-t border-white/10 bg-surface-2 px-5 py-2.5 text-center text-[10px] uppercase tracking-[0.08em] text-ink-3 lg:block">
         🛡️ {GUARANTEE.short}
       </figcaption>
     </figure>
@@ -535,23 +584,29 @@ function ProblemSection() {
           </p>
         </div>
 
-        {/* The cards do the explaining — competitor picked, on Google and in AI. */}
+        {/* The cards do the explaining — competitor picked, on Google and in AI.
+            Drawn as the surfaces themselves (a search box over a map pack; a
+            chat exchange) rather than described, for the same reason the hero
+            hook is a chat bubble: a reader recognises the shape before reading
+            a word, and on a phone this is the first thing after the letter
+            that isn't a paragraph. No invented names, ratings or counts — the
+            competitors are grey placeholder bars, which is the honest way to
+            draw "someone else". */}
         <div className="space-y-4">
-          <QueryCard
-            engine="Google"
-            query="best pressure washing company near me"
-            answer="Top 3 map results — your competitor, not you."
-          />
-          <QueryCard
-            engine="ChatGPT"
+          <SearchMock query="best pressure washing company near me" />
+          <ChatMock
             query="who should I hire to soft-wash my house in Tampa?"
-            answer={"“Based on reviews and local presence, I’d recommend…” — and it names someone else."}
+            answer="Based on reviews and local presence, I’d recommend"
           />
         </div>
       </div>
 
-      {/* The honest split — what's guaranteed, what isn't. */}
-      <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2">
+      {/* The honest split — what's guaranteed, what isn't. Desktop and tablet
+          only: on a phone both halves are already answered word for word in
+          the FAQ ("Is there a guarantee?", "Can you actually guarantee
+          leads?"), the promise is in the hero line and the letter, and this
+          was 450px more to scroll before the reader reached what they get. */}
+      <div className="mt-12 hidden grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid sm:grid-cols-2">
         <div className="bg-surface p-6 sm:p-7">
           <p className="text-[11px] uppercase tracking-[0.08em] text-gold">
             ✓ What I guarantee
@@ -583,19 +638,94 @@ function ProblemSection() {
   );
 }
 
-function QueryCard({ engine, query, answer }: { engine: string; query: string; answer: string }) {
+/** Shared chrome for the two "what the customer sees" mocks. */
+function MockFrame({ engine, glyph, children }: { engine: string; glyph: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-white/10 bg-surface p-4 sm:p-5">
       <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
-        <span aria-hidden className="text-[11px] text-gold">⌕</span>
+        <span aria-hidden className="text-[11px] text-gold">{glyph}</span>
         <span className="text-[10px] uppercase tracking-[0.08em] text-ink-3">{engine}</span>
       </div>
-      <p className="mt-3 text-[15px] font-medium text-ink">"{query}"</p>
-      <p className="mt-2 flex items-start gap-2 text-[13px] leading-[1.55] text-ink-3">
-        <span aria-hidden className="mt-0.5 text-[#E5534B]">✗</span>
-        <span>{answer}</span>
-      </p>
+      {children}
     </div>
+  );
+}
+
+/** A Google search box over the map pack. Three grey rows stand for the
+ *  businesses that got the call; the fourth is the reader. Placeholder bars
+ *  rather than names or star counts so nothing here is a made-up statistic. */
+function SearchMock({ query }: { query: string }) {
+  return (
+    <MockFrame engine="Google" glyph="⌕">
+      <div className="mt-3 flex items-center gap-2.5 rounded-full border border-black/[0.12] bg-ground px-3.5 py-2.5">
+        <span aria-hidden className="text-[13px] text-ink-3">⌕</span>
+        {/* 12.5px at phone width so the whole query fits the pill; at 14px it
+            truncated to "…company ne…" and lost the words that matter. */}
+        <p className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink sm:text-[14px]">{query}</p>
+      </div>
+      <div className="mt-3 overflow-hidden rounded-lg border border-black/[0.08]">
+        <p className="border-b border-black/[0.06] bg-surface-2 px-3 py-1.5 text-[10px] uppercase tracking-[0.08em] text-ink-3">
+          Map results
+        </p>
+        <ol className="divide-y divide-black/[0.06]">
+          {[1, 2, 3].map((n) => (
+            <li key={n} className="flex items-center gap-3 px-3 py-2.5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-[10px] font-bold text-ink-3">
+                {n}
+              </span>
+              <span className="sr-only">A competitor</span>
+              <span className="flex-1 space-y-1.5" aria-hidden>
+                <span className="block h-2.5 w-[62%] rounded-full bg-black/[0.12]" />
+                <span className="block h-2 w-[38%] rounded-full bg-black/[0.07]" />
+              </span>
+              <span aria-hidden className="text-[10px] tracking-[0.05em] text-black/[0.18]">
+                ★★★★★
+              </span>
+            </li>
+          ))}
+          <li className="flex items-center gap-3 bg-[#FBEDEB] px-3 py-2.5">
+            <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center text-[12px] text-[#C7392F]">
+              ✗
+            </span>
+            <span className="text-[13px] font-semibold text-ink">You — not in the top 3</span>
+          </li>
+        </ol>
+      </div>
+    </MockFrame>
+  );
+}
+
+/** The same exchange as the hero hook, with the ending the reader is living
+ *  today: the assistant recommends a grey bar that isn't them. */
+function ChatMock({ query, answer }: { query: string; answer: string }) {
+  return (
+    <MockFrame engine="ChatGPT" glyph="✦">
+      <div className="mt-3 space-y-2">
+        <div className="flex justify-end">
+          <div className="max-w-[86%] rounded-2xl rounded-br-sm bg-[#3A62B8] px-3.5 py-2.5">
+            <p className="text-[13px] leading-[1.45] text-[#FFFFFF]">{query}</p>
+          </div>
+        </div>
+        <div className="flex justify-start">
+          <div className="max-w-[92%] rounded-2xl rounded-bl-sm border border-black/[0.10] bg-ground px-3.5 py-2.5">
+            <p className="text-[13px] leading-[1.5] text-ink-2">
+              <span aria-hidden className="mr-1.5 text-ok">✦</span>
+              {answer}{' '}
+              <span
+                role="img"
+                aria-label="a competitor's name"
+                className="inline-block h-2.5 w-[84px] translate-y-px rounded-full bg-black/[0.14] align-middle"
+              />
+              …
+            </p>
+          </div>
+        </div>
+      </div>
+      <p className="mt-3 flex items-start gap-2 text-[13px] leading-[1.55] text-ink-3">
+        <span aria-hidden className="mt-0.5 text-[#C7392F]">✗</span>
+        <span>And it names someone else.</span>
+      </p>
+    </MockFrame>
   );
 }
 
@@ -638,9 +768,8 @@ function ProofSection() {
             Sandbar Soft Wash — 15 years of great work. Almost zero Google.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
-            A real Palm Harbor business serving 20+ cities across Tampa Bay, that nobody
-            could find online. The whole rebuild is in the open — every move, timestamped,
-            for anyone to check.
+            A real Palm Harbor business serving 20+ cities across Tampa Bay that nobody
+            could find online. The whole rebuild is in the open.
           </p>
           <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-gold">
             Open the dashboard
@@ -648,10 +777,13 @@ function ProofSection() {
           </span>
         </a>
 
-        {/* self-proof — better than any case study, because it's about them */}
+        {/* self-proof — better than any case study, because it's about them.
+            Desktop only: on a phone the same free-score ask is already in the
+            hero, the offer block, the closing section and the sticky bar, so
+            this card was the fifth copy of one button. */}
         <a
           href="/growth-score"
-          className="group flex flex-col rounded-xl border border-white/12 bg-[#0B0B0D] p-6 transition-colors hover:border-gold/40 sm:p-7"
+          className="group hidden flex-col rounded-xl border border-white/12 bg-surface p-6 transition-colors hover:border-gold/40 sm:p-7 lg:flex"
         >
           <p className="text-[11px] uppercase tracking-[0.08em] text-ink-3">
             Or skip my proof entirely
@@ -680,6 +812,15 @@ function ProofSection() {
    motive outperforms third-person agency boilerplate, and it's the truth.
    ───────────────────────────────────────────────────────────────────────── */
 function StorySection() {
+  // Phones get the three paragraphs that carry the letter — the dog, how we
+  // work, and the promise — and a tap for the rest. Six paragraphs beside a
+  // full-width portrait ran 2.3 screens on a phone, and a reader deciding
+  // about a person does it in the first three. Desktop always shows the whole
+  // letter (it sits beside the sticky photo and fills the column), and every
+  // paragraph is in the prerendered HTML either way; only the phone display
+  // toggles. useState(false) keeps the server and first client render equal.
+  const [more, setMore] = useState(false);
+  const rest = `${more ? '' : 'hidden'} sm:block`;
   return (
     // id="founder" gives the founder story a stable, linkable address. It is
     // the one section other pages want to point at ("who you're working with")
@@ -693,27 +834,35 @@ function StorySection() {
           letter ~660px down the page on a small phone. Desktop is unchanged:
           explicit row/column placement puts photo and résumé back in the left
           column with the letter spanning both rows on the right. */}
-      <div className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[minmax(260px,340px)_1fr] sm:items-start sm:gap-x-14 sm:gap-y-5">
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-[minmax(240px,300px)_1fr] sm:items-start sm:gap-x-14 sm:gap-y-5">
         {/* Sticky on desktop. The letter is taller than the photo no matter how
             tight the copy gets, and a fixed photo left ~490px of dead black
             column beside the text — which is what read as "choppy". Sticking it
             means the portrait travels with the letter instead of abandoning it. */}
+
+        {/* A real photo of Ty at work — coaching from the sideline, shirt on,
+            cap backwards — in the column a signed letter gives the portrait.
+            It replaced the beach shot, which was the same image as the hero
+            byline two screens up. Phones crop it 4:5 with the face high in the
+            frame; desktop shows the full frame, photographer's mark included.
+            The credit is in the caption at every size — the photo is used
+            with the photographer's okay, and the mark is never cropped away to
+            hide that. */}
         <figure className="order-1 sm:col-start-1 sm:row-start-1">
           <div className="overflow-hidden rounded-xl border border-gold/25">
             <img
-              src="/images/ty-lola-beach.jpg"
-              alt="Ty Alexander Traufield — Coach Ty — with his dog Lola, the namesake of Lola Leads, on a Tampa Bay beach at sunset"
+              src="/images/ty-coaching-gym.jpg"
+              alt="Ty Alexander Traufield — Coach Ty — coaching from the sideline at a basketball gym in Florida"
               loading="lazy"
-              width={600}
-              height={800}
-              className="aspect-[4/5] w-full object-cover"
+              width={547}
+              height={827}
+              className="aspect-[4/5] w-full object-cover [object-position:center_35%] sm:aspect-auto"
             />
           </div>
           <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
-            Ty &amp; Lola · St. Pete, FL
+            Coach Ty · Photo: Florida&apos;s Sports Coast
           </figcaption>
         </figure>
-
 
         {/* the letter */}
         <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
@@ -722,7 +871,7 @@ function StorySection() {
           </h2>
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
-          <div className="mt-6 max-w-[58ch] space-y-4 text-[16px] leading-[1.7] text-ink-2 sm:text-[17px]">
+          <div className="mt-5 max-w-[58ch] space-y-3.5 text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
             {/* The two halves of the dog ARE the two halves of the product, and
                 saying so is the cleanest way to explain what's software and
                 what's a person without using either word. Matches the hero
@@ -744,12 +893,12 @@ function StorySection() {
               Around the clock, never bored, never off.{' '}
               <span className="font-semibold text-ink">I do the work she turns up.</span>
             </p>
-            <p>
+            <p className={rest}>
               I coach strength and conditioning. Same job either way: show up, do the work, keep
               showing up on the days nothing's happening yet. That's what moves you up Google.
               It's the part most agencies quietly skip.
             </p>
-            <p>
+            <p className={rest}>
               It started with one crew —{' '}
               {/* Points at the LIVE dashboard, not /case-studies/sandbar. That
                   page is held by D-014 until the ranking tracker has real
@@ -775,11 +924,23 @@ function StorySection() {
               I do the work myself.{' '}
               <span className="font-bold text-gold">{GUARANTEE.short}</span> In writing.
             </p>
-            <p>
+            <p className={rest}>
               A local business that finally gets found changes what a family can say yes to.
               That's the whole point. Enough of you win,{' '}
               <span className="font-semibold text-ink">and Lola gets the backyard she deserves.</span>
             </p>
+            {/* Phone-only. 44px tall so it's a real tap target, styled as a
+                line of the letter rather than a button so it doesn't compete
+                with the sticky bar's two buttons a thumb-width below. */}
+            <button
+              type="button"
+              onClick={() => setMore((v) => !v)}
+              aria-expanded={more}
+              className="inline-flex min-h-[44px] items-center gap-1.5 text-[15px] font-semibold text-gold sm:hidden"
+            >
+              {more ? 'Show less' : 'Read the rest of the letter'}
+              <span aria-hidden>{more ? '↑' : '↓'}</span>
+            </button>
             <p className="text-[17px] font-semibold text-ink sm:text-[18px]">
               Let's get your phone ringing.
             </p>
@@ -792,7 +953,7 @@ function StorySection() {
             face; and it fills the column the photo used to leave empty, which
             is what made this section read as choppy. On mobile the explicit
             order keeps the human sequence — photo, letter, then who signed it. */}
-        <div className="order-3 sm:col-start-1 sm:row-start-2 sm:-mt-1">
+        <div className="order-3 sm:col-start-1 sm:row-start-2">
           <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
           <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-2">
             <span className="font-semibold text-ink">{FOUNDER.fullName}</span>
@@ -816,7 +977,7 @@ function StorySection() {
             href={GBP_URL || 'https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL'}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
+            className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
           >
             {GBP_URL ? '✓ Verified Google Business' : 'Find us on Google Maps'}{' '}
             <span aria-hidden>↗</span>
@@ -826,12 +987,13 @@ function StorySection() {
               three more paragraphs — the brief asks for warm and credible, and
               a fourth paragraph of prose is neither. Every one is checkable or
               is a promise already published elsewhere on the site. */}
-          <ul className="mt-5 flex flex-wrap gap-2">
+          {/* Three chips, all about the person. A fourth ("The 90-Day
+              Promise") restated the callout line directly above it. */}
+          <ul className="mt-3 flex flex-wrap gap-2">
             {[
               'Hybrid athlete · trains HYROX',
               'Faith and family first',
               'Started with my dad\u2019s crew',
-              GUARANTEE.title,
             ].map((chip) => (
               <li
                 key={chip}
@@ -884,6 +1046,11 @@ function RoiSection() {
   // Visitor's own average job value — the only input, and it never leaves the
   // browser. Default is a plausible mid-range local-services ticket.
   const [avgJob, setAvgJob] = useState(500);
+  // Phones lead with the one number — the year-one difference — and fold the
+  // six-row comparison and the slider behind a single tap. Both were 1.7
+  // screens of detail before the number that makes the point. Desktop shows
+  // everything; the markup is identical and prerendered either way.
+  const [showMath, setShowMath] = useState(false);
   // One plan, so one row. Two rows rendered identical text once DIY and BUILD
   // both aliased to PLAN — the sweep made it a literal duplicate.
   const jobsForMonthly = Math.max(1, Math.ceil(MONTHLY_PRICE / Math.max(avgJob, 1)));
@@ -900,11 +1067,13 @@ function RoiSection() {
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         {/* the comparison */}
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-surface">
+        <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-surface">
+          {/* Collapsed on phones until "Show the full math" (below). */}
+          <div className={`${showMath ? '' : 'hidden'} sm:block`}>
           {/* Mobile: label on its own line, then the two values side by side.
               sm+: a true three-column table. Keeps the label readable at 320px
               instead of crushing it into a ~70px gutter. */}
-          <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-[#141416] px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
+          <div className="grid grid-cols-2 items-end gap-x-3 border-b border-white/10 bg-surface-2 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:px-5">
             <span className="hidden text-[10px] uppercase tracking-[0.08em] text-ink-3 sm:block">
               Compare
             </span>
@@ -939,8 +1108,11 @@ function RoiSection() {
               </div>
             ))}
           </dl>
+          </div>
 
-          <div className="border-t border-gold/25 bg-gold/[0.06] px-4 py-4 sm:px-5">
+          {/* First on phones (order-first), last on desktop, so the number is
+              what a phone reader sees and the table is what it expands into. */}
+          <div className="order-first border-b border-gold/25 bg-gold/[0.06] px-4 py-4 sm:order-none sm:border-b-0 sm:border-t sm:px-5">
             <p className="text-[10px] uppercase tracking-[0.08em] text-gold">
               Year-one difference
             </p>
@@ -959,8 +1131,19 @@ function RoiSection() {
           </div>
         </div>
 
+        {/* Phone-only expander. Reveals the comparison rows above and the
+            calculator below, then gets out of the way. */}
+        <button
+          type="button"
+          onClick={() => setShowMath(true)}
+          aria-expanded={showMath}
+          className={`${showMath ? 'hidden' : 'inline-flex'} min-h-[48px] w-full items-center justify-center gap-2 rounded-lg border border-gold/30 px-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-gold sm:hidden`}
+        >
+          Show the full math <span aria-hidden>↓</span>
+        </button>
+
         {/* break-even calculator */}
-        <div className="flex flex-col rounded-xl border border-white/10 bg-[#0B0B0D] p-5 sm:p-6">
+        <div className={`${showMath ? 'flex' : 'hidden'} flex-col rounded-xl border border-white/10 bg-surface p-5 sm:flex sm:p-6`}>
           <p className="text-[10px] uppercase tracking-[0.08em] text-ink-3">
             Break-even
           </p>
@@ -1071,7 +1254,11 @@ function BreakEvenRow({
    ───────────────────────────────────────────────────────────────────────── */
 function OfferSection() {
   return (
-    <section className="mt-14 sm:mt-20">
+    // A warm gold-tinted band (the feature section's band is grey, the closing
+    // one darker): the page now alternates paper / band / paper, and the one
+    // section that asks for money is the one that visibly changes surface.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-y border-gold/25 bg-gold/[0.05] py-10 sm:mt-20 sm:py-16">
+      <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
       <SectionHead kicker="Start free, then choose" />
       <h2 className="mt-8 max-w-[760px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
         See exactly where you stand — free — then pick your path.
@@ -1080,7 +1267,7 @@ function OfferSection() {
       {/* free step */}
       <a
         href="/growth-score"
-        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-gold/[0.05] p-5 transition-colors hover:bg-gold/[0.09] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-surface p-5 transition-colors hover:bg-gold/[0.06] sm:flex-row sm:items-center sm:justify-between sm:p-6"
       >
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-gold">00</span>
@@ -1100,10 +1287,10 @@ function OfferSection() {
         <TierCard tier={PLAN} href={START} featured />
       </div>
 
-      <p className="mt-5 text-[12px] leading-[1.6] text-ink-3">
-        Website design included · $0 setup · cancel after 3 months · {GUARANTEE.emoji}{' '}
-        {GUARANTEE.title}.
-      </p>
+      {/* A one-line footnote used to restate the card above it (website
+          included, $0 setup, cancel after 3 months, the promise) — all four
+          are lines of the card. Fourth repetition of the offer on the page. */}
+      </div>
     </section>
   );
 }
@@ -1111,7 +1298,7 @@ function OfferSection() {
 function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; featured?: boolean }) {
   return (
     <div
-      className={`flex flex-col rounded-xl border p-6 sm:p-7 ${
+      className={`flex flex-col rounded-xl border p-5 sm:p-7 ${
         featured ? 'border-gold/50 bg-surface' : 'border-white/12 bg-[#0B0B0D]'
       }`}
     >
@@ -1182,14 +1369,22 @@ function FaqSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function FinalCta() {
   return (
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-black py-14 sm:mt-20 sm:py-16">
+    // bg-surface-2 (was bg-black, remapped): the footer is the same surface and
+    // sits flush beneath this on the homepage, so the two read as one closing
+    // block instead of grey / a strip of paper / grey.
+    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-surface-2 py-12 sm:mt-20 sm:py-16">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
         <p className="text-[11px] uppercase tracking-[0.1em] text-gold">Your next customer is searching right now</p>
         <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[48px]">
           Make sure the answer is you.
         </h2>
         <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
-          See where you stand in 60 seconds — free, no card. Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
+          See where you stand in 60 seconds — free, no card.
+          {/* Desktop only: this sentence describes the Start button, which
+              phones don't show here (the sticky bar carries it). */}
+          <span className="hidden sm:inline">
+            {' '}Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
+          </span>
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
@@ -1198,9 +1393,11 @@ function FinalCta() {
           >
             Get my free Growth Score <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
+          {/* Desktop only: the sticky bar carries "Start" on phones, one
+              thumb-width below this exact button. */}
           <a
             href={START}
-            className="inline-flex min-h-[56px] items-center justify-center rounded-lg border border-gold/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08]"
+            className="hidden min-h-[56px] items-center justify-center rounded-lg border border-gold/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08] sm:inline-flex"
           >
             Start now — {PLAN.price}{PLAN.period}
           </a>

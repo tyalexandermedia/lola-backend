@@ -160,7 +160,7 @@ export default function Vsl() {
                   className="h-full w-full object-cover transition group-hover:scale-[1.02]"
                 />
               ) : (
-                <span className="absolute inset-0 bg-gradient-to-br from-[#1A1A1F] to-on-gold" />
+                <span className="absolute inset-0 bg-gradient-to-br from-[#1A1A1F] to-gold/[0.16]" />
               )}
               <span className="absolute inset-0 flex items-center justify-center">
                 <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gold text-[22px] text-on-gold shadow-[0_8px_28px_rgba(212,175,55,0.5)] transition group-hover:scale-105 sm:h-20 sm:w-20">
@@ -187,7 +187,7 @@ export default function Vsl() {
         {/* Crawlable transcript. Collapsed for readers, present in the HTML for
             Google and for the AI crawlers this whole business is aimed at. */}
         <details className="mt-8 rounded-xl border border-white/[0.08] bg-surface">
-          <summary className="cursor-pointer list-none px-5 py-3.5 text-[13px] font-semibold text-ink-2 transition hover:text-white">
+          <summary className="cursor-pointer list-none px-5 py-3.5 text-[13px] font-semibold text-ink-2 transition hover:text-ink">
             Read the transcript
           </summary>
           <div className="space-y-3 border-t border-white/[0.07] px-5 py-4">

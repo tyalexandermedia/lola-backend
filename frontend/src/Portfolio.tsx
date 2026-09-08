@@ -44,7 +44,7 @@ function BrowserBar({ host, compact = false }: { host: string; compact?: boolean
           <span key={c} className="h-2.5 w-2.5 rounded-full" style={{ background: c }} />
         ))}
       </div>
-      <div className="ml-1 flex-1 truncate rounded-md bg-on-gold px-3 py-1 text-center text-[11px] text-ink-3">
+      <div className="ml-1 flex-1 truncate rounded-md bg-surface-2 px-3 py-1 text-center text-[11px] text-ink-3">
         {host}
       </div>
     </div>
@@ -162,7 +162,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex flex-col bg-on-gold/92 p-3 backdrop-blur-[6px] sm:p-6"
+      className="fixed inset-0 z-[80] flex flex-col bg-ground/95 p-3 backdrop-blur-[6px] sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={`Preview of ${site.name}`}
@@ -190,7 +190,7 @@ function PreviewModal({ site, onClose }: { site: PortfolioSite; onClose: () => v
             type="button"
             onClick={onClose}
             aria-label="Close preview"
-            className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.1] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.1] bg-white/[0.03] text-[18px] text-ink-2 transition hover:border-gold/40 hover:text-ink"
           >
             ✕
           </button>
