@@ -34,6 +34,9 @@ const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
 // appears anywhere on it. Set VITE_SHOW_SANDBAR_CASE_STUDY=false to pull it.
 const SHOW_SANDBAR_CASE_STUDY =
   (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) !== 'false';
+/** Real Google Business Profile listing URL, for the footer's trust link. Until
+ *  it is set the link is a Maps search and makes no verification claim. */
+const GBP_URL = (import.meta.env.VITE_GBP_URL as string | undefined)?.trim() || '';
 const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
@@ -378,6 +381,15 @@ function SiteFooter({ route }: { route: Route }) {
           <FooterLink href="/methodology">Scoring methodology</FooterLink>
           <FooterLink href="/lp/industries">Industries we serve</FooterLink>
           <FooterLink href="/apply">Apply for a slot</FooterLink>
+          {/* Moved here from the founder letter's sign-off. Honest by default:
+              it claims a verified listing only when VITE_GBP_URL points at a
+              real one; otherwise it is a Maps search, labelled as such. */}
+          <FooterLink
+            href={GBP_URL || 'https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL'}
+            external
+          >
+            {GBP_URL ? 'Verified Google Business ↗' : 'Find us on Google Maps ↗'}
+          </FooterLink>
         </FooterCol>
       </div>
 
@@ -402,7 +414,7 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+function FooterLink({ href, children, external }: { href: string; children: React.ReactNode; external?: boolean }) {
   return (
     <li>
       {/* inline-flex + min-h-[44px] rather than a bare inline <a>: measured on a
@@ -412,6 +424,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
           the column heading despite the added padding. */}
       <a
         href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         className="-mx-2 inline-flex min-h-[40px] items-center px-2 text-[13px] text-ink-2 underline-offset-2 transition hover:text-gold hover:underline"
       >
         {children}
