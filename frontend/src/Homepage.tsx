@@ -38,9 +38,6 @@
 import { useState } from 'react';
 
 import { FOUNDER, LOLA_TURNS } from './lib/lola';
-/** Real Google Business Profile listing URL. Until it is set the badge makes
- *  no verification claim — see the note where it renders. */
-const GBP_URL = (import.meta.env.VITE_GBP_URL as string | undefined)?.trim() || '';
 
 import AnswerBlock from './AnswerBlock';
 import PawMark from './PawMark';
@@ -843,20 +840,19 @@ function StorySection() {
         {/* A real photo of Ty at work — coaching from the sideline, shirt on,
             cap backwards — in the column a signed letter gives the portrait.
             It replaced the beach shot, which was the same image as the hero
-            byline two screens up. Phones crop it 4:5 with the face high in the
-            frame; desktop shows the full frame, photographer's mark included.
-            The credit is in the caption at every size — the photo is used
-            with the photographer's okay, and the mark is never cropped away to
-            hide that. */}
+            byline two screens up. The file is pre-cropped 4:5 on Ty alone
+            (the wide original had a ceiling of gym lights and a second player
+            at the edge); the photographer is credited in the caption at every
+            size. Used with the photographer's okay. */}
         <figure className="order-1 sm:col-start-1 sm:row-start-1">
           <div className="overflow-hidden rounded-xl border border-gold/25">
             <img
               src="/images/ty-coaching-gym.jpg"
               alt="Ty Alexander Traufield — Coach Ty — coaching from the sideline at a basketball gym in Florida"
               loading="lazy"
-              width={547}
-              height={827}
-              className="aspect-[4/5] w-full object-cover [object-position:center_35%] sm:aspect-auto"
+              width={360}
+              height={450}
+              className="aspect-[4/5] w-full object-cover"
             />
           </div>
           <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
@@ -944,67 +940,14 @@ function StorySection() {
             <p className="text-[17px] font-semibold text-ink sm:text-[18px]">
               Let's get your phone ringing.
             </p>
+            {/* The whole sign-off. Name, title and location used to follow
+                here — the footer carries those same three lines word for word,
+                and the hero byline already says Coach Ty · Tampa Bay. */}
+            <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
           </div>
 
         </div>
 
-        {/* Signature sits UNDER THE PORTRAIT on desktop, not at the end of the
-            letter. Two reasons: it's where a signed letter puts it, next to the
-            face; and it fills the column the photo used to leave empty, which
-            is what made this section read as choppy. On mobile the explicit
-            order keeps the human sequence — photo, letter, then who signed it. */}
-        <div className="order-3 sm:col-start-1 sm:row-start-2">
-          <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
-          <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-2">
-            <span className="font-semibold text-ink">{FOUNDER.fullName}</span>
-            <br />
-            {FOUNDER.title} · {FOUNDER.company}
-          </p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-3">
-            {FOUNDER.location}
-          </p>
-          {/* This used to read "✓ Verified Google Business" while pointing at a
-              Google Maps SEARCH QUERY — not a claimed listing — and the GBP
-              integration is still unconfigured (see docs/SETUP.md). Claiming a
-              verification the business doesn't have yet is the one thing this
-              site cannot afford, on the page where it argues that everyone else
-              inflates their proof.
-
-              So the badge is honest by default and only claims verification
-              when VITE_GBP_URL points at a real listing. Set that var and the
-              ✓ appears with a link that actually proves it. */}
-          <a
-            href={GBP_URL || 'https://www.google.com/maps/search/?api=1&query=Ty+Alexander+Media+Tampa+FL'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/[0.06] px-4 py-2 text-[11px] uppercase leading-[1.2] tracking-[0.12em] text-gold transition hover:border-gold/60 hover:bg-gold/[0.12]"
-          >
-            {GBP_URL ? '✓ Verified Google Business' : 'Find us on Google Maps'}{' '}
-            <span aria-hidden>↗</span>
-          </a>
-
-          {/* The signals the letter doesn't have room for, as chips rather than
-              three more paragraphs — the brief asks for warm and credible, and
-              a fourth paragraph of prose is neither. Every one is checkable or
-              is a promise already published elsewhere on the site. */}
-          {/* Three chips, all about the person. A fourth ("The 90-Day
-              Promise") restated the callout line directly above it. */}
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {[
-              'Hybrid athlete · trains HYROX',
-              'Faith and family first',
-              'Started with my dad\u2019s crew',
-            ].map((chip) => (
-              <li
-                key={chip}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.10] bg-white/[0.03] px-3 py-1.5 text-[11.5px] leading-none text-ink-3"
-              >
-                <PawMark className="shrink-0 text-gold/70" />
-                {chip}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       {/* Real screenshots beat every mock on this page. Renders nothing until
