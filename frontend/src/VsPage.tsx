@@ -551,7 +551,7 @@ const ANGI: Competitor = {
   priceRange: 'Pay per lead — varies by trade and market',
   metaTitle: 'Angi vs SEO for Contractors — Rent Leads or Own Them? | Lola Leads',
   metaDescription:
-    'Honest take on Angi for contractors: what pay-per-lead actually buys you, why leads get shared with 3–4 pros, what happens when you stop paying, and where organic + AI visibility wins. From Lola Leads, Tampa Bay.',
+    'Honest take on Angi for contractors: what pay-per-lead actually buys you, why leads get shared with several pros, what happens when you stop paying, and where organic + AI visibility wins. From Lola Leads, Tampa Bay.',
   tldr: {
     pickThemIf: [
       'You need work this week and have little or no online presence yet',

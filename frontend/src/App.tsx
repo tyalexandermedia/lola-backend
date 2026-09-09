@@ -432,7 +432,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
  * vs a single hero-only CTA. Pattern from Podium / Birdeye marketing sites.
  */
 function MobileStickyCTA({ route }: { route: Route }) {
-  const STICKY_ROUTES = new Set(['home', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index']);
+  const STICKY_ROUTES = new Set(['home', 'lola-leads', 'pricing', 'vs', 'vs-hub', 'methodology', 'case-study', 'case-studies-index']);
   if (!STICKY_ROUTES.has(route.name)) return null;
 
   // Self-serve, not scheduled. The gold button used to open a calendar — the

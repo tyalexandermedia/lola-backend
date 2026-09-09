@@ -73,11 +73,9 @@ export default function LolaLeads() {
           Get found on Google and AI —{' '}
           <span className="text-gold">and chosen.</span>
         </h1>
-        <p className="mt-5 max-w-[560px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
-          Lola is done-for-you local visibility for home-service contractors:
-          your site written so Google and ChatGPT can read it, your Google
-          Business Profile managed, reviews and follow-up running on their own —
-          so the next customer who searches finds you and picks you.
+        <p className="mt-5 max-w-[520px] text-[16.5px] leading-[1.55] text-ink-2 sm:text-[18px]">
+          Done-for-you local SEO &amp; AI visibility for home-service contractors —{' '}
+          <span className="font-semibold text-ink">so the next customer who searches finds you and picks you.</span>
         </p>
 
         {/* Price / included anchor — same struck-price pattern as the homepage. */}
@@ -108,7 +106,7 @@ export default function LolaLeads() {
           <a href={START} className={`${GHOST_CTA} shrink-0`}>
             Start — {PLAN.price}{PLAN.period}
           </a>
-          <a href="/pricing" className="text-[14px] font-semibold text-ink-2 underline-offset-4 hover:text-ink hover:underline">
+          <a href="/pricing" className="inline-flex min-h-[44px] items-center text-[14px] font-semibold text-ink-2 underline-offset-4 hover:text-ink hover:underline">
             See everything included →
           </a>
         </div>
@@ -170,7 +168,7 @@ export default function LolaLeads() {
       <section className="reveal mt-14 sm:mt-20">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <a
-            href="/case-studies/sandbar"
+            href="/r/client/sandbar"
             className="group rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 transition-colors hover:border-gold/40 hover:bg-gold/[0.04]"
           >
             <div className="text-[13px] font-bold uppercase tracking-[0.08em] text-gold">Proof</div>
