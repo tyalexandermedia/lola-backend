@@ -696,12 +696,15 @@ def render_page(svc_slug, svc, city_slug, city):
     person = {
         "@context": "https://schema.org",
         "@type": "Person",
-        "@id": "https://tyalexandermedia.com#person",
+        # Same @id as the main site's Person node (lib/pageMeta PERSON_ID) so the
+        # graph resolves to one entity. Old Wix domain retired 2026-09 — see the
+        # tyalexandermedia.com -> coachtyalexander.com redirect in vercel.json.
+        "@id": f"{BASE_URL}/#coach-ty",
         "name": "Coach Ty",
         "givenName": "Ty",
         "jobTitle": "Founder, Local SEO Strategist",
         "image": f"{BASE_URL}/coach-ty.jpg",
-        "url": "https://tyalexandermedia.com",
+        "url": f"{BASE_URL}/about",
         "email": EMAIL,
         "telephone": PHONE,
         "address": {"@type": "PostalAddress", "addressLocality": "Tampa Bay",
