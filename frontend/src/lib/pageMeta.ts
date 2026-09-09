@@ -423,7 +423,7 @@ export function organizationSchema() {
       'Answer engine optimization',
       'Local service business marketing',
     ],
-    sameAs: ['https://tyalexandermedia.com', 'https://www.instagram.com/tyalexandermedia'],
+    sameAs: ['https://www.instagram.com/tyalexandermedia'],
   };
 }
 

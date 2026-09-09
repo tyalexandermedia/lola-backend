@@ -34,7 +34,7 @@ export default function SandbarCaseStudy() {
         '@type': 'Article',
         headline: 'Sandbar Soft Wash — Local Visibility Case Study',
         description: 'How Lola rebuilt local visibility for Sandbar Soft Wash in Palm Harbor, FL — tracked in the open on a live public dashboard.',
-        author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
+        author: { '@type': 'Person', '@id': `${SITE_ORIGIN}/#coach-ty` },
         publisher: { '@id': `${SITE_ORIGIN}/#business` },
         about: 'Sandbar Soft Wash',
         mentions: [

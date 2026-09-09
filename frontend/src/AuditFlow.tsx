@@ -984,7 +984,9 @@ const PRICING_URL =
 
 const GUIDE_URL =
   (import.meta.env.VITE_GUIDE_URL as string | undefined) ||
-  'https://tyalexandermedia.com/guide?source=lola_audit';
+  // Was the old Wix site (tyalexandermedia.com/guide), now retired. Default to
+  // the live on-site methodology page rather than a domain that only 301s home.
+  '/methodology';
 
 const CASE_STUDY_URL =
   (import.meta.env.VITE_CASE_STUDY_URL as string | undefined) ||

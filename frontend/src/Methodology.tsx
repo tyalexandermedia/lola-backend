@@ -31,7 +31,7 @@ export default function Methodology() {
         '@type': 'Article',
         headline: 'How the Lola Local Growth Score Scores',
         description: 'Full methodology for the 0-100 Local AI Visibility Score: 5 categories, weighting, and how each signal is measured.',
-        author: { '@type': 'Person', '@id': 'https://tyalexandermedia.com#person' },
+        author: { '@type': 'Person', '@id': `${SITE_ORIGIN}/#coach-ty` },
         publisher: { '@id': `${SITE_ORIGIN}/#business` },
         url: `${SITE_ORIGIN}/methodology`,
         about: ['Local SEO', 'AI Search Visibility', 'Google Business Profile', 'AEO', 'GEO'],

@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "(www\\.)?tyalexandermedia\\.com" }],
+      "destination": "https://www.coachtyalexander.com/",
+      "permanent": true
+    },
+    {
       "source": "/lp/local-seo-pressure-washing-florida",
       "destination": "/lp/pressure-washing-seo-tampa",
       "permanent": true
