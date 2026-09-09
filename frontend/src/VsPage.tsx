@@ -541,6 +541,210 @@ const LSA: Competitor = {
   ],
 };
 
+const ANGI: Competitor = {
+  slug: 'angi',
+  name: 'Angi',
+  url: 'https://www.angi.com',
+  category: 'Pay-per-lead marketplace + directory (formerly Angie\'s List)',
+  oneLine:
+    'A large home-services marketplace that sells you leads — usually the same customer is sold to several pros at once, so you\'re racing them to the phone.',
+  priceRange: 'Pay per lead — varies by trade and market',
+  metaTitle: 'Angi vs SEO for Contractors — Rent Leads or Own Them? | Lola Leads',
+  metaDescription:
+    'Honest take on Angi for contractors: what pay-per-lead actually buys you, why leads get shared with 3–4 pros, what happens when you stop paying, and where organic + AI visibility wins. From Lola Leads, Tampa Bay.',
+  tldr: {
+    pickThemIf: [
+      'You need work this week and have little or no online presence yet',
+      'You can carry a per-lead budget and answer every lead within minutes',
+      'You\'re willing to compete with several pros for the same customer',
+    ],
+    pickLolaIf: [
+      'You\'re tired of paying for leads that go to four contractors at once',
+      'You want visibility you own, not leads you rent month after month',
+      'You want to show up in the Google map pack and in AI answers — where Angi doesn\'t put you',
+    ],
+  },
+  whereTheyWin: [
+    'Speed — you can be buying leads the day you sign up, before SEO compounds',
+    'Huge consumer brand recognition and marketplace traffic already in place',
+    'Genuinely useful when you have zero online presence and need the phone ringing now',
+    'You pay for leads rather than clicks, so the spend maps to contacts',
+  ],
+  whereLolaWins: [
+    'Angi leads are usually shared — the same customer is sold to several pros, so it\'s a race. Your own ranking sends that customer to you alone.',
+    'The day you stop paying Angi, the leads stop. Organic ranking keeps working for years.',
+    'Angi doesn\'t put you in ChatGPT, Perplexity, or Google AI answers — that\'s the whole point of Lola.',
+    'Your website, Google profile, and reviews are assets you own — a marketplace listing is rented.',
+  ],
+  table: [
+    { label: 'Cost model', lola: '$397/month, flat', them: 'Per lead, ongoing, forever', lolaWin: true },
+    { label: 'Leads shared with rivals', lola: 'No — the customer finds you', them: 'Usually — sold to several pros', lolaWin: true },
+    { label: 'Speed to first lead', lola: 'Weeks — then compounds', them: 'Days', lolaWin: false },
+    { label: 'Stops when you stop paying', lola: 'No — ranking persists', them: 'Yes, immediately', lolaWin: true },
+    { label: 'Shows up in AI answers', lola: 'Yes — the core product', them: 'No', lolaWin: true },
+    { label: 'You own the asset', lola: 'Site, profile, reviews', them: 'Marketplace listing (rented)', lolaWin: true },
+    { label: 'Best for', lola: 'Visibility you keep', them: 'Filling a slow week fast', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is Angi worth it for a contractor?',
+      a: 'It can be, if you need work now and can move fast on every lead. The catch is that most Angi leads are sold to several pros at once, so you\'re paying to compete for the same customer — and the day you stop paying, it all stops. It fills a slow week; it doesn\'t build anything you keep.',
+    },
+    {
+      q: 'Are Angi leads shared with other contractors?',
+      a: 'Usually, yes. The same job request is commonly sold to multiple pros, which is why the first one to call often wins and why lead quality is the most common complaint. When a customer finds you through your own Google ranking or an AI answer, that customer is yours alone.',
+    },
+    {
+      q: 'Angi or SEO — which should I do?',
+      a: 'Both, in that order, if cash allows. Angi (or Local Service Ads) can buy you leads this week while organic is still compounding; organic is what stops you needing to rent leads forever. Anyone who tells you to pick only one is usually selling the one they offer.',
+    },
+    {
+      q: 'Do Angi leads help me show up in ChatGPT or Google AI answers?',
+      a: 'No. Angi is a marketplace listing. When someone asks ChatGPT, Perplexity, or Gemini for a contractor in their town, the answer is built from what those models can read about your business — your site, your profile, your reviews. A marketplace profile doesn\'t put you there. That gap is why Lola exists.',
+    },
+    {
+      q: 'What do Angi leads cost?',
+      a: 'It varies a lot by trade and market, and it changes with demand — which is why we won\'t quote a number we can\'t stand behind. The number that matters is your cost per booked job against your average ticket. Run your Growth Score and the break-even math on our pricing page uses your real job value.',
+    },
+  ],
+};
+
+const HOMEADVISOR: Competitor = {
+  slug: 'homeadvisor',
+  name: 'HomeAdvisor',
+  url: 'https://www.homeadvisor.com',
+  category: 'Pay-per-lead marketplace (now part of Angi Inc.)',
+  oneLine:
+    'The pay-per-lead marketplace now folded into Angi Leads — you pay for each lead, and the same request is typically matched to several pros.',
+  priceRange: 'Per-lead fees + optional membership — varies',
+  metaTitle: 'HomeAdvisor vs SEO — Are the Lead Fees Worth It? | Lola Leads',
+  metaDescription:
+    'A straight look at HomeAdvisor (Angi Leads) for contractors: per-lead fees, shared leads, the annual membership, and what happens when you stop paying — versus local SEO and AI visibility you actually own. From Lola Leads.',
+  tldr: {
+    pickThemIf: [
+      'You want leads flowing immediately and can vet the shared ones',
+      'You\'ll work the leads hard enough to beat the other matched pros',
+      'You\'re comfortable with per-lead fees plus a membership',
+    ],
+    pickLolaIf: [
+      'You\'re done paying per lead for customers you have to share',
+      'You want the customer to land on your site, not a matching form',
+      'You want to be the answer in Google\'s map pack and in AI, not one match of four',
+    ],
+  },
+  whereTheyWin: [
+    'Immediate lead flow while any organic work is still compounding',
+    'Big marketplace with real homeowner traffic and intent',
+    'Structured lead matching by trade and ZIP, ready out of the box',
+    'A reasonable bridge if you\'re brand new with no site and no reviews',
+  ],
+  whereLolaWins: [
+    'HomeAdvisor matches one request to several pros — you pay to compete. Your own ranking hands you the customer with no bidding war.',
+    'Per-lead fees never stop and rise with competition; a flat $397/month doesn\'t.',
+    'The moment you stop paying, the pipeline stops. Ranking and reviews keep earning.',
+    'HomeAdvisor doesn\'t put you in AI answers — Lola is built specifically to.',
+  ],
+  table: [
+    { label: 'Cost model', lola: '$397/month, flat', them: 'Per-lead fees + membership', lolaWin: true },
+    { label: 'Leads shared with rivals', lola: 'No', them: 'Usually — matched to several pros', lolaWin: true },
+    { label: 'Speed to first lead', lola: 'Weeks — then compounds', them: 'Days', lolaWin: false },
+    { label: 'Cost over time', lola: 'Flat and predictable', them: 'Rises with competition', lolaWin: true },
+    { label: 'Shows up in AI answers', lola: 'Yes — the core product', them: 'No', lolaWin: true },
+    { label: 'You own the asset', lola: 'Site, profile, reviews', them: 'Marketplace profile (rented)', lolaWin: true },
+    { label: 'Best for', lola: 'Owning your pipeline', them: 'Instant leads, brand new', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is HomeAdvisor worth the lead fees?',
+      a: 'If you\'re brand new and need work now, the fees can pay for themselves — provided you close enough of the shared leads to cover them. Over time it\'s an expensive way to stay visible, because you\'re renting each lead and often sharing it. It buys you jobs; it doesn\'t build an asset you keep.',
+    },
+    {
+      q: 'Is HomeAdvisor the same as Angi now?',
+      a: 'They\'re under the same company (Angi Inc.), and HomeAdvisor\'s lead product is now largely Angi Leads. The model is the same either way: you pay per lead, and the request is typically matched to more than one pro.',
+    },
+    {
+      q: 'HomeAdvisor or local SEO — which first?',
+      a: 'If you have no online presence and need jobs this week, a pay-per-lead source bridges the gap. But run it alongside building your own ranking, because organic is what eventually stops the lead fees. The goal is to graduate off rented leads, not depend on them.',
+    },
+    {
+      q: 'Does a HomeAdvisor profile help me rank in Google or AI?',
+      a: 'No. It\'s a listing inside their marketplace. Your Google map-pack ranking and whether ChatGPT names you come from your own site, profile, and reviews — exactly what Lola builds. A marketplace profile doesn\'t move either one.',
+    },
+    {
+      q: 'What do HomeAdvisor leads cost?',
+      a: 'It varies by trade, market and demand, often with an annual membership on top of per-lead fees. We won\'t quote a number we can\'t stand behind — the figure that matters is cost per booked job against your average ticket. Your Growth Score and our pricing page run that math on your real numbers.',
+    },
+  ],
+};
+
+const THUMBTACK: Competitor = {
+  slug: 'thumbtack',
+  name: 'Thumbtack',
+  url: 'https://www.thumbtack.com',
+  category: 'Pay-per-lead marketplace (you set a budget, pay per contact)',
+  oneLine:
+    'A services marketplace where you set a budget and pay when a customer contacts you — leads that are often sent to several pros at the same time.',
+  priceRange: 'Pay per lead/contact — you set a budget',
+  metaTitle: 'Thumbtack vs SEO for Contractors — Which Pays Off? | Lola Leads',
+  metaDescription:
+    'Honest comparison of Thumbtack for contractors: how pay-per-contact works, why leads get shared, budget creep, and what you keep when you stop — versus local SEO and AI visibility you own. From Lola Leads, Tampa Bay.',
+  tldr: {
+    pickThemIf: [
+      'You want to control a daily budget and pay only when contacted',
+      'You can respond in minutes and out-hustle the other pros contacted',
+      'You want a fast start with no website or reviews yet',
+    ],
+    pickLolaIf: [
+      'You\'re tired of paying per contact for leads you still have to share',
+      'You want customers arriving through your own site and ranking',
+      'You want to be named in AI answers and the map pack, not just a marketplace',
+    ],
+  },
+  whereTheyWin: [
+    'Fast to start — set a budget and leads can come the same week',
+    'You control spend at the budget level and pay when a customer reaches out',
+    'Broad category coverage beyond the trades, with real consumer traffic',
+    'A workable bridge before your own ranking and reviews exist',
+  ],
+  whereLolaWins: [
+    'Thumbtack often sends the same request to several pros — you pay to compete. Your ranking sends the customer to you.',
+    'Budgets creep as competition rises; a flat $397/month stays put.',
+    'Turn Thumbtack off and the contacts stop. Your ranking, site, and reviews keep working.',
+    'Thumbtack doesn\'t put you in ChatGPT or Google AI answers — Lola is built to.',
+  ],
+  table: [
+    { label: 'Cost model', lola: '$397/month, flat', them: 'Pay per contact, budget-based', lolaWin: true },
+    { label: 'Leads shared with rivals', lola: 'No', them: 'Often — several pros contacted', lolaWin: true },
+    { label: 'Speed to first lead', lola: 'Weeks — then compounds', them: 'Days', lolaWin: false },
+    { label: 'Stops when you stop paying', lola: 'No — ranking persists', them: 'Yes, immediately', lolaWin: true },
+    { label: 'Shows up in AI answers', lola: 'Yes — the core product', them: 'No', lolaWin: true },
+    { label: 'You own the asset', lola: 'Site, profile, reviews', them: 'Marketplace profile (rented)', lolaWin: true },
+    { label: 'Best for', lola: 'Visibility you keep', them: 'A fast, budgeted start', lolaWin: false },
+  ],
+  faqs: [
+    {
+      q: 'Is Thumbtack worth it for contractors?',
+      a: 'It can work as a fast start or to fill gaps, if you respond quickly and close enough contacts to justify the spend. The recurring complaints are shared leads and budgets that climb over time. Like any marketplace, it rents you access — it doesn\'t build visibility you keep.',
+    },
+    {
+      q: 'Are Thumbtack leads exclusive?',
+      a: 'Often not — the same request is frequently sent to multiple pros, so speed of response matters and the same customer may be talking to your competitors. A customer who finds you through your own ranking or an AI answer isn\'t being shopped around.',
+    },
+    {
+      q: 'Thumbtack or SEO — where should my money go?',
+      a: 'If you need contacts now and have nothing online yet, a budgeted marketplace bridges the gap. Put money into your own ranking in parallel, because that\'s the part that eventually lets you turn the pay-per-lead spend down. Rent leads to start; own visibility to last.',
+    },
+    {
+      q: 'Does Thumbtack help me show up in Google or AI search?',
+      a: 'No. Thumbtack ranks inside Thumbtack. Whether you appear in the Google map pack, or get named by ChatGPT and Gemini, depends on your own site, profile, and reviews — which is exactly what Lola works on. A marketplace profile doesn\'t affect either.',
+    },
+    {
+      q: 'What does Thumbtack cost?',
+      a: 'You set a budget and pay per contact, and the effective cost per job varies by trade, market and how many pros are bidding. We won\'t quote a number we can\'t stand behind. Run your Growth Score and the break-even math on our pricing page against your real average ticket.',
+    },
+  ],
+};
+
 const COMPETITORS: Record<string, Competitor> = {
   localiq: LOCALIQ,
   brightlocal: BRIGHTLOCAL,
@@ -549,6 +753,9 @@ const COMPETITORS: Record<string, Competitor> = {
   yext: YEXT,
   hibu: HIBU,
   'local-service-ads': LSA,
+  angi: ANGI,
+  homeadvisor: HOMEADVISOR,
+  thumbtack: THUMBTACK,
 };
 
 export function getCompetitorSlugs(): string[] {

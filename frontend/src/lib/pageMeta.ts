@@ -337,6 +337,9 @@ const VS: ReadonlyArray<[slug: string, name: string, hook: string]> = [
   ['yext', 'Yext', 'listings sync you rent vs local SEO and AI visibility you own'],
   ['hibu', 'Hibu', 'a bundled ad-agency contract vs a published $397/month'],
   ['local-service-ads', 'Local Service Ads', 'paid leads per call vs organic and AI visibility you keep'],
+  ['angi', 'Angi', 'shared pay-per-lead marketplace vs visibility you own'],
+  ['homeadvisor', 'HomeAdvisor', 'per-lead fees and shared leads vs local SEO you keep'],
+  ['thumbtack', 'Thumbtack', 'pay-per-contact marketplace vs ranking you own'],
 ];
 
 for (const [slug, name, hook] of VS) {

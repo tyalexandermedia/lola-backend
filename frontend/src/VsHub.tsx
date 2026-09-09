@@ -31,6 +31,9 @@ const CARDS: Array<{ slug: string; name: string; oneLine: string; priceRange: st
   { slug: 'yext',        name: 'Yext',        oneLine: 'Enterprise listings management + Answers AI for multi-location brands.', priceRange: 'Enterprise quote', category: 'Listings platform' },
   { slug: 'local-service-ads', name: 'Google Local Service Ads', oneLine: "Google's own pay-per-lead placement + the Google Guaranteed badge — the one contractors ask about most.", priceRange: 'Pay per lead — ongoing', category: 'Paid placement' },
   { slug: 'hibu',        name: 'Hibu',        oneLine: 'Full-service local digital marketing agency — sites, ads, SEO, social.', priceRange: 'Quote-only', category: 'Full-stack agency' },
+  { slug: 'angi',        name: 'Angi',        oneLine: 'Home-services marketplace that sells you leads — usually shared with several pros.', priceRange: 'Pay per lead — varies', category: 'Lead marketplace' },
+  { slug: 'homeadvisor', name: 'HomeAdvisor', oneLine: 'Pay-per-lead marketplace (now Angi Leads) — per-lead fees, leads matched to several pros.', priceRange: 'Per-lead + membership', category: 'Lead marketplace' },
+  { slug: 'thumbtack',   name: 'Thumbtack',   oneLine: 'Set a budget, pay per contact — leads often sent to several pros at once.', priceRange: 'Pay per contact — budgeted', category: 'Lead marketplace' },
 ];
 
 export default function VsHub() {

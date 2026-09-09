@@ -39,4 +39,7 @@ export const ROUTES = [
   '/vs/podium',
   '/vs/yext',
   '/vs/hibu',
+  '/vs/angi',
+  '/vs/homeadvisor',
+  '/vs/thumbtack',
 ];
