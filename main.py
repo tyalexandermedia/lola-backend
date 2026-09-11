@@ -3892,7 +3892,7 @@ async def _send_purchase_email(to_email: str, tier: str, link: str) -> None:
     complete one. Sent from Lola to Lola's own customer, so it is unaffected by
     OUTBOUND_VIA_GHL, which governs messaging to CLIENTS' customers.
     """
-    label = "Lola Leads Monthly"
+    label = "Coach Ty Leads Monthly"
     cta = "Do the 2-minute intake"
     html = (
         f'<div style="font-family:sans-serif;max-width:520px;margin:0 auto">'

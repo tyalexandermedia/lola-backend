@@ -104,12 +104,24 @@ coachtyleads.com, while the new homepage + training paths stay on coachtyalexand
 
 ## Rollback
 
-1. **Fastest (no deploy of code):** set `VITE_SITE_ORIGIN=https://www.coachtyalexander.com`
-   in the Vercel project and redeploy. The env override flips canonicals, OG, schema,
-   sitemap and the `/lp` pages back in one variable.
-2. **Full revert:** `git revert` the migration commit on this branch and redeploy.
-3. The host-aware redirects are inert unless coachtyalexander.com points at this project,
-   so a rollback needs no redirect cleanup.
+1. **Complete rollback — `git revert`.** Revert the migration commit(s) on this branch and
+   redeploy. This is the reliable path: it restores the old code defaults, the old committed
+   `/lp/*.html` + `sitemap.xml`, AND removes the host-aware `vercel.json` redirect — all
+   together, so nothing is left half-migrated.
+2. **Emergency, canonical-only (PARTIAL — not a full rollback).** Setting
+   `VITE_SITE_ORIGIN=https://www.coachtyalexander.com` and redeploying flips the
+   **prerendered app routes** (`/`, `/pricing`, `/vs/*`, …) — canonical, `og:url`, schema —
+   back immediately. It does **not**:
+   - regenerate the committed `/lp/*.html` or `sitemap.xml` — those are `gen_lp.py` output and
+     the Vercel build never runs `gen_lp.py`, so they keep the new domain and `check-seo` will
+     **fail the build** on the route/sitemap domain mismatch; and
+   - change `vercel.json`, so the host-aware 301 still sends `coachtyalexander.com/<path>` to
+     `coachtyleads.com` — the old domain can't serve its own content.
+
+   So use it only as a stopgap for app-route canonicals, then finish with `git revert`. (If you
+   must stay forward instead: re-run `python3 frontend/scripts/gen_lp.py` with `VITE_SITE_ORIGIN`
+   set to the old origin, commit the regenerated `/lp` + `sitemap.xml`, and drop the host-aware
+   redirect from `gen_lp.py`.)
 
 ## Intentionally NOT changed
 
