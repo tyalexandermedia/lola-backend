@@ -52,7 +52,7 @@ export default function BeforeAfter() {
             so dragging left reveals more of the new site. */}
         <img
           src={AFTER}
-          alt="Sandbar Soft Wash's website as built by Lola Leads"
+          alt="Sandbar Soft Wash's website as built by Coach Ty Leads"
           className="block w-full"
           width={1200}
           height={900}

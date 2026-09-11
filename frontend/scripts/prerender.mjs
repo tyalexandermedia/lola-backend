@@ -57,7 +57,7 @@ const ROOT_DIV = '<div id="root"></div>';
  * Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts, and reads the
  * same env var, so a domain move is one variable rather than a sweep.
  */
-const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyalexander.com').replace(/\/$/, '');
+const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyleads.com').replace(/\/$/, '');
 
 /**
  * Rewrite the shared <head> for one route.

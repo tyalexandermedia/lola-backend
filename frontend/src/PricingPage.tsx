@@ -50,7 +50,7 @@ export default function PricingPage() {
         description: PLAN.positioning,
         provider: {
           '@type': 'Organization',
-          name: 'Lola Leads — Ty Alexander Media',
+          name: 'Coach Ty Leads — Ty Alexander Media',
           url: SITE_ORIGIN,
         },
         areaServed: { '@type': 'Country', name: 'United States' },

@@ -46,6 +46,9 @@ import { PLAN, GUARANTEE } from './pricing';
  * Canonical origin — ONE definition for the whole frontend.
  *
  * 2026-08-20: migrated from lola.tyalexandermedia.com to www.coachtyalexander.com.
+ * 2026-09-11: migrated to www.coachtyleads.com (Coach Ty Leads). coachtyalexander.com
+ * is being freed up to become a separate personal-training / athletics site later,
+ * so the marketing brand now lives on its own domain.
  *
  * Env-overridable rather than a hardcoded literal, deliberately. A domain move
  * is the change most likely to need reverting under time pressure, and a
@@ -59,15 +62,15 @@ import { PLAN, GUARANTEE } from './pricing';
  */
 export const SITE_ORIGIN = (
   (import.meta.env.VITE_SITE_ORIGIN as string | undefined)?.trim() ||
-  'https://www.coachtyalexander.com'
+  'https://www.coachtyleads.com'
 ).replace(/\/$/, '');
-export const SITE_NAME = 'Lola Leads';
-export const LEGAL_NAME = 'Ty Alexander Media';
+export const SITE_NAME = 'Coach Ty Leads';
+export const LEGAL_NAME = 'Ty Alexander Media LLC';
 
 /** Share image. 1200x630, shipped in public/. */
 export const OG_IMAGE = `${SITE_ORIGIN}/og.png`;
 export const OG_IMAGE_ALT =
-  'Lola Leads — done-for-you local SEO for Tampa Bay service businesses. Website design included, then $397/month.';
+  'Coach Ty Leads — done-for-you local SEO for Tampa Bay service businesses. Website design included, then $397/month.';
 
 export interface PageMeta {
   /** <= 60 chars. Leads with the demand term, not the brand. */
@@ -387,6 +390,7 @@ export function organizationSchema() {
     '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
     '@id': ORG_ID,
     name: SITE_NAME,
+    alternateName: ['The Lola Local Growth System', 'Lola'],
     legalName: LEGAL_NAME,
     url: `${SITE_ORIGIN}/`,
     logo: `${SITE_ORIGIN}/og.png`,

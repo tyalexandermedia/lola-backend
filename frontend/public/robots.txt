@@ -17,4 +17,4 @@ Allow: /
 User-agent: anthropic-ai
 Allow: /
 
-Sitemap: https://www.coachtyalexander.com/sitemap.xml
+Sitemap: https://www.coachtyleads.com/sitemap.xml

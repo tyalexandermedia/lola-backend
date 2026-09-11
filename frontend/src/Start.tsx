@@ -79,7 +79,7 @@ export default function Start() {
     // The unpaid title/description come from PAGE_META so the prerendered
     // /start head and this one cannot disagree; the paid view gets its own,
     // and its noindex, because it is a receipt rather than a landing page.
-    title: paid ? "You're in — Lola Leads" : PAGE_META['/start'].title,
+    title: paid ? "You're in — Coach Ty Leads" : PAGE_META['/start'].title,
     description: paid
       ? 'Your plan is active. Here is what happens next.'
       : PAGE_META['/start'].description,

@@ -32,7 +32,7 @@ export const FOUNDER = {
   fullName: 'Ty Alexander Traufield',
   /** What Tampa Bay actually calls him. */
   knownAs: 'Coach Ty',
-  title: 'Founder, Lola Leads',
+  title: 'Founder, Coach Ty Leads',
   company: 'Ty Alexander Media',
   location: 'St. Pete · serving all of Tampa Bay, FL',
   /** Direct line. Mirrors the telephone/email in index.html's JSON-LD —

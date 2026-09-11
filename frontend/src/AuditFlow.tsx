@@ -1624,7 +1624,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         <p className="mt-5 text-[13px] text-gold">
           — Coach Ty
           <span className="ml-2 text-[12px] text-ink-3">
-            Ty Alexander Traufield · Founder, Lola Leads · Ty Alexander Media · St. Pete, FL ·
+            Ty Alexander Traufield · Founder, Coach Ty Leads · Ty Alexander Media · St. Pete, FL ·
             @tyalexandermedia
           </span>
         </p>

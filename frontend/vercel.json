@@ -1,6 +1,28 @@
 {
   "redirects": [
     {
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "coachtyalexander.com"
+        }
+      ],
+      "destination": "https://www.coachtyleads.com/:path+",
+      "permanent": true
+    },
+    {
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.coachtyalexander.com"
+        }
+      ],
+      "destination": "https://www.coachtyleads.com/:path+",
+      "permanent": true
+    },
+    {
       "source": "/lp/local-seo-pressure-washing-florida",
       "destination": "/lp/pressure-washing-seo-tampa",
       "permanent": true
