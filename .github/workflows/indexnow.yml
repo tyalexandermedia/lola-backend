@@ -15,12 +15,12 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, re, urllib.request
-          xml = urllib.request.urlopen('https://lola.tyalexandermedia.com/sitemap.xml', timeout=30).read().decode()
+          xml = urllib.request.urlopen('https://www.coachtyleads.com/sitemap.xml', timeout=30).read().decode()
           urls = sorted(set(re.findall(r'<loc>(.*?)</loc>', xml)))
           body = json.dumps({
-              'host': 'lola.tyalexandermedia.com',
+              'host': 'www.coachtyleads.com',
               'key': '22a022ee88cb970590631f5efcd7ec1f',
-              'keyLocation': 'https://lola.tyalexandermedia.com/22a022ee88cb970590631f5efcd7ec1f.txt',
+              'keyLocation': 'https://www.coachtyleads.com/22a022ee88cb970590631f5efcd7ec1f.txt',
               'urlList': urls,
           }).encode()
           req = urllib.request.Request('https://api.indexnow.org/indexnow', data=body,
