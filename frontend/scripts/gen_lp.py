@@ -800,7 +800,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0A0A0B">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="google-site-verification" content="T9uR-1_o17WTlgJz1zN-KPcvCn1qjrN_QmUZ11M8QNU">
 <meta name="msvalidate.01" content="CD8E25FF91F5386338431014B7D68066">
 <link rel="icon" href="/favicon.svg">
@@ -995,7 +995,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0A0A0B">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="google-site-verification" content="T9uR-1_o17WTlgJz1zN-KPcvCn1qjrN_QmUZ11M8QNU">
 <meta name="msvalidate.01" content="CD8E25FF91F5386338431014B7D68066">
 <link rel="icon" href="/favicon.svg">
