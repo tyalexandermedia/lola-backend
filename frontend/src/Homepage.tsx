@@ -30,7 +30,7 @@
  * with react-dom/server (see scripts/prerender.mjs), so the headline, body and
  * offer are readable in the raw HTML before any JS runs. Nothing here reads
  * `window`/`document` during render; the only effects (useSeo, useReveal) are
- * progressive enhancement. Pricing, Stripe links and the 90-Day Promise
+ * progressive enhancement. Pricing, Stripe links and the launch commitment
  * are NOT defined here — they live in lib/pricing, lib/checkout and the
  * index.html JSON-LD, which this page intentionally does not touch.
  */
@@ -216,23 +216,22 @@ function Hero() {
               <span className="text-[14.5px] font-semibold text-ink">Your website, designed &amp; built</span>
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
-                <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-ok">
-                  Included
+                <span className="rounded-full border border-gold/40 bg-gold/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-gold">
+                  $997 launch
                 </span>
               </span>
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
-              <span className="text-[14.5px] text-ink-2">Then everything else, monthly</span>
+              <span className="text-[14.5px] text-ink-2">Then the full system, monthly</span>
               <span className="shrink-0 text-[17px] font-bold text-ink">
                 {PLAN.price}<span className="text-[13px] font-semibold text-ink-3">{PLAN.period}</span>
               </span>
             </div>
           </div>
-          {/* One line. The struck $3,000+ above already makes the comparison —
-              spelling it out again in two more lines was the reader doing the
-              same arithmetic twice. */}
+          {/* The one-time launch fee builds the site + foundation; the struck
+              $3,000+ is what a comparable custom site costs elsewhere. */}
           <p className="mt-2.5 text-[13px] leading-[1.5] text-ink-3">
-            No setup fee. Most shops charge that up front.
+            A one-time $997 launch builds it — most shops charge $3,000+ for the website alone.
           </p>
 
           {/* Desktop-only now: on mobile the same free-score button already sits
@@ -270,7 +269,7 @@ function Hero() {
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
             {trialLine() && <span className="text-ok">{trialLine()}</span>}
             {trialLine() && <span aria-hidden className="text-ink-4">/</span>}
-            <span className="text-gold">Ranking in 90 days or 2 months free</span>
+            <span className="text-gold">We finish the launch scope we agree on — in writing</span>
           </p>
 
           {/* PROOF ABOVE THE FOLD.
@@ -465,8 +464,8 @@ function ReportCard() {
           </span>
           <span className="flex shrink-0 items-baseline gap-2">
             <span className="text-[12px] text-ink-4 line-through">$3,000+</span>
-            <span className="rounded-full border border-ok/35 bg-ok/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-ok">
-              Included
+            <span className="rounded-full border border-gold/40 bg-gold/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-gold">
+              $997 launch
             </span>
           </span>
         </div>
@@ -529,7 +528,7 @@ function ReportCard() {
           <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
         </a>
         <p className="mt-2 text-center text-[11.5px] leading-[1.45] text-ink-3">
-          No setup fee · cancel anytime after the first 3 months
+          One-time $997 launch · month-to-month after the first 90 days
         </p>
 
         {/* Softer second path, 44px min height. */}
@@ -978,11 +977,11 @@ const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 const COMPARISON: ReadonlyArray<{ label: string; agency: string; lola: string }> = [
   { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(LOLA_YEAR_ONE)} — $${MONTHLY_PRICE}/mo` },
-  { label: 'Website build', agency: '$3,000+ extra, up front', lola: 'Included, no setup fee' },
-  { label: 'Contract', agency: '12 months, locked', lola: 'Cancel after 3 months' },
+  { label: 'Website build', agency: '$3,000+ extra, up front', lola: 'Built in your $997 launch' },
+  { label: 'Contract', agency: '12 months, locked', lola: 'Month-to-month after 90 days' },
   { label: 'Who does the work', agency: 'An account manager', lola: 'Ty — the one you texted' },
   { label: 'What you get monthly', agency: 'A 50-page PDF report', lola: 'A live score you can check' },
-  { label: "If you don't rank", agency: 'You keep paying', lola: 'Your next 2 months are free' },
+  { label: 'If the launch scope slips', agency: 'You keep paying', lola: 'We keep working until it ships' },
 ];
 
 function RoiSection() {
@@ -1024,7 +1023,7 @@ function RoiSection() {
               {usd(AGENCY_MONTHLY)}/mo agency
             </span>
             <span className="text-right text-[10px] uppercase leading-[1.3] tracking-[0.14em] text-gold sm:w-[136px] lg:w-[160px]">
-              Lola — $397/mo
+              Lola — {PLAN.price}/mo
             </span>
           </div>
 
@@ -1045,7 +1044,7 @@ function RoiSection() {
                   {row.agency}
                 </dd>
                 <dd className="text-right text-[13px] font-semibold leading-[1.4] text-ink sm:w-[136px] lg:w-[160px]">
-                  <span className="sr-only">Lola — $397/mo: </span>
+                  <span className="sr-only">Lola — {PLAN.price}/mo: </span>
                   {row.lola}
                 </dd>
               </div>
@@ -1247,17 +1246,13 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
     >
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[12px] uppercase tracking-[0.08em] text-ink">{tier.name}</p>
-        {featured && (
-          <span className="rounded-md bg-gold px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-on-gold">
-            {undefined}
-          </span>
-        )}
       </div>
       <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-ink">
         {tier.price}
         <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-ink-3">{tier.period}</span>
       </p>
       <p className="mt-3 text-[15px] font-medium leading-[1.45] text-ink-2">{tier.tagline}</p>
+      <p className="mt-2 text-[12.5px] leading-[1.4] text-ink-3">{tier.terms}</p>
 
       <ul className="mt-5 flex-1 space-y-2.5 border-t border-white/[0.07] pt-5">
         {tier.includes.map((line) => (
@@ -1326,7 +1321,7 @@ function FinalCta() {
           {/* Desktop only: this sentence describes the Start button, which
               phones don't show here (the sticky bar carries it). */}
           <span className="hidden sm:inline">
-            {' '}Or start today: website design included, {PLAN.price}{PLAN.period}, cancel anytime after 3 months.
+            {' '}Or start today: the complete system with your website built in — {PLAN.price}{PLAN.period} plus a one-time $997 launch.
           </span>
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">

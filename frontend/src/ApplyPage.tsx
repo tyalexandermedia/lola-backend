@@ -20,7 +20,7 @@ import { FOUNDER } from './lib/lola';
 import { usePageMeta } from './lib/seo';
 
 type RevenueBand = 'under_20k' | '20k_50k' | '50k_100k' | '100k_plus';
-type TierInterest = 'monthly';
+type TierInterest = 'visibility' | 'growth' | 'expansion';
 
 const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
@@ -39,12 +39,14 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
   { value: '100k_plus', label: '$100K+' },
 ];
 
-// One plan (source of truth: docs/PRICING.md). The radio group is a single
-// option on purpose — it confirms what they're starting rather than asking them
-// to choose, and the value posted here becomes the tier label in the
-// confirmation email the backend sends (main.py::TIER_LABELS).
+// The two plans + the custom Expansion route (source of truth: docs/PRICING.md).
+// The value posted here becomes the tier label in the confirmation email the
+// backend sends (main.py::TIER_LABELS) — keep these values in sync with that map.
+// A ?plan= hint from the pricing page pre-selects the matching option.
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'monthly', label: 'The monthly — $397/month' },
+  { value: 'visibility', label: 'Local Visibility — $397/mo + $397 activation' },
+  { value: 'growth', label: 'Local Growth System — $797/mo + $997 launch' },
+  { value: 'expansion', label: 'Expansion — custom, from $1,497/mo' },
 ];
 
 export default function ApplyPage() {
@@ -57,7 +59,13 @@ export default function ApplyPage() {
   const [monthly_revenue, setMonthlyRevenue] = useState<RevenueBand | ''>('');
   const [trade, setTrade] = useState('');
   const [frustration, setFrustration] = useState('');
-  const [tier, setTier] = useState<TierInterest | ''>('');
+  // Pre-select from a ?plan= hint on the pricing-page CTAs. SSR-guarded so the
+  // prerender pass (no window) starts empty and hydration matches.
+  const [tier, setTier] = useState<TierInterest | ''>(() => {
+    if (typeof window === 'undefined') return '';
+    const p = new URLSearchParams(window.location.search).get('plan');
+    return p === 'visibility' || p === 'growth' || p === 'expansion' ? p : '';
+  });
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

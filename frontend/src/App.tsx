@@ -3,7 +3,6 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import PawMark from './PawMark';
 import { startHref, startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
-import { PLAN } from './lib/pricing';
 import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
@@ -363,7 +362,7 @@ function SiteFooter({ route }: { route: Route }) {
             44px on every phone and read as padding. */}
         <FooterCol title="Get found">
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
-          <FooterLink href="/pricing">Pricing — $397/month</FooterLink>
+          <FooterLink href="/pricing">Pricing — from $397/mo</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>
@@ -371,10 +370,10 @@ function SiteFooter({ route }: { route: Route }) {
 
         <FooterCol title="Compare">
           <FooterLink href="/vs">All comparisons</FooterLink>
-          <FooterLink href="/vs/localiq">Lola vs LocalIQ</FooterLink>
-          <FooterLink href="/vs/brightlocal">Lola vs BrightLocal</FooterLink>
-          <FooterLink href="/vs/scorpion">Lola vs Scorpion</FooterLink>
-          <FooterLink href="/vs/podium">Lola vs Podium</FooterLink>
+          <FooterLink href="/vs/localiq">vs LocalIQ</FooterLink>
+          <FooterLink href="/vs/brightlocal">vs BrightLocal</FooterLink>
+          <FooterLink href="/vs/scorpion">vs Scorpion</FooterLink>
+          <FooterLink href="/vs/podium">vs Podium</FooterLink>
         </FooterCol>
 
         <FooterCol title="Trust">
@@ -476,10 +475,10 @@ function MobileStickyCTA({ route }: { route: Route }) {
           href={buyHref}
           className="flex h-12 flex-[1.35] items-center justify-center rounded-md bg-gradient-to-r from-gold via-gold-bright to-gold px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-on-gold shadow-glow transition-transform duration-150 ease-press active:scale-[0.97]"
         >
-          {/* The full "Start — $397/month" wrapped to two lines at 390px and
-              looked cramped beside the other two controls. Abbreviated so the
-              primary control stays on one line on the narrowest phone. */}
-          Start · {PLAN.price}/mo →
+          {/* Two plans now, so the sticky control can't quote one price — it
+              opens /pricing (or /apply on the offer) to choose. Kept short so it
+              stays on one line beside the other two controls on the narrowest phone. */}
+          Get Started →
         </a>
         {/* Reaching a human is the offer ("you text Ty directly"), so it earns
             a permanent control rather than living only in the footer. Icon-only

@@ -1,17 +1,19 @@
 """
-LOLA — pricing & offer (backend source of truth).
+Coach Ty Leads — pricing & offer (backend source of truth).
 
 Mirror of docs/PRICING.md. When pricing changes: update docs/PRICING.md first,
 then this file, then frontend/src/lib/pricing.ts and frontend/scripts/gen_lp.py.
 
-Model: a simple two-tier offer, both one-time.
+Model (2026-09-12): a free Growth Score diagnostic + two paid plans + a custom
+Expansion route.
 
-  - The monthly  $397/month  "Everything it takes to get you found. One monthly price."
+  - Local Visibility     $397/month + $397 one-time activation
+  - Local Growth System  $797/month + $997 one-time launch   (recommended)
+  - Expansion            custom, from $1,497/month
 
-Replaces the retired two-tier one-time model (DIY $197, Full Build $997), which
-replaced the Foundation → Growth → Scale roadmap before it.
-The Growth Score stays the free, branded, top-of-funnel lead magnet. The optional
-There is no separate retainer any more: the monthly IS the offer, and it is public.
+Replaces the single $397 all-inclusive plan (website included free, 90-Day
+Promise), which replaced the two-tier one-time model (DIY $197, Full Build $997).
+The Growth Score stays the free, branded, top-of-funnel diagnostic.
 
 The DB-backed counter is retained (function signatures unchanged for import
 compatibility) as a simple build-signup counter.
@@ -25,17 +27,22 @@ import aiosqlite
 DB_PATH = os.getenv("DB_PATH", "lola.db")
 
 # ── Offer prices (source of truth) ────────────────────────────────
-MONTHLY_PRICE = 397        # /month — all-inclusive; the only paid offer
-# Back-compat aliases so older imports keep resolving to the live price rather
-# than a retired one. Remove once nothing references them.
-DIY_PRICE = MONTHLY_PRICE
-BUILD_PRICE = MONTHLY_PRICE
+VISIBILITY_PRICE = 397         # Local Visibility — $/month
+VISIBILITY_ACTIVATION = 397    # one-time activation
+GROWTH_PRICE = 797             # Local Growth System — $/month (recommended)
+GROWTH_LAUNCH = 997            # one-time launch
+EXPANSION_FROM = 1497          # Expansion — custom, from $/month
 
-# Optional, EMAIL-ONLY retainer. Never surfaced on a page; introduced only in the
-# final follow-up email. Modeled here purely so backend copy has one source.
-RETAINER_PRICE = MONTHLY_PRICE  # the monthly IS the offer now — no separate retainer
+# The live Stripe subscription (and its webhook validation) is $397/month, which
+# equals the Local Visibility monthly. Older imports referencing MONTHLY_PRICE
+# resolve to that entry price.
+MONTHLY_PRICE = VISIBILITY_PRICE
+# Back-compat aliases so older imports keep resolving to a live price.
+DIY_PRICE = VISIBILITY_PRICE
+BUILD_PRICE = GROWTH_PRICE
+RETAINER_PRICE = GROWTH_PRICE
 
-PRICE_RANGE = "$397/month"
+PRICE_RANGE = "$397–$797/month"
 
 # ── Signup counter ────────────────────────────────────────────────
 # Retained for import compatibility with main.py. Kept as a simple counter.
