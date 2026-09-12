@@ -106,7 +106,7 @@ export default function SharedReport({ auditId }: { auditId: string }) {
       audit={audit}
       cta={
         justScored
-          ? { label: 'Fix this for me — see the Full Build', href: '/pricing' }
+          ? { label: 'Fix this for me — see the plans', href: '/pricing' }
           : { label: 'Run your own Growth Score', href: '/growth-score' }
       }
     />

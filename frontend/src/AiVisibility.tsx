@@ -4,7 +4,7 @@
  *
  * Calls GET /ai-visibility, which asks Claude whether an AI assistant would
  * currently recommend this business for its trade + city. When AI doesn't name
- * them, that's the gap the Full Build closes — so this block becomes live proof
+ * them, that's the gap the Local Growth System closes — so this block becomes live proof
  * with a direct CTA. Renders nothing if the backend has no Anthropic key
  * (available:false) or there isn't enough info to ask.
  */
@@ -128,7 +128,7 @@ export default function AiVisibility({
               </p>
               <p className="mx-auto mt-2 max-w-[460px] text-[13px] leading-[1.6] text-ink-2">
                 Now let&apos;s make sure you&apos;re the <em>top</em> pick — and that Google agrees.
-                The $397/month plan locks it in.
+                Our plans keep you there — starting at $397/month.
               </p>
             </>
           ) : (
@@ -138,9 +138,8 @@ export default function AiVisibility({
               </p>
               <p className="mx-auto mt-2 max-w-[480px] text-[13px] leading-[1.6] text-ink-2">
                 When your next customer asks AI for a {trade || 'business'} in {city}, you want to be
-                the name it gives. The <span className="font-semibold text-gold">$397/month Full
-                Build</span> gets you found — on Google and in AI answers — backed by our 90-Day Promise
-                Guarantee.
+                the name it gives. The <span className="font-semibold text-gold">Local Growth
+                System</span> gets you found — on Google and in AI answers — backed by our launch commitment.
               </p>
             </>
           )}
@@ -148,7 +147,7 @@ export default function AiVisibility({
             href="/pricing"
             className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_4px_16px_rgba(212,175,55,0.28)] transition hover:scale-[1.02]"
           >
-            See the monthly →
+            See the plans →
           </a>
         </div>
       )}

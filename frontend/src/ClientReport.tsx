@@ -753,8 +753,8 @@ function WhatWeWatchCard({
 
       {/* What to expect, and when. Silence is what makes a new client anxious in
           month one, so the timeline is stated up front. Deliberately describes
-          WORK on a schedule, never results on a schedule — the only dated
-          outcome promise Lola makes is the 90-Day Promise. */}
+          WORK on a schedule, never results on a schedule. The only commitment
+          Lola makes is the launch commitment — finish the agreed scope. */}
       <div className="border-t border-white/10 px-6 py-5 sm:px-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
           What happens from here

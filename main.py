@@ -958,9 +958,10 @@ async def send_audit_email(
     except Exception:
         founding_remaining = FOUNDING_CAP  # safe fallback — never says "0 left" on error
     founding_line = (
-        "P.P.S. — The 90-Day Promise: we pick your money keywords together in week 1, "
-        "and if I don't get you ranking on page one or in the map pack within 90 days, "
-        "your next 2 months are free. I only make money if the work lands."
+        "P.P.S. — Our launch commitment: we agree the launch scope and the search terms "
+        "we track before any work starts, and if we don't finish the agreed foundation in "
+        "the launch window for reasons on our side, we keep working at no extra management "
+        "charge until it's done."
     )
 
     # Plain-text fallback (Gmail uses this for the preview pane + accessibility)
@@ -992,15 +993,15 @@ Inside the report:
 
 WANT ME TO FIX IT?
 
-$397/month — and your website is included free.
+Two plans, from $397/month.
 
-Most shops charge $3,000+ just to build the site, then bill you monthly on top. Yours is part of it: designed, built, and written so Google AND ChatGPT can actually read it. Plus your Google Business Profile managed every month, and a live dashboard you can open any time to check my work.
+Local Visibility ($397/month + a one-time $397 activation) strengthens your Google Business Profile, reviews, missed-call text-back and lead tracking — for a business that already has a usable website. The Local Growth System ($797/month + a one-time $997 launch) adds a conversion-focused website built in, technical SEO and automated follow-up. Everything's done for you, with a live dashboard you can open any time to check my work.
 
-Ranking on page one or in the map pack within 90 days, or your next 2 months are free.
+Our launch commitment: we agree the launch scope and the search terms we track before work starts, and if we don't finish the agreed foundation in the launch window for reasons on our side, we keep working at no extra management charge until it's done.
 
-One client per trade, per city — I can't rank two soft-wash companies in the same town against each other, so I don't take the second one.
+One client per trade, per agreed territory — I can't rank two soft-wash companies in the same town against each other, so I don't take the second one.
 
-{STRIPE_MONTHLY_URL}
+See the plans and pick what fits: {pricing_url}
 
 Or just hit reply. Tell me what you want fixed first, and I'll walk you through the order. No pitch, no pressure.
 
@@ -1091,12 +1092,12 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want me to fix it?</strong> <span style="color:#C9A84C;">$397/month</span></p>
-<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">Your website is included free.</strong> Most shops charge $3,000+ just to build it, then bill you monthly on top. Yours is designed, built, and written so Google AND ChatGPT can actually read it — plus your Google Business Profile managed every month, and a live dashboard you can open any time to check my work.</p>
-<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>The 90-Day Promise:</strong> ranking on page one or in the map pack within 90 days, or your next 2 months are free.</p>
-<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">One client per trade, per city.</strong> I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want me to fix it?</strong> <span style="color:#C9A84C;">Plans from $397/month</span></p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">Local Visibility — $397/month</strong> (+ a one-time $397 activation) strengthens your Google Business Profile, reviews, missed-call text-back and lead tracking, for a business that already has a usable website. <strong style="color:#F0EAD6;">Local Growth System — $797/month</strong> (+ a one-time $997 launch) adds a conversion-focused website built in, technical SEO and automated follow-up. Done for you, with a live dashboard you can open any time.</p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>Our launch commitment:</strong> we agree the launch scope and the search terms we track before work starts — and if we don't finish the agreed foundation in the launch window for reasons on our side, we keep working at no extra management charge until it's done.</p>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">One client per trade, per agreed territory.</strong> I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
-<a href="{STRIPE_MONTHLY_URL}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">Start — $397/month →</a>
+<a href="{pricing_url}" target="_blank" rel="noopener" style="display:inline-block;padding:14px 24px;font-size:14px;font-weight:700;color:#0A0A0A;text-decoration:none;min-height:48px;line-height:1.4;">See the plans →</a>
 </td></tr></table>
 </td></tr></table>
 </td></tr>
@@ -1125,7 +1126,7 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 </td></tr>
 
 <tr><td style="padding:0 28px 28px;">
-<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — <strong style="color:#C9A84C">The 90-Day Promise</strong>: we pick your money keywords together in week 1, and if I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. I only make money if the work lands.</p>
+<p style="margin:0;padding:12px 18px;background:#1A1408;border:1px solid #C9A84C;border-radius:6px;font-size:13px;line-height:1.6;color:#F0EAD6;">🦴 <strong>P.P.S.</strong> — <strong style="color:#C9A84C">Our launch commitment</strong>: we agree the launch scope and the search terms we track before work starts, and if we don't finish the agreed foundation in the launch window for reasons on our side, we keep working at no extra management charge until it's done.</p>
 </td></tr>
 
 </table>
@@ -1641,12 +1642,13 @@ async def pricing():
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        # One offer (source of truth: docs/PRICING.md). This used to publish
-        # {"diy": 197, "build": 997} — a public endpoint serving two prices that
-        # no longer exist. Nothing in the frontend reads it today, which is
-        # exactly why it went stale unnoticed.
+        # Two plans + a custom Expansion route (source of truth: docs/PRICING.md).
+        # Nothing in the frontend reads this today (it reads lib/pricing.ts), but
+        # it's kept truthful so a scraped public price is never a retired one.
         "tiers": {
-            "monthly": {"recurring_monthly": 397},
+            "visibility": {"recurring_monthly": 397, "one_time_activation": 397},
+            "growth": {"recurring_monthly": 797, "one_time_launch": 997},
+            "expansion": {"recurring_monthly_from": 1497},
         },
     }
 
@@ -1675,18 +1677,24 @@ REVENUE_LABELS = {
 # key now resolves to the one plan rather than to "$997 one-time · Half-Back
 # Guarantee" — the apply form posts "monthly", which wasn't even in this map, so
 # it silently fell through to the bare string.
-_MONTHLY_LABEL = "The monthly — $397/month, website design included free"
+# The /apply form posts one of the current plan values (visibility / growth /
+# expansion). Older cached bundles may still post retired values (monthly, diy,
+# build, …); those fall back to a neutral label rather than a stale price.
+_LEGACY_LABEL = "A Coach Ty Leads plan (details in the application)"
 TIER_LABELS = {
-    "monthly": _MONTHLY_LABEL,
+    # Current plans — must match ApplyPage TIER_OPTIONS values.
+    "visibility": "Local Visibility — $397/month + $397 activation",
+    "growth": "Local Growth System — $797/month + $997 launch",
+    "expansion": "Expansion — custom, from $1,497/month",
     "both": "Tell me which fits better",
     # Back-compat for older/retired inbound payloads (stale cached bundles).
-    "diy": _MONTHLY_LABEL,
-    "build": _MONTHLY_LABEL,
-    "foundation": _MONTHLY_LABEL,
-    "growth": _MONTHLY_LABEL,
-    "scale": _MONTHLY_LABEL,
-    "retainer": _MONTHLY_LABEL,
-    "pro": _MONTHLY_LABEL,
+    "monthly": _LEGACY_LABEL,
+    "diy": _LEGACY_LABEL,
+    "build": _LEGACY_LABEL,
+    "foundation": _LEGACY_LABEL,
+    "scale": _LEGACY_LABEL,
+    "retainer": _LEGACY_LABEL,
+    "pro": _LEGACY_LABEL,
 }
 
 
@@ -2659,10 +2667,10 @@ def draft_outreach_email(
         f"{score_line}. When someone asks Google, ChatGPT, or Gemini for a {niche_label} in "
         f"{city}, you're getting skipped — that's {leak_line}.\n\n"
         f"{fix_line}\n\n"
-        f"I do this done-for-you for one {niche_label} per city (so I'd never take your "
-        f"competitor here). Want me to send your full scorecard + the 3 fixes worth the most? "
-        f"Just reply. Or start today — $397/month, website design included free, backed by my "
-        f"90-Day Promise: {STRIPE_MONTHLY_URL}\n\n"
+        f"I do this done-for-you for one {niche_label} per agreed territory (so I'd never take "
+        f"your competitor here). Want me to send your full scorecard + the 3 fixes worth the most? "
+        f"Just reply. Or see the plans — from $397/month, backed by my launch commitment: "
+        f"{PUBLIC_APP_URL}/pricing\n\n"
         f"— Coach Ty\nLola — AI Leads Expert · Ty Alexander Media"
     )
     return subject, body

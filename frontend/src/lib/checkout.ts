@@ -65,29 +65,29 @@ export function startSmsHref(
 /**
  * Where a "Start" control should point.
  *
- * With the Payment Link configured this is always checkout — every Start button
- * on the site goes straight there, no interstitial. Until it is, the fallback
- * has to depend on where the reader is standing:
+ * 2026-09-12: with the two-plan model (Local Visibility $397/mo + $397
+ * activation, Local Growth System $797/mo + $997 launch, plus custom
+ * Expansion), a generic "Start" button must NOT go straight to Stripe. The one
+ * Payment Link is a single recurring charge that can't represent a chosen plan,
+ * its one-time fee, or the territory-availability check — and docs/PRICING.md
+ * requires plan terms to be clear before any charge. So every Start control now
+ * routes through the site instead:
  *
- *   • Somewhere in the pitch (home, /vs, a case study) → `/pricing`. They
- *     haven't seen the offer laid out yet, so the page is the right next step.
- *   • Already ON the offer (/pricing, /start) → `/apply`, the intake form.
- *     Sending them to /pricing from /pricing is a dead button on the money
- *     page, which is exactly what the mobile sticky bar was doing.
+ *   • Somewhere in the pitch (home, /vs, a case study) → `/pricing`, to see the
+ *     two plans and the free Growth Score laid out.
+ *   • Already ON the offer (/pricing, /start) → `/apply`, the intake form, which
+ *     confirms plan + territory + scope, writes the applications row, captures
+ *     UTMs and emails Ty the details.
  *
- * The offer-page fallback is the FORM, not a text. A text arrives with no
- * business name, no trade, no site — Ty has to run the whole qualification by
- * hand. /apply posts to the backend, writes the applications row and emails
- * him the details, so an unconfigured Payment Link still produces a real lead
- * record instead of a stranger's phone number. The pre-filled text stays
- * available as an explicit secondary ("or just text me").
+ * `checkoutUrl()` / `STRIPE_MONTHLY_URL` are intentionally preserved (the /start
+ * success flow still branches on the Stripe session_id, and Ty can still hand a
+ * link to a specific buyer), they're just no longer the target of a generic
+ * Start button.
  *
- * Pass `atOffer` when the caller is already showing the full offer.
- *
- * Deliberately a same-tab link everywhere. A Payment Link redirects back to
- * /start on success, so target=_blank just strands the customer in a detached
- * tab — and target on an `sms:` href is meaningless anyway.
+ * Pass `atOffer` when the caller is already showing the offer. Same-tab links
+ * everywhere — these are in-site navigations now, so target=_blank would only
+ * strand the visitor in a detached tab.
  */
 export function startHref(atOffer = false): string {
-  return checkoutUrl() || (atOffer ? '/apply' : '/pricing');
+  return atOffer ? '/apply' : '/pricing';
 }

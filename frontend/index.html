@@ -6,7 +6,7 @@
     <title>Did You Show Up? Get Found on Google & AI — Coach Ty Leads, Tampa Bay</title>
     <meta
       name="description"
-      content="Your next customer already searched for you on Google and ChatGPT. Lola makes sure you're the one they find — and the one they choose. Free 60-second Growth Score, then one all-inclusive plan at $397/month with your website design included — backed by the 90-Day Promise. Built by Coach Ty in Tampa Bay."
+      content="Your next customer already searched for you on Google and ChatGPT. Coach Ty Leads makes sure you're the one they find — and choose. Start with a free 60-second Growth Score, then pick a plan from $397/month. Built by Coach Ty in Tampa Bay."
     />
 
     <!-- Sharp display face for headlines. display=swap → text is visible in the
@@ -19,23 +19,25 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Coach Ty Leads" />
     <meta property="og:title" content="Your next customer already searched for you. Did you show up?" />
-    <meta property="og:description" content="Local service businesses lose customers every day to Google and AI results they don't know exist. Lola makes sure you're the one they find — and choose. Free 60-second Growth Score, then one all-inclusive plan at $397/month with your website design included — backed by the 90-Day Promise." />
+    <meta property="og:description" content="Local service businesses lose customers every day to Google and AI results they don't know exist. Coach Ty Leads makes sure you're the one they find — and choose. Start with a free 60-second Growth Score, then pick a plan from $397/month." />
     <meta property="og:url" content="https://www.coachtyleads.com" />
     <meta property="og:image" content="https://www.coachtyleads.com/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <!-- Alt text for the share card. Screen readers announce it when the
-         preview is posted in Slack/iMessage/LinkedIn, and X uses it too. -->
-    <meta property="og:image:alt" content="Coach Ty Leads — Your next customer already searched for you. Did you show up? Website designed and built included free, then $397/month." />
-    <meta name="twitter:image:alt" content="Coach Ty Leads — Your next customer already searched for you. Did you show up? Website designed and built included free, then $397/month." />
+         preview is posted in Slack/iMessage/LinkedIn, and X uses it too.
+         NOTE: prerender.mjs does NOT rewrite these two alt tags, so they ship
+         on every route — keep them free of stale/route-specific claims. -->
+    <meta property="og:image:alt" content="Coach Ty Leads — Your next customer already searched for you. Did you show up? Start with a free Growth Score, then plans from $397/month." />
+    <meta name="twitter:image:alt" content="Coach Ty Leads — Your next customer already searched for you. Did you show up? Start with a free Growth Score, then plans from $397/month." />
 
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Your next customer already searched for you. Did you show up?" />
-    <meta name="twitter:description" content="Lola gets local service businesses found on Google AND in ChatGPT, Perplexity, Gemini — and chosen. Free 60-second Growth Score, then $397/month all-inclusive — website design included. Built by Coach Ty in Tampa Bay." />
+    <meta name="twitter:description" content="Coach Ty Leads gets local service businesses found on Google AND in ChatGPT, Perplexity, Gemini — and chosen. Free 60-second Growth Score, then plans from $397/month. Built by Coach Ty in Tampa Bay." />
     <meta name="twitter:image" content="https://www.coachtyleads.com/og.png" />
 
-    <!-- Theme color (matches dark hero) -->
+    <!-- Theme color (matches light ground) -->
     <meta name="theme-color" content="#FAF9F5" />
 
     <!-- Icons. The SVG is the primary (crisp at any size, ~200 bytes); the PNGs
@@ -47,22 +49,26 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- ───────── JSON-LD: ProfessionalService (provider) ───────── -->
-    <!-- Crawlable in the static shell so Google + AI agents resolve the entity
-         even though the marketing UI is client-rendered React. -->
+    <!-- ───────── JSON-LD: ProfessionalService (provider) ─────────
+         Crawlable in the static shell so Google + AI agents resolve the entity
+         even though the marketing UI is client-rendered React.
+         NOTE: for every prerendered route, scripts/prerender.mjs REPLACES the
+         JSON-LD below with the per-route graph from src/lib/pageMeta.ts. These
+         blocks are the template/dev fallback — keep them mirrored to pageMeta
+         and docs/PRICING.md so a non-prerendered fallback is never stale. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
       "@id": "https://www.coachtyleads.com/#business",
       "name": "Coach Ty Leads (Ty Alexander Media)",
-      "alternateName": ["Coach Ty Leads", "Lola", "Lola — AI Leads Expert", "Lola AI Leads Expert", "Lola SEO", "Lola AI"],
+      "alternateName": ["Coach Ty Leads", "The Lola Local Growth System", "Lola"],
       "image": "https://www.coachtyleads.com/coach-ty.jpg",
       "url": "https://www.coachtyleads.com",
       "telephone": "+1-727-300-6573",
       "email": "ty@tyalexandermedia.com",
-      "priceRange": "$397/month",
-      "description": "AI-powered local lead generation + SEO for service businesses. Done-for-you Google + AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews). One all-inclusive plan at $397/month with your website design included, backed by the 90-Day Promise.",
+      "priceRange": "$397–$797/month",
+      "description": "Done-for-you local SEO and lead systems for home-service contractors. Google + AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews), reviews and lead follow-up. Plans from $397/month, or a complete conversion-focused website + growth system at $797/month.",
       "founder": {
         "@type": "Person",
         "name": "Ty Alexander Traufield",
@@ -92,21 +98,38 @@
         "opens": "08:00",
         "closes": "18:00"
       },
-      "offers": {
-        "@type": "Offer",
-        "name": "The monthly",
-        "price": "397",
-        "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock",
-        "url": "https://www.coachtyleads.com/pricing",
-        "priceSpecification": {
-          "@type": "UnitPriceSpecification",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Local Visibility",
           "price": "397",
           "priceCurrency": "USD",
-          "unitCode": "MON",
-          "billingIncrement": 1
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.coachtyleads.com/pricing",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "397",
+            "priceCurrency": "USD",
+            "unitCode": "MON",
+            "billingIncrement": 1
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Local Growth System",
+          "price": "797",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.coachtyleads.com/pricing",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "797",
+            "priceCurrency": "USD",
+            "unitCode": "MON",
+            "billingIncrement": 1
+          }
         }
-      },
+      ],
       "parentOrganization": {
         "@type": "Organization",
         "name": "Ty Alexander Media",
@@ -120,10 +143,10 @@
     }
     </script>
 
-    <!-- ───────── JSON-LD: Service + the single monthly offer ─────────
-         Names the plan and its recurring price so an answer engine asked
-         "how much is Lola" quotes $397/month rather than inferring from a
-         range. Mirrors frontend/src/lib/pricing.ts — update both together. -->
+    <!-- ───────── JSON-LD: Service + the two plan offers ─────────
+         Names the plans and their recurring prices so an answer engine asked
+         "how much is Coach Ty Leads" quotes the real range rather than inferring
+         it. Mirrors frontend/src/lib/pricing.ts — update both together. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -142,21 +165,38 @@
         "@type": "BusinessAudience",
         "name": "Local service businesses — pressure washing, plumbing, HVAC, roofing, pool care and other local trades"
       },
-      "offers": {
-        "@type": "Offer",
-        "name": "The monthly",
-        "price": "397",
-        "priceCurrency": "USD",
-        "description": "All-inclusive monthly plan: your website designed and built (included, no setup fee), Google Business Profile managed, and ongoing visibility work across Google and the AI answer engines (ChatGPT, Perplexity, Gemini). Backed by the 90-Day Promise — ranking on page one or in the map pack within 90 days, or your next 2 months are free.",
-        "availability": "https://schema.org/InStock",
-        "priceSpecification": {
-          "@type": "UnitPriceSpecification",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Local Visibility",
           "price": "397",
           "priceCurrency": "USD",
-          "billingIncrement": 1,
-          "unitCode": "MON"
+          "description": "$397/month plus a one-time $397 activation. Google Business Profile management, review system, missed-call text-back, and call + form tracking for a business that already has a usable website. 90-day initial term, then month-to-month.",
+          "availability": "https://schema.org/InStock",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "397",
+            "priceCurrency": "USD",
+            "billingIncrement": 1,
+            "unitCode": "MON"
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Local Growth System",
+          "price": "797",
+          "priceCurrency": "USD",
+          "description": "$797/month plus a one-time $997 launch. Everything in Local Visibility plus a conversion-focused website built in, technical SEO, a quote/estimate conversion path and automated follow-up. 90-day initial term, then month-to-month.",
+          "availability": "https://schema.org/InStock",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "797",
+            "priceCurrency": "USD",
+            "billingIncrement": 1,
+            "unitCode": "MON"
+          }
         }
-      }
+      ]
     }
     </script>
 
@@ -168,26 +208,26 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What kinds of businesses does Lola work with?",
+          "name": "What kinds of businesses does Coach Ty Leads work with?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Local service businesses of all kinds — home services like pressure washing, plumbing, HVAC, roofing, and pool care, plus other local trades and service providers who get most of their customers from their local area. If your next customer is searching Google or asking ChatGPT for a business near them, Lola helps them find you."
+            "text": "Local service businesses of all kinds — home services like pressure washing, plumbing, HVAC, roofing, and pool care, plus other local trades and service providers who get most of their customers from their local area. If your next customer is searching Google or asking ChatGPT for a business near them, Coach Ty Leads helps them find you."
           }
         },
         {
           "@type": "Question",
-          "name": "How much does Lola cost?",
+          "name": "How much does Coach Ty Leads cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "One plan: $397/month, all-inclusive. Your website design is included — no setup fee and no build charge — then I manage your Google Business Profile and keep you visible on Google and in the AI answers. Cancel anytime after the first 3 months. Backed by the 90-Day Promise. Start with the free Growth Score to see where you stand."
+            "text": "Two plans. Local Visibility is $397/month plus a one-time $397 activation — Google Business Profile management, reviews, missed-call text-back and lead tracking for a business that already has a usable website. Local Growth System is $797/month plus a one-time $997 launch, and adds a conversion-focused website built in, technical SEO and automated follow-up. Both run a 90-day initial term, then month-to-month. Start with the free Growth Score to see which fits."
           }
         },
         {
           "@type": "Question",
-          "name": "Does Lola help me show up in ChatGPT and AI search, not just Google?",
+          "name": "Does Coach Ty Leads help me show up in ChatGPT and AI search, not just Google?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Lola optimizes for both traditional Google local results and AI search — ChatGPT, Perplexity, Gemini, and Google AI Overviews — because that's increasingly where buyers ask for a recommendation."
+            "text": "Yes. Coach Ty Leads optimizes for both traditional Google local results and AI search — ChatGPT, Perplexity, Gemini, and Google AI Overviews — because that's increasingly where buyers ask for a recommendation."
           }
         },
         {
@@ -195,7 +235,7 @@
           "name": "Is there a guarantee?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes — the 90-Day Promise. We pick your money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print."
+            "text": "Not a ranking or lead guarantee — anyone who promises those is guessing. What we do commit to, in writing: we agree the launch scope and the tracked search terms before work begins, and if the agreed foundation deliverables aren't finished within the documented launch window for reasons under our control, we keep working at no extra management charge until they are."
           }
         },
         {
@@ -203,23 +243,23 @@
           "name": "Can you actually guarantee leads?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No — and I won't pretend to. I guarantee visibility: that you're found and clickable on Google and in the AI answers. Whether a click becomes a job also depends on your pricing and follow-through. The 90-Day Promise covers the ranking I control: we pick your money keywords together in week 1, and if you're not on page one or in the map pack within 90 days, your next 2 months are free."
+            "text": "No — and we won't pretend to. Whether a click becomes a job depends on your competition, your reviews, how fast you answer, and market conditions. We guarantee the implementation, not the outcome: the agreed launch scope gets completed, or we keep working at no extra management charge until it's done."
           }
         },
         {
           "@type": "Question",
-          "name": "Why is it $397/month when agencies quote $5,000 a month?",
+          "name": "Why does it cost so much less than a $5,000/month agency?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. A $5,000/month retainer is $60,000 in year one and usually a 12-month contract. This is $397/month with your website design included, no setup fee, cancel anytime after the first 3 months — and if I don't get you ranking in 90 days, your next 2 months are free. Same job, without the overhead you were funding."
+            "text": "Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. Plans are $397/month for visibility or $797/month for the complete system with a website built in. A $5,000/month agency retainer is $60,000 in year one, usually on a 12-month contract. Same work, without the overhead you were funding."
           }
         },
         {
           "@type": "Question",
-          "name": "Who is behind Lola?",
+          "name": "Who is behind Coach Ty Leads?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Ty Alexander Traufield — “Coach Ty” — based in St. Petersburg and serving all of Tampa Bay. He's a group strength & conditioning coach and a full-time GM who trains for HYROX, and he built Lola to fix the local visibility of his father's real business, Sandbar Soft Wash. He now runs that same system for other local service businesses, does the work himself, and answers his own phone."
+            "text": "Ty Alexander Traufield — “Coach Ty” — based in St. Petersburg and serving all of Tampa Bay. He's a group strength & conditioning coach and a full-time GM who trains for HYROX, and he built the Lola Local Growth System to fix the local visibility of his father's real business, Sandbar Soft Wash. He now runs that same system for other local service businesses, does the work himself, and answers his own phone."
           }
         },
         {

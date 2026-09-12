@@ -706,7 +706,7 @@ export function ResultsStage({
         {/* Micro-benefits — single row on desktop, stacked on mobile */}
         <ul className="mt-5 flex flex-col gap-2 text-[13px] text-ink-2 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-2">
           <li className="flex items-center gap-2">
-            <CheckIcon /> Website build included free
+            <CheckIcon /> Website built into your plan
           </li>
           <li className="flex items-center gap-2">
             <CheckIcon /> {GUARANTEE.short}
@@ -1142,7 +1142,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
         </a>
 
         <p className="mt-3 text-center text-[12px] text-ink-3">
-          🔒 Secure checkout · {PLAN.terms} ·{' '}
+          {PLAN.terms} ·{' '}
           <a href={startSmsHref()} className="text-gold underline-offset-2 hover:underline">
             or text Ty first
           </a>
@@ -1150,7 +1150,7 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
 
         <ul className="mt-6 space-y-2.5 text-[14px] sm:text-[15px]">
           {[
-            'Your website designed and built — included free, no setup fee',
+            'Your website designed and built — part of your launch',
             `${GUARANTEE.title}: ${GUARANTEE.short}`,
             `${EXCLUSIVITY.short} — once yours is taken, it's taken`,
           ].map((item) => (
@@ -1515,7 +1515,7 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
 
         <div className="mt-6">
           <CopyCard
-            eyebrow="1 · Title tag — included free"
+            eyebrow="1 · Title tag — free, yours"
             title="Optimized <title> for this page"
             hint="Paste into Wix → Page Settings → SEO → Title (or your CMS equivalent)."
             body={titleTag}
@@ -1574,8 +1574,8 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           Get all four done for you — {PLAN.price}{PLAN.period} →
         </a>
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-ink-3">
-          Website design is included too, and I do all of it — backed by
-          the 90-Day Promise.
+          Website design is part of it too, and I do all of it — backed by
+          our launch commitment.
         </p>
       </section>
 

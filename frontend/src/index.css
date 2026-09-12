@@ -61,6 +61,17 @@
   --ok: 21 128 61;             /* #15803D — green, ~4.7:1 on light */
   --gold-deep: 110 85 20;      /* #6E5514 — the deepest gold, pressed/emphasis */
 
+  /* Premium navy — the ONE dark accent on the light theme. Added for the
+     pricing page's "Recommended" plan panel and commitment band, where a deep
+     navy against warm cream + gold reads as considered and high-trust without
+     the SaaS-gradient look. Raw channels so text-on-navy can compose alpha.
+     Deliberately NOT a #0…/#1… hex so the dark-hex→surface remap below leaves
+     it alone. Contrast on navy: cream #EEF2FA is ~13:1, gold #D6A84A ~6.4:1. */
+  --navy: 23 37 66;            /* #172542 — deep premium navy panel */
+  --navy-2: 15 25 46;          /* #0F192E — darker navy, gradient foot / borders */
+  --on-navy: 238 242 250;      /* #EEF2FA — near-white text on navy */
+  --on-navy-2: 179 190 212;    /* #B3BED4 — muted text on navy (~7:1) */
+
   /* Radius scale */
   --r-sm: 8px;
   --r-md: 12px;
@@ -138,6 +149,20 @@
 .text-emerald-300 { color: rgb(var(--ok)) !important; }
 .text-red-300 { color: #B91C1C !important; }
 .text-gold-bright { color: rgb(var(--gold)) !important; }
+
+/* ── Navy accent utilities (pricing page) ───────────────────────────────────
+   Plain classes rather than Tailwind arbitrary values so they compose cleanly
+   with the light-theme remaps above and can't be flattened by the #0…/#1…
+   dark-hex rule. `text-on-navy` is applied explicitly on navy panels so the
+   `.text-white → ink` remap never darkens copy that must stay light. */
+.bg-navy { background-color: rgb(var(--navy)); }
+.bg-navy-2 { background-color: rgb(var(--navy-2)); }
+.text-navy { color: rgb(var(--navy)); }
+.border-navy { border-color: rgb(var(--navy)); }
+.text-on-navy { color: rgb(var(--on-navy)); }
+.text-on-navy-2 { color: rgb(var(--on-navy-2)); }
+.border-on-navy\/15 { border-color: rgb(var(--on-navy) / 0.15); }
+.bg-on-navy\/5 { background-color: rgb(var(--on-navy) / 0.05); }
 
 html, body, #root {
   min-height: 100%;

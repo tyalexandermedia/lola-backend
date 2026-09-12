@@ -248,9 +248,9 @@ export default function DiyAccess() {
               Rather we just handle it?
             </h2>
             <p className="mx-auto mt-3 max-w-[520px] text-[14px] leading-[1.6] text-ink-2 sm:text-[15px]">
-              {PLAN.price}{PLAN.period}, done for you — your website designed and built (included
-              free), your Google Business Profile managed, and your keywords picked with Ty in
-              week 1. Backed by {GUARANTEE.title}.
+              {PLAN.price}{PLAN.period}, done for you — your website designed and built (part of
+              your launch), your Google Business Profile managed, and your keywords picked with Ty
+              in week 1. Backed by {GUARANTEE.title}.
             </p>
             <a
               href={startHref()}
@@ -286,7 +286,7 @@ export default function DiyAccess() {
             {PLAN.cta} — {PLAN.price}{PLAN.period} →
           </a>
           <p className="mt-4 text-[12px] text-ink-4">
-            Website design included free ·{' '}
+            Website design built in ·{' '}
             <a href="/pricing" className="text-gold underline-offset-2 hover:underline">
               see what&apos;s included
             </a>

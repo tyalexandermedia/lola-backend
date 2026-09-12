@@ -21,7 +21,7 @@ import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
 import { usePageMeta } from './lib/seo';
-import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, TIERS } from './lib/pricing';
+import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, PLAN_VISIBILITY, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import AnswerBlock from './AnswerBlock';
 import { SITE_ORIGIN, SCORE_QA } from './lib/pageMeta';
@@ -680,7 +680,7 @@ export default function GrowthScore() {
               <p className="mt-3 text-[13px] leading-[1.5] text-ink-2">
                 {false
                   ? 'Your full Growth Score plus a simple 5-step fix-it checklist. Fix it on your own time.'
-                  : 'We build the site and get you found on Google and in AI answers. Backed by the 90-Day Promise.'}
+                  : 'We build the site and get you found on Google and in AI answers. Backed by our launch commitment.'}
               </p>
             </div>
           ))}
@@ -694,8 +694,9 @@ export default function GrowthScore() {
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Run your free Growth Score above — we send it by text and email within 24 hours. Or skip the
-          wait and start now: one plan, <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span>,
-          website build included free. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
+          wait and choose a plan: from <span className="font-semibold text-ink">{PLAN_VISIBILITY.monthly}/month</span> for
+          visibility, or <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span> for the complete
+          system with your website built in. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
           <a href="/#founder" className="text-gold underline underline-offset-2 decoration-gold/50 hover:decoration-gold">
             Who&apos;s behind it →
           </a>
