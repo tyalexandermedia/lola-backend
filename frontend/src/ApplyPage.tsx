@@ -14,8 +14,7 @@ import { useState } from 'react';
 import { useReveal } from './lib/useReveal';
 import { API_URL } from './api';
 import { track } from './analytics';
-import { startHref } from './lib/checkout';
-import { PLAN } from './lib/pricing';
+import { startSmsHref } from './lib/checkout';
 import { FOUNDER } from './lib/lola';
 import { usePageMeta } from './lib/seo';
 
@@ -147,7 +146,7 @@ export default function ApplyPage() {
         <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-ink-2 sm:text-[16px]">
           {paid
             ? "I start on your build today. You'll get your dashboard link as soon as the first work lands — no call needed, and you can text me any time."
-            : "I read every one of these myself and will reply within 24 hours. If you'd rather not wait, you can start right now — same thing, minus the waiting."}
+            : "I read every one of these myself and will reply within 24 hours. If you'd rather not wait, text me directly and I'll get you started."}
         </p>
         <div className="mt-8 flex flex-col items-center gap-3">
           {paid ? (
@@ -163,10 +162,10 @@ export default function ApplyPage() {
                   had just handed over their details. They are the warmest lead
                   on the site at this exact moment; send them somewhere. */}
               <a
-                href={startHref(true)}
+                href={startSmsHref("Hi Ty — I just applied and I'd like to get started.")}
                 className="inline-flex h-14 items-center justify-center rounded-[12px] bg-gradient-to-r from-gold via-gold-bright to-gold px-8 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[0_6px_20px_rgba(212,175,55,0.32)]"
               >
-                Start now — {PLAN.price}{PLAN.period} →
+                Text Ty now — {FOUNDER.phoneDisplay} →
               </a>
               <a href="/" className="text-[13px] text-ink-3 underline-offset-4 hover:text-gold hover:underline">
                 Or keep looking around

@@ -42,7 +42,7 @@ import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import AnswerBlock from './AnswerBlock';
 import PawMark from './PawMark';
 import { HOME_QA } from './lib/pageMeta';
-import { PLAN, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
+import { PLAN, PLAN_GROWTH, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
@@ -968,7 +968,9 @@ function StorySection() {
 /** Numeric prices derived from the display strings so lib/pricing stays the
  *  single source of truth — change the price there and this math follows. */
 const MONTHLY_PRICE = Number(PLAN.price.replace(/[^0-9.]/g, ''));
-const LOLA_YEAR_ONE = MONTHLY_PRICE * 12;
+/** One-time launch fee for the Local Growth System — part of the year-one total. */
+const LOLA_LAUNCH = Number(PLAN_GROWTH.oneTime.amount.replace(/[^0-9.]/g, ''));
+const LOLA_YEAR_ONE = MONTHLY_PRICE * 12 + LOLA_LAUNCH;
 /** The comparison Ty gets quoted against — a $5K/mo retainer agency. */
 const AGENCY_MONTHLY = 5000;
 const AGENCY_YEAR_ONE = AGENCY_MONTHLY * 12;
