@@ -36,7 +36,7 @@ from pathlib import Path
 
 # Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts and the
 # VITE_SITE_ORIGIN the build scripts read, so the whole site moves together.
-BASE_URL = os.getenv("VITE_SITE_ORIGIN", "https://www.coachtyalexander.com").rstrip("/")
+BASE_URL = os.getenv("VITE_SITE_ORIGIN", "https://www.coachtyleads.com").rstrip("/")
 # The live $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts.
 # These pages used to point three gold CTAs at a Google Calendar booking link,
 # which is the call path Ty removed. A Payment Link is a public URL, not a
@@ -647,7 +647,7 @@ def render_page(svc_slug, svc, city_slug, city):
     url = f"{BASE_URL}/lp/{slug}"
     canonical = f"{BASE_URL}/lp/{svc_slug}-seo-{CANONICAL_CITY}"
     cname = city["name"]
-    title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Lola'
+    title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Coach Ty Leads'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
             f'ChatGPT for high-intent searches. $397/month, website design included '
             f'free, no setup fee. Backed by the 90-Day Promise. Built by Coach Ty.')
@@ -660,7 +660,7 @@ def render_page(svc_slug, svc, city_slug, city):
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "@id": f"{canonical}#business",
-        "name": "Lola SEO by Ty Alexander Media",
+        "name": "Coach Ty Leads",
         "image": f"{BASE_URL}/coach-ty.jpg",
         "url": canonical,
         "telephone": PHONE,
@@ -800,7 +800,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0A0A0B">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="google-site-verification" content="T9uR-1_o17WTlgJz1zN-KPcvCn1qjrN_QmUZ11M8QNU">
 <meta name="msvalidate.01" content="CD8E25FF91F5386338431014B7D68066">
 <link rel="icon" href="/favicon.svg">
@@ -865,7 +865,7 @@ def render_page(svc_slug, svc, city_slug, city):
 {footer_links}
 
 <div class="footer">
-<p>Lola SEO by Ty Alexander Media · Tampa Bay</p>
+<p>Coach Ty Leads · Tampa Bay</p>
 <p>&copy; 2026 · Built with Lola &#128062;</p>
 </div>
 </main>
@@ -881,7 +881,7 @@ def render_page(svc_slug, svc, city_slug, city):
 
 def render_hub():
     url = f"{BASE_URL}/lp/industries"
-    title = "Local SEO by Industry & City — Tampa Bay & Florida | Lola"
+    title = "Local SEO by Industry & City — Tampa Bay & Florida | Coach Ty Leads"
     desc = ("Done-for-you local SEO for service businesses across Tampa Bay & "
             "Florida. Pick your trade and city. Rank on Google + ChatGPT. "
             "$397/month, website design included free, no setup fee. "
@@ -911,7 +911,7 @@ def render_hub():
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "@id": f"{url}#business",
-        "name": "Lola SEO by Ty Alexander Media",
+        "name": "Coach Ty Leads",
         "image": f"{BASE_URL}/coach-ty.jpg",
         "url": url,
         "telephone": PHONE,
@@ -995,7 +995,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{BASE_URL}/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0A0A0B">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="google-site-verification" content="T9uR-1_o17WTlgJz1zN-KPcvCn1qjrN_QmUZ11M8QNU">
 <meta name="msvalidate.01" content="CD8E25FF91F5386338431014B7D68066">
 <link rel="icon" href="/favicon.svg">
@@ -1008,7 +1008,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 </head>
 <body>
 <main class="wrap">
-<p class="eyebrow">Industries &amp; Cities · Lola SEO</p>
+<p class="eyebrow">Industries &amp; Cities · Coach Ty Leads</p>
 <h1>Local SEO by industry &amp; city. Tampa Bay &amp; Florida.</h1>
 <p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). One plan: $397/month, website design included free, no setup fee.</p>
 <a class="cta" href="{esc(cta)}">Start my monthly &mdash; $397/month &rarr;</a>
@@ -1031,7 +1031,7 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 </div>
 
 <div class="foot">
-<p>Lola SEO by Ty Alexander Media · Tampa Bay</p>
+<p>Coach Ty Leads · Tampa Bay</p>
 <p>&copy; 2026 · Built with Lola &#128062;</p>
 </div>
 </main>
@@ -1157,6 +1157,36 @@ def render_vercel(slugs):
     # than a redirect: Google gets a second indexable URL serving the same page.
     for src, dest in RETIRED_ROUTE_REDIRECTS.items():
         redirects.append({"source": src, "destination": dest, "permanent": True})
+
+    # ── Host-aware domain migration (2026-09): coachtyalexander.com → coachtyleads.com
+    # Every NON-homepage path on the OLD marketing domain 301s to the SAME path on the
+    # new domain, so legacy /pricing, /lp/*, /vs/*, /growth-score, tracking and
+    # case-study URLs already indexed, printed, or linked keep working after the move.
+    #
+    # The homepage ("/") is deliberately NOT redirected here. coachtyalexander.com is
+    # slated to become a separate personal-training / athletics site, and its root must
+    # stay free for that. `/:path+` matches one-OR-MORE path segments, so it never
+    # matches the bare "/".
+    #
+    # Host-scoped: these fire ONLY when the request host is the old domain, so they are
+    # INERT on coachtyleads.com and on *.vercel.app previews (safe to ship in a preview).
+    # During migration both domains point at THIS project. Once coachtyalexander.com is
+    # moved to the future training project, port these two rules into THAT project (or
+    # set a Vercel domain-level redirect) so legacy marketing paths keep resolving. The
+    # TEMPORARY whole-site (incl. homepage) redirect during migration is applied at the
+    # Vercel Domains level, NOT here, so it can be lifted without a code change when the
+    # training site launches. See docs/DOMAIN-MIGRATION.md.
+    OLD_DOMAIN_HOSTS = ["coachtyalexander.com", "www.coachtyalexander.com"]
+    host_redirects = [
+        {
+            "source": "/:path+",
+            "has": [{"type": "host", "value": h}],
+            "destination": "https://www.coachtyleads.com/:path+",
+            "permanent": True,
+        }
+        for h in OLD_DOMAIN_HOSTS
+    ]
+    redirects = host_redirects + redirects
 
     obj = {"redirects": redirects, "rewrites": rewrites}
     return json.dumps(obj, indent=2) + "\n"

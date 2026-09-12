@@ -481,9 +481,9 @@ const LSA: Competitor = {
   oneLine:
     "Google's own pay-per-lead placement above the map pack, with the green Google Guaranteed badge after a background and license check.",
   priceRange: 'Pay per lead — varies by trade and market',
-  metaTitle: 'Local Service Ads vs SEO — Do You Need Both? | Lola Leads',
+  metaTitle: 'Local Service Ads vs SEO — Do You Need Both? | Coach Ty Leads',
   metaDescription:
-    "Straight answer on Google Local Service Ads and the Google Guaranteed badge vs organic local SEO: what each one actually buys you, what happens when you stop paying, and why most local contractors should run both. From Lola Leads, Tampa Bay.",
+    "Straight answer on Google Local Service Ads and the Google Guaranteed badge vs organic local SEO: what each one actually buys you, what happens when you stop paying, and why most local contractors should run both. From Coach Ty Leads, Tampa Bay.",
   tldr: {
     pickThemIf: [
       'You need the phone to ring this week, not this quarter',

@@ -32,7 +32,7 @@ const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
 /** Same origin the prerenderer writes. One env var moves both. */
-const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyalexander.com').replace(/\/$/, '');
+const SITE = (process.env.VITE_SITE_ORIGIN || 'https://www.coachtyleads.com').replace(/\/$/, '');
 
 const TITLE_MAX = 60;
 const DESC_MAX = 155;

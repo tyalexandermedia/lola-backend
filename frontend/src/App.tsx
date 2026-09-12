@@ -340,7 +340,7 @@ function SiteFooter({ route }: { route: Route }) {
           <a href="/" className="-mx-2 inline-flex min-h-[44px] items-center gap-2 px-2">
             <PawMark size={18} className="text-gold" />
             <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-[13px] font-bold uppercase tracking-[0.18em] text-transparent">
-              LOLA LEADS
+              COACH TY LEADS
             </span>
           </a>
           <p className="mt-2 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
@@ -352,7 +352,7 @@ function SiteFooter({ route }: { route: Route }) {
               them on mobile only ran the three clauses together. */}
           <p className="mt-2 text-[11px] leading-[1.6] text-ink-3">
             Built and run by <span className="text-ink-2">Ty Alexander Traufield</span> — “Coach Ty.”
-            <br /> Founder, Lola Leads · Ty Alexander Media
+            <br /> Founder, Coach Ty Leads · Ty Alexander Media
             <br /> St. Pete · serving all of Tampa Bay, FL
           </p>
         </div>
@@ -518,17 +518,17 @@ function Header({ bare = false }: { bare?: boolean } = {}) {
           href="/"
           className="group -mx-2 flex min-h-[44px] items-center gap-2 px-2"
           // WCAG 2.5.3 (Label in Name): the accessible name has to CONTAIN the
-          // visible text. The visible wordmark is "LOLA LEADS"; the old label
+          // visible text. The visible wordmark is "COACH TY LEADS"; the old label
           // read "Lola — AI Leads Expert — home", which doesn't contain it — so
-          // a voice-control user saying "click Lola Leads" got nothing.
-          aria-label="Lola Leads — home"
+          // a voice-control user saying "click Coach Ty Leads" got nothing.
+          aria-label="Coach Ty Leads — home"
         >
           <PawMark size={16} className="shrink-0 text-gold" />
-          {/* One wordmark at every breakpoint — "Lola Leads" is the brand name.
+          {/* One wordmark at every breakpoint — "Coach Ty Leads" is the brand name.
               (The descriptor "AI Leads Expert" lives in the hero kicker and
               meta copy, where it works as positioning rather than as a name.) */}
           <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-[14px] font-bold uppercase tracking-[0.18em] text-transparent">
-            LOLA LEADS
+            COACH TY LEADS
           </span>
         </a>
 

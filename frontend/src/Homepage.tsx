@@ -188,8 +188,8 @@ function Hero() {
               already makes better two scrolls down. The headline is the punch;
               this only has to land the promise and get out of the way. */}
           <p className="mt-3 max-w-[520px] text-[16px] leading-[1.5] text-ink-2 sm:mt-5 sm:text-[18px]">
-            Lola makes sure you're the one they find —{' '}
-            <span className="font-semibold text-ink">and the one they choose.</span>
+            <span className="font-semibold text-ink">Get found. Get called. Get booked.</span>{' '}
+            Local SEO, websites, reviews and lead follow-up for home-service contractors.
           </p>
 
           {/* MOBILE-ONLY primary CTA. Most visitors are on a phone, and with

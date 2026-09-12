@@ -399,7 +399,7 @@ export default function RetainerPage() {
                 athlete, strength and endurance, no either/or. That's how I've built everything:
                 coach and founder, gym and laptop, getting you found on Google{' '}
                 <span className="font-semibold text-white">and</span> in the AI answers. That's{' '}
-                <span className="font-semibold text-white">Lola Leads</span>.
+                <span className="font-semibold text-white">Coach Ty Leads</span>.
               </p>
               <p>
                 My first proof story is my dad's business — Sandbar Soft Wash in Palm Harbor —{' '}
