@@ -1,0 +1,113 @@
+---
+import '../styles/global.css';
+import { BRAND, INTEGRATIONS, SITE, absoluteUrl, val } from '../lib/config';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyCta from '../components/StickyCta.astro';
+
+interface Props {
+  /** <= 60 chars. Leads with the demand term, then the brand. */
+  title: string;
+  /** <= 155 chars. */
+  description: string;
+  /** Route path, e.g. "/services/roof-cleaning". Builds the canonical. */
+  path: string;
+  /** JSON-LD object from lib/schema.ts. */
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+  ogImage?: string;
+}
+const { title, description, path, jsonLd, noindex = false, ogImage } = Astro.props;
+const canonical = absoluteUrl(path);
+const og = ogImage || val(BRAND.ogImage);
+const favicon = val(BRAND.favicon) || BRAND.logo;
+const ga4 = val(INTEGRATIONS.ga4MeasurementId);
+const heroImage = val(BRAND.heroImage);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.publicName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {og && <meta property="og:image" content={absoluteUrl(og)} />}
+    <meta name="twitter:card" content={og ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {og && <meta name="twitter:image" content={absoluteUrl(og)} />}
+    <meta name="theme-color" content={BRAND.colors.primary} />
+    <meta name="format-detection" content="telephone=yes" />
+    <link rel="icon" href={favicon} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {heroImage && <link rel="preload" as="image" href={heroImage} fetchpriority="high" />}
+    <style set:html={`:root{--primary:${BRAND.colors.primary};--accent:${BRAND.colors.accent};--ink:${BRAND.colors.ink};--bg:${BRAND.colors.background};--font:${BRAND.fontStack || "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif"};${heroImage ? `--hero-image:url('${heroImage}')` : ''}}`} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {ga4 && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`}></script>
+        <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${ga4}');`} />
+      </>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <StickyCta />
+    <script>
+      // ── Source attribution (first touch) + conversion click events ──
+      // Stores utm_* / click ids / referrer / landing page on the first visit
+      // and copies them into every lead form so GHL sees where the lead came
+      // from. A later visit that carries campaign params upgrades a touch that
+      // had none, otherwise the first touch is kept.
+      const KEY = 'lsf_attr';
+      const PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'msclkid'];
+      type Attr = Record<string, string>;
+      function readAttr(): Attr | null {
+        try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; }
+      }
+      function captureAttr(): Attr {
+        const p = new URLSearchParams(location.search);
+        const fresh: Attr = {};
+        for (const k of PARAMS) { const v = p.get(k); if (v) fresh[k] = v.slice(0, 200); }
+        const hasCampaign = Object.keys(fresh).length > 0;
+        const stored = readAttr();
+        if (stored && (stored.has_campaign === '1' || !hasCampaign)) return stored;
+        const attr: Attr = {
+          ...fresh,
+          referrer: (document.referrer || '').slice(0, 300),
+          landing_page: location.href.slice(0, 500),
+          first_seen: new Date().toISOString(),
+          has_campaign: hasCampaign ? '1' : '0',
+        };
+        try { localStorage.setItem(KEY, JSON.stringify(attr)); } catch {}
+        return attr;
+      }
+      const attr = captureAttr();
+      document.querySelectorAll<HTMLInputElement>('form[data-lead-form] input[data-attr]').forEach((input) => {
+        const name = input.name;
+        if (name === 'page_url') input.value = location.href.slice(0, 500);
+        else if (name === '_t') input.value = String(Date.now());
+        else if (attr[name]) input.value = attr[name];
+      });
+      // Phone / SMS click events for GA4 when it is configured.
+      document.addEventListener('click', (e) => {
+        const a = (e.target as HTMLElement).closest('a[href^="tel:"], a[href^="sms:"]') as HTMLAnchorElement | null;
+        if (!a) return;
+        const g = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+        if (typeof g === 'function') g('event', a.href.startsWith('tel:') ? 'phone_click' : 'sms_click', { link_url: a.href });
+      });
+    </script>
+  </body>
+</html>

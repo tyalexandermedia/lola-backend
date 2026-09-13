@@ -1,0 +1,16 @@
+{
+  "$comment": "EXAMPLE brand. Colors are hex. Paths are relative to /public.",
+  "colors": {
+    "primary": "#0b2233",
+    "accent": "#c99a2e",
+    "ink": "#152430",
+    "background": "#faf7f0"
+  },
+  "fontStack": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+  "logo": "/client/logo-example.svg",
+  "logoAlt": "Example Exterior Cleaning logo",
+  "favicon": "/client/logo-example.svg",
+  "heroImage": "unavailable",
+  "heroImageAlt": "unavailable",
+  "ogImage": "unavailable"
+}

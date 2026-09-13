@@ -1,0 +1,20 @@
+---
+import { PROOF, SITE, hasAnyTrust, val } from '../lib/config';
+const rating = val(PROOF.googleRating);
+const years = val(PROOF.yearsInBusiness);
+---
+{hasAnyTrust && (
+  <section class="trust-bar" aria-label={`Why customers choose ${SITE.publicName}`}>
+    <div class="shell trust-grid">
+      {rating && (
+        <a class="trust-pill rating" href={rating.url} target="_blank" rel="noopener">
+          <strong>★ {rating.rating.toFixed(1)}</strong>
+          <span>{rating.count} Google reviews · read them</span>
+        </a>
+      )}
+      {years && <div class="trust-pill"><strong>{years}+ years</strong><span>in business</span></div>}
+      {PROOF.certifications.map((c) => <div class="trust-pill"><strong>{c}</strong><span>Verified</span></div>)}
+      {PROOF.guarantees.map((g) => <div class="trust-pill"><strong>{g}</strong><span>Our promise</span></div>)}
+    </div>
+  </section>
+)}

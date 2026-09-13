@@ -1,0 +1,14 @@
+{
+  "$comment": "Names of secrets only. Values live in Vercel environment variables.",
+  "ghl": {
+    "webhookEnvVar": "GHL_WEBHOOK_URL",
+    "source": "website",
+    "tags": ["website-lead"]
+  },
+  "notifications": {
+    "resendEnvVar": "RESEND_API_KEY",
+    "from": "unavailable",
+    "emails": []
+  },
+  "ga4MeasurementId": "unavailable"
+}

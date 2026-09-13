@@ -1,0 +1,63 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import BeforeAfter from '../../components/BeforeAfter.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import Faq from '../../components/Faq.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import EstimateForm from '../../components/EstimateForm.astro';
+import { SITE, clip } from '../../lib/config';
+import { pageGraph } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services', (s) => s.data.enabled);
+  return services.map((service) => ({ params: { slug: service.id }, props: { service } }));
+}
+const { service } = Astro.props;
+const { Content } = await render(service);
+const d = service.data;
+const path = `/services/${service.id}`;
+const primaryCity = SITE.serviceArea.cities[0];
+const title = d.metaTitle || clip(`${d.name} in ${primaryCity} | ${SITE.publicName}`, 60);
+const description = d.metaDescription || clip(`${d.summary} Serving ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+---
+<Base
+  title={title}
+  description={description}
+  path={path}
+  ogImage={d.image}
+  jsonLd={pageGraph({
+    path,
+    name: title,
+    description,
+    breadcrumb: [{ name: d.name, path }],
+    service: { name: d.name, description: d.summary },
+    faqs: d.faqs,
+  })}
+>
+  <Hero
+    compact
+    eyebrow={`${d.name} · ${SITE.serviceArea.summary}`}
+    h1={`${d.name} in ${primaryCity}`}
+    sub={d.heroSub || d.summary}
+    defaultService={d.name}
+    breadcrumb={{ name: d.name }}
+  />
+  <section class="block">
+    <div class="shell two-col">
+      <article class="prose">
+        <Content />
+      </article>
+      <aside class="sticky-card">
+        <div class="card">
+          <EstimateForm id="service-estimate-form" defaultService={d.name} heading={`${d.name} estimate`} />
+        </div>
+      </aside>
+    </div>
+  </section>
+  <BeforeAfter pairs={d.beforeAfter} heading={`${d.name}: before and after`} />
+  <Faq faqs={d.faqs} heading={`${d.name} questions, answered`} />
+  <ServiceGrid exclude={service.id} heading="Other services" eyebrow="While we're there" />
+  <CtaBand heading={`Get your ${d.name.toLowerCase()} estimate.`} />
+</Base>

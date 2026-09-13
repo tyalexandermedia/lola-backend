@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { PHONE_HREF, SITE, phoneDisplay } from '../lib/config';
+---
+<Base title={`Page not found | ${SITE.publicName}`} description="That page does not exist." path="/404" noindex>
+  <section class="block">
+    <div class="shell center" style="max-width:640px">
+      <p class="eyebrow">404</p>
+      <h1>That page is not here.</h1>
+      <p class="lede">Head back home or call us at <a href={PHONE_HREF} style="color:var(--accent-text);font-weight:800">{phoneDisplay()}</a>.</p>
+      <div class="hero-ctas" style="justify-content:center">
+        <a class="btn primary" href="/">Homepage</a>
+        <a class="btn outline" href="/estimate">{SITE.cta.label}</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { PHONE_HREF, SITE, hoursDisplay, phoneDisplay } from '../lib/config';
+const title = `Request received | ${SITE.publicName}`;
+---
+<Base title={title} description={`Your request to ${SITE.publicName} was received.`} path="/thank-you" noindex>
+  <section class="block">
+    <div class="shell" style="max-width:720px">
+      <p class="eyebrow">Request received</p>
+      <h1>Thanks, we have it.</h1>
+      <p class="lede">{SITE.cta.responsePromise}</p>
+      <p class="lede">Need it faster? Call <a href={PHONE_HREF} style="color:var(--accent-text);font-weight:800">{phoneDisplay()}</a>.</p>
+      <h3 style="margin-top:32px">Hours</h3>
+      <ul style="padding-left:18px;color:var(--muted)">
+        {hoursDisplay().map((h) => <li>{h}</li>)}
+      </ul>
+      <p style="margin-top:32px"><a class="btn outline" href="/">Back to the homepage</a></p>
+    </div>
+  </section>
+  <script>
+    // Conversion event. GA4 only fires when a measurement id is configured.
+    const g = (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag;
+    if (typeof g === 'function') g('event', 'generate_lead', { method: 'estimate_form' });
+  </script>
+</Base>

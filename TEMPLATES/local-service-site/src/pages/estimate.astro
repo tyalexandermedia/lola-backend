@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import EstimateForm from '../components/EstimateForm.astro';
+import { PHONE_HREF, SITE, SMS_HREF, clip, hoursDisplay, phoneDisplay } from '../lib/config';
+import { pageGraph } from '../lib/schema';
+const title = clip(`Free Estimate | ${SITE.publicName}`, 60);
+const description = clip(`Request a free estimate from ${SITE.publicName} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+const sms = SITE.allowSms !== false;
+---
+<Base title={title} description={description} path="/estimate" jsonLd={pageGraph({ path: '/estimate', name: title, description, breadcrumb: [{ name: 'Free estimate', path: '/estimate' }] })}>
+  <section class="block">
+    <div class="shell two-col">
+      <div>
+        <p class="eyebrow">Free estimate</p>
+        <h1>{SITE.cta.label}</h1>
+        <p class="lede">{SITE.cta.responsePromise}</p>
+        <div class="hero-ctas">
+          <a class="btn primary" href={PHONE_HREF}>Call {phoneDisplay()}</a>
+          {sms && <a class="btn outline" href={`${SMS_HREF}?&body=${encodeURIComponent(`Hi ${SITE.publicName}, I'd like an estimate.`)}`}>Text us</a>}
+        </div>
+        <h3 style="margin-top:32px">Hours</h3>
+        <ul style="padding-left:18px;color:var(--muted)">
+          {hoursDisplay().map((h) => <li>{h}</li>)}
+        </ul>
+        <h3 style="margin-top:24px">Service area</h3>
+        <p class="muted">{SITE.serviceArea.cities.join(' · ')}</p>
+      </div>
+      <div class="card">
+        <EstimateForm heading="Tell us what you need" />
+      </div>
+    </div>
+  </section>
+</Base>

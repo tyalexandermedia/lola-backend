@@ -1,0 +1,42 @@
+{
+  "$comment": "EXAMPLE client. Every value here is fictional and is replaced by `npm run setup-site`. The validator refuses to build a site whose config still carries the EXAMPLE marker, the example domain, or the 555 phone number unless ALLOW_EXAMPLE_CONFIG=1.",
+  "legalName": "Example Exterior Cleaning LLC",
+  "publicName": "Example Exterior Cleaning",
+  "domain": "https://www.example-exterior.com",
+  "phone": "+15555550100",
+  "allowSms": true,
+  "email": "quotes@example-exterior.com",
+  "primaryCustomer": "Homeowners and property managers who want their roof, house, and driveway cleaned safely",
+  "tagline": "EXAMPLE tagline: Soft wash and pressure washing done right",
+  "serviceArea": {
+    "summary": "Example City and the surrounding county",
+    "region": "FL",
+    "cities": ["Example City", "Sample Springs", "Placeholder Harbor"]
+  },
+  "address": "unavailable",
+  "hours": [
+    { "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "18:00" },
+    { "days": ["Saturday"], "opens": "09:00", "closes": "14:00" }
+  ],
+  "cta": {
+    "label": "Get My Free Estimate",
+    "responsePromise": "EXAMPLE promise: we reply to every request within one business day."
+  },
+  "schemaType": "LocalBusiness",
+  "foundingYear": "unavailable",
+  "licenseNumber": "unavailable",
+  "about": "EXAMPLE about copy: replace with the owner's own words about who they are, how long they have been doing this, and why they do it.",
+  "process": [
+    { "title": "EXAMPLE step 1: Request", "text": "You send the form or call. We reply with a clear number." },
+    { "title": "EXAMPLE step 2: Clean", "text": "We show up on time and do the work the safe way." },
+    { "title": "EXAMPLE step 3: Walkthrough", "text": "You see the results before we leave." }
+  ],
+  "faqs": [
+    { "q": "EXAMPLE question: Do I need to be home?", "a": "EXAMPLE answer: No. We need water access and unlocked gates." }
+  ],
+  "social": {
+    "googleBusinessProfile": "unavailable",
+    "facebook": "unavailable",
+    "instagram": "unavailable"
+  }
+}

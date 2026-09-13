@@ -1,0 +1,22 @@
+---
+interface Props { faqs: Array<{ q: string; a: string }>; heading?: string }
+const { faqs, heading = 'Good questions' } = Astro.props;
+---
+{faqs.length > 0 && (
+  <section class="block" id="faq">
+    <div class="shell">
+      <div class="center">
+        <p class="eyebrow">FAQ</p>
+        <h2>{heading}</h2>
+      </div>
+      <div class="faq-list">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import TrustBar from '../components/TrustBar.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Process from '../components/Process.astro';
+import Reviews from '../components/Reviews.astro';
+import Areas from '../components/Areas.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { PROOF, SITE, clip, val } from '../lib/config';
+import { pageGraph } from '../lib/schema';
+
+const services = (await getCollection('services', (s) => s.data.enabled)).sort((a, b) => a.data.priority - b.data.priority);
+const top = services.slice(0, 3).map((s) => s.data.name);
+const primaryCity = SITE.serviceArea.cities[0];
+
+// Title leads with demand terms, then the brand. Kept under 60 characters.
+const title = clip(`${top[0]} in ${primaryCity} | ${SITE.publicName}`, 60);
+const description = clip(`${SITE.publicName}: ${top.join(', ').toLowerCase()} for ${SITE.primaryCustomer.toLowerCase()} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+const faqs = val(SITE.faqs) || [];
+const about = val(SITE.about);
+const h1 = `${top.slice(0, 2).join(' & ')} in ${primaryCity}`;
+const sub = `${SITE.publicName} serves ${SITE.primaryCustomer.toLowerCase()} across ${SITE.serviceArea.summary}. <strong>${SITE.cta.responsePromise}</strong>`;
+---
+<Base title={title} description={description} path="/" jsonLd={pageGraph({ path: '/', name: title, description, faqs })}>
+  <Hero eyebrow={`${SITE.publicName} · ${SITE.serviceArea.summary}`} h1={h1} sub={sub} />
+  <TrustBar />
+  <ServiceGrid />
+  <BeforeAfter pairs={PROOF.beforeAfter} />
+  <Process />
+  <Reviews />
+  {about && (
+    <section class="block surface" id="about">
+      <div class="shell prose">
+        <p class="eyebrow">About</p>
+        <h2 style="margin-top:0">About {SITE.publicName}</h2>
+        <p>{about}</p>
+      </div>
+    </section>
+  )}
+  <Areas />
+  <Faq faqs={faqs} />
+  <CtaBand />
+</Base>
