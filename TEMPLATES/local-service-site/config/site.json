@@ -20,8 +20,11 @@
   ],
   "cta": {
     "label": "Get My Free Estimate",
-    "responsePromise": "EXAMPLE promise: we reply to every request within one business day."
+    "responsePromise": "EXAMPLE promise: we reply to every request within one business day.",
+    "path": "estimate",
+    "shortLabel": "Free Estimate"
   },
+  "legalNotice": "unavailable",
   "schemaType": "LocalBusiness",
   "foundingYear": "unavailable",
   "licenseNumber": "unavailable",

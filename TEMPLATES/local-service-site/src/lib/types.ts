@@ -24,13 +24,17 @@ export interface SiteConfig {
   /** E.164, e.g. +17275550123 */
   phone: string;
   allowSms?: boolean;
-  email: string;
+  /** Optional: many call-first businesses do not publish one. */
+  email?: string | Unavailable;
   primaryCustomer: string;
   tagline?: string | Unavailable;
   serviceArea: { summary: string; region: string; cities: string[] };
   address?: Address | Unavailable;
   hours: Hours[];
-  cta: { label: string; responsePromise: string };
+  /** path: URL segment for the CTA page, e.g. "estimate", "consultation", "contact". Default "estimate". */
+  cta: { label: string; responsePromise: string; path?: string; shortLabel?: string };
+  /** Optional footer notice, e.g. attorney advertising or license disclaimers. */
+  legalNotice?: string | Unavailable;
   schemaType?: string;
   foundingYear?: string | Unavailable;
   licenseNumber?: string | Unavailable;

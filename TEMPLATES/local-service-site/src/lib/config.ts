@@ -20,6 +20,9 @@ export function val<T>(v: T | 'unavailable' | undefined | null): T | undefined {
 export const ORIGIN = SITE.domain.replace(/\/$/, '');
 export const absoluteUrl = (path: string): string => new URL(path, ORIGIN + '/').href;
 
+export const CTA_PATH = `/${(SITE.cta.path || 'estimate').replace(/^\/+|\/+$/g, '')}`;
+/** Short CTA wording for tight spots (sticky bar, nav). Falls back to the full label. */
+export const CTA_SHORT = SITE.cta.shortLabel || SITE.cta.label;
 export const PHONE_HREF = `tel:${SITE.phone}`;
 export const SMS_HREF = `sms:${SITE.phone}`;
 

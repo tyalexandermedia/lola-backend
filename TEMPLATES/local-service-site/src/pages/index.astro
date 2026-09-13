@@ -19,11 +19,12 @@ const primaryCity = SITE.serviceArea.cities[0];
 
 // Title leads with demand terms, then the brand. Kept under 60 characters.
 const title = clip(`${top[0]} in ${primaryCity} | ${SITE.publicName}`, 60);
-const description = clip(`${SITE.publicName}: ${top.join(', ').toLowerCase()} for ${SITE.primaryCustomer.toLowerCase()} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+// primaryCustomer is written as a lowercase noun phrase ("homeowners in …"), so it drops into a sentence as-is.
+const description = clip(`${SITE.publicName}: ${top.join(', ')} for ${SITE.primaryCustomer} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
 const faqs = val(SITE.faqs) || [];
 const about = val(SITE.about);
 const h1 = `${top.slice(0, 2).join(' & ')} in ${primaryCity}`;
-const sub = `${SITE.publicName} serves ${SITE.primaryCustomer.toLowerCase()} across ${SITE.serviceArea.summary}. <strong>${SITE.cta.responsePromise}</strong>`;
+const sub = `${SITE.publicName} serves ${SITE.primaryCustomer} across ${SITE.serviceArea.summary}. <strong>${SITE.cta.responsePromise}</strong>`;
 ---
 <Base title={title} description={description} path="/" jsonLd={pageGraph({ path: '/', name: title, description, faqs })}>
   <Hero eyebrow={`${SITE.publicName} · ${SITE.serviceArea.summary}`} h1={h1} sub={sub} />

@@ -1,17 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
 import EstimateForm from '../components/EstimateForm.astro';
-import { PHONE_HREF, SITE, SMS_HREF, clip, hoursDisplay, phoneDisplay } from '../lib/config';
+import { CTA_PATH, PHONE_HREF, SITE, SMS_HREF, clip, hoursDisplay, phoneDisplay } from '../lib/config';
 import { pageGraph } from '../lib/schema';
-const title = clip(`Free Estimate | ${SITE.publicName}`, 60);
-const description = clip(`Request a free estimate from ${SITE.publicName} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+
+// One CTA page whose URL comes from config: /estimate for contractors,
+// /consultation or /contact for professional services.
+export function getStaticPaths() {
+  return [{ params: { cta: CTA_PATH.slice(1) } }];
+}
+const title = clip(`${SITE.cta.label} | ${SITE.publicName}`, 60);
+const description = clip(`${SITE.cta.label}: contact ${SITE.publicName} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
 const sms = SITE.allowSms !== false;
 ---
-<Base title={title} description={description} path="/estimate" jsonLd={pageGraph({ path: '/estimate', name: title, description, breadcrumb: [{ name: 'Free estimate', path: '/estimate' }] })}>
+<Base title={title} description={description} path={CTA_PATH} jsonLd={pageGraph({ path: CTA_PATH, name: title, description, breadcrumb: [{ name: SITE.cta.label, path: CTA_PATH }] })}>
   <section class="block">
     <div class="shell two-col">
       <div>
-        <p class="eyebrow">Free estimate</p>
+        <p class="eyebrow">{SITE.publicName}</p>
         <h1>{SITE.cta.label}</h1>
         <p class="lede">{SITE.cta.responsePromise}</p>
         <div class="hero-ctas">

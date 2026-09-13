@@ -75,7 +75,7 @@ if (site) {
   required(f, site, 'publicName');
   required(f, site, 'domain', (v) => isHttps(v) && !v.endsWith('/') && !v.includes('/', 8), 'https://www.example.com with no trailing slash');
   required(f, site, 'phone', isE164, 'E.164 like +17275550123');
-  required(f, site, 'email', isEmail);
+  optional(f, site, 'email', isEmail);
   required(f, site, 'primaryCustomer');
   required(f, site, 'serviceArea.summary');
   required(f, site, 'serviceArea.region', (v) => isStr(v) && /^[A-Z]{2}$/.test(v), 'two-letter state code');
@@ -83,6 +83,9 @@ if (site) {
   required(f, site, 'hours', (v) => Array.isArray(v) && v.length > 0 && v.every((h) => isStrList(h.days) && isTime(h.opens) && isTime(h.closes)), 'array of { days[], opens "08:00", closes "18:00" }');
   required(f, site, 'cta.label');
   required(f, site, 'cta.responsePromise');
+  if (site.cta?.path !== undefined && !/^[a-z0-9-]+$/.test(String(site.cta.path))) err(`${f} → cta.path: one lowercase URL segment like "estimate", "consultation" or "contact"`);
+  if (site.cta?.shortLabel !== undefined && !isStr(site.cta.shortLabel)) err(`${f} → cta.shortLabel: invalid`);
+  optional(f, site, 'legalNotice');
   optional(f, site, 'tagline');
   optional(f, site, 'address', (v) => v && typeof v === 'object' && ['street', 'city', 'region', 'postalCode', 'country'].every((k) => isStr(v[k])), 'object with street, city, region, postalCode, country');
   optional(f, site, 'foundingYear', (v) => /^\d{4}$/.test(String(v)), 'four-digit year');

@@ -1,11 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import { BRAND, PHONE_HREF, SITE, hoursDisplay, phoneDisplay, val } from '../lib/config';
+import { BRAND, CTA_PATH, PHONE_HREF, SITE, hoursDisplay, phoneDisplay, val } from '../lib/config';
 const services = (await getCollection('services', (s) => s.data.enabled)).sort((a, b) => a.data.priority - b.data.priority);
 const address = val(SITE.address);
 const license = val(SITE.licenseNumber);
 const tagline = val(SITE.tagline);
 const year = new Date().getFullYear();
+const legalNotice = val(SITE.legalNotice);
+const email = val(SITE.email);
 ---
 <footer class="site-footer">
   <div class="shell foot-grid">
@@ -31,12 +33,13 @@ const year = new Date().getFullYear();
       <h4>Contact</h4>
       <ul>
         <li><a href={PHONE_HREF}>{phoneDisplay()}</a></li>
-        <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-        <li><a href="/estimate">{SITE.cta.label}</a></li>
+        {email && <li><a href={`mailto:${email}`}>{email}</a></li>}
+        <li><a href={CTA_PATH}>{SITE.cta.label}</a></li>
         {hoursDisplay().map((h) => <li>{h}</li>)}
       </ul>
     </div>
   </div>
+  {legalNotice && <div class="shell foot-notice"><p>{legalNotice}</p></div>}
   <div class="shell foot-bottom">
     <span>© {year} {SITE.legalName}</span>
     <span>{SITE.serviceArea.summary}</span>

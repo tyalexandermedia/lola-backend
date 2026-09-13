@@ -1,5 +1,5 @@
 ---
-import { PHONE_HREF, SITE, phoneDisplay } from '../lib/config';
+import { CTA_PATH, PHONE_HREF, SITE, phoneDisplay } from '../lib/config';
 interface Props { heading?: string; text?: string }
 const { heading = 'Ready when you are.', text = SITE.cta.responsePromise } = Astro.props;
 ---
@@ -9,7 +9,7 @@ const { heading = 'Ready when you are.', text = SITE.cta.responsePromise } = Ast
     <h2>{heading}</h2>
     <p>{text}</p>
     <div class="hero-ctas">
-      <a class="btn" href="/estimate">{SITE.cta.label}</a>
+      <a class="btn" href={CTA_PATH}>{SITE.cta.label}</a>
       <a class="btn ghost" href={PHONE_HREF} aria-label={`Call ${SITE.publicName} at ${phoneDisplay()}`}>Call {phoneDisplay()}</a>
     </div>
   </div>

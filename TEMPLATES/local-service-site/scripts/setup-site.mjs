@@ -78,7 +78,7 @@ const publicName = await ask('Public business name (as shown on the site)', { de
 const domain = await ask('Production domain (https://www.example.com, no trailing slash)', { required: true, validate: isHttps });
 const phone = await ask('Primary phone in E.164 (+17275550123)', { required: true, validate: isE164 });
 const allowSms = await yes('Can customers text this number?');
-const email = await ask('Primary email', { required: true, validate: isEmail });
+const email = (await ask('Public email (blank = unavailable)', { validate: isEmail })) || 'unavailable';
 const primaryCustomer = await ask('Primary customer, one line (e.g. "Homeowners in Pinellas County who want their roof and driveway cleaned")', { required: true });
 const summary = await ask('Service area summary (e.g. "Dunedin and Pinellas County")', { required: true });
 const region = await ask('State code', { def: 'FL', required: true, validate: (v) => /^[A-Z]{2}$/.test(v) });
@@ -95,6 +95,7 @@ for (;;) {
 }
 
 const ctaLabel = await ask('Primary CTA label', { def: 'Get My Free Estimate', required: true });
+const ctaPath = await ask('CTA page URL segment (estimate | consultation | contact)', { def: 'estimate', required: true, validate: (v) => /^[a-z0-9-]+$/.test(v) });
 const responsePromise = await ask('Response-time promise the owner will actually keep (e.g. "We reply within one business day.")', { required: true });
 const tagline = await askOptional('Tagline');
 const foundingYear = await askOptional('Founding year');
@@ -146,11 +147,12 @@ const site = {
   legalName, publicName, domain, phone, allowSms, email, primaryCustomer, tagline,
   serviceArea: { summary, region, cities },
   address, hours,
-  cta: { label: ctaLabel, responsePromise },
+  cta: { label: ctaLabel, responsePromise, path: ctaPath },
   schemaType: 'LocalBusiness',
   foundingYear, licenseNumber, about,
   process: 'unavailable',
   faqs: 'unavailable',
+  legalNotice: 'unavailable',
   social: { googleBusinessProfile: gbp, facebook, instagram },
 };
 const brand = {

@@ -12,7 +12,6 @@ export function businessNode(): Record<string, unknown> {
     legalName: SITE.legalName,
     url: `${ORIGIN}/`,
     telephone: SITE.phone,
-    email: SITE.email,
     image: absoluteUrl(val(BRAND.ogImage) || BRAND.logo),
     logo: absoluteUrl(BRAND.logo),
     areaServed: SITE.serviceArea.cities.map((c) => ({ '@type': 'City', name: c })),
@@ -37,6 +36,8 @@ export function businessNode(): Record<string, unknown> {
     // Service-area business: no street address published, region only.
     node.address = { '@type': 'PostalAddress', addressRegion: SITE.serviceArea.region, addressCountry: 'US' };
   }
+  const email = val(SITE.email);
+  if (email) node.email = email;
   const founding = val(SITE.foundingYear);
   if (founding) node.foundingDate = String(founding);
   const social = Object.values(SITE.social || {}).map((s) => val(s)).filter(Boolean);

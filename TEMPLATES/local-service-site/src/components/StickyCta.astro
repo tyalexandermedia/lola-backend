@@ -1,9 +1,9 @@
 ---
-import { PHONE_HREF, SITE, SMS_HREF, phoneDisplay } from '../lib/config';
+import { CTA_PATH, CTA_SHORT, PHONE_HREF, SITE, SMS_HREF, phoneDisplay } from '../lib/config';
 const sms = SITE.allowSms !== false;
 ---
 <nav class={`sticky-cta${sms ? '' : ' no-sms'}`} aria-label="Quick contact">
   <a class="sc-call" href={PHONE_HREF} aria-label={`Call ${SITE.publicName} at ${phoneDisplay()}`}>☎ Call</a>
   {sms && <a class="sc-text" href={`${SMS_HREF}?&body=${encodeURIComponent(`Hi ${SITE.publicName}, I'd like an estimate.`)}`} aria-label={`Text ${SITE.publicName}`}>💬 Text</a>}
-  <a class="sc-quote" href="/estimate">{SITE.cta.label}</a>
+  <a class="sc-quote" href={CTA_PATH}>{CTA_SHORT}</a>
 </nav>

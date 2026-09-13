@@ -84,11 +84,13 @@ Three markers apply to every field:
 | `domain` | required | `https://www.example.com`, no trailing slash; becomes canonical + sitemap origin |
 | `phone` | required | E.164 (`+17275550123`); display format is derived |
 | `allowSms` | optional | `false` hides the Text buttons |
-| `email` | required | |
+| `email` | optional | omit or `"unavailable"` for call-first businesses |
 | `primaryCustomer` | required | one line, used in the hero and meta description |
 | `serviceArea.summary`, `.region`, `.cities` | required | cities in priority order; first city leads titles |
 | `hours` | required | `[{ "days": ["Monday", …], "opens": "08:00", "closes": "18:00" }]` |
 | `cta.label`, `cta.responsePromise` | required | the one CTA and the promise the owner will keep |
+| `cta.path`, `cta.shortLabel` | optional | URL segment of the CTA page (`estimate` default, or `consultation`, `contact`) and a short label for the sticky bar |
+| `legalNotice` | optional | footer disclaimer, e.g. attorney advertising or license text |
 | `tagline`, `foundingYear`, `licenseNumber`, `about` | optional | |
 | `address` | optional | omit for service-area businesses |
 | `process` | optional | `[{ "title", "text" }]`, renders the "How it works" band |
@@ -141,7 +143,7 @@ with the file and field.
 |---|---|
 | `/` | site + services + proof |
 | `/services/<slug>` | one per enabled service, ordered by `priority` |
-| `/estimate` | full form, phone, hours |
+| `/estimate` (or `cta.path`) | full form, phone, hours |
 | `/thank-you` | noindex, fires the GA4 `generate_lead` event |
 | `/api/lead` | the only server function |
 | `/sitemap-index.xml`, `/robots.txt`, `/404` | generated |

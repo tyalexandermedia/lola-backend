@@ -13,7 +13,7 @@
  *  - Nothing about the lead is logged except the outcome and the service.
  */
 import type { APIRoute } from 'astro';
-import { INTEGRATIONS, SITE, phoneDisplay } from '../../lib/config';
+import { CTA_PATH, INTEGRATIONS, SITE, phoneDisplay } from '../../lib/config';
 
 export const prerender = false;
 
@@ -48,7 +48,7 @@ function respond(wantsJson: boolean, redirect: Redirect, ok: boolean, code?: str
       headers: { 'Content-Type': 'application/json' },
     });
   }
-  return redirect(ok ? THANK_YOU : `/estimate?error=${code}#estimate-form`, 303);
+  return redirect(ok ? THANK_YOU : `${CTA_PATH}?error=${code}#estimate-form`, 303);
 }
 
 async function forwardToGhl(lead: Lead): Promise<boolean> {
