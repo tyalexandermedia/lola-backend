@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content';
 import { BRAND, CTA_PATH, CTA_SHORT, PHONE_HREF, SITE, phoneDisplay } from '../lib/config';
 const services = (await getCollection('services', (s) => s.data.enabled))
   .sort((a, b) => a.data.priority - b.data.priority)
-  .slice(0, 4);
+  // Three fit at desktop width even with long service names; the rest are one
+  // click away on the homepage grid and in the footer.
+  .slice(0, 3);
 ---
 <div class="topbar">
   Serving <strong>{SITE.serviceArea.summary}</strong><span class="topbar-extra"> · {SITE.cta.responsePromise}</span>

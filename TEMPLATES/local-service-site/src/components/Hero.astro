@@ -16,7 +16,7 @@ const rating = val(PROOF.googleRating);
 const years = val(PROOF.yearsInBusiness);
 const trust: string[] = [];
 if (rating) trust.push(`${rating.rating.toFixed(1)} stars · ${rating.count} Google reviews`);
-if (years) trust.push(`${years} years in business`);
+if (years) trust.push(`${years}+ years in business`);
 trust.push(...PROOF.certifications.slice(0, 2));
 trust.push(...PROOF.guarantees.slice(0, 1));
 ---
