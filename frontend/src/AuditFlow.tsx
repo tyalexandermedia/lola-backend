@@ -598,6 +598,38 @@ export function ResultsStage({
 
   const heroCtaHref = withUtm(STRATEGY_CALL_URL, 'hero_cta', { campaign: 'plug_leak' });
 
+  const competitorShapeOk = useMemo(() => {
+    if (!Array.isArray(audit.competitors)) return false;
+    return audit.competitors.some((c) => {
+      const title = typeof c.title === 'string' ? c.title.trim() : '';
+      const url = typeof c.url === 'string' ? c.url.trim() : '';
+      return title.length > 0 || url.length > 0;
+    });
+  }, [audit.competitors]);
+
+  const youRank = useMemo<number | null>(() => {
+    if (!Array.isArray(audit.competitors)) return null;
+    const nameNeedle = (audit.business_name || '').toLowerCase();
+    const hostNeedle = (audit.website || '')
+      .replace(/^https?:\/\//i, '')
+      .replace(/^www\./i, '')
+      .split('/')[0]
+      .toLowerCase();
+    for (const c of audit.competitors) {
+      const title = typeof c.title === 'string' ? c.title.toLowerCase() : '';
+      const name = typeof c.name === 'string' ? c.name.toLowerCase() : '';
+      const url = typeof c.url === 'string' ? c.url.toLowerCase() : '';
+      const nameHit =
+        nameNeedle.length > 2 && (title.includes(nameNeedle) || name.includes(nameNeedle));
+      const hostHit = hostNeedle.length > 3 && url.includes(hostNeedle);
+      if (nameHit || hostHit) {
+        const rank = Number(c.rank);
+        return Number.isFinite(rank) && rank > 0 ? rank : null;
+      }
+    }
+    return null;
+  }, [audit.competitors, audit.business_name, audit.website]);
+
   return (
     <main className="lola-report flex flex-1 flex-col">
       {/* Print-only branded header — only renders in the saved PDF, turning a
@@ -653,8 +685,11 @@ export function ResultsStage({
               {audit.total_score < 0 ? '—' : audit.total_score}
             </p>
             <p className="mt-2 text-[13px] text-[#A0A5AE]">
-              {audit.grade} — {audit.grade_label}
+              {audit.grade === '?' ? 'Pending' : audit.grade} — {audit.grade_label}
             </p>
+            {audit.total_score >= 0 && audit.percentile > 0 && (
+              <p className="mt-1.5 text-[12px] leading-[1.4] text-[#D4AF37]/75">Ahead of {audit.percentile}% of {audit.city} {businessTypeDisplay} businesses</p>
+            )}
           </div>
 
           {/* Monthly leak — toggle between $ and missed calls */}
@@ -670,18 +705,27 @@ export function ResultsStage({
             className={`relative rounded-[12px] border-2 border-[#D4AF37]/55 bg-gradient-to-br from-[#D4AF37]/[0.10] via-[#F4B942]/[0.05] to-transparent p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.08),0_0_28px_rgba(212,175,55,0.10)]`}
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
-              Annual at stake
+              Estimated at stake
             </p>
-            <p
-              className={`mt-3 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text font-extrabold leading-[0.95] tracking-[-0.025em] text-transparent ${
-                isHighLeak
-                  ? 'text-[56px] sm:text-[72px] lg:text-[80px]'
-                  : 'text-[48px] sm:text-[64px] lg:text-[72px]'
-              } drop-shadow-[0_4px_20px_rgba(212,175,55,0.25)]`}
-            >
-              ${formatNumber(annualAtStake)}
-            </p>
-            <p className="mt-2 text-[13px] text-[#D4AF37]/80">/ year at risk</p>
+            {audit.total_score < 0 ? (
+              <p className="mt-3 text-[13px] leading-[1.5] text-[#D4AF37]/80">
+                Estimate pending — some data was still syncing on this run.
+              </p>
+            ) : (
+              <>
+                <p
+                  className={`mt-3 bg-gradient-to-br from-[#FFD166] via-[#F4D47C] to-[#D4AF37] bg-clip-text font-extrabold leading-[0.95] tracking-[-0.025em] text-transparent tabular-nums break-words ${
+                    isHighLeak
+                      ? 'text-[56px] sm:text-[72px] lg:text-[80px]'
+                      : 'text-[48px] sm:text-[64px] lg:text-[72px]'
+                  } drop-shadow-[0_4px_20px_rgba(212,175,55,0.25)]`}
+                >
+                  ${formatNumber(annualAtStake)}
+                </p>
+                <p className="mt-2 text-[13px] text-[#D4AF37]/80">/ year at risk</p>
+                <p className="mt-1.5 text-[11px] leading-[1.45] text-[#D4AF37]/60">≈ {formatNumber(audit.revenue_leak.missed_calls_per_month || 0)} missed leads/mo × ${formatNumber(audit.revenue_leak.avg_job_value || 0)} avg job — estimate</p>
+              </>
+            )}
           </div>
         </div>
 
@@ -963,7 +1007,13 @@ export function ResultsStage({
                   {audit.business_name}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[#D4AF37]/85">
-                  Score {audit.total_score}/100 — currently not on page 1 for this query
+                  {audit.total_score < 0
+                    ? 'Score pending'
+                    : youRank != null
+                      ? `Score ${audit.total_score}/100 — you're currently #${youRank} for this query`
+                      : competitorShapeOk
+                        ? `Score ${audit.total_score}/100 — currently not on page 1 for this query`
+                        : `Score ${audit.total_score}/100 — see how you stack up below`}
                 </p>
               </div>
             </li>
@@ -1309,7 +1359,7 @@ function LeakCard({
     <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8A8F98]">
-          Monthly leak
+          Estimated monthly leak
         </p>
         <div
           role="tablist"
@@ -1602,21 +1652,30 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
           🦴 Lola's quick take on {audit.business_name}
         </p>
         <div className="mt-4 space-y-3 text-[15px] leading-[1.65] text-white sm:text-[16px]">
-          <p>
-            Your foundation is <strong className="text-[#D4AF37]">{assessment}</strong>. (Score:{' '}
-            <strong>{score}/100 — {audit.grade}</strong>)
-          </p>
-          <p>
-            <strong className="text-white">Fastest win:</strong> {topFix}. That alone could move
-            you <strong className="text-[#D4AF37]">{movementHint}</strong> in 30 days.
-          </p>
-          {monthlyLeak > 0 && (
+          {score < 0 ? (
             <p>
-              <strong className="text-white">Biggest leak:</strong> The gap between where{' '}
-              {businessFirst} ranks today and where it could rank. That's about{' '}
-              <strong className="text-[#D4AF37]">${formatNumber(monthlyLeak)}/mo</strong> on the
-              table.
+              {audit.lola_message || 'Some Google signals were quiet on this run — the playbook below is the safe-bet starting point.'}{' '}
+              <span className="text-[#8A8F98]">(Score pending)</span>
             </p>
+          ) : (
+            <>
+              <p>
+                Your foundation is <strong className="text-[#D4AF37]">{assessment}</strong>. (Score:{' '}
+                <strong>{score}/100 — {audit.grade}</strong>)
+              </p>
+              <p>
+                <strong className="text-white">Fastest win:</strong> {topFix}. That alone could move
+                you <strong className="text-[#D4AF37]">{movementHint}</strong> in 30 days.
+              </p>
+              {monthlyLeak > 0 && (
+                <p>
+                  <strong className="text-white">Biggest leak:</strong> The gap between where{' '}
+                  {businessFirst} ranks today and where it could rank. That's about{' '}
+                  <strong className="text-[#D4AF37]">${formatNumber(monthlyLeak)}/mo</strong> on the
+                  table.
+                </p>
+              )}
+            </>
           )}
           <p className="pt-1 font-semibold text-white">
             Want me to do this for you instead?

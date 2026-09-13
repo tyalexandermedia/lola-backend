@@ -463,17 +463,18 @@ def calculate_revenue_leak(business_type: str, score: int) -> dict:
     job_value = JOB_VALUES.get(business_type.lower(), JOB_VALUES["default"])
 
     def missed_calls_for(s: int) -> int:
+        # Conservative estimated missed leads/month, not measured call data.
         if s >= 90:
-            return 3
+            return 1
         if s >= 80:
-            return 8
+            return 2
         if s >= 70:
-            return 15
+            return 3
         if s >= 60:
-            return 25
+            return 5
         if s >= 50:
-            return 40
-        return 60
+            return 7
+        return 10
 
     missed_calls = missed_calls_for(score)
     monthly_leak = missed_calls * job_value
