@@ -153,6 +153,7 @@ const site = {
   process: 'unavailable',
   faqs: 'unavailable',
   legalNotice: 'unavailable',
+  homeDescription: 'unavailable',
   social: { googleBusinessProfile: gbp, facebook, instagram },
 };
 const brand = {

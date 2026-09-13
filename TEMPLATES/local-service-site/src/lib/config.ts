@@ -71,6 +71,9 @@ export function clip(text: string, max: number): string {
   const s = text.replace(/\s+/g, ' ').trim();
   if (s.length <= max) return s;
   const cut = s.slice(0, max);
+  // Prefer ending on a full sentence, then on a word.
+  const sentence = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.'));
+  if (sentence > max * 0.6) return cut.slice(0, sentence + 1);
   const at = cut.lastIndexOf(' ');
   return (at > max * 0.6 ? cut.slice(0, at) : cut).replace(/[,;:\-–]$/, '');
 }

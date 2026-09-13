@@ -33,6 +33,8 @@ export interface SiteConfig {
   hours: Hours[];
   /** path: URL segment for the CTA page, e.g. "estimate", "consultation", "contact". Default "estimate". */
   cta: { label: string; responsePromise: string; path?: string; shortLabel?: string };
+  /** Optional hand-written homepage meta description (<= 155 chars). Beats the formula every time. */
+  homeDescription?: string | Unavailable;
   /** Optional footer notice, e.g. attorney advertising or license disclaimers. */
   legalNotice?: string | Unavailable;
   schemaType?: string;

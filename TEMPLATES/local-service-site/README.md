@@ -91,6 +91,7 @@ Three markers apply to every field:
 | `cta.label`, `cta.responsePromise` | required | the one CTA and the promise the owner will keep |
 | `cta.path`, `cta.shortLabel` | optional | URL segment of the CTA page (`estimate` default, or `consultation`, `contact`) and a short label for the sticky bar |
 | `legalNotice` | optional | footer disclaimer, e.g. attorney advertising or license text |
+| `homeDescription` | optional | hand-written homepage meta description, at most 155 characters; overrides the formula |
 | `tagline`, `foundingYear`, `licenseNumber`, `about` | optional | |
 | `address` | optional | omit for service-area businesses |
 | `process` | optional | `[{ "title", "text" }]`, renders the "How it works" band |

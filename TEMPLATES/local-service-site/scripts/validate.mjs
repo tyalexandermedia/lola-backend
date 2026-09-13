@@ -86,6 +86,7 @@ if (site) {
   if (site.cta?.path !== undefined && !/^[a-z0-9-]+$/.test(String(site.cta.path))) err(`${f} → cta.path: one lowercase URL segment like "estimate", "consultation" or "contact"`);
   if (site.cta?.shortLabel !== undefined && !isStr(site.cta.shortLabel)) err(`${f} → cta.shortLabel: invalid`);
   optional(f, site, 'legalNotice');
+  optional(f, site, 'homeDescription', (v) => isStr(v) && v.length <= 155, 'at most 155 characters');
   optional(f, site, 'tagline');
   optional(f, site, 'address', (v) => v && typeof v === 'object' && ['street', 'city', 'region', 'postalCode', 'country'].every((k) => isStr(v[k])), 'object with street, city, region, postalCode, country');
   optional(f, site, 'foundingYear', (v) => /^\d{4}$/.test(String(v)), 'four-digit year');
