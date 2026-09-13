@@ -1197,7 +1197,40 @@ def lola_message_for(segment: str, business_name: str) -> str:
     )
 
 
-# ── MAIN ENDPOINT ──────────────────────────────────────────
+def lola_message_from_findings(
+    segment: str, business_name: str, recommendations: List[dict]
+) -> str:
+    """Hero subhead that names the ACTUAL weakest thing Lola found, instead of a
+    canned segment string. Sourced from the top data-driven recommendation
+    (recommendations are already sorted by impact), so the line is specific and
+    true — never fabricated. Falls back to the generic segment copy when there
+    is nothing concrete to point at (or the audit was incomplete)."""
+    bn = business_name or "your business"
+    if segment == "incomplete":
+        return lola_message_for(segment, business_name)
+
+    # Top 1-2 concrete findings, already prioritised by impact then effort.
+    top = [
+        str(r.get("title", "")).strip()
+        for r in (recommendations or [])
+        if str(r.get("title", "")).strip()
+    ][:2]
+    if not top:
+        return lola_message_for(segment, business_name)
+
+    lead = top[0]
+    if segment == "urgent":
+        second = f" Then: {top[1]}." if len(top) > 1 else ""
+        return f"{bn}, the leaks are real. Start here: {lead}.{second} A few fixes get you back in the game."
+    if segment == "education":
+        return (
+            f"{bn} has solid bones. Start here: {lead}. A handful of targeted "
+            "moves like it turn this into a lead machine."
+        )
+    return (
+        f"{bn} is already in the top tier. The last points come from things like "
+        f"{lead} — now we tighten the bolts and stretch the lead."
+    )
 
 
 @app.post("/audit", response_model=AuditResponse)
@@ -1252,7 +1285,6 @@ async def audit(request: AuditRequest) -> AuditResponse:
                 segment = "education"
             else:
                 segment = "optimization"
-            lola_message = lola_message_for(segment, request.business_name)
 
             lead_score, temperature = classify_temperature(
                 seo_score=scoring_score,
@@ -1276,6 +1308,13 @@ async def audit(request: AuditRequest) -> AuditResponse:
             # APIs don't cover. Skipped silently when fetch failed so a
             # transient HTML pull doesn't poison the whole audit.
             recommendations.extend(page_seo_to_recommendations(page_seo_result))
+            # Hero subhead names the real top finding (recommendations are
+            # already sorted by impact), so it speaks to THIS business instead
+            # of a canned segment string. Computed here, after recommendations
+            # are finalised.
+            lola_message = lola_message_from_findings(
+                segment, request.business_name, recommendations
+            )
             # Generate copy-paste JSON-LD schema blocks the contractor can
             # paste into <head>. Only attaches when Places returned a name —
             # without that we'd emit empty schema, which is worse than none.
