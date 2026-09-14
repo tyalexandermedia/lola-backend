@@ -800,10 +800,10 @@ export function ResultsStage({
       )}
 
       {audit.recommendations && audit.recommendations.length > 0 && (
-        <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+        <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6">
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.24em] text-gold-300">Lola's playbook</p>
-            <p className="text-xs text-slate-500">Ranked by impact × effort</p>
+            <p className="text-xs text-[#8A8F98]">Ranked by impact × effort</p>
           </div>
           <ul className="mt-4 space-y-3">
             {audit.recommendations.map((rec, i) => (
@@ -1032,10 +1032,10 @@ export function ResultsStage({
         </section>
       )}
 
-      <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+      <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category signals</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs uppercase tracking-[0.24em] text-[#A0A5AE]">Category signals</p>
+          <p className="text-xs text-[#8A8F98]">
             {categoryRows.filter((r) => r.available).length}/{categoryRows.length} signals available
           </p>
         </div>
@@ -1043,22 +1043,22 @@ export function ResultsStage({
           {categoryRows.map((row) => (
             <div
               key={row.title}
-              className={`rounded-2xl bg-slate-950/70 p-4 ring-1 ${
-                row.available ? 'ring-slate-800' : 'ring-slate-900 opacity-60'
+              className={`rounded-2xl bg-white/[0.03] p-4 ring-1 ${
+                row.available ? 'ring-white/[0.10]' : 'ring-white/[0.06] opacity-60'
               }`}
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{row.title}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#8A8F98]">{row.title}</p>
               <p className="mt-1 text-2xl font-semibold text-white">
                 {row.available ? row.score : '—'}
               </p>
-              {!row.available && <p className="mt-1 text-xs text-slate-500">No data</p>}
+              {!row.available && <p className="mt-1 text-xs text-[#8A8F98]">No data</p>}
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-        <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Business profile</p>
+      <section className="mt-5 rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6">
+        <p className="text-xs uppercase tracking-[0.24em] text-[#A0A5AE]">Business profile</p>
         <div className="mt-4 grid gap-2 text-sm">
           <ProfileRow label="Website" value={audit.website} />
           <ProfileRow label="Phone" value={stringOf(businessInfo.phone, 'Not on Google')} />
@@ -2058,19 +2058,19 @@ function RecommendationCard({
 }) {
   const impactStyle =
     rec.impact === 'critical'
-      ? 'bg-rose-500/15 text-rose-300 ring-rose-500/30'
+      ? 'bg-[#D4AF37]/15 text-[#F4D47C] ring-[#D4AF37]/35'
       : rec.impact === 'high'
-      ? 'bg-amber-500/15 text-amber-300 ring-amber-500/30'
+      ? 'bg-[#D4AF37]/10 text-[#D4AF37] ring-[#D4AF37]/25'
       : rec.impact === 'medium'
-      ? 'bg-sky-500/15 text-sky-300 ring-sky-500/30'
-      : 'bg-slate-500/15 text-slate-300 ring-slate-500/30';
+      ? 'bg-white/[0.05] text-[#A0A5AE] ring-white/[0.12]'
+      : 'bg-white/[0.04] text-[#8A8F98] ring-white/[0.08]';
 
   return (
     <li
       className={`rounded-2xl border p-4 transition ${
         primary
           ? 'border-gold-400/50 bg-gold-500/[0.07]'
-          : 'border-slate-800 bg-slate-950/60'
+          : 'border-white/[0.08] bg-white/[0.02]'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -2078,7 +2078,7 @@ function RecommendationCard({
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ring-1 ${
             primary
               ? 'bg-gold-500/20 text-gold-200 ring-gold-400/40'
-              : 'bg-slate-800 text-slate-300 ring-slate-700'
+              : 'bg-white/[0.05] text-[#A0A5AE] ring-white/[0.12]'
           }`}
         >
           {order}
@@ -2092,12 +2092,12 @@ function RecommendationCard({
               </span>
             )}
           </div>
-          <p className="mt-1.5 text-sm leading-6 text-slate-300">{rec.detail}</p>
+          <p className="mt-1.5 text-sm leading-6 text-[#A0A5AE]">{rec.detail}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.16em]">
             <span className={`inline-flex rounded-full px-2 py-0.5 font-medium ring-1 ${impactStyle}`}>
               {rec.impact} impact
             </span>
-            <span className="inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 font-medium text-slate-300 ring-1 ring-slate-700">
+            <span className="inline-flex rounded-full bg-white/[0.05] px-2 py-0.5 font-medium text-[#A0A5AE] ring-1 ring-white/[0.12]">
               {rec.effort} effort
             </span>
           </div>
@@ -2109,14 +2109,14 @@ function RecommendationCard({
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-soft">{children}</div>
+    <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 shadow-soft">{children}</div>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{label}</p>
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
+      <p className="text-xs uppercase tracking-[0.22em] text-[#8A8F98]">{label}</p>
       <p className="mt-2 text-xl font-semibold text-white">{value}</p>
     </div>
   );
@@ -2124,9 +2124,9 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-slate-950/70 px-4 py-3">
-      <span className="text-slate-400">{label}</span>
-      <span className="ml-3 truncate text-right font-medium text-slate-100">{value}</span>
+    <div className="flex items-center justify-between rounded-2xl bg-white/[0.03] px-4 py-3">
+      <span className="text-[#8A8F98]">{label}</span>
+      <span className="ml-3 truncate text-right font-medium text-white">{value}</span>
     </div>
   );
 }
