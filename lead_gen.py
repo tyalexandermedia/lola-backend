@@ -684,6 +684,10 @@ Format as actionable checkbox list:
 
 from db.tracking import log_event, log_call, update_call_status  # noqa: E402
 from db.reporting import get_client_by_slug, upsert_client  # noqa: E402
+from db.revenue import (  # noqa: E402
+    upsert_opportunity,
+    update_opportunity_status,
+)
 
 
 class FormWebhookPayload(BaseModel):
@@ -737,6 +741,102 @@ async def webhook_form(body: FormWebhookPayload, request: Request):
         },
     )
     return {"ok": True, "event_id": eid}
+
+
+class OpportunityWebhookPayload(BaseModel):
+    client_slug: str = "sandbar"
+    # GHL opportunity id — the idempotency key. Repeated stage changes for the
+    # same opportunity update the SAME row instead of creating duplicates.
+    opportunity_id: str
+    name: Optional[str] = None            # opportunity/contact name -> title
+    contact_name: Optional[str] = None    # fallback title
+    pipeline_stage: Optional[str] = None  # GHL pipeline stage NAME (free text)
+    status: Optional[str] = None          # GHL native status: open/won/lost/abandoned
+    monetary_value: Optional[float] = None  # opportunity value in dollars
+
+
+def _map_ghl_opp_status(stage: Optional[str], ghl_status: Optional[str]) -> str:
+    """
+    Map a GoHighLevel opportunity's native status + pipeline stage name onto our
+    revenue statuses (new / qualified / estimate_sent / won / lost).
+
+    Native won/lost wins first (it's authoritative in GHL). Otherwise we read the
+    pipeline STAGE NAME so Eli can rename stages in the UI and we still classify
+    correctly — 'Booked'/'Job'/'Complete'/'Paid' => won, 'Estimate'/'Quote' =>
+    estimate_sent, everything else => new. Unknown => new (safe default; a lead
+    already counted at the top of the funnel, not yet revenue).
+    """
+    s = (ghl_status or "").strip().lower()
+    if s == "won":
+        return "won"
+    if s in ("lost", "abandoned"):
+        return "lost"
+    st = (stage or "").strip().lower()
+    if any(k in st for k in ("booked", "job complete", "completed", "paid", "won", "review")):
+        return "won"
+    if any(k in st for k in ("estimate", "quote", "proposal")):
+        return "estimate_sent"
+    if any(k in st for k in ("qualif", "contacted", "scheduled")):
+        return "qualified"
+    return "new"
+
+
+@router.post("/webhook/opportunity")
+async def webhook_opportunity(body: OpportunityWebhookPayload, request: Request):
+    """
+    GoHighLevel opportunity webhook -> revenue scoreboard.
+
+    Wire this in GHL: Workflow -> trigger 'Opportunity Status Changed' (or
+    'Opportunity Stage Changed') -> Webhook action ->
+      POST https://lola-backend-production.up.railway.app/lead-gen/webhook/opportunity
+    with a JSON body carrying {opportunity_id, name, pipeline_stage, status,
+    monetary_value}. Every stage change re-posts and upserts the SAME opportunity
+    (idempotent on the GHL opportunity id), so the /r/client/sandbar dashboard's
+    revenue_agent section — pipeline value, opportunities by status, and WON
+    REVENUE — tracks the real pipeline in near real time.
+
+    Fire-and-forget: any failure is swallowed and returns a 200-with-error so a
+    sync hiccup can never break the GHL workflow or double-fire.
+    """
+    slug = (body.client_slug or "sandbar").strip().lower()
+    opp_ghl_id = (body.opportunity_id or "").strip()
+    if not opp_ghl_id:
+        return {"ok": False, "error": "missing opportunity_id"}
+
+    title = (body.name or body.contact_name or "GoHighLevel Opportunity").strip()
+    value = int(round(body.monetary_value or 0))
+    mapped = _map_ghl_opp_status(body.pipeline_stage, body.status)
+
+    # For terminal states, upsert with an interim status first (upsert can't set
+    # won_at/won_value/lost_at), then stamp the terminal state via
+    # update_opportunity_status so won revenue and timestamps are recorded.
+    base_status = mapped
+    if mapped == "won":
+        base_status = "estimate_sent"
+    elif mapped == "lost":
+        base_status = "new"
+
+    try:
+        opp_id = await upsert_opportunity(
+            slug=slug,
+            title=title,
+            source="gohighlevel",
+            source_id=opp_ghl_id,
+            status=base_status,
+            estimated_value=value,
+        )
+        if mapped == "won":
+            await update_opportunity_status(opp_id, "won", won_value=value)
+        elif mapped == "lost":
+            await update_opportunity_status(opp_id, "lost")
+    except Exception as e:  # never break the GHL workflow
+        print(
+            f"[webhook/opportunity] ERROR ({slug}/{opp_ghl_id}): "
+            f"{type(e).__name__}: {e}"
+        )
+        return {"ok": False, "error": str(e)[:200]}
+
+    return {"ok": True, "opportunity_id": opp_id, "status": mapped}
 
 
 @router.post("/webhook/call")
