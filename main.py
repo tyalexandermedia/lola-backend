@@ -145,6 +145,18 @@ from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
 from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webmaster
 from api_clients.ghl import push_growth_score_lead, ghl_enabled
+
+# Lola personal command-center (Daily Brief) — see docs/LOLA-COMMAND-CENTER-AUDIT.md
+from db.lola_items import (
+    init_lola_items_table,
+    create_item,
+    set_status,
+    set_scoreboard,
+    WORKSPACES,
+    WORKSPACE_LABELS,
+)
+from services.priority import build_brief
+from services.brief_ingest import refresh_all as brief_refresh_all
 from outreach.sender import make_unsub_token
 from db.reviews import init_reviews_tables
 from reviews.routes import router as reviews_router
@@ -254,6 +266,7 @@ async def startup_event():
     await init_swarm_tables()
     await init_followups_table()
     await init_mctb_tables()
+    await init_lola_items_table()
     await cache_purge_expired()
 
     # Growth Score follow-up sequencer. Dormant until an email/SMS provider is
@@ -1886,6 +1899,121 @@ async def admin_hq(x_admin_key: str = Header(..., alias="X-Admin-Key")):
             "ghl": ghl_enabled(),
         },
     }
+
+
+# ── LOLA DAILY BRIEF (personal command center) ────────────────────────────
+# The cross-business "what should I do next?" view. Deterministic priority
+# engine over one lola_items table; revenue action ranks above speculative
+# build. Admin-key gated, same key as the rest of /admin. Read model only —
+# it never messages customers or changes CRM records.
+
+class BriefCapture(BaseModel):
+    workspace: str
+    title: str
+    detail: str = ""
+    type: str = "task"
+    status: str = "inbox"
+    revenue_estimate: float = 0
+    revenue_recurring: bool = False
+    effort: str = "medium"
+    confidence: float = 0.6
+    due_at: str | None = None
+    waiting_on: str = ""
+    system_critical: bool = False
+
+
+class BriefStatus(BaseModel):
+    status: str
+
+
+class ScoreboardEntry(BaseModel):
+    workspace: str
+    period: str          # 'YYYY-MM'
+    amount: float
+    note: str = ""
+
+
+@app.get("/brief")
+async def get_brief(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """The Daily Command Center payload: most-important-next-step + sections."""
+    _check_admin(x_admin_key)
+    brief = await build_brief()
+    brief["workspaces"] = [
+        {"slug": w, "label": WORKSPACE_LABELS[w]} for w in WORKSPACES
+    ]
+    return brief
+
+
+@app.post("/brief/refresh")
+async def refresh_brief(x_admin_key: str = Header(..., alias="X-Admin-Key")):
+    """Pull the latest revenue signals (product + GHL) into the brief."""
+    _check_admin(x_admin_key)
+    counts = await brief_refresh_all()
+    return {"ok": True, "ingested": counts}
+
+
+@app.post("/brief/capture")
+async def capture_brief_item(
+    body: BriefCapture,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Inbox capture — one box for an idea/task/opportunity/problem."""
+    _check_admin(x_admin_key)
+    if body.workspace not in WORKSPACES:
+        raise HTTPException(status_code=400, detail="Unknown workspace")
+    if not body.title.strip():
+        raise HTTPException(status_code=400, detail="Title required")
+    try:
+        item = await create_item(
+            workspace=body.workspace,
+            title=body.title.strip(),
+            detail=body.detail.strip(),
+            type=body.type,
+            status=body.status,
+            revenue_estimate=body.revenue_estimate,
+            revenue_recurring=body.revenue_recurring,
+            effort=body.effort,
+            confidence=body.confidence,
+            due_at=body.due_at,
+            waiting_on=body.waiting_on.strip(),
+            system_critical=body.system_critical,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"ok": True, "item": item}
+
+
+@app.post("/brief/items/{item_id}/status")
+async def set_brief_item_status(
+    item_id: int,
+    body: BriefStatus,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Move an item: done / today / active / waiting / ignored / inbox."""
+    _check_admin(x_admin_key)
+    try:
+        item = await set_status(item_id, body.status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"ok": True, "item": item}
+
+
+@app.post("/brief/scoreboard")
+async def set_brief_scoreboard(
+    body: ScoreboardEntry,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """Manual predictable-monthly-revenue entry per business (toward $4k/mo)."""
+    _check_admin(x_admin_key)
+    if body.workspace not in WORKSPACES:
+        raise HTTPException(status_code=400, detail="Unknown workspace")
+    try:
+        row = await set_scoreboard(body.workspace, body.period.strip(), body.amount, body.note.strip())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"ok": True, "entry": row}
 
 
 @app.post("/admin/case-study/{slug}/run")
