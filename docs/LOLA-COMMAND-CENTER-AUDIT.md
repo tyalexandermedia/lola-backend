@@ -467,6 +467,29 @@ sequence_sender rather than maintain them.
 5. **Workspace list** — is the six-workspace set in §14 the right starting set,
    or add/remove any?
 
+### DECISIONS LOCKED — 2026-09-25 (Ty)
+
+1. **One app or two → REUSE.** v1 lives inside this deployment (new `/brief`
+   route, shared DB), with command-center data cleanly separated
+   (`workspace`, `lola_items`) so it can be split out later if it earns it.
+2. **GHL locations → Sandbar + Lola Leads only.** Revenue Opportunities are
+   auto-populated for these two workspaces. Coach Ty, TAM, Lola Dev, Personal
+   are **manual-entry** in v1 (no GHL location to read).
+3. **Personal/financial data behind the single admin key → Claude's call, ruled
+   for best ROI: keep sensitive personal financial data OUT of v1.** Rationale:
+   storing bank/personal-finance detail doesn't directly make money and *would*
+   force an auth-hardening detour first. So v1 stores **only revenue-actionable
+   data** — GHL pipeline (Sandbar + Lola Leads), Stripe cash/recurring, product
+   hot leads, and manual tasks/opportunities per workspace. The **Personal/Admin
+   workspace is task-capture only** (e.g. "renew LLC") — no sensitive dollar
+   figures. The $4k scoreboard = Stripe (auto) + one manual revenue number per
+   business/month (business revenue, not private finance). Any sensitive personal
+   financial detail is deferred to v1.1 behind hardened auth.
+4. **$4k/mo scoreboard → manual-start approved.** Stripe auto for product
+   revenue; manual entry for Coach Ty / TAM; automate per-source later.
+5. **Workspace set → the six in §14 stand:** `sandbar · lola-leads · coach-ty ·
+   ty-alexander-media · lola-dev · personal`.
+
 ---
 
 ## 22. MINIMUM VIABLE LOLA
