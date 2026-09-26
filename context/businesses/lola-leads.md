@@ -13,4 +13,9 @@ Free lead magnet = Growth Score. See `../offers.md` and `DECISIONS.md`.
 **Watch:** qualified prospects waiting on a response, estimates/proposals unanswered,
 Full Build closes, Managed conversions.
 
+**Clients mapped to this workspace in the brief:**
+- **Randy Golden, PC** (Ty's grandfather's mediation practice) — GHL location
+  `ajRyx9aH0Sy8RbY4Fl3M`. A real client; his open opportunities surface here.
+  (Decision 2026-09-26: keep Randy under `lola-leads`.)
+
 _Owner-fill: monthly predictable revenue, active client count._
