@@ -7,16 +7,21 @@ missing read half. SAFE BY DEFAULT: every function returns [] cleanly when the
 token/location isn't configured, and swallows network errors — the brief must
 render whether or not GHL is wired.
 
-Scope (per owner decision 2026-09-25): only the Sandbar and Lola Leads
-locations. Configure via env — no IDs are hard-coded:
+Configure via env — no IDs are hard-coded. Preferred: one JSON map of
+LeadConnector location id -> Lola workspace slug:
 
-    GHL_API_TOKEN            # Private Integration token (same one the segment CLI uses)
-    GHL_LOCATION_SANDBAR     # LeadConnector location id for Sandbar
-    GHL_LOCATION_LOLA_LEADS  # LeadConnector location id for Lola Leads
+    GHL_API_TOKEN     # Private Integration token (same one the segment CLI uses)
+    GHL_LOCATION_MAP  # e.g. {"rL4X2gKNPEgIwsuJeYIL":"sandbar",
+                      #       "ZGaVN1X7cuOVlz0kyr3i":"ty-alexander-media",
+                      #       "ajRyx9aH0Sy8RbY4Fl3M":"lola-leads"}
+
+Backward-compatible named fallbacks (used only when GHL_LOCATION_MAP is unset):
+GHL_LOCATION_SANDBAR, GHL_LOCATION_TAM, GHL_LOCATION_LOLA_LEADS.
 
 Read-only: this never creates, updates, or messages anything in GHL.
 """
 
+import json
 import os
 from typing import Optional
 
@@ -29,15 +34,26 @@ _TIMEOUT = 15.0
 # Statuses that mean "still live / money not yet won or lost".
 OPEN_STATUSES = {"open"}
 
-# Map each configured location id -> the Lola workspace it belongs to.
+
 def location_workspace_map() -> dict[str, str]:
+    """Map each configured location id -> the Lola workspace it belongs to."""
+    raw = os.getenv("GHL_LOCATION_MAP", "").strip()
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            return {str(k): str(v) for k, v in parsed.items() if k and v}
+        except Exception as e:
+            print(f"⚠️ GHL_LOCATION_MAP is not valid JSON, ignoring: {e}")
+    # Fallback: named env vars.
     m: dict[str, str] = {}
-    sandbar = os.getenv("GHL_LOCATION_SANDBAR", "").strip()
-    lola = os.getenv("GHL_LOCATION_LOLA_LEADS", "").strip()
-    if sandbar:
-        m[sandbar] = "sandbar"
-    if lola:
-        m[lola] = "lola-leads"
+    for env_name, workspace in (
+        ("GHL_LOCATION_SANDBAR", "sandbar"),
+        ("GHL_LOCATION_TAM", "ty-alexander-media"),
+        ("GHL_LOCATION_LOLA_LEADS", "lola-leads"),
+    ):
+        loc = os.getenv(env_name, "").strip()
+        if loc:
+            m[loc] = workspace
     return m
 
 
@@ -61,7 +77,9 @@ async def fetch_open_opportunities(location_id: str, limit: int = 100) -> list[d
     token = os.getenv("GHL_API_TOKEN", "").strip()
     if not token or not location_id:
         return []
-    params = {"location_id": location_id, "limit": str(limit), "status": "open"}
+    # LeadConnector's GET /opportunities/search expects camelCase `locationId`
+    # (confirmed against the API's own nextPageUrl), not `location_id`.
+    params = {"locationId": location_id, "limit": str(limit), "status": "open"}
     try:
         async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
             r = await client.get(
@@ -79,11 +97,15 @@ async def fetch_open_opportunities(location_id: str, limit: int = 100) -> list[d
 
     out = []
     for o in data.get("opportunities", []) or []:
+        name = o.get("name") or (o.get("contact") or {}).get("name") or "Opportunity"
+        # Skip GoHighLevel's seeded demo deals ("(Example) Deal with …").
+        if name.strip().lower().startswith("(example)"):
+            continue
         contact = o.get("contact") or {}
         out.append(
             {
                 "id": o.get("id") or "",
-                "name": o.get("name") or contact.get("name") or "Opportunity",
+                "name": name,
                 "contact_name": contact.get("name") or "",
                 "value": float(o.get("monetaryValue") or 0),
                 "status": o.get("status") or "open",
