@@ -72,11 +72,19 @@ python3 services/build_review_segment.py           # dry-run, sends nothing
 python3 services/build_review_segment.py --apply   # tags eligible contacts
 ```
 
-Line 220 halts if the token is still the revoked Aug-2 one, so generate a fresh
+It halts if the token is still the revoked Aug-2 one, so generate a fresh
 Private Integration token rather than reusing an old one. Requires `httpx`.
 
 Then build the review campaign **in GHL**, against the `review-send-eligible`
-tag, sending from Sandbar's own domain and number.
+tag, **email only**, sending from Sandbar's own domain and number.
+
+**`review-send-eligible` is an email predicate — never gate SMS on it.** It
+means valid email + not Email-DND + not excluded; it carries no phone consent.
+The builder has a separate, stricter SMS predicate: an explicit `sms:consent`
+opt-in tag + usable phone + not Phone-DND. It reports an `sms-eligible:` count
+(0 until real opt-ins exist) and `--apply-sms` tags those `review-sms-eligible`.
+When A2P clears, trigger the SMS step on `review-sms-eligible`, not the email
+tag. See HANDOFF.md for the full note.
 
 ## 2 · Take money — Stripe
 

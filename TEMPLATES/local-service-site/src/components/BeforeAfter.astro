@@ -1,0 +1,32 @@
+---
+import type { BeforeAfterPair } from '../lib/types';
+interface Props { pairs: BeforeAfterPair[]; heading?: string; eyebrow?: string }
+const { pairs, heading = 'Real results, same angle', eyebrow = 'Before & after' } = Astro.props;
+---
+{pairs.length > 0 && (
+  <section class="block surface" id="results">
+    <div class="shell">
+      <div class="center">
+        <p class="eyebrow">{eyebrow}</p>
+        <h2>{heading}</h2>
+      </div>
+      <div class="ba-grid">
+        {pairs.map((p) => (
+          <div class="ba">
+            <div class="ba-pair">
+              <figure>
+                <img src={p.before} alt={`Before: ${p.alt}`} width="1200" height="900" loading="lazy" decoding="async" />
+                <figcaption>Before</figcaption>
+              </figure>
+              <figure>
+                <img src={p.after} alt={`After: ${p.alt}`} width="1200" height="900" loading="lazy" decoding="async" />
+                <figcaption>After</figcaption>
+              </figure>
+            </div>
+            <div class="ba-label">{p.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

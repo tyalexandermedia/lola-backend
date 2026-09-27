@@ -1,0 +1,23 @@
+{
+  "name": "lola-local-service-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Lola Local Service Website Factory — master template. Generate one independent client site per repository from config files.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "setup-site": "node scripts/setup-site.mjs",
+    "validate": "node scripts/validate.mjs",
+    "dev": "node scripts/validate.mjs && astro dev",
+    "prebuild": "node scripts/validate.mjs",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/vercel": "^11.0.10",
+    "astro": "^7.3.2"
+  }
+}

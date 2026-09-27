@@ -1,0 +1,14 @@
+---
+import { SITE } from '../lib/config';
+---
+{SITE.serviceArea.cities.length > 0 && (
+  <section class="block surface" id="areas">
+    <div class="shell">
+      <p class="eyebrow">Where we work</p>
+      <h2>Serving {SITE.serviceArea.summary}</h2>
+      <ul class="areas">
+        {SITE.serviceArea.cities.map((c) => <li>{c}</li>)}
+      </ul>
+    </div>
+  </section>
+)}

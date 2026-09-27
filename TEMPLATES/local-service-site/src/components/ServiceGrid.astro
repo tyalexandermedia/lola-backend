@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+interface Props { exclude?: string; heading?: string; eyebrow?: string }
+const { exclude, heading = 'What we do', eyebrow = 'Services' } = Astro.props;
+const services = (await getCollection('services', (s) => s.data.enabled && s.id !== exclude)).sort((a, b) => a.data.priority - b.data.priority);
+---
+{services.length > 0 && (
+  <section class="block" id="services">
+    <div class="shell">
+      <div class="center">
+        <p class="eyebrow">{eyebrow}</p>
+        <h2>{heading}</h2>
+      </div>
+      <div class="cards">
+        {services.map((s) => (
+          <a class="card" href={`/services/${s.id}`}>
+            {s.data.image && <img src={s.data.image} alt={s.data.imageAlt || s.data.name} width="640" height="480" loading="lazy" decoding="async" />}
+            <h3>{s.data.name}</h3>
+            <p>{s.data.summary}</p>
+            <span class="more">Learn more →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

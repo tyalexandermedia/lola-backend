@@ -83,6 +83,28 @@ with the rotated token, eyeball `reports/review_eligible.csv`, then
 3. **Publish** the workflow. Tagged contacts enter from the trigger; the
    send itself only happens via the published workflow, never from code.
 
+### When A2P clears and you add an SMS step — do NOT reuse this tag
+
+`review-send-eligible` is an **email predicate only**: valid email, not
+Email-DND, not excluded. It says nothing about phone permission. A contact
+can be perfectly email-eligible and have never given phone consent — and the
+~92 imported past-customers is exactly the "imported list + review
+solicitation" shape carriers scrutinize hardest.
+
+So the SMS path is deliberately separate:
+
+- The builder computes a **stricter** SMS predicate (`sms_eligible()`): an
+  explicit **`sms:consent`** opt-in tag on the contact, a usable phone, not
+  Phone-DND, not excluded. It reports an `sms-eligible:` count (0 today,
+  because none of the imported contacts carry `sms:consent`) and writes an
+  `sms`/`sms_reason` column to the CSV.
+- `--apply-sms` tags qualifying contacts **`review-sms-eligible`** — a
+  distinct tag. `--apply` (email) never touches it.
+- When you add an SMS step, trigger it on **`review-sms-eligible`**, never on
+  `review-send-eligible`. Collect the `sms:consent` opt-in first (webform,
+  keyword opt-in, or a checkbox at point of service). No opt-in → 0 texts,
+  by design.
+
 ## Blockers needing owner input
 
 - **Rotated GHL token + location ID** — needed to produce real counts

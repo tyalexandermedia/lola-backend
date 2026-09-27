@@ -1,0 +1,23 @@
+---
+import { PROOF, val } from '../lib/config';
+const platform = val(PROOF.reviewPlatformUrl);
+---
+{PROOF.reviews.length > 0 && (
+  <section class="block" id="reviews">
+    <div class="shell">
+      <div class="center">
+        <p class="eyebrow">Reviews</p>
+        <h2>What customers say</h2>
+        {platform && <p class="lede"><a href={platform} target="_blank" rel="noopener" style="color:var(--accent-text);font-weight:800">Read all reviews →</a></p>}
+      </div>
+      <div class="reviews">
+        {PROOF.reviews.map((r) => (
+          <article class="review">
+            <blockquote>“{r.quote}”</blockquote>
+            <footer>— {r.author} · <a href={r.sourceUrl} target="_blank" rel="noopener">{r.source}</a>{r.date && ` · ${r.date.slice(0, 4)}`}</footer>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

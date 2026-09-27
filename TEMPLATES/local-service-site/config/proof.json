@@ -1,0 +1,25 @@
+{
+  "$comment": "Verified proof only. Every entry needs a source the owner can point to. Empty arrays are fine: the matching sections hide themselves and the site still builds.",
+  "yearsInBusiness": "unavailable",
+  "googleRating": "unavailable",
+  "reviewPlatformUrl": "unavailable",
+  "reviews": [
+    {
+      "quote": "EXAMPLE review text. Replace with a real review copied verbatim from the platform it lives on.",
+      "author": "EXAMPLE A.",
+      "source": "Google",
+      "sourceUrl": "https://www.example-exterior.com/reviews",
+      "date": "2026-01-15"
+    }
+  ],
+  "certifications": ["EXAMPLE: Licensed & insured"],
+  "guarantees": ["EXAMPLE: Satisfaction walkthrough before we leave"],
+  "beforeAfter": [
+    {
+      "before": "/client/example-before.svg",
+      "after": "/client/example-after.svg",
+      "label": "EXAMPLE: Roof soft wash",
+      "alt": "EXAMPLE placeholder image pair"
+    }
+  ]
+}

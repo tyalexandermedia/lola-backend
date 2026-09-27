@@ -17,13 +17,23 @@ sends email or SMS and never enrolls anyone in a workflow.
 Always writes reports/review_eligible.csv (name/email/reason) and prints the
 real / directory / excluded counts.
 
+SMS is a SEPARATE, STRICTER predicate. `review-send-eligible` means EMAIL
+reachable and nothing more — it must never gate an SMS send. A contact is
+SMS-eligible only if it carries an explicit `sms:consent` opt-in tag, has a
+usable phone, is not Phone-DND, and is not excluded; those get the distinct
+tag `review-sms-eligible`, and only when you pass --apply-sms. The imported
+past-customer list has no recorded phone consent, so the SMS-eligible count
+is 0 by default. That is intentional: point any future SMS workflow step at
+`review-sms-eligible`, never at `review-send-eligible`.
+
 Credentials (env only, never hard-coded):
   export GHL_API_TOKEN=pit-...   # rotated Private Integration token
   export GHL_LOCATION_ID=...
 
 Usage:
   python3 services/build_review_segment.py            # dry-run
-  python3 services/build_review_segment.py --apply    # tag REAL customers
+  python3 services/build_review_segment.py --apply    # tag REAL customers (EMAIL)
+  python3 services/build_review_segment.py --apply-sms  # tag sms:consent contacts (SMS)
 
 Fallback when transaction/spend custom fields didn't import: pass
 --emails-file PATH (plain list or CSV containing the known-real customer
@@ -44,13 +54,17 @@ API_BASE = "https://services.leadconnectorhq.com"
 API_VERSION = "2021-07-28"
 
 SOURCE_TAG = "customer:past"
-ELIGIBLE_TAG = "review-send-eligible"
+ELIGIBLE_TAG = "review-send-eligible"        # EMAIL reachability ONLY
+SMS_ELIGIBLE_TAG = "review-sms-eligible"     # SEPARATE: never gate SMS on the email tag
+SMS_CONSENT_TAG = "sms:consent"              # explicit opt-in a contact MUST carry for SMS
 EXCLUDE_TAGS = {"exclusion:no-marketing", "sandbar-optout"}
 
 # The Aug-2 leaked token was rotated; refuse to run with the old one.
 REVOKED_TOKEN_PREFIX = "pit-fe93dc05"
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+# Loose phone check: at least 7 digits, common separators allowed.
+PHONE_RE = re.compile(r"^\+?[\d().\-\s]{7,}$")
 
 # Custom-field name heuristics (lowercased substring match) for the three
 # real-customer signals. Override with --tx-field / --spend-field /
@@ -198,9 +212,41 @@ def classify(contact: dict, fields: dict, ground_truth: set = None):
     return "eligible", "+".join(reasons)
 
 
+def sms_eligible(contact: dict):
+    """
+    Return (bool, reason). SMS eligibility is DELIBERATELY separate from and
+    stricter than email eligibility. A contact is SMS-eligible ONLY if it
+    carries an explicit ``sms:consent`` opt-in, has a usable phone, is not
+    Phone-DND, and is not excluded. Email-DND is not consulted here: email
+    opt-out has nothing to do with phone permission, and phone permission is
+    what a carrier cares about.
+
+    The imported ``customer:past`` list has no recorded phone consent, so this
+    returns False for all of them until real SMS opt-ins are collected. That
+    is the guardrail: never let ``review-send-eligible`` (an email predicate)
+    trigger a text.
+    """
+    tags = {t.lower() for t in (contact.get("tags") or [])}
+    hit = tags & EXCLUDE_TAGS
+    if hit:
+        return False, f"tag:{sorted(hit)[0]}"
+    if SMS_CONSENT_TAG not in tags:
+        return False, "no-sms-consent"
+    phone = (contact.get("phone") or "").strip()
+    if not PHONE_RE.match(phone):
+        return False, "invalid-or-missing-phone"
+    dnd = ((contact.get("dndSettings") or {}).get("Phone") or {}).get("status")
+    if (dnd or "").lower() == "active":
+        return False, "phone-dnd"
+    if SMS_ELIGIBLE_TAG in tags:
+        return True, "already-tagged"
+    return True, "sms:consent+phone"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true", help=f"add tag {ELIGIBLE_TAG} (default: dry-run)")
+    ap.add_argument("--apply-sms", action="store_true", help=f"add tag {SMS_ELIGIBLE_TAG} to sms:consent contacts only (SMS path; separate from --apply)")
     ap.add_argument("--report", default="reports/review_eligible.csv")
     ap.add_argument("--sleep", type=float, default=0.15, help="pause between API calls")
     ap.add_argument("--tx-field", default="", help="custom-field ID for transaction count")
@@ -254,18 +300,25 @@ def main() -> int:
     print(f"[{mode}] {len(contacts)} contacts tagged {SOURCE_TAG}")
 
     rows, counts = [], {"eligible": 0, "already-tagged": 0, "directory": 0, "excluded": 0}
-    tagged = failed = 0
+    sms_counts = {"sms-eligible": 0, "sms-already-tagged": 0}
+    tagged = failed = sms_tagged = sms_failed = 0
     matched_emails = set()
     for c in contacts:
         bucket, reason = classify(c, fields, ground_truth)
         counts[bucket] += 1
+        # SMS eligibility is computed independently for every contact and is
+        # NOT derived from the email bucket. See sms_eligible() for why.
+        sms_ok, sms_reason = sms_eligible(c)
+        if sms_ok:
+            sms_counts["sms-already-tagged" if sms_reason == "already-tagged" else "sms-eligible"] += 1
         if ground_truth is not None:
             em = (c.get("email") or "").strip().lower()
             if em in ground_truth:
                 matched_emails.add(em)
         name = c.get("contactName") or " ".join(
             p for p in [c.get("firstName") or "", c.get("lastName") or ""] if p) or "(no name)"
-        rows.append({"name": name, "email": c.get("email") or "", "bucket": bucket, "reason": reason})
+        rows.append({"name": name, "email": c.get("email") or "", "bucket": bucket,
+                     "reason": reason, "sms": "yes" if sms_ok else "no", "sms_reason": sms_reason})
 
         if args.apply and bucket == "eligible":
             r = request(client, "POST", f"{API_BASE}/contacts/{c['id']}/tags", token,
@@ -281,9 +334,25 @@ def main() -> int:
                     break
             time.sleep(args.sleep)
 
+        # SMS tagging is a SEPARATE, deliberate action, gated on its own flag
+        # and on real per-contact SMS consent — never a side effect of --apply.
+        if args.apply_sms and sms_ok and sms_reason != "already-tagged":
+            r = request(client, "POST", f"{API_BASE}/contacts/{c['id']}/tags", token,
+                        json={"tags": [SMS_ELIGIBLE_TAG]})
+            if r.status_code < 300:
+                sms_tagged += 1
+            else:
+                sms_failed += 1
+                print(f"  ✗ sms {c.get('email')}: {r.status_code} {redact(r.text[:200], token)}",
+                      file=sys.stderr)
+                if r.status_code in (401, 403):
+                    print("  auth rejected — stopping.", file=sys.stderr)
+                    break
+            time.sleep(args.sleep)
+
     os.makedirs(os.path.dirname(args.report) or ".", exist_ok=True)
     with open(args.report, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=["name", "email", "bucket", "reason"])
+        w = csv.DictWriter(fh, fieldnames=["name", "email", "bucket", "reason", "sms", "sms_reason"])
         w.writeheader()
         w.writerows(rows)
 
@@ -291,6 +360,10 @@ def main() -> int:
     print(f"[{mode}] real: {real} (new: {counts['eligible']}, "
           f"already tagged: {counts['already-tagged']}) | "
           f"directory: {counts['directory']} | excluded: {counts['excluded']}")
+    sms_real = sms_counts["sms-eligible"] + sms_counts["sms-already-tagged"]
+    print(f"[{mode}] sms-eligible: {sms_real} (new: {sms_counts['sms-eligible']}, "
+          f"already tagged: {sms_counts['sms-already-tagged']}) — requires an explicit "
+          f"{SMS_CONSENT_TAG} opt-in; the email tag {ELIGIBLE_TAG} never gates SMS")
     print(f"report: {args.report}")
     if ground_truth is not None:
         unfound = sorted(ground_truth - matched_emails)
@@ -298,10 +371,13 @@ def main() -> int:
               f"{SOURCE_TAG} contact; {len(unfound)} not found"
               + (f": {', '.join(unfound)}" if unfound else ""))
     if args.apply:
-        print(f"[{mode}] tagged {tagged}, failed {failed}")
-    else:
-        print(f"Dry-run only — nothing tagged. Re-run with --apply to add {ELIGIBLE_TAG}.")
-    return 1 if failed else 0
+        print(f"[{mode}] email tagged {tagged}, failed {failed}")
+    if args.apply_sms:
+        print(f"[{mode}] sms tagged {sms_tagged}, failed {sms_failed}")
+    if not args.apply and not args.apply_sms:
+        print(f"Dry-run only — nothing tagged. --apply adds {ELIGIBLE_TAG} (email); "
+              f"--apply-sms adds {SMS_ELIGIBLE_TAG} to {SMS_CONSENT_TAG} contacts only.")
+    return 1 if (failed or sms_failed) else 0
 
 
 if __name__ == "__main__":

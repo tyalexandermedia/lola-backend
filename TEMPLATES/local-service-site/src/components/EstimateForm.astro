@@ -1,0 +1,131 @@
+---
+/**
+ * The one lead form. Used compact in the hero and full on /estimate.
+ * Works with JavaScript off (plain POST → 303 to /thank-you) and with it on
+ * (fetch → inline error handling → redirect). Attribution hidden fields are
+ * filled by the script in Base.astro.
+ */
+import { getCollection } from 'astro:content';
+import { PHONE_HREF, SITE, phoneDisplay } from '../lib/config';
+
+interface Props {
+  compact?: boolean;
+  defaultService?: string;
+  heading?: string;
+  id?: string;
+}
+const { compact = false, defaultService, heading, id = 'estimate-form' } = Astro.props;
+const services = (await getCollection('services', (s) => s.data.enabled)).sort((a, b) => a.data.priority - b.data.priority);
+const ATTR_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'msclkid', 'referrer', 'landing_page', 'first_seen'];
+---
+<form class="lead-form" id={id} method="post" action="/api/lead" data-lead-form novalidate>
+  {heading && <h3>{heading}</h3>}
+  {!compact && <p class="qc-sub">{SITE.cta.responsePromise}</p>}
+  <div class={compact ? '' : 'form-grid'}>
+    <div class="field">
+      <label for={`${id}-name`}>Name</label>
+      <input id={`${id}-name`} name="name" type="text" autocomplete="name" required maxlength="80" />
+    </div>
+    <div class="field">
+      <label for={`${id}-phone`}>Phone</label>
+      <input id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="30" />
+    </div>
+    {!compact && (
+      <div class="field">
+        <label for={`${id}-email`}>Email <span class="muted">(optional)</span></label>
+        <input id={`${id}-email`} name="email" type="email" autocomplete="email" maxlength="120" />
+      </div>
+    )}
+    {!compact && (
+      <div class="field">
+        <label for={`${id}-city`}>City</label>
+        <select id={`${id}-city`} name="city">
+          <option value="">Select your city</option>
+          {SITE.serviceArea.cities.map((c) => <option>{c}</option>)}
+          <option>Other / nearby</option>
+        </select>
+      </div>
+    )}
+    <div class={compact ? 'field' : 'field full'}>
+      <label for={`${id}-service`}>What do you need?</label>
+      <select id={`${id}-service`} name="service" required>
+        <option value="">Choose a service</option>
+        {services.map((s) => <option selected={s.data.name === defaultService}>{s.data.name}</option>)}
+        <option>Other / not sure</option>
+      </select>
+    </div>
+    {!compact && (
+      <div class="field full">
+        <label for={`${id}-notes`}>Anything we should know? <span class="muted">(optional)</span></label>
+        <textarea id={`${id}-notes`} name="notes" maxlength="1000" placeholder="Property type, what needs cleaning, preferred timing."></textarea>
+      </div>
+    )}
+  </div>
+  <input class="honey" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  <input type="hidden" name="_t" data-attr />
+  <input type="hidden" name="page_url" data-attr />
+  {ATTR_FIELDS.map((f) => <input type="hidden" name={f} data-attr />)}
+  <button class="btn block" type="submit">{SITE.cta.label}</button>
+  <p class="form-status" role="status" aria-live="polite"></p>
+  <p class="form-note">
+    By submitting you agree to be contacted about your request. No spam, no pressure.
+    Prefer to talk? <a href={PHONE_HREF} style="font-weight:800;color:var(--accent-text)">{phoneDisplay()}</a>
+  </p>
+</form>
+
+<script>
+  const PHONE_LABEL = document.querySelector<HTMLAnchorElement>('.lead-form .form-note a')?.textContent || '';
+  document.querySelectorAll<HTMLFormElement>('form[data-lead-form]').forEach((form) => {
+    const status = form.querySelector<HTMLElement>('.form-status')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const params = new URLSearchParams(location.search);
+    if (params.get('error') && form.id === location.hash.slice(1)) {
+      status.className = 'form-status error';
+      status.textContent = messageFor(params.get('error')!);
+    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.className = 'form-status';
+      status.textContent = '';
+      const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+      if (!data.name?.trim() || !data.phone?.trim() || !data.service) {
+        status.className = 'form-status error';
+        status.textContent = 'Please add your name, phone, and the service you need.';
+        return;
+      }
+      const g = (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag;
+      if (typeof g === 'function') g('event', 'form_submit', { form_id: form.id, service: data.service });
+      button.disabled = true;
+      const label = button.textContent;
+      button.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.ok) {
+          location.href = body.redirect || '/thank-you';
+          return;
+        }
+        status.className = 'form-status error';
+        status.textContent = messageFor(body.error || 'send_failed');
+      } catch {
+        status.className = 'form-status error';
+        status.textContent = messageFor('send_failed');
+      } finally {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    });
+  });
+  function messageFor(code: string): string {
+    const call = PHONE_LABEL ? ` Or call ${PHONE_LABEL}.` : '';
+    switch (code) {
+      case 'missing': return 'Please add your name, phone, and the service you need.';
+      case 'unconfigured': return `The request form is not connected yet.${call}`;
+      default: return `Something went wrong sending your request.${call}`;
+    }
+  }
+</script>

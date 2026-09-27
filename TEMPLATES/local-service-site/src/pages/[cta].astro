@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import EstimateForm from '../components/EstimateForm.astro';
+import { CTA_PATH, PHONE_HREF, SITE, SMS_HREF, clip, hoursDisplay, phoneDisplay } from '../lib/config';
+import { pageGraph } from '../lib/schema';
+
+// One CTA page whose URL comes from config: /estimate for contractors,
+// /consultation or /contact for professional services.
+export function getStaticPaths() {
+  return [{ params: { cta: CTA_PATH.slice(1) } }];
+}
+const title = clip(`${SITE.cta.label} | ${SITE.publicName}`, 60);
+const description = clip(`${SITE.cta.label}: contact ${SITE.publicName} in ${SITE.serviceArea.summary}. ${SITE.cta.responsePromise}`, 155);
+const sms = SITE.allowSms !== false;
+---
+<Base title={title} description={description} path={CTA_PATH} jsonLd={pageGraph({ path: CTA_PATH, name: title, description, breadcrumb: [{ name: SITE.cta.label, path: CTA_PATH }] })}>
+  <section class="block">
+    <div class="shell two-col">
+      <div>
+        <p class="eyebrow">{SITE.publicName}</p>
+        <h1>{SITE.cta.label}</h1>
+        <p class="lede">{SITE.cta.responsePromise}</p>
+        <div class="hero-ctas">
+          <a class="btn primary" href={PHONE_HREF}>Call {phoneDisplay()}</a>
+          {sms && <a class="btn outline" href={`${SMS_HREF}?&body=${encodeURIComponent(`Hi ${SITE.publicName}, I'd like an estimate.`)}`}>Text us</a>}
+        </div>
+        <h3 style="margin-top:32px">Hours</h3>
+        <ul style="padding-left:18px;color:var(--muted)">
+          {hoursDisplay().map((h) => <li>{h}</li>)}
+        </ul>
+        <h3 style="margin-top:24px">Service area</h3>
+        <p class="muted">{SITE.serviceArea.cities.join(' · ')}</p>
+      </div>
+      <div class="card">
+        <EstimateForm heading="Tell us what you need" />
+      </div>
+    </div>
+  </section>
+</Base>
