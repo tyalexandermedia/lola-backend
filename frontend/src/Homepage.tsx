@@ -42,7 +42,7 @@ import { FOUNDER, LOLA_TURNS } from './lib/lola';
 import AnswerBlock from './AnswerBlock';
 import PawMark from './PawMark';
 import { HOME_QA } from './lib/pageMeta';
-import { PLAN, PLAN_GROWTH, GUARANTEE, GROWTH_SCORE_DIMENSIONS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
+import { PLAN, PLAN_GROWTH, GUARANTEE, GROWTH_SCORE_CHECKS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
@@ -80,11 +80,11 @@ const GOLD_CTA =
   'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_10px_30px_rgba(212,175,55,0.44)] ' +
   'active:scale-[0.99]';
 
-const SAMPLE_SCORE = 99;
+const SAMPLE_SCORE = 62;
 // Values line up with the six canonical dimensions (single source of truth).
 // The two lows — AI Visibility, Revenue Tracking — are the leaks Lola closes.
-const SAMPLE_VALUES = [99, 98, 97, 99, 100, 98];
-const SAMPLE_DIMENSIONS = GROWTH_SCORE_DIMENSIONS.map((name, i) => ({
+const SAMPLE_VALUES = [55, 60, 65, 65, 60, 70, 60];
+const SAMPLE_DIMENSIONS = GROWTH_SCORE_CHECKS.map((name, i) => ({
   name,
   value: SAMPLE_VALUES[i] ?? 50,
 }));
@@ -111,7 +111,7 @@ export default function Homepage() {
           what it's worth. */}
       <FeatureShowcase />
       <ProofSection />
-      <RoiSection />
+      {/* Agency comparisons are omitted from the main sales journey. */}
       <OfferSection />
       <FaqSection />
       <FinalCta />
@@ -263,7 +263,7 @@ function Hero() {
           {/* The only honest urgency here. No counter — "3 spots left in Tampa"
               converts better and is invented, which is the exact thing this
               business is positioned against. */}
-          {/* "Free 60-second Growth Score" was here too — the button directly
+          {/* "Free Growth Score · one-minute form" was here too — the button directly
               above already says it, so the line is the one thing the button
               doesn't: the promise. */}
           <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-3">
@@ -399,10 +399,10 @@ function ReportCard() {
             bubble: the reader recognises the shape before reading a word. */}
         <div className="rounded-lg border border-ok/25 bg-ok/[0.05] p-4">
           <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-ok">
-            <span aria-hidden>✦</span> Get named in AI answers
+            <span aria-hidden>✦</span> Improve your AI search visibility
           </p>
           <p className="mt-2 text-[14px] font-semibold leading-[1.5] text-ink">
-            Your customer stopped scrolling ten blue links. They just ask.
+            Some customers ask AI tools for local recommendations.
           </p>
 
           <div className="mt-3 space-y-2">
@@ -431,8 +431,8 @@ function ReportCard() {
           </div>
 
           <p className="mt-3 text-[12.5px] leading-[1.5] text-ink-3">
-            Most shops are invisible here.{' '}
-            <span className="font-semibold text-ink">Getting you named is the job.</span>
+            Illustrative example, not a measured recommendation.{' '}
+            <span className="font-semibold text-ink">We improve business information and measure mentions separately. Placement is not guaranteed.</span>
           </p>
         </div>
 
@@ -478,10 +478,10 @@ function ReportCard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[10px] uppercase tracking-[0.08em] text-gold">
-                And you can watch it work
+                Illustrative scorecard
               </p>
               <p className="mt-1.5 text-[12.5px] leading-[1.5] text-ink-2">
-                Your Growth Score, re-checked every month on your own dashboard.
+                Your report identifies available checks and missing evidence.
               </p>
             </div>
             <div className="shrink-0 text-right">
@@ -515,7 +515,7 @@ function ReportCard() {
             ))}
           </div>
           <p className="mt-2.5 text-[11px] text-ink-3">
-            Most start near 60. Sample shown — yours takes 60 seconds.
+            Illustrative sample only, not a client result or target. Complete the form in about one minute.
           </p>
         </div>
 
@@ -538,7 +538,7 @@ function ReportCard() {
         >
           <p className="flex-1 text-[13px] leading-[1.45] text-ink-2">
             <span className="font-semibold text-ink">See your own score first</span> — free, 60
-            seconds, no signup.
+            seconds to complete. Contact details required; no account needed.
           </p>
           <span
             aria-hidden
@@ -744,11 +744,10 @@ function ProofSection() {
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Don't take my word for it" />
       <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
-        Most agencies show you a case study. I'll just give you the login.
+        See the work and the evidence.
       </h2>
       <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
-        Every move I make for a client is tracked on a dashboard anyone can open. No
-        screenshot I picked, no number I typed in myself.
+        See completed work, dated measurements and what still needs attention. Missing data is labeled unavailable; manual observations are identified separately.
       </p>
 
       <div className="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -761,11 +760,10 @@ function ProofSection() {
             Live client dashboard
           </p>
           <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-ink">
-            Sandbar Soft Wash — 15 years of great work. Almost zero Google.
+            Sandbar Soft Wash — our original implementation.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
-            A real Palm Harbor business serving 20+ cities across Tampa Bay that nobody
-            could find online. The whole rebuild is in the open.
+            My father’s Holiday-based soft-wash business. Follow the website, visibility and lead-handoff work, with measured results distinguished from implementation progress.
           </p>
           <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-gold">
             Open the dashboard
@@ -788,9 +786,7 @@ function ProofSection() {
             Run it on your own business. Right now, free.
           </p>
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
-            Sixty seconds, no signup. You'll see exactly where you stand on Google and in
-            AI answers — and the one fix that moves you most. Whether you hire me is a
-            separate conversation.
+            Complete the form in about one minute. Your on-screen report shows available website and business checks, missing data, and recommended fixes. Hiring me is a separate decision.
           </p>
           <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-ink">
             Get my Growth Score
@@ -1006,7 +1002,7 @@ function RoiSection() {
         If you've been quoted {usd(AGENCY_MONTHLY)} a month, read this part twice.
       </h2>
       <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
-        Same job. An agency just has salaries to cover before your first result. I don't.
+        Compare written scopes and total costs before choosing a provider. This example compares fees, not equivalent services.
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -1215,8 +1211,8 @@ function OfferSection() {
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-gold">00</span>
           <div>
-            <p className="text-[17px] font-semibold text-ink">Free 60-second Growth Score</p>
-            <p className="mt-0.5 text-[14px] text-ink-2">Your 0–100 score across six dimensions + your single biggest fix. No signup.</p>
+            <p className="text-[17px] font-semibold text-ink">Free Growth Score · one-minute form</p>
+            <p className="mt-0.5 text-[14px] text-ink-2">Available website and business checks + recommended fixes. About one minute to complete; contact details required, no account needed.</p>
           </div>
         </div>
         <span className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.1em] text-gold">
@@ -1318,7 +1314,7 @@ function FinalCta() {
           Make sure the answer is you.
         </h2>
         <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
-          See where you stand in 60 seconds — free, no card.
+          Complete the free one-minute form, then open your report. No card or account needed.
           {/* Desktop only: this sentence describes the Start button, which
               phones don't show here (the sticky bar carries it). */}
           <span className="hidden sm:inline">

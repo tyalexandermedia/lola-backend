@@ -92,7 +92,7 @@ export const AI_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'How do I get my business found on Google and AI search?',
     a:
-      "Four things decide it: a website written so machines can read it, a complete and active Google Business Profile, consistent business details everywhere you're listed, and recent reviews. Google reads all four to rank you in the map pack, and ChatGPT, Perplexity and Gemini read the same signals to decide which business to name when someone asks for a recommendation. Coach Ty Leads handles this for home-service contractors in Tampa Bay — from " +
+      "We improve your website, Google Business Profile, public business information and review-request process. Rankings and AI recommendations vary by engine, location and competition; no placement is guaranteed. Coach Ty Leads supports Tampa Bay home-service contractors — from " +
       `${PLAN_VISIBILITY.monthly}/month for visibility, reviews and lead response, or ${PLAN_GROWTH.monthly}/month for the complete system with a conversion-focused website built in.`,
   },
   {
@@ -108,7 +108,7 @@ export const AI_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'What is a Growth Score?',
     a:
-      "A Growth Score is a free, fast diagnostic of why your business isn't being found and chosen — before you pay to fix anything. It reviews your local visibility, your website and on-page setup, your Google Business Profile, your reviews and reputation, and your lead-response gap, then hands you the single highest-priority fix. No payment and no call required. It's a diagnostic, not a guarantee and not a full campaign.",
+      "The free Growth Score uses available public business data and website checks to produce a snapshot and recommended fixes. The form takes about one minute; phone is required and email is optional. Your report opens after successful checks. Missing data is labeled. Missed calls, response times, AI recommendations and revenue need separate verification.",
   },
   {
     q: 'What areas does Lola serve?',
@@ -139,7 +139,7 @@ export const BRAND_QA: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'Why does it cost so much less than a $5,000/month agency?',
-    a: `Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. Plans are ${PLAN_VISIBILITY.monthly}/month for visibility or ${PLAN_GROWTH.monthly}/month for the complete system with a website built in. A $5,000/month agency retainer is $60,000 in year one, usually on a 12-month contract. Same work, without the overhead you were funding.`,
+    a: `Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. Plans are ${PLAN_VISIBILITY.monthly}/month for visibility or ${PLAN_GROWTH.monthly}/month for the complete system with a website built in. A $5,000/month agency retainer is $60,000 in year one, usually on a 12-month contract. Compare each provider’s written scope; these are fee examples, not equivalent-service claims.`,
   },
   {
     q: 'Who is behind Lola?',
@@ -251,9 +251,9 @@ export const PAGE_META: Record<string, PageMeta> = {
     faq: PRICING_QA,
   },
   '/growth-score': {
-    title: 'Free Growth Score — Google & AI Visibility Check',
+    title: 'Free Growth Score — Website & Business Check',
     description:
-      'See where your leads are leaking in 60 seconds. A free Growth Score for local service businesses — Google, reviews and lead response. No call, no card.',
+      'Complete a free one-minute form for website and public business checks, missing-data labels and recommended fixes. No account or card required.',
     path: '/growth-score',
     breadcrumb: [{ name: 'Growth Score', path: '/growth-score' }],
     faq: SCORE_QA,
@@ -266,9 +266,9 @@ export const PAGE_META: Record<string, PageMeta> = {
     breadcrumb: [{ name: 'Our Work', path: '/work' }],
   },
   '/methodology': {
-    title: 'How We Get Contractors Found on Google & AI',
+    title: 'How the Free Growth Score Works',
     description:
-      'The exact method behind done-for-you local SEO: Google Business Profile, machine-readable pages, review velocity and AI answer visibility. No jargon.',
+      'See the seven checks, configured weights and missing-data rules behind your free Growth Score, plus what requires separate verification.',
     path: '/methodology',
     breadcrumb: [{ name: 'Methodology', path: '/methodology' }],
   },
@@ -537,3 +537,4 @@ export function schemaFor(path: string): object[] {
   ];
   return blocks.filter((b): b is object => b !== null);
 }
+

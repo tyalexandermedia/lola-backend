@@ -21,7 +21,7 @@ import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
 import { usePageMeta } from './lib/seo';
-import { GROWTH_SCORE_DIMENSIONS, GUARANTEE, PLAN, PLAN_VISIBILITY, TIERS } from './lib/pricing';
+import { GROWTH_SCORE_CHECKS, GUARANTEE, PLAN, PLAN_VISIBILITY, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import AnswerBlock from './AnswerBlock';
 import { SITE_ORIGIN, SCORE_QA } from './lib/pageMeta';
@@ -57,22 +57,23 @@ interface Errors {
 
 const SCORING_LINES = [
   'Pulling your Google Business Profile…',
-  'Sweeping citations across the top 10 directories…',
-  'Asking ChatGPT, Perplexity, and Gemini what they say about you…',
-  'Scanning on-page signals + schema…',
-  'Scoring your six growth dimensions…',
+  'Checking available review and contact information…',
+  'Checking mobile speed, SEO basics and accessibility…',
+  'Checking site safety…',
+  'Calculating a score from available signals…',
 ];
 
 // Maps each dimension to what we actually measure + a short plain-English tag
 // for what it gets you. Keeps the marketing honest: the score is built from the
 // same audit signals the report already returns.
 const DIMENSION_DETAIL: Record<string, { measures: string; stage: string }> = {
-  Foundation: { measures: 'Website, indexing, on-page SEO, tracking', stage: 'Gets you found' },
-  Growth: { measures: 'Content, service-area pages, GBP posting cadence', stage: 'More rankings' },
-  Authority: { measures: 'Citations, links, local relevance', stage: 'More trust' },
-  'AI Visibility': { measures: 'ChatGPT, Perplexity, Gemini, Google AI answers', stage: 'Found in AI answers' },
-  Reputation: { measures: 'Review rating, count, and recent velocity', stage: 'More calls booked' },
-  'Revenue Tracking': { measures: 'Calls, forms, and lead attribution wired up', stage: 'Proof of leads' },
+  'Business profile match': { measures: 'Confidence that the returned public business listing matches your business', stage: 'Listing match' },
+  Reviews: { measures: 'Available Google rating and review count', stage: 'Public reputation' },
+  'Mobile speed': { measures: 'Lighthouse mobile performance', stage: 'Website performance' },
+  'SEO basics': { measures: 'Lighthouse SEO checks', stage: 'Technical basics' },
+  Accessibility: { measures: 'Lighthouse accessibility checks', stage: 'Website usability' },
+  'Local contact information': { measures: 'Address and phone presence in returned business data; not a service-area-business eligibility judgment', stage: 'Contact information' },
+  'Site safety': { measures: 'Available Safe Browsing response', stage: 'Safety snapshot' },
 };
 
 export default function GrowthScore() {
@@ -166,13 +167,13 @@ export default function GrowthScore() {
         '@context': 'https://schema.org',
         '@type': 'HowTo',
         name: 'How the LOLA Growth Score works',
-        description: 'Get a 0–100 Growth Score for your local business in 60 seconds across six dimensions, plus the one move that lifts you fastest.',
+        description: 'Complete a one-minute form for an on-screen snapshot of available website and business checks, plus recommended fixes.',
         totalTime: 'PT1M',
         step: [
-          { '@type': 'HowToStep', name: 'Enter your business', text: 'Business name, city, website, and phone. No signup required.' },
-          { '@type': 'HowToStep', name: 'Lola scores you', text: 'We measure Foundation, Growth, Authority, AI Visibility, Reputation, and Revenue Tracking.' },
-          { '@type': 'HowToStep', name: 'See what to fix first', text: 'Your score shows exactly where you are on Google and in AI answers and what to fix first.' },
-          { '@type': 'HowToStep', name: 'Get your results', text: 'Your scorecard is delivered by text and email within 24 hours, with your priority fixes.' },
+          { '@type': 'HowToStep', name: 'Enter your business', text: 'Business name, city, website, and phone. Email optional; no account required.' },
+          { '@type': 'HowToStep', name: 'Lola scores you', text: 'We check business profile match, reviews, mobile speed, SEO basics, accessibility, local contact information and site safety.' },
+          { '@type': 'HowToStep', name: 'See what to fix first', text: 'Your report shows available checks, unavailable signals and recommended fixes. It is not a search ranking or AI recommendation measurement.' },
+          { '@type': 'HowToStep', name: 'Get your results', text: 'Your report opens after successful checks. Optional notifications depend on provider configuration; inbox delivery is not guaranteed.' },
         ],
       },
     ];
@@ -393,7 +394,7 @@ export default function GrowthScore() {
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
-          Free Tool · 60 Seconds · No Signup
+          Free Tool · One-Minute Form · No Account Needed
         </p>
 
         {/* The pitch earns the first answer; after that it's just furniture
@@ -412,9 +413,7 @@ export default function GrowthScore() {
 
         {step === 0 && (
           <p className="mt-6 max-w-[680px] text-[16px] leading-[1.55] text-ink-2 sm:text-[18px]">
-            One number, 0–100, across the six things that actually grow a local business —
-            and the one move that lifts it fastest. You&apos;re not behind. You just haven&apos;t
-            seen the map yet.
+            Check your website and public business information, then see recommended fixes. Missing signals are labeled. This does not measure missed calls, response times or actual revenue.
           </p>
         )}
 
@@ -606,7 +605,7 @@ export default function GrowthScore() {
           </div>
 
           <p className="mt-4 text-center text-[12px] text-ink-4">
-            Your score lands by text + email within 24 hours · No spam · Reply STOP to opt out
+            Your report opens after successful checks. Phone required; email optional. Message delivery depends on configured providers. Reply STOP to opt out.
           </p>
         </form>
       </section>
@@ -620,15 +619,14 @@ export default function GrowthScore() {
           className="mt-3 font-bold leading-[1.1] tracking-[-0.02em] text-ink"
           style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)' }}
         >
-          Six dimensions. One number. A clear next step.
+          Seven checks. Available evidence. A clear next step.
         </h2>
         <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
-          Your Growth Score rolls these six up into a single 0–100 — so it doesn&apos;t just grade
-          you, it tells you exactly what to fix to get more calls and leads.
+          Your Growth Score combines available checks into a 0–100 snapshot. With too little data, the result is incomplete. Recommendations help you choose what to investigate first.
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {GROWTH_SCORE_DIMENSIONS.map((dim, i) => {
+          {GROWTH_SCORE_CHECKS.map((dim, i) => {
             const d = DIMENSION_DETAIL[dim];
             return (
               <div key={dim} className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
@@ -690,10 +688,10 @@ export default function GrowthScore() {
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="mt-16 rounded-2xl border border-gold/25 bg-white/[0.02] p-6 sm:mt-20 sm:p-8">
         <h2 className="text-[22px] font-bold leading-[1.15] text-ink sm:text-[28px]">
-          Get your number first. Your score lands within 24 hours.
+          Get your report first. Choose your next step.
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
-          Run your free Growth Score above — we send it by text and email within 24 hours. Or skip the
+          Complete the free form above to open your report when checks succeed. Or skip the
           wait and choose a plan: from <span className="font-semibold text-ink">{PLAN_VISIBILITY.monthly}/month</span> for
           visibility, or <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span> for the complete
           system with your website built in. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
@@ -798,3 +796,4 @@ function inputCls(hasError: boolean): string {
       : 'border-gold/25 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
   ].join(' ');
 }
+
