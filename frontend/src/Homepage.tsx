@@ -608,10 +608,10 @@ function ProblemSection() {
             ✓ What I guarantee
           </p>
           <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
-            You get found. On Google, and in the AI answers.
+            {GUARANTEE.short}
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
-            That's the part I control.
+            The commitment covers the agreed work, not a ranking, lead count or AI recommendation.
           </p>
           <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-gold">
             {GUARANTEE.emoji} {GUARANTEE.title}
@@ -623,10 +623,10 @@ function ProblemSection() {
             ✗ What I won't fake
           </p>
           <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
-            Leads. Anyone promising you those is guessing.
+            Specific rankings, lead counts or AI recommendations.
           </p>
           <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
-            I get you in front of them. Closing is on both of us.
+            We improve visibility and follow-up. Results depend on your market, customer demand and how inquiries are handled.
           </p>
         </div>
       </div>
@@ -906,8 +906,8 @@ function StorySection() {
               >
                 Sandbar Soft Wash
               </a>
-              , right here in the bay. Got them found on Google and in the AI answers. The phone
-              started ringing. So I built the system to do it again.
+              , my dad's business right here in the bay. We built the website, quote tool and
+              tracking foundation. We're testing the full journey before publishing revenue results.
             </p>
             {/* GUARANTEE.short, not GUARANTEE.body. The full version opens with
                 "We pick your money keywords together in week 1" — true, and the
@@ -1095,7 +1095,7 @@ function RoiSection() {
             htmlFor="avg-job"
             className="mt-3 block text-[17px] font-semibold leading-[1.35] text-ink"
           >
-            What's one job worth to you?
+            What's your contribution profit from one completed job?
           </label>
 
           {/* aria-hidden: the range reports this same value via aria-valuetext,
@@ -1128,7 +1128,7 @@ function RoiSection() {
             {/* Visually the first casualty at 375px, but `hidden` would drop it
                 from the accessibility tree and gut the aria-describedby — so
                 hide it visually only. */}
-            <span className="sr-only sm:not-sr-only sm:inline">Drag to your average ticket</span>
+            <span className="sr-only sm:not-sr-only sm:inline">After direct job costs, before this service fee</span>
             <span>$2,500</span>
           </div>
 
@@ -1147,8 +1147,7 @@ function RoiSection() {
           </div>
 
           <p className="mt-5 text-[12px] leading-[1.55] text-ink-3">
-            <span className="text-ink-2">Cost math, not a lead promise.</span> And that's one
-            job a month — not one job total.
+            <span className="text-ink-2">Cost math, not a lead promise.</span> Uses contribution profit after direct job costs. The one-time launch fee is additional.
           </p>
 
           {/* Peak intent: the number just resolved against their own ticket. */}
