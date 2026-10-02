@@ -20,7 +20,7 @@ The public Sandbar dashboard displayed 12 “live” #1 placements from legacy m
 Each observation needs exact query, service, search location, surface (organic/map pack/AI), position, observed timestamp, method, evidence reference and source. Deduplicate by query/location/surface/observation. Apply freshness policy and visibly label historical evidence. Do not infer a service’s map-pack ranking merely from the city name.
 
 ## What remains
-Full frontend build and mobile verification are still required. Live page was inspected; no production deployment, CRM enrollment or outbound messages were performed.
+The frontend preview build passed; full mobile verification and dashboard data-path verification are still required. Live page was inspected; no production deployment, CRM enrollment or outbound messages were performed.
 Other old copy and retired pages may remain; this patch targets verified contradictions, not a rebrand.
 Dashboard system-status booleans are configuration signals, not proof that a real call or SMS was received. Revenue evidence must distinguish an opportunity won, deposit received, completed job and cash collected.
 
@@ -32,3 +32,11 @@ Current $797/month + $997 launch is an existing offer to evaluate against actual
 ## Rollback
 Revert this branch’s commits or redeploy the previous version. Manual ranking lists remain intact so attaching dated evidence later requires no recreation.
 
+
+## Preview test run — 2026-10-02
+- Frontend preview deployment dpl_2YU3BwuSFAiWZeB66yABnmB1mkgk built READY at code commit 56ac7fa91d8c66ff0748b57ffad91f0b77aa3d45.
+- Served homepage HTML returned HTTP 200; canonical terms, contribution-profit input and commitment disclaimer are present. The contradictory “no setup fee, no contract” string is absent.
+- Isolated source checks confirm undated manual lists are excluded from the public proof count and city-only map badges are disabled. These are code checks, not measured ranking evidence.
+- Browser opening /r/client/sandbar reached “Dashboard not found” / “Failed to fetch.” Preview-to-backend data connectivity is unresolved; no visual dashboard acceptance is claimed. This observation does not establish a production dashboard outage or the precise network cause.
+- Full mobile verification remains pending. No production deployment or outbound messages occurred.
+- Release decision: HOLD dashboard acceptance until its preview data path loads and dated/null-position rendering is exercised with representative fixtures.
