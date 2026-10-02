@@ -40,7 +40,7 @@ export const FREE_GROWTH_SCORE = {
     'Your single highest-priority fix',
   ],
   supporting: 'See where leads are leaking before you pay to fix anything.',
-  clarify: 'A 60-second diagnostic — not a guarantee, and not a complete SEO campaign.',
+  clarify: 'A one-minute form followed by an on-screen diagnostic when checks succeed. Missing signals are labeled; no ranking or revenue guarantee.',
   cta: 'Run My Free Growth Score',
   href: '/growth-score',
 } as const;
@@ -249,7 +249,7 @@ export const BREAK_EVEN = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const AFTER_YOU_START: ReadonlyArray<{ step: string; detail: string }> = [
-  { step: 'Run your Growth Score', detail: 'Free, 60 seconds, no card. See where leads are leaking.' },
+  { step: 'Run your Growth Score', detail: 'Free one-minute form, then an on-screen report. No card or account required.' },
   { step: 'Confirm scope + territory', detail: 'We agree the launch scope and tracked terms in writing before any charge.' },
   { step: 'Build and go live', detail: 'Work starts. Progress shows on your Lola dashboard as it lands.' },
 ];
@@ -269,7 +269,13 @@ export const LEAD_MAGNET: LeadMagnet = {
   href: FREE_GROWTH_SCORE.href,
 };
 
-/** The six Growth Score dimensions shown on the client dashboard. */
+/** Automated home-service score checks, matching main.py compute_home_services_score. */
+export const GROWTH_SCORE_CHECKS: ReadonlyArray<string> = [
+  'Business profile match', 'Reviews', 'Mobile speed', 'SEO basics',
+  'Accessibility', 'Local contact information', 'Site safety',
+];
+
+/** Six ongoing service roadmap dimensions; distinct from the automated score. */
 export const GROWTH_SCORE_DIMENSIONS: ReadonlyArray<string> = [
   'Foundation',
   'Growth',

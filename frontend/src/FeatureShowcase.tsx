@@ -20,7 +20,7 @@
  */
 
 import PawMark from './PawMark';
-import { PLAN } from './lib/pricing';
+import { PLAN, PLAN_GROWTH } from './lib/pricing';
 
 /** What each of these systems is usually sold for ON ITS OWN. The "from"
  *  figures are typical à-la-carte prices when a shop buys them one at a time
@@ -46,20 +46,20 @@ const ALA_CARTE: ReadonlyArray<{ label: string; price: string }> = [
 const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; how: string }> = [
   {
     icon: '🤖',
-    headline: 'Named when they ask AI.',
-    worth: 'Nobody else does this',
-    how: "AI can only recommend a business it can actually read. Yours is written so ChatGPT, Gemini and Google's AI can — and name you.",
+    headline: 'Improve your visibility in AI search.',
+    worth: 'Clear information customers can find',
+    how: 'We improve service information and monitor AI mentions. Recommendations depend on the search engine and are not guaranteed.',
   },
   {
     icon: '🌐',
-    headline: 'A $3,000 website, included.',
-    worth: 'No setup fee',
+    headline: 'Your website, built for inquiries.',
+    worth: `Included in the ${PLAN_GROWTH.oneTime.amount} launch`,
     how: 'Fast, mobile-first, built around the jobs you actually want, with click-to-call and a quote form front and centre.',
   },
   {
     icon: '📍',
-    headline: 'First in the Google map.',
-    worth: 'Half your local leads',
+    headline: 'A stronger Google Business Profile.',
+    worth: 'Make your services easier to find',
     how: 'Right primary category, services, hours, photos and regular posts — the pin a neighbour actually taps.',
   },
   {
@@ -76,9 +76,9 @@ const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; h
   },
   {
     icon: '🔁',
-    headline: 'No lead ever goes cold.',
-    worth: 'Most jobs die in silence',
-    how: "Every new lead gets a reply within a minute, then 3 follow-ups by text and email while you're in the field. Jobs are lost to silence, not price.",
+    headline: 'Follow up while you’re in the field.',
+    worth: 'Less manual chasing',
+    how: 'Eligible inquiries receive the agreed text and email sequence. Replies and bookings pause sales follow-up for a human handoff.',
   },
   {
     icon: '📊',
@@ -110,7 +110,7 @@ export default function FeatureShowcase() {
         Everything below, every month.
       </h2>
       <p className="mt-4 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
-        One flat price. No setup fee, no add-ons, no contract.
+        {PLAN.terms}
       </p>
 
       {/* Phones: a divided list — icon in the gutter, benefit and the one-line
