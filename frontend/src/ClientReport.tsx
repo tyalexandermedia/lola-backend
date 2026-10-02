@@ -280,7 +280,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           </p>
           <p className="mt-2 text-[34px] font-bold leading-none text-ink">{totalDone}</p>
           <p className="mt-1 text-[12px] text-ink-3">
-            {totalDone === 1 ? 'job completed' : 'jobs completed'} on your account
+            {totalDone === 1 ? 'implementation task completed' : 'implementation tasks completed'} on your account
           </p>
           {done.length > 0 && (
             <ul className="mt-3 space-y-1.5">
@@ -678,7 +678,7 @@ function WhatWeWatchCard({
   aiMode: Series[];
   verifiedWins?: { organic: string[]; map_pack: string[] };
 }) {
-  const wins = (verifiedWins?.organic?.length || 0) + (verifiedWins?.map_pack?.length || 0);
+  const wins = google.filter(s => s.current.position === 1 && !!s.current.run_at).length;
   const keywords = google.length;
   const prompts = aiMode.length;
 
@@ -713,11 +713,11 @@ function WhatWeWatchCard({
       foot: null,
     },
     wins > 0 && {
-      label: 'Confirmed #1 placements',
+      label: 'Tracked #1 placements',
       value: wins,
       tone: 'text-emerald-300',
       ring: 'border-emerald-500/20 bg-emerald-500/[0.04]',
-      blurb: 'Top spot already held in organic search or the Google map pack.',
+      blurb: 'Organic positions from dated tracker snapshots. Manual reports are excluded until evidence is attached.',
       foot: null,
     },
   ].filter(Boolean) as Array<{
@@ -797,7 +797,7 @@ function TopWinsCard({
   verifiedWins?: { organic: string[]; map_pack: string[] };
   clientName: string;
 }) {
-  const num1 = google.filter(s => s.current.position === 1);
+  const num1 = google.filter(s => s.current.position === 1 && !!s.current.run_at);
   const top3 = google.filter(s => {
     const p = s.current.position;
     return p !== null && p >= 2 && p <= 3;
@@ -810,8 +810,10 @@ function TopWinsCard({
   const totalTrackedG = google.length;
   const totalTrackedAi = aiMode.length;
 
-  const verifiedOrganic = verifiedWins?.organic ?? [];
-  const verifiedMapPack = verifiedWins?.map_pack ?? [];
+  // Legacy labels have no date, exact query, search location or receipt.
+  // Retain them in client configuration, but exclude them from public proof.
+  const verifiedOrganic: string[] = [];
+  const verifiedMapPack: string[] = [];
   const totalVerified = verifiedOrganic.length + verifiedMapPack.length;
 
   if (num1.length === 0 && top3.length === 0 && aiWins.length === 0 && totalVerified === 0) {
@@ -825,7 +827,7 @@ function TopWinsCard({
       <div className="flex items-center gap-2">
         <span className="text-[20px]">🏆</span>
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
-          Top Wins — Live on Google Right Now
+          Top Wins — Dated Tracker Snapshots
         </p>
       </div>
 
@@ -835,11 +837,10 @@ function TopWinsCard({
             <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
               {num1Count} #1 placement{num1Count === 1 ? '' : 's'}
             </span>{' '}
-            across Google organic + map packs.
+            in tracked Google organic searches.
           </h2>
           <p className="mt-2 max-w-[640px] text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">
-            When customers search these terms, {clientName} is the first result they see —
-            the position competitors pay $5–$15 per click for.
+            These are recorded observations, not a guarantee of what every customer sees. Positions vary by location and time. Manual claims are excluded until supporting evidence is attached.
           </p>
 
           {verifiedOrganic.length > 0 && (
@@ -887,7 +888,7 @@ function TopWinsCard({
           {num1.length > 0 && (
             <>
               <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3">
-                Auto-tracked #1 Rankings · This Week
+                Auto-tracked #1 Rankings · Last Recorded
               </p>
               <ul className="mt-2 space-y-2">
                 {num1.map(s => (
@@ -900,6 +901,7 @@ function TopWinsCard({
                     </span>
                     <span className="text-[14px] font-medium text-ink sm:text-[15px]">
                       {s.query}
+                      <span className="block text-[11px] font-normal text-ink-3">Recorded: {s.current.run_at}</span>
                     </span>
                   </li>
                 ))}
@@ -1885,22 +1887,12 @@ function RankingsTable({
 }) {
   if (google.length === 0) return null;
 
-  // Build a quick-lookup of which queries have a confirmed map-pack win.
-  // Strategy: extract city names from the map_pack strings (e.g. "Holiday —
-  // pressure washing" → "holiday") and check if the query contains that city.
-  const mapPackCities = useMemo(() => {
-    return (verifiedWins?.map_pack ?? []).map(s =>
-      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
-    );
-  }, [verifiedWins]);
-
-  const hasMapPack = (query: string) => {
-    const q = query.toLowerCase();
-    return mapPackCities.some(city => city && q.includes(city));
-  };
+  // City-only matching incorrectly gave every service in a city a #1 badge.
+  // Restore map-pack badges only with evidence for the exact query + location.
+  const hasMapPack = (_query: string) => false;
 
   const posTier = (p: number | null) => {
-    if (p === null) return { label: '—', color: '#7C828C', bg: 'rgba(107,114,128,0.08)' };
+    if (p === null) return { label: 'N/A', color: '#7C828C', bg: 'rgba(107,114,128,0.08)' };
     if (p === 1)    return { label: '#1', color: '#FFD166', bg: 'rgba(212,175,55,0.12)' };
     if (p <= 3)     return { label: `#${p}`, color: '#6EE7B7', bg: 'rgba(16,185,129,0.10)' };
     if (p <= 10)    return { label: `#${p}`, color: '#93C5FD', bg: 'rgba(147,197,253,0.08)' };
@@ -1929,7 +1921,7 @@ function RankingsTable({
       <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-gold-bright">
         Organic Rankings · Full Keyword List
         <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-ink-3">
-          live positions across {google.length} tracked keywords
+          recorded positions across {google.length} tracked keywords
         </span>
       </h2>
       <div className="overflow-hidden rounded-[14px] border border-white/10">
@@ -1975,7 +1967,7 @@ function RankingsTable({
         })}
       </div>
       <p className="mt-2 text-[10px] text-ink-4">
-        📍 = confirmed #1 in Google Map Pack · trend arrow vs first recorded snapshot
+        N/A = position unavailable in this feed; it does not prove the business is absent from search. Map-pack badges await query-specific, dated evidence. Trend arrow compares recorded snapshots.
       </p>
     </section>
   );
