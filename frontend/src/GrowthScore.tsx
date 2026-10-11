@@ -790,7 +790,7 @@ function extractCity(address: string): string {
 
 function inputCls(hasError: boolean): string {
   return [
-    'block w-full rounded-[12px] border bg-surface px-4 py-3 text-[15px] font-medium text-ink outline-none transition',
+    'block w-full rounded-[12px] border bg-surface px-4 py-3 text-[16px] font-medium text-ink outline-none transition',
     hasError
       ? 'border-[#E5A95B] focus:border-[#E5A95B] focus:shadow-[0_0_0_3px_rgba(229,169,91,0.12)]'
       : 'border-gold/25 focus:border-gold focus:shadow-[0_0_0_3px_rgba(212,175,55,0.18)]',
