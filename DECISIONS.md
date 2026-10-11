@@ -192,3 +192,12 @@ scroll at 320px, production build and SEO check green.
 **Consequences.** No third navy band on the homepage — two is the rhythm, more
 is the dark theme again. No new looping motion (hover lift only, disabled for
 reduced motion). Copy, prices, claims and `/lp/*` are untouched by this change.
+
+
+## 2026-10-11 — D-017: Coach Ty Leads implementation preview
+
+**Decision.** Preview branch builds on D-016's light/gold/navy design. The homepage uses two navy bands (Sandbar proof and final CTA). Sandbar's implementation story is available without the old results-publication flag; no ranking or revenue improvements are asserted. The original gated results component remains untouched for reference.
+
+**Why.** A real installed workflow can demonstrate delivery before outcome measurements are available. Raw form events, unavailable positions and report-generation dates must not imply customers, absent rankings, collected money or integration freshness.
+
+**Consequences.** No pricing, backend, messaging, charging, Sandbar code or production domain changes. Test/spam exclusion, complete attribution and payment verification remain upstream dependencies. Review the preview before production.

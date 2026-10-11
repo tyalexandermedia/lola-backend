@@ -103,7 +103,7 @@ export const AI_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'How long does local SEO take to work?',
     a:
-      "Expect the first movement in 30 to 90 days. Google Business Profile fixes and review activity move fastest, often inside a few weeks, while ranking for competitive service-and-city searches usually takes two to three months of consistent work. That's why every plan runs a 90-day initial term before it goes month-to-month — it's the honest window to judge the work, in either direction.",
+      "We review the agreed work and available measurements during the initial 90 days. Search performance varies with competition, proximity, business history and demand. Implementation progress can be checked before ranking or revenue changes are measurable.",
   },
   {
     q: 'What is a Growth Score?',
@@ -135,7 +135,7 @@ export const BRAND_QA: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'Does Lola help me show up in ChatGPT and AI search, not just Google?',
-    a: "Yes — that's the whole point. Coach Ty Leads optimizes for both traditional Google local results and AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews), because that's increasingly where buyers ask for a recommendation.",
+    a: "We improve clear, accurate public business and service information. AI mentions are measured separately when the relevant observations are available. Inclusion or recommendations in any search engine are not guaranteed.",
   },
   {
     q: 'Why does it cost so much less than a $5,000/month agency?',
@@ -199,7 +199,7 @@ export const PRICING_QA: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'How long does it take to see results?',
-    a: "Expect first movement in 30 to 90 days — Google Business Profile and review activity move fastest, while competitive rankings take two to three months of consistent work. Every plan runs a 90-day initial term before month-to-month, because that's the honest window to judge it.",
+    a: "We review the agreed work and available measurements during the initial 90 days. Ranking changes and business outcomes vary by market and are not guaranteed.",
   },
   {
     q: 'Do you guarantee leads or first-page rankings?',
@@ -287,9 +287,9 @@ export const PAGE_META: Record<string, PageMeta> = {
     breadcrumb: [{ name: 'Start', path: '/start' }],
   },
   '/case-studies/sandbar': {
-    title: 'Sandbar Soft Wash — Local SEO Case Study',
+    title: 'Sandbar Soft Wash — Website & Inquiry Case Study',
     description:
-      'How the Lola Local Growth System rebuilt local visibility for a Palm Harbor pressure-washing business, tracked in the open on a live public dashboard.',
+      'Explore Sandbar’s service website, inquiry journey and reporting. An implementation case study with measured outcomes and unverified items separated.',
     path: '/case-studies/sandbar',
     breadcrumb: [
       { name: 'Case Studies', path: '/case-studies' },
@@ -299,7 +299,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   '/case-studies': {
     title: 'Local SEO Case Studies — Tampa Bay Contractors',
     description:
-      'How Coach Ty Leads rebuilt local visibility for Tampa Bay service businesses, tracked in the open on live public dashboards, not in a sales deck.',
+      'Explore Coach Ty Leads implementations for local businesses. Installed work, original evidence and measured outcomes are reported separately.',
     path: '/case-studies',
     breadcrumb: [{ name: 'Case Studies', path: '/case-studies' }],
   },
