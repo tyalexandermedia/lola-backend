@@ -2091,17 +2091,18 @@ function WonJobsCard({
   return (
     <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-surface-2 p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-        💰 Confirmed revenue · this month
+        Owner-recorded won job value · this month
       </p>
       <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
         ${wonJobs.revenue_month.toLocaleString()}
       </p>
       <p className="mt-1 text-[12px] text-ink-3">
-        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} closed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
+        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} recorded as won · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
       </p>
+      <p className="mt-3 text-[12px] leading-relaxed text-ink-3">Recorded job values are not verified collected payments or incremental revenue. Deposits, refunds and job completion need separate records.</p>
       {recentJobs.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-4">Recent closed jobs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-4">Recent owner-recorded jobs</p>
           {recentJobs.map(j => (
             <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-surface px-3 py-2">
               <div className="flex items-center gap-3">
