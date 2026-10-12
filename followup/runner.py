@@ -40,7 +40,7 @@ from db import followups
 from reviews.sms import send_sms, twilio_enabled
 
 # ── Config (env-overridable; hours) ───────────────────────────────────────
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyleads.com").rstrip("/")
 # Checkout, not a calendar. These emails used to point at a Google Calendar
 # booking link; Ty doesn't sell on calls, and a booking form is a slower, lossier
 # ask than the Payment Link the rest of the site now uses.
@@ -146,7 +146,7 @@ def _email_wrap(title: str, body_html: str) -> str:
 </td></tr>
 <tr><td style="padding:0 28px 26px;color:#8a8f98;font-size:12px;line-height:1.6;">
 Coach Ty · Ty Alexander Media · Tampa Bay, FL<br>
-You're getting this because you ran a free Growth Score at lola.tyalexandermedia.com. Reply STOP and I'll take you off follow-ups.
+You're getting this because you ran a free Growth Score at coachtyleads.com. Reply STOP and I'll take you off follow-ups.
 </td></tr>
 </table></td></tr></table></body></html>"""
 
