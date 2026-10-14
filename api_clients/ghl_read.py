@@ -130,3 +130,113 @@ async def fetch_all_open_opportunities() -> list[dict]:
             opp["workspace"] = workspace
             results.append(opp)
     return results
+
+
+async def fetch_opportunities(location_id: str, limit: int = 100) -> list[dict]:
+    """
+    Like fetch_open_opportunities but returns ALL statuses (open/won/lost/
+    abandoned) so the client dashboard can show real pipeline + won revenue.
+    [] on any problem. Normalized: {id, name, contact_id, value, status, stage}.
+    """
+    token = os.getenv("GHL_API_TOKEN", "").strip()
+    if not token or not location_id:
+        return []
+    params = {"locationId": location_id, "limit": str(limit)}
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.get(
+                f"{API_BASE}/opportunities/search",
+                headers=_headers(token),
+                params=params,
+            )
+            if r.status_code >= 400:
+                print(f"⚠️ GHL opportunities (all) non-2xx: {r.status_code} {r.text[:160]}")
+                return []
+            data = r.json()
+    except Exception as e:
+        print(f"⚠️ GHL opportunities (all) read failed: {e}")
+        return []
+
+    out = []
+    for o in data.get("opportunities", []) or []:
+        name = o.get("name") or (o.get("contact") or {}).get("name") or "Opportunity"
+        if name.strip().lower().startswith("(example)"):
+            continue
+        contact = o.get("contact") or {}
+        out.append(
+            {
+                "id": o.get("id") or "",
+                "name": name,
+                "contact_id": o.get("contactId") or contact.get("id") or "",
+                "value": float(o.get("monetaryValue") or 0),
+                "status": (o.get("status") or "open").lower(),
+                "stage": o.get("pipelineStageId") or "",
+            }
+        )
+    return out
+
+
+async def fetch_revenue_summary(slug: str) -> Optional[dict]:
+    """
+    Aggregate LIVE GoHighLevel opportunities for a workspace slug into the same
+    shape the client dashboard's `revenue_agent` section expects. Returns None
+    when GHL read isn't configured, or when no location maps to this slug — the
+    caller then falls back to the local revenue tables (safe-by-default, so a
+    slug with no GHL mapping behaves exactly as before).
+    """
+    if not ghl_read_enabled():
+        return None
+    loc_ids = [loc for loc, ws in location_workspace_map().items() if ws == slug]
+    if not loc_ids:
+        return None
+
+    opps: list[dict] = []
+    for loc in loc_ids:
+        opps.extend(await fetch_opportunities(loc))
+
+    # No live opps (unconfigured, transient error, or a brand-new account) ->
+    # fall back to the local revenue tables rather than blanking the dashboard.
+    if not opps:
+        return None
+
+    from collections import defaultdict
+
+    by_status: dict[str, dict] = defaultdict(
+        lambda: {"count": 0, "estimated_value": 0.0, "won_value": 0.0}
+    )
+    pipeline_value = 0.0
+    won_revenue = 0.0
+    contacts: set[str] = set()
+    for o in opps:
+        st = o.get("status") or "open"
+        val = float(o.get("value") or 0)
+        b = by_status[st]
+        b["count"] += 1
+        if st == "won":
+            b["won_value"] += val
+            won_revenue += val
+        else:
+            b["estimated_value"] += val
+            if st == "open":
+                pipeline_value += val
+        cid = o.get("contact_id") or o.get("id")
+        if cid:
+            contacts.add(cid)
+
+    return {
+        "slug": slug,
+        "contacts": len(contacts),
+        "opportunities": {
+            k: {
+                "count": v["count"],
+                "estimated_value": int(v["estimated_value"]),
+                "won_value": int(v["won_value"]),
+            }
+            for k, v in by_status.items()
+        },
+        "estimates": {},
+        "pipeline_value": int(pipeline_value),
+        "won_revenue": int(won_revenue),
+        "open_actions": int(by_status.get("open", {}).get("count", 0)),
+        "source": "ghl-live",
+    }

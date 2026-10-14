@@ -2216,7 +2216,13 @@ async def public_client_dashboard(slug: str):
     # in the reporting table yet.
     from db.tracking import won_jobs_stats as _won_jobs_stats
     won_jobs = await _safe(_won_jobs_stats(slug), {"month": 0, "lifetime": 0, "revenue_month": 0, "revenue_lifetime": 0, "jobs": []})
-    revenue_agent_summary = await _safe(
+    # Prefer LIVE GoHighLevel opportunities when GHL read is configured for this
+    # slug, so the dashboard reflects the real CRM pipeline + won revenue instead
+    # of the local tracking tables (which only fill from on-site call/form events).
+    # Falls back to the local revenue tables when GHL isn't wired for the slug —
+    # safe-by-default, no change in behavior for unmapped clients.
+    from api_clients.ghl_read import fetch_revenue_summary as _ghl_revenue_summary
+    revenue_agent_summary = await _safe(_ghl_revenue_summary(slug), None) or await _safe(
         revenue_summary(slug),
         {
             "contacts": 0,
