@@ -109,7 +109,13 @@ export default function ClientReport({ slug }: { slug: string }) {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch(`${API_URL}/reporting/public/${encodeURIComponent(slug)}`)
+    // On Vercel preview domains the production API is cross-origin and CORS-blocked,
+    // so route the dashboard fetch through the same-origin /reporting proxy (see the
+    // vercel.json rewrite). Production (coachtyleads.com, CORS-allowed) and local dev
+    // keep using API_URL unchanged.
+    const reportBase =
+      typeof location !== 'undefined' && location.hostname.endsWith('.vercel.app') ? '' : API_URL;
+    fetch(`${reportBase}/reporting/public/${encodeURIComponent(slug)}`)
       .then(async (r) => {
         if (r.status === 404) throw new Error('No dashboard exists for that link.');
         if (!r.ok) throw new Error(`Failed to load (HTTP ${r.status}).`);
