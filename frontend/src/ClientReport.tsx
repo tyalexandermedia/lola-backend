@@ -127,6 +127,24 @@ export default function ClientReport({ slug }: { slug: string }) {
     return () => { cancelled = true; };
   }, [slug]);
 
+  // Two-view toggle for a non-technical owner: "today" (essentials, ~one screen)
+  // vs "full" (every deeper section). Remembered per browser; default "today".
+  const [view, setView] = useState<'today' | 'full'>(() => {
+    try {
+      return localStorage.getItem('lola:dashboard-view') === 'full' ? 'full' : 'today';
+    } catch {
+      return 'today';
+    }
+  });
+  const chooseView = (v: 'today' | 'full') => {
+    setView(v);
+    try {
+      localStorage.setItem('lola:dashboard-view', v);
+    } catch {
+      /* private mode / blocked storage — the in-memory choice still works */
+    }
+  };
+
   if (loading) {
     return (
       <main className="mx-auto w-full max-w-4xl py-12 text-center text-ink-3">
@@ -172,76 +190,88 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
-      {/* The single most important next step, from live revenue-agent fields
-          only. Renders nothing when the agent isn't connected; a calm cleared
-          state when it is connected and there's nothing outstanding. */}
-      <NeedsYouToday data={data} />
-      {/* Lead → Estimate → Booked → Paid → Review, each mapped to a real field.
-          Muted "—"/0 where a feed isn't wired or has nothing yet. */}
-      <LifecycleSpine data={data} />
-      {/* Value, work, what's next and how to reach Ty — before any metric.
-          The numbers below prove the work happened; this says what it was for. */}
-      <OwnerBriefing data={data} />
-      <OwnerOverview data={data} />
-      {/* Renders on every dashboard, not just the empty state — see SystemStatus. */}
-      <SystemStatus integrations={data.integrations} />
-      <TopWinsCard
-        google={data.google}
-        aiMode={data.ai_mode}
-        verifiedWins={data.verified_wins}
-        clientName={data.client_name}
-      />
-      {data.won_jobs && data.won_jobs.lifetime > 0 && (
-        <WonJobsCard wonJobs={data.won_jobs} />
+
+      {/* Two views for a non-technical owner: "Today" is the essentials on roughly
+          one screen; "Full report" is every deeper section. Choice persists. */}
+      <ViewToggle view={view} onChange={chooseView} />
+
+      {view === 'today' ? (
+        /* ── TODAY — owner essentials, ~one screen ──────────────────────────── */
+        <>
+          {/* The single most important next step, from live revenue-agent fields
+              only. Renders nothing when the agent isn't connected; a calm cleared
+              state when it is connected and there's nothing outstanding. */}
+          <NeedsYouToday data={data} />
+          {/* The money, live from the pipeline — stat tiles + conversion ring. */}
+          {data.revenue_agent && <RevenueAgentCard revenue={data.revenue_agent} />}
+          {/* Lead → Estimate → Booked → Paid → Review, each mapped to a real field.
+              Muted "—"/0 where a feed isn't wired or has nothing yet. */}
+          <LifecycleSpine data={data} />
+          {/* Is Lola actually running? */}
+          <SystemStatus integrations={data.integrations} />
+        </>
+      ) : (
+        /* ── FULL REPORT — everything else; all honesty/empty gates intact ───── */
+        <>
+          {/* Value, work, what's next and how to reach Ty. */}
+          <OwnerBriefing data={data} />
+          <OwnerOverview data={data} />
+          <TopWinsCard
+            google={data.google}
+            aiMode={data.ai_mode}
+            verifiedWins={data.verified_wins}
+            clientName={data.client_name}
+          />
+          {data.won_jobs && data.won_jobs.lifetime > 0 && (
+            <WonJobsCard wonJobs={data.won_jobs} />
+          )}
+
+          {/* Gated on "nothing MEASURED yet", not "nothing at all". It used to
+              require totallyEmpty, which includes work delivered — so the moment Ty
+              shipped the first task (day one, every time) the card vanished and a
+              brand-new client lost the only panel explaining what was being tracked
+              and what happens next. Work delivered is the day-one state, not a
+              reason to hide the expectations. Disappears once real data arrives. */}
+          {nothingMeasured && (
+            <WhatWeWatchCard
+              clientName={data.client_name}
+              google={data.google}
+              aiMode={data.ai_mode}
+              verifiedWins={data.verified_wins}
+            />
+          )}
+
+          {anyTracking && (
+            <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
+          )}
+          {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
+          {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
+          {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
+          {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
+          {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
+          {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
+          {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
+          {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
+
+          {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankings && <CompetitorWatchlist google={data.google} />}
+
+          {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
+
+          {/* The itemised work feed. The briefing at the top already names the most
+              recent items; this is the full ledger plus the category breakdown. */}
+          {anyWork && <WorkDelivered impl={data.implementation!} />}
+
+          {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
+            <ShareOfVoiceCard sov={data.share_of_voice} />
+          )}
+
+          {anyAi && <AIVisibilityCard series={data.ai_mode} />}
+
+          {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankings && <RankingMomentum google={data.google} />}
+        </>
       )}
-      {data.revenue_agent && (
-        <RevenueAgentCard revenue={data.revenue_agent} />
-      )}
-
-      {/* Gated on "nothing MEASURED yet", not "nothing at all". It used to
-          require totallyEmpty, which includes work delivered — so the moment Ty
-          shipped the first task (day one, every time) the card vanished and a
-          brand-new client lost the only panel explaining what was being tracked
-          and what happens next. Work delivered is the day-one state, not a
-          reason to hide the expectations. Disappears once real data arrives. */}
-      {nothingMeasured && (
-        <WhatWeWatchCard
-          clientName={data.client_name}
-          google={data.google}
-          aiMode={data.ai_mode}
-          verifiedWins={data.verified_wins}
-        />
-      )}
-
-      {anyTracking && (
-        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
-      )}
-      {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
-      {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
-      {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
-      {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
-      {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
-      {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
-      {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
-      {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
-
-      {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
-      {anyRankings && <CompetitorWatchlist google={data.google} />}
-
-      {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
-
-      {/* The itemised work feed. The briefing at the top already names the most
-          recent items; this is the full ledger plus the category breakdown. */}
-      {anyWork && <WorkDelivered impl={data.implementation!} />}
-
-      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
-        <ShareOfVoiceCard sov={data.share_of_voice} />
-      )}
-
-      {anyAi && <AIVisibilityCard series={data.ai_mode} />}
-
-      {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
-      {anyRankings && <RankingMomentum google={data.google} />}
 
       <p className="mt-10 text-center text-[12px] text-ink-4">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
@@ -437,6 +467,60 @@ function ActionIcon({ name }: { name: 'followups' | 'estimates' | 'pipeline' }) 
   );
 }
 
+// Slug → GoHighLevel location id, for building the owner's "open in GHL" deep links.
+// TODO: move to the dashboard payload so this is multi-tenant, not hardcoded.
+const GHL_LOCATION: Record<string, string> = { sandbar: 'rL4X2gKNPEgIwsuJeYIL' };
+
+/**
+ * Where the owner actually ACTS in GoHighLevel. We only have aggregate counts in
+ * the payload, so every link opens a VIEW (the opportunities list / the inbox) —
+ * never a specific contact — and the surrounding copy never implies the dashboard
+ * sent a message or moved a deal. It just takes the owner to where they do it.
+ */
+function ghlLinks(slug: string) {
+  const loc = GHL_LOCATION[slug];
+  if (!loc) {
+    return { opportunities: 'https://app.gohighlevel.com/', conversations: 'https://app.gohighlevel.com/' };
+  }
+  return {
+    opportunities: `https://app.gohighlevel.com/v2/location/${loc}/opportunities/list`,
+    conversations: `https://app.gohighlevel.com/v2/location/${loc}/conversations/conversations`,
+  };
+}
+
+/**
+ * Two-view segmented control. "Today" is the owner-essentials, roughly one
+ * screen; "Full report" is every deeper section. Plain toggle buttons (not a
+ * tablist) so it's valid without a paired tabpanel. 44px touch targets.
+ */
+function ViewToggle({ view, onChange }: { view: 'today' | 'full'; onChange: (v: 'today' | 'full') => void }) {
+  const opts: Array<{ id: 'today' | 'full'; label: string; hint: string }> = [
+    { id: 'today', label: 'Today', hint: 'What needs you' },
+    { id: 'full', label: 'Full report', hint: 'Every metric' },
+  ];
+  return (
+    <div className="no-print mb-6 flex rounded-full border border-gold/20 bg-surface-2 p-1">
+      {opts.map((o) => {
+        const active = view === o.id;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(o.id)}
+            className={`flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full px-4 text-[13px] font-bold transition duration-200 motion-reduce:transition-none ${
+              active ? 'bg-gold text-on-gold shadow-lift' : 'text-ink-3 hover:text-ink'
+            }`}
+          >
+            {o.label}
+            <span className={`hidden text-[11px] font-medium sm:inline ${active ? 'text-on-gold/70' : 'text-ink-4'}`}>· {o.hint}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /**
  * NEEDS YOU TODAY — the single most important next step, derived ONLY from live
  * revenue-agent fields. Shows at most two actions, ranked. When the agent is
@@ -449,8 +533,10 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
   const ra = data.revenue_agent;
   if (!ra) return null;
 
+  const links = ghlLinks(data.slug);
+
   type Tone = 'gold' | 'amber';
-  type Action = { key: string; icon: 'followups' | 'estimates' | 'pipeline'; tone: Tone; title: string; why: string; tag: string };
+  type Action = { key: string; icon: 'followups' | 'estimates' | 'pipeline'; tone: Tone; title: string; why: string };
   const candidates: Action[] = [];
 
   const followups = ra.open_actions || 0;
@@ -462,9 +548,8 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       key: 'followups',
       icon: 'followups',
       tone: 'gold',
-      title: `${followups} follow-up${followups === 1 ? '' : 's'} queued and ready to send.`,
-      why: `Lola has the next touch drafted for ${followups === 1 ? 'a contact who hasn’t' : `${followups} contacts who haven’t`} replied yet. Sending ${followups === 1 ? 'it' : 'them'} today is the cheapest booked job you’ll get all week.`,
-      tag: 'Action ready',
+      title: `${followups} follow-up${followups === 1 ? '' : 's'} queued and waiting.`,
+      why: `${followups === 1 ? 'One follow-up is' : `${followups} follow-ups are`} queued in GoHighLevel and ${followups === 1 ? "hasn't" : "haven't"} gone out yet. Open it to send the next touch — the cheapest booked job you'll get all week.`,
     });
   }
   if (sentEstimates > 0) {
@@ -473,8 +558,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       icon: 'estimates',
       tone: 'amber',
       title: `${sentEstimates} estimate${sentEstimates === 1 ? '' : 's'} waiting on a yes or no.`,
-      why: `${sentEstimates === 1 ? 'An estimate has' : `${sentEstimates} estimates have`} been sent but not booked yet. One quick nudge is usually all it takes to turn a maybe into a job.`,
-      tag: 'Awaiting reply',
+      why: `${sentEstimates === 1 ? 'An estimate has' : `${sentEstimates} estimates have`} been sent but ${sentEstimates === 1 ? "isn't" : "aren't"} booked yet. Open GoHighLevel and give ${sentEstimates === 1 ? 'it' : 'them'} a quick nudge.`,
     });
   }
   if (pipeline > 0) {
@@ -483,8 +567,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       icon: 'pipeline',
       tone: 'gold',
       title: `${fmtMoney(pipeline)} in open pipeline to keep moving.`,
-      why: 'That’s the live value of every open opportunity in your CRM right now. Keeping it progressing is how this month’s revenue actually gets booked.',
-      tag: 'Open pipeline',
+      why: "That's the live value of every open opportunity in your CRM. Open GoHighLevel to keep them progressing.",
     });
   }
 
@@ -497,14 +580,23 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
         className="mb-6 overflow-hidden rounded-2xl border border-ok/25 shadow-lift"
         style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 60%, rgb(var(--ok) / 0.07) 100%)' }}
       >
-        <div className="flex items-center gap-3 px-5 py-5 sm:px-7">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-5 sm:px-7">
           <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ok/15 text-ok">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
           </span>
-          <div className="min-w-0">
-            <h2 className="font-display text-[18px] font-bold text-ink sm:text-[20px]">You’re on top of everything</h2>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-[18px] font-bold text-ink sm:text-[20px]">You're on top of everything</h2>
             <p className="mt-0.5 text-[12.5px] leading-[1.5] text-ink-3">Nothing needs you right now — Lola will surface the next move here the moment one appears.</p>
           </div>
+          <a
+            href={links.opportunities}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-lg px-1 text-[11px] font-bold uppercase tracking-[0.08em] text-gold underline-offset-2 hover:underline"
+          >
+            Open in GoHighLevel
+            <span aria-hidden>→</span>
+          </a>
         </div>
       </section>
     );
@@ -515,14 +607,20 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       className="mb-6 overflow-hidden rounded-2xl border border-gold/30 shadow-lift"
       style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 55%, rgb(var(--gold) / 0.08) 100%)' }}
     >
-      <div className="flex items-center gap-3 px-5 py-4 sm:px-7">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-4 sm:px-7">
         <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-full bg-gold px-2 font-display text-[13px] font-bold text-on-gold">
           {actions.length}
         </span>
         <h2 className="font-display text-[18px] font-bold text-ink sm:text-[20px]">Needs you today</h2>
-        <span className="ml-auto hidden text-[10px] font-bold uppercase tracking-[0.12em] text-ink-4 sm:inline">
-          Live from your CRM
-        </span>
+        <a
+          href={links.opportunities}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto inline-flex min-h-[44px] items-center gap-1 rounded-lg px-1 text-[11px] font-bold uppercase tracking-[0.08em] text-gold underline-offset-2 hover:underline"
+        >
+          Open in GoHighLevel
+          <span aria-hidden>→</span>
+        </a>
       </div>
       <div className="grid gap-3 px-4 pb-4 sm:px-5 sm:pb-5">
         {actions.map((a) => {
@@ -530,9 +628,12 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
           const toneSoft = a.tone === 'gold' ? 'bg-gold/[0.12]' : 'bg-[#F59E0B]/[0.14]';
           const accentColor = a.tone === 'gold' ? 'rgb(var(--gold))' : '#C77E0A';
           return (
-            <div
+            <a
               key={a.key}
-              className="grid grid-cols-[auto_1fr] items-start gap-4 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift sm:p-5"
+              href={links.opportunities}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group grid min-h-[44px] grid-cols-[auto_1fr_auto] items-start gap-4 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift transition duration-200 hover:border-gold/40 hover:shadow-glow motion-reduce:transition-none sm:p-5"
               style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}
             >
               <span aria-hidden className={`grid h-10 w-10 place-items-center rounded-lg ${toneSoft} ${toneText}`}>
@@ -541,11 +642,15 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
               <div className="min-w-0">
                 <p className="font-display text-[15px] font-semibold leading-snug text-ink sm:text-[16px]">{a.title}</p>
                 <p className="mt-1.5 text-[13px] leading-[1.5] text-ink-2">{a.why}</p>
-                <span className={`mt-3 inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${toneSoft} ${toneText}`}>
-                  {a.tag}
+                <span className={`mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.06em] ${toneText}`}>
+                  Open in GoHighLevel
+                  <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none">→</span>
                 </span>
               </div>
-            </div>
+              <span aria-hidden className="self-center text-ink-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+              </span>
+            </a>
           );
         })}
       </div>
