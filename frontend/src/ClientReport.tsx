@@ -207,8 +207,9 @@ export default function ClientReport({ slug }: { slug: string }) {
           {/* Lead → Estimate → Booked → Paid → Review, each mapped to a real field.
               Muted "—"/0 where a feed isn't wired or has nothing yet. */}
           <LifecycleSpine data={data} />
-          {/* Is Lola actually running? */}
-          <SystemStatus integrations={data.integrations} />
+          {/* Is Lola actually running? Compact one-strip summary on Today; the
+              full per-feed breakdown lives in the Full report. */}
+          <SystemStatus integrations={data.integrations} compact />
         </>
       ) : (
         /* ── FULL REPORT — everything else; all honesty/empty gates intact ───── */
@@ -270,6 +271,10 @@ export default function ClientReport({ slug }: { slug: string }) {
 
           {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
           {anyRankings && <RankingMomentum google={data.google} />}
+
+          {/* Full per-feed system-health detail. Today shows only the compact
+              summary strip above; the itemised breakdown lives here. */}
+          <SystemStatus integrations={data.integrations} />
         </>
       )}
 
@@ -549,7 +554,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       icon: 'followups',
       tone: 'gold',
       title: `${followups} follow-up${followups === 1 ? '' : 's'} queued and waiting.`,
-      why: `${followups === 1 ? 'One follow-up is' : `${followups} follow-ups are`} queued in GoHighLevel and ${followups === 1 ? "hasn't" : "haven't"} gone out yet. Open it to send the next touch — the cheapest booked job you'll get all week.`,
+      why: "Queued in GoHighLevel, not sent yet — the cheapest booked job you'll get all week.",
     });
   }
   if (sentEstimates > 0) {
@@ -558,7 +563,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       icon: 'estimates',
       tone: 'amber',
       title: `${sentEstimates} estimate${sentEstimates === 1 ? '' : 's'} waiting on a yes or no.`,
-      why: `${sentEstimates === 1 ? 'An estimate has' : `${sentEstimates} estimates have`} been sent but ${sentEstimates === 1 ? "isn't" : "aren't"} booked yet. Open GoHighLevel and give ${sentEstimates === 1 ? 'it' : 'them'} a quick nudge.`,
+      why: 'Sent but not booked yet. A quick nudge closes some of these.',
     });
   }
   if (pipeline > 0) {
@@ -567,7 +572,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
       icon: 'pipeline',
       tone: 'gold',
       title: `${fmtMoney(pipeline)} in open pipeline to keep moving.`,
-      why: "That's the live value of every open opportunity in your CRM. Open GoHighLevel to keep them progressing.",
+      why: 'Live value of every open opportunity. Keep them progressing.',
     });
   }
 
@@ -949,7 +954,7 @@ function Header({ data }: { data: DashboardPayload }) {
  * That distinction is the whole difference between a client feeling out of
  * control and a client feeling informed.
  */
-function SystemStatus({ integrations }: { integrations?: DashboardPayload['integrations'] }) {
+function SystemStatus({ integrations, compact = false }: { integrations?: DashboardPayload['integrations']; compact?: boolean }) {
   // The quote form is wired in the page itself rather than an integration, so
   // it is always on. Everything else reflects what the backend reports.
   const feeds: ReadonlyArray<{ label: string; on: boolean; live: string; pending: string }> = [
@@ -987,6 +992,38 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
   ];
 
   const liveCount = feeds.filter((f) => f.on).length;
+
+  // TODAY uses a one-strip summary (status chips) so the owner's first screen
+  // stays short; the full per-feed detail renders in the Full report.
+  if (compact) {
+    return (
+      <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 px-5 py-4 shadow-lift sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">System health</p>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-ok">
+            {liveCount} of {feeds.length} live
+          </span>
+          <span className="ml-auto text-[11px] text-ink-4">Full detail in Full report</span>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {feeds.map((f) => (
+            <span
+              key={f.label}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] font-medium text-ink-2 ${
+                f.on ? 'border-emerald-500/25 bg-emerald-500/[0.06]' : 'border-[#F59E0B]/25 bg-[#F59E0B]/[0.06]'
+              }`}
+            >
+              <span aria-hidden className={`h-2 w-2 rounded-full ${f.on ? 'bg-emerald-400' : 'bg-[#F59E0B]'}`} />
+              {f.label}
+              <span className={`text-[9.5px] font-bold uppercase tracking-[0.08em] ${f.on ? 'text-ok' : 'text-[#B8770A]'}`}>
+                {f.on ? 'Live' : 'Pending'}
+              </span>
+            </span>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 shadow-lift">
