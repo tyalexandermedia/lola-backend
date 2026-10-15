@@ -377,7 +377,7 @@ function MoneyTile({
   const shown = useCountUp(value);
   const text = format === 'currency' ? fmtMoney(shown) : fmtNum(shown);
   return (
-    <div className="rounded-xl border border-gold/15 bg-surface p-4 shadow-lift transition duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-glow motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+    <div className="rounded-xl border border-gold/15 bg-surface p-3.5 shadow-lift transition duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-glow motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       <p className="text-[12px] font-medium text-ink-3">{label}</p>
       <p
         className={`mt-2 font-display text-[26px] font-bold leading-none tabular-nums sm:text-[29px] ${
@@ -582,7 +582,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
   if (actions.length === 0) {
     return (
       <section
-        className="mb-6 overflow-hidden rounded-2xl border border-ok/25 shadow-lift"
+        className="mb-5 overflow-hidden rounded-2xl border border-ok/25 shadow-lift"
         style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 60%, rgb(var(--ok) / 0.07) 100%)' }}
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-5 sm:px-7">
@@ -609,7 +609,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
 
   return (
     <section
-      className="mb-6 overflow-hidden rounded-2xl border border-gold/30 shadow-lift"
+      className="mb-5 overflow-hidden rounded-2xl border border-gold/30 shadow-lift"
       style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 55%, rgb(var(--gold) / 0.08) 100%)' }}
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-4 sm:px-7">
@@ -692,7 +692,7 @@ function LifecycleSpine({ data }: { data: DashboardPayload }) {
   if (withData < 2) return null;
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 p-5 shadow-lift sm:p-6">
+    <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 p-5 shadow-lift sm:p-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="font-display text-[16px] font-bold text-ink sm:text-[18px]">Your pipeline, end to end</h2>
         <SourceChip label="Live from your CRM" />
@@ -895,12 +895,12 @@ function Header({ data }: { data: DashboardPayload }) {
     host = '';
   }
   return (
-    <header className="mb-6 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2 shadow-lift">
-      <div className="flex flex-wrap items-start gap-4 p-6 sm:p-8">
+    <header className="mb-5 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2 shadow-lift">
+      <div className="flex flex-wrap items-start gap-4 p-5 sm:p-7">
         <div className="flex min-w-0 flex-1 items-center gap-4">
           <div
             aria-hidden
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-gold/30 font-display text-[22px] font-bold text-gold"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-gold/30 font-display text-[22px] font-bold text-gold sm:h-12 sm:w-12"
             style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--gold) / 0.18), rgb(var(--gold) / 0.04))' }}
           >
             {initial}
@@ -909,7 +909,7 @@ function Header({ data }: { data: DashboardPayload }) {
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
               Command center · Owner view
             </p>
-            <h1 className="mt-1 truncate font-display text-[26px] font-bold leading-tight text-ink sm:text-[32px]">
+            <h1 className="mt-1 truncate font-display text-[22px] font-bold leading-tight text-ink sm:text-[32px]">
               {data.client_name}
             </h1>
             {data.target_url && (
@@ -1186,7 +1186,7 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
   else if (revenue.open_actions > 0) tiles.push({ label: 'Follow-ups queued', value: revenue.open_actions, format: 'number', sub: 'next touches ready' });
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 shadow-lift">
+    <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 shadow-lift">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Revenue agent</p>
@@ -1203,7 +1203,7 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
           ))}
         </div>
         {showRing && (
-          <div className="mt-3 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift">
+          <div className="mt-4 border-t border-white/10 pt-4">
             <ProgressRing
               pct={wonShare}
               centerLabel={`${Math.round(wonShare)}%`}
