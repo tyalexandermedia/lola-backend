@@ -8,7 +8,7 @@ import { SITE_ORIGIN } from './lib/seo';
 // else is lazy-loaded so the initial bundle stays lean for first-paint /
 // Core Web Vitals (LCP). Each lazy import becomes its own JS chunk under
 // dist/assets that Vite will only fetch when the route is hit.
-import Homepage from './Homepage';
+import Homepage from './GrowthHomepage';
 const SharedReport = lazy(() => import('./SharedReport'));
 const AdminLeads = lazy(() => import('./AdminLeads'));
 const AdminCalls = lazy(() => import('./AdminCalls'));
@@ -25,15 +25,13 @@ const Start = lazy(() => import('./Start'));
 const VsPage = lazy(() => import('./VsPage'));
 const VsHub = lazy(() => import('./VsHub'));
 const Methodology = lazy(() => import('./Methodology'));
-const SandbarCaseStudy = lazy(() => import('./SandbarCaseStudy'));
+const SandbarCaseStudy = lazy(() => import('./SandbarImplementation'));
 // D-014 released 2026-08-20 by the owner: Sandbar is the published case study.
 // The hold existed because the page must not claim ranking results it can't
 // evidence — that constraint still holds and the page still honours it. Its
 // four stat tiles are verifiable business facts (live public dashboard, weekly
 // work feed, 20+ cities served, 15+ years in business); no ranking metric
-// appears anywhere on it. Set VITE_SHOW_SANDBAR_CASE_STUDY=false to pull it.
-const SHOW_SANDBAR_CASE_STUDY =
-  (import.meta.env.VITE_SHOW_SANDBAR_CASE_STUDY as string | undefined) !== 'false';
+// Implementation proof is available; unverified results remain withheld.
 /** Real Google Business Profile listing URL, for the footer's trust link. Until
  *  it is set the link is a Maps search and makes no verification claim. */
 const GBP_URL = (import.meta.env.VITE_GBP_URL as string | undefined)?.trim() || '';
@@ -244,7 +242,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
-          {route.name === 'case-study' && route.slug === 'sandbar' && (SHOW_SANDBAR_CASE_STUDY ? <SandbarCaseStudy /> : <NotFound />)}
+          {route.name === 'case-study' && route.slug === 'sandbar' && <SandbarCaseStudy />}
           {route.name === 'case-study' && route.slug !== 'sandbar' && <NotFound />}
           {route.name === 'vs' && <VsPage slug={route.slug} />}
           {route.name === 'vs-hub' && <VsHub />}
@@ -349,8 +347,8 @@ function SiteFooter({ route }: { route: Route }) {
             </span>
           </a>
           <p className="mt-2 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
-            Done-for-you AI Leads + Local SEO for service businesses. Recommended on
-            Google AND ChatGPT, Perplexity, and Gemini.
+            Websites, local visibility, reviews and lead follow-up for service businesses.
+            Built and personally managed by Coach Ty.
           </p>
           {/* #5A5F68 on #0A0A0B is 3.08:1 — below the 4.5:1 AA minimum for
               11px text. #8A8F98 is 6.09:1. Breaks are unconditional: hiding

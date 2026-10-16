@@ -5,14 +5,14 @@ Walks enrolled leads (db/followups.py) through a 3-touch cadence so a free
 Growth Score turns into a sale:
 
     Step 1  (~24h)  Nudge  — "did you see your score? here's the #1 fix" + checkout
-    Step 2  (~72h)  Proof  — the 90-Day Promise + exclusivity
+    Step 2  (~72h)  Proof  — the launch commitment + exclusivity
     Step 3  (~7d)   Final  — EMAIL ONLY, the offer stated plainly one last time
 
 There's a SECOND sequence, kind='build', for people who have already paid. It
-used to upsell them from a $997 one-time build to a $297/mo retainer; with a
-single $397/month plan there is nothing to upsell, so it now chases the thing
-that actually blocks delivery — the 2-minute intake at /apply. Checkout takes a
-card; it doesn't tell Ty what the business does.
+used to upsell them from a $997 one-time build to a $297/mo retainer; those
+products are retired and scope is confirmed before any charge, so it now chases
+the thing that actually blocks delivery — the 2-minute intake at /apply. A paid
+seat still doesn't tell Ty what the business does.
 
 Channels: email (Resend) + SMS (Twilio, only if the lead consented). Every SMS
 gets "Reply STOP to opt out." appended by reviews.sms.send_sms.
@@ -40,7 +40,7 @@ from db import followups
 from reviews.sms import send_sms, twilio_enabled
 
 # ── Config (env-overridable; hours) ───────────────────────────────────────
-PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyalexander.com").rstrip("/")
+PUBLIC_APP_URL = os.getenv("PUBLIC_APP_URL", "https://www.coachtyleads.com").rstrip("/")
 # Checkout, not a calendar. These emails used to point at a Google Calendar
 # booking link; Ty doesn't sell on calls, and a booking form is a slower, lossier
 # ask than the Payment Link the rest of the site now uses.
@@ -78,9 +78,9 @@ def _days(name: str, default_days: float) -> float:
 
 # ── Post-purchase onboarding nudges ────────────────────────────────────────
 # This branch used to nurture $997 Full Build buyers toward a $297/mo "Lola
-# Managed" upsell. Both of those products are retired: there is one plan, and a
-# "build" row is now someone who is already paying $397/month. Pitching them a
-# monthly they already have is the worst email we could send.
+# Managed" upsell. Both of those products are retired. A "build" row is now a
+# paying client who still needs onboarding; pitching them a plan they already
+# bought is the worst email we could send.
 #
 # What they actually need is the intake form. Checkout collects a card, not a
 # business — until /apply is filled in, Ty has a subscriber he can't start work
@@ -146,7 +146,7 @@ def _email_wrap(title: str, body_html: str) -> str:
 </td></tr>
 <tr><td style="padding:0 28px 26px;color:#8a8f98;font-size:12px;line-height:1.6;">
 Coach Ty · Ty Alexander Media · Tampa Bay, FL<br>
-You're getting this because you ran a free Growth Score at lola.tyalexandermedia.com. Reply STOP and I'll take you off follow-ups.
+You're getting this because you ran a free Growth Score at coachtyleads.com. Reply STOP and I'll take you off follow-ups.
 </td></tr>
 </table></td></tr></table></body></html>"""
 
@@ -168,43 +168,44 @@ def _content(step: int, row: dict) -> dict:
     pricing = f"{PUBLIC_APP_URL}/pricing"
 
     if step == 1:
-        subject = f"{name}: fix #1 is done — three left"
+        subject = f"{name}: your first fix is written — three to go"
         html = _email_wrap(
             "Did you catch your Growth Score?",
             f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Hey {name}, it's Ty. Your Growth Score came with your first fix already written — the title tag for your page. Paste it in and it works; that one's yours free.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">Three left: your Google Business Profile description, your first GBP post, and the schema that decides whether AI can read your business at all. <a href="{report}" style="color:#B8860B;">👉 Re-open your score</a> — or I do all of it, plus build you a new site, for {PLAN_PRICE}.</p>
-<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")} &nbsp; <a href="{pricing}" style="color:#B8860B;font-weight:700;">or see what's included</a></p>""",
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">Three left: your Google Business Profile description, your first GBP post, and the schema that decides whether AI can read your business at all. <a href="{report}" style="color:#B8860B;">👉 Re-open your score</a> — or I handle all of it for you. Plans start at {PLAN_PRICE}, and I confirm the scope and your territory before anything's charged.</p>
+<p style="margin:0 0 22px;">{_btn(pricing, "See your plan options →")} &nbsp; <a href="{report}" style="color:#B8860B;font-weight:700;">or re-open your score</a></p>""",
         )
         text = (
             f"Hey {name}, it's Ty. Your Growth Score came with your first fix written and ready "
             f"to paste — that one's free. Three left: GBP description, first post, and your "
-            f"schema. Re-open it: {report} — or I do all of it plus build your site for "
-            f"{PLAN_PRICE}: {CHECKOUT_URL}"
+            f"schema. Re-open it: {report} — or I handle all of it; plans start at {PLAN_PRICE}, "
+            f"scope and territory confirmed before any charge: {pricing}"
         )
         sms = (
             f"Hey {name}, it's Lola 🐾 Your first fix is written and waiting in your score: "
-            f"{report} — or Ty does all of it plus builds your site: {PLAN_PRICE}, {pricing}"
+            f"{report} — or Ty handles all of it; plans from {PLAN_PRICE}: {pricing}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
     if step == 2:
-        subject = "I'll put the guarantee in writing"
+        subject = "The part most agencies won't put in writing"
         html = _email_wrap(
-            "The 90-Day Promise",
-            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Most agencies want $2,000–$5,000/mo and a 6-month contract. Mine is {PLAN_PRICE} — and your website design is included free. No setup fee, no build charge. Cancel anytime after the first 3 months.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;"><strong>And it's guaranteed:</strong> we pick your 5 money keywords together in week 1. If I don't get you ranking on page one or in the map pack within 90 days, your next 2 months are free. No fine print.</p>
-<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">One more thing worth knowing: I take one client per trade, per city. I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
-<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")}</p>""",
+            "What I put in writing",
+            f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Most agencies want $2,000–$5,000/mo and a 6-month contract. My plans start at {PLAN_PRICE}, month-to-month after the first 90 days.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;"><strong>And here's what I put in writing — instead of a ranking promise I can't honestly make:</strong> we agree your launch scope and the search terms we'll track together before any work starts. If I don't finish the agreed foundation in the launch window for reasons on my side, I keep working at no extra management charge until it's done. I commit to the work — not to a specific ranking, lead count, or AI mention.</p>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.65;">One more thing worth knowing: I take one client per trade, per territory. I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
+<p style="margin:0 0 22px;">{_btn(pricing, "See your plan options →")}</p>""",
         )
         text = (
-            f"{PLAN_PRICE} — website design included free, no setup fee, cancel anytime after 3 "
-            "months. Backed by the 90-Day Promise: we pick your 5 money keywords in week 1, and "
-            "if I don't get you ranking on page one or in the map pack within 90 days, your next "
-            f"2 months are free. Start: {CHECKOUT_URL}"
+            f"My plans start at {PLAN_PRICE}, month-to-month after the first 90 days. Instead of a "
+            "ranking promise I can't honestly make: we agree your launch scope and the search terms "
+            "we'll track together up front, and if I don't finish the agreed foundation in the launch "
+            "window for reasons on my side, I keep working at no extra management charge until it's "
+            f"done. One client per trade, per territory. See the plans: {pricing}"
         )
         sms = (
-            f"{name}, it's {PLAN_PRICE} and your site build is included free — backed by my "
-            f"90-Day Promise: ranking in 90 days or your next 2 months are free. {CHECKOUT_URL}"
+            f"{name}, plans from {PLAN_PRICE}. No fake ranking promise — I put the launch "
+            f"commitment in writing and finish the agreed work. One per trade/territory: {pricing}"
         )
         return {"subject": subject, "html": html, "text": text, "sms": sms}
 
@@ -213,14 +214,16 @@ def _content(step: int, row: dict) -> dict:
     html = _email_wrap(
         "One last thing",
         f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I won't keep bugging you, {name} — but you ran your Growth Score for a reason, and every week you're not found is jobs going to the competitor above you.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">One plan, one price: <strong>{PLAN_PRICE}</strong>. Your website designed and built — included free — then your Google Business Profile managed and ongoing work to get you named when someone asks Google or ChatGPT for a company like yours. Backed by the 90-Day Promise.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I take one client per trade, per city. If someone in your trade and town starts before you, that's the seat.</p>
-<p style="margin:0 0 22px;">{_btn(CHECKOUT_URL, f"Start my monthly — {PLAN_PRICE} →")} &nbsp; <a href="{pricing}" style="color:#B8860B;font-weight:700;">or see what's included</a></p>""",
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Two ways in: strengthen the visibility, reviews and follow-up around the site you've got, or the full build — a new website, local visibility, reviews and lead follow-up as one system. Plans start at {PLAN_PRICE}. Scope and your territory are confirmed before anything's charged, and it's backed by my launch commitment — I finish the agreed work; I don't promise a ranking.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I take one client per trade, per territory. If someone in your trade and town starts before you, that's the seat.</p>
+<p style="margin:0 0 22px;">{_btn(pricing, "See your plan options →")} &nbsp; <a href="{report}" style="color:#B8860B;font-weight:700;">or re-open your score</a></p>""",
     )
     text = (
-        f"Last note, {name}. One plan: {PLAN_PRICE}, website design included free, no setup fee, "
-        "cancel anytime after 3 months. Backed by the 90-Day Promise. One client per trade, per "
-        f"city. Start: {CHECKOUT_URL} · What's included: {pricing}"
+        f"Last note, {name}. Two ways in: strengthen what you've got, or the full build — website, "
+        f"local visibility, reviews and follow-up as one system. Plans start at {PLAN_PRICE}, scope "
+        "and territory confirmed before any charge, backed by my launch commitment (I finish the "
+        f"agreed work — no ranking promise). One client per trade, per territory. Plans: {pricing} · "
+        f"Re-open your score: {report}"
     )
     return {"subject": subject, "html": html, "text": text, "sms": None}
 
@@ -239,7 +242,7 @@ def _build_content(step: int, row: dict) -> dict:
         html = _email_wrap(
             "You're in — one small thing left",
             f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Welcome aboard, {name}. Your payment's in and your seat is held — one client per trade, per city, and that's yours now.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I need about two minutes from you before I can start: your trade, the towns you actually drive to, and your current site if you have one. That's what I use to pick your 5 money keywords in week 1 — the ones the 90-Day Promise is measured against.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">I need about two minutes from you before I can start: your trade, the towns you actually drive to, and your current site if you have one. That's what I use to agree your scope and the search terms we'll track together from week 1.</p>
 <p style="margin:0 0 22px;">{_btn(INTAKE_URL, "Fill in my 2-minute intake →")}</p>""",
         )
         text = (
@@ -257,7 +260,7 @@ def _build_content(step: int, row: dict) -> dict:
         html = _email_wrap(
             "I don't want to burn your week 1",
             f"""<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">{name} — you're paid up and I still can't start. I've got a card and no business: I don't know your trade, your service area, or what your customers actually type into Google.</p>
-<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">The 90-day clock is real, and week 1 is when we pick the keywords it's measured against. Two minutes fixes it.</p>
+<p style="margin:0 0 14px;font-size:15px;line-height:1.65;">Week 1 is when we agree your scope and the search terms we'll track together. Two minutes fixes it.</p>
 <p style="margin:0 0 22px;">{_btn(INTAKE_URL, "Send Ty my details →")}</p>""",
         )
         text = (

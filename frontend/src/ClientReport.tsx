@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { FOUNDER } from './lib/lola';
 import { useSeo } from './lib/seo';
 import { API_URL } from './api';
+import { recordedCount, validPosition, rankingCoverage, snapshotAge } from './lib/reportingEvidence';
+import './growth-preview.css';
 
 type RankPoint = { position: number | null; mentioned: boolean; competitors?: string[]; run_at: string };
 
@@ -101,7 +103,7 @@ export default function ClientReport({ slug }: { slug: string }) {
   // revenue. Same reasoning as the audit reports: never a search result.
   useSeo({
     title: data ? `${data.client_name} — Lola dashboard` : 'Client dashboard',
-    description: 'Private client reporting dashboard.',
+    description: 'Public client reporting view with evidence boundaries.',
     robots: 'noindex',
   });
 
@@ -131,8 +133,8 @@ export default function ClientReport({ slug }: { slug: string }) {
   if (error || !data) {
     return (
       <main className="mx-auto w-full max-w-4xl py-12 text-center">
-        <h1 className="text-2xl font-bold text-ink">Dashboard not found</h1>
-        <p className="mt-3 text-[14px] text-ink-3">{error}</p>
+        <h1 className="text-2xl font-bold text-ink">Dashboard data unavailable</h1>
+        <p className="mt-3 text-[14px] text-ink-3">{error}</p><button className="mt-5 rounded-lg border border-gold px-5 py-3 text-gold" onClick={() => window.location.reload()}>Try again</button>
       </main>
     );
   }
@@ -166,12 +168,13 @@ export default function ClientReport({ slug }: { slug: string }) {
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
       <Header data={data} />
+      <section className="evidence-notice" aria-labelledby="evidence-heading"><h2 id="evidence-heading">What this report can tell you</h2><p>Recorded form and call events are not verified unique customers, qualified inquiries or paid jobs. Test and duplicate exclusion is not established by this feed. Report generation does not verify that each integration refreshed successfully.</p><p>Sources: Lola event tracking, configured integrations and dated search snapshots. Calendar-month counts use the source system’s reporting window; comparable prior-period coverage is unavailable. Collected payments and incremental ROI are not verified here.</p>{slug === 'sandbar' && <p>Sandbar is Ty’s father’s business. <a href="/case-studies/sandbar">See the implementation and verification boundaries →</a></p>}</section>
       {/* Value, work, what's next and how to reach Ty — before any metric.
           The numbers below prove the work happened; this says what it was for. */}
       <OwnerBriefing data={data} />
       <OwnerOverview data={data} />
       {/* Renders on every dashboard, not just the empty state — see SystemStatus. */}
-      <SystemStatus integrations={data.integrations} />
+      <SystemStatus integrations={data.integrations} quoteEvents={data.tracking?.lead?.lifetime} />
       <TopWinsCard
         google={data.google}
         aiMode={data.ai_mode}
@@ -231,7 +234,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       {anyRankings && <RankingMomentum google={data.google} />}
 
       <p className="mt-10 text-center text-[12px] text-ink-4">
-        Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
+        Report assembled {fmtDateTime(data.generated_at)} · powered by Lola SEO
       </p>
     </main>
   );
@@ -267,8 +270,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           Where things stand
         </h2>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
-          Everything on this page is live and yours to check any time — nothing here is
-          waiting on a report from me.
+          Recorded work and available measurements, with data gaps labeled. Integration status is reported separately.
         </p>
       </div>
 
@@ -278,9 +280,9 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
             Work finished
           </p>
-          <p className="mt-2 text-[34px] font-bold leading-none text-ink">{totalDone}</p>
+          <p className="mt-2 text-[34px] font-bold leading-none text-ink">{totalDone > 0 ? totalDone : "—"}</p>
           <p className="mt-1 text-[12px] text-ink-3">
-            {totalDone === 1 ? 'implementation task completed' : 'implementation tasks completed'} on your account
+            {totalDone > 0 ? `${totalDone === 1 ? 'implementation task' : 'implementation tasks'} recorded as completed` : 'No completed work has been logged in this feed. This does not mean no work was delivered.'}
           </p>
           {done.length > 0 && (
             <ul className="mt-3 space-y-1.5">
@@ -310,7 +312,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
             </ul>
           ) : (
             <p className="mt-2 text-[12.5px] text-ink-3">
-              Nothing mid-flight — the queue below is what's coming.
+              No active work is recorded in this feed.
             </p>
           )}
 
@@ -374,13 +376,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
  * system, not a one-time report. Drives the "open it every Monday" habit.
  */
 function FreshnessPill({ iso }: { iso: string }) {
-  let label = 'Live';
-  let fresh = true;
-  try {
-    const days = (Date.now() - new Date(iso).getTime()) / 86400000;
-    fresh = days < 8;
-    label = days < 1 ? 'Updated today' : days < 8 ? `Updated ${Math.round(days)}d ago` : `Stale — ${Math.round(days)}d`;
-  } catch { /* keep defaults */ }
+  const { label, fresh } = snapshotAge(iso);
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
       fresh ? 'border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-300' : 'border-[#F59E0B]/40 bg-[#F59E0B]/[0.08] text-[#F59E0B]'
@@ -396,7 +392,7 @@ function Header({ data }: { data: DashboardPayload }) {
     <header className="mb-6 rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-          Retainer Dashboard
+          Client evidence dashboard
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <FreshnessPill iso={data.generated_at} />
@@ -439,40 +435,40 @@ function Header({ data }: { data: DashboardPayload }) {
  * That distinction is the whole difference between a client feeling out of
  * control and a client feeling informed.
  */
-function SystemStatus({ integrations }: { integrations?: DashboardPayload['integrations'] }) {
+function SystemStatus({ integrations, quoteEvents }: { integrations?: DashboardPayload['integrations']; quoteEvents?: number }) {
   // The quote form is wired in the page itself rather than an integration, so
   // it is always on. Everything else reflects what the backend reports.
   const feeds: ReadonlyArray<{ label: string; on: boolean; live: string; pending: string }> = [
     {
       label: 'Quote form',
-      on: true,
-      live: 'Every quote request on your site lands here and texts Ty.',
-      pending: '',
+      on: recordedCount(quoteEvents) !== null,
+      live: 'Form events are present in the reporting feed. Recipient delivery is verified separately.',
+      pending: 'Form event reporting is unavailable in this feed.',
     },
     {
       label: 'Call tracking',
       on: integrations?.callrail ?? false,
-      live: 'Every call to your tracking number is logged, timed and recorded.',
-      pending: 'Waiting on the CallRail webhook. Calls land here the day it connects.',
+      live: 'Call tracking is configured. Recording availability and completeness are not established here.',
+      pending: 'Call tracking is not reported as configured. Verify provider access and delivery.',
     },
     {
       label: 'Google Business Profile',
       on: integrations?.gbp ?? false,
       live: 'Views, searches, calls and direction taps from your map pin.',
       pending:
-        'Waiting on Google to approve profile access. Ty is still posting and optimising it — this feed only controls whether the numbers show up here.',
+        'Profile data is not available in this feed. The reason and access status need verification.',
     },
     {
       label: 'Rank tracking',
       on: integrations?.rankings_tracker ?? false,
-      live: 'Your position for every money keyword, re-checked on a schedule.',
-      pending: 'First snapshot is still being taken. Positions appear after it runs.',
+      live: 'Rank tracking is configured. Available positions and observation dates are shown below.',
+      pending: 'Rank tracking is not reported as configured. Check the measurement setup.',
     },
     {
       label: 'Bing / Copilot',
       on: integrations?.bing ?? false,
-      live: 'Clicks and impressions from Bing, which is what Copilot answers from.',
-      pending: 'Bing Webmaster verification pending — a smaller feed than Google.',
+      live: 'Bing performance integration is configured. This does not measure Copilot recommendations.',
+      pending: 'Bing performance data is unavailable. Verify account access and connection status.',
     },
   ];
 
@@ -482,13 +478,13 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
     <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
         <div>
-          <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">What&apos;s live right now</h2>
+          <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">Data coverage</h2>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
-            Every data feed on this page, and what it&apos;s doing for you.
+            Configuration reported by the source. Availability does not guarantee freshness or completeness.
           </p>
         </div>
         <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-gold-bright">
-          {liveCount} of {feeds.length} connected
+          {liveCount} of {feeds.length} reported available
         </span>
       </div>
 
@@ -514,7 +510,7 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
                     f.on ? 'text-emerald-300' : 'text-amber-300'
                   }`}
                 >
-                  {f.on ? 'Live' : 'Pending'}
+                  {f.on ? 'Reported available' : 'Unavailable'}
                 </span>
               </p>
               <p className="mt-1 text-[12.5px] leading-[1.5] text-ink-3">
@@ -537,75 +533,9 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
  * never feels broken on day one.
  */
 function OwnerOverview({ data }: { data: DashboardPayload }) {
-  const calls = data.tracking?.call?.month ?? 0;
-  const leads = data.tracking?.lead?.month ?? 0;
-  const contacts = calls + leads;
-  const wonMonth = data.won_jobs?.month ?? 0;
-  const revMonth = data.won_jobs?.revenue_month ?? 0;
-  const prevCalls = data.tracking_trends?.call?.prev_month ?? 0;
-  const prevLeads = data.tracking_trends?.lead?.prev_month ?? 0;
-  const prevContacts = prevCalls + prevLeads;
-  const delta = contacts - prevContacts;
-  const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
-  const siteHost = (() => {
-    try {
-      return data.target_url ? new URL(data.target_url).hostname.replace(/^www\./, '') : 'your website';
-    } catch {
-      return 'your website';
-    }
-  })();
-
-  if (contacts === 0) {
-    return (
-      // Deliberately a one-line strip, not a panel. SystemStatus below already
-      // lists what's connected and WhatWeWatchCard already explains what's being
-      // tracked and when it lands — this used to repeat both at full height, so
-      // a new client read the same reassurance three times before reaching a
-      // single number. All this needs to own is "no calls or forms yet".
-      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-gold/15 bg-surface-2 px-6 py-4 sm:px-8">
-        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
-          {monthLabel} so far
-        </span>
-        <span className="text-[14px] text-ink-2">
-          No calls or quote requests yet this month — the moment one lands on{' '}
-          {siteHost}, it appears here.
-        </span>
-        {/* The chip strip that used to sit here moved into SystemStatus, which
-            renders on every dashboard rather than vanishing the moment the
-            first call lands. Repeating it here would say the same thing twice
-            in two panels. */}
-      </section>
-    );
-  }
-
-  const deltaTone = delta > 0 ? 'text-emerald-300' : delta < 0 ? 'text-[#FCA5A5]' : 'text-ink-3';
-  const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
-  const deltaText = delta === 0
-    ? 'flat vs last month'
-    : `${deltaArrow} ${Math.abs(delta)} vs last month`;
-
-  return (
-    <section className="mb-6 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.08)] sm:p-8">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
-        {monthLabel} so far
-      </p>
-      <h2 className="mt-3 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">
-        <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
-          {contacts} new contact{contacts === 1 ? '' : 's'}
-        </span>{' '}
-        — <span className={deltaTone}>{deltaText}</span>.
-      </h2>
-      <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-ink-2">
-        <strong className="text-ink">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
-        and <strong className="text-ink">{leads} quote form{leads === 1 ? '' : 's'}</strong>{' '}
-        landed this month.
-        {wonMonth > 0 && (
-          <> You&apos;ve confirmed <strong className="text-emerald-300">{wonMonth} won job{wonMonth === 1 ? '' : 's'}</strong> totaling{' '}
-          <strong className="text-emerald-300">${revMonth.toLocaleString()}</strong>.</>
-        )}
-      </p>
-    </section>
-  );
+  const calls = data.integrations?.callrail ? recordedCount(data.tracking?.call?.month) : null;
+  const forms = recordedCount(data.tracking?.lead?.month);
+  return <section className="mb-6 rounded-2xl border border-gold/25 bg-surface p-6 sm:p-8"><p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gold">Calendar month · source reporting window</p><h2 className="mt-3 text-[27px] font-bold leading-tight text-ink">{forms === null ? 'Form activity unavailable' : `${forms} recorded quote-form event${forms === 1 ? '' : 's'}`}</h2><p className="mt-3 text-[13px] leading-relaxed text-ink-3">{calls === null ? 'Phone-call measurement unavailable.' : `${calls} recorded call event${calls === 1 ? '' : 's'}.`} These are raw events, not a verified count of new customers. Comparable previous-period measurements are not supplied.</p></section>;
 }
 
 function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['revenue_agent']> }) {
@@ -1091,7 +1021,7 @@ function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
   return (
     <section className="mt-6 rounded-2xl border border-white/10 bg-surface-2 p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
-        Where your contacts came from · this month
+        Recorded event sources · this month
       </p>
       {/* Stacked bar */}
       <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-surface">
@@ -1108,7 +1038,7 @@ function LeadSourceCard({ sources }: { sources: Record<string, number> }) {
           </span>
         ))}
       </div>
-      <p className="mt-3 text-[11px] text-ink-4">Every contact, attributed to the channel Lola earned it through.</p>
+      <p className="mt-3 text-[11px] text-ink-4">Source labels captured with recorded events. They do not prove that Lola caused a contact or sale.</p>
     </section>
   );
 }
@@ -1145,7 +1075,7 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
         {metric('seo', 'SEO', '#9B781A')}
         {metric('accessibility', 'Accessibility', '#1D4ED8')}
       </div>
-      <p className="mt-3 text-[11px] text-ink-4">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
+      <p className="mt-3 text-[11px] text-ink-4">Dated PageSpeed observations. These scores do not establish ranking or conversion improvements.</p>
     </section>
   );
 }
@@ -1345,7 +1275,7 @@ function TrackingRow({
 }) {
   const cells = [
     { key: 'call', label: 'Calls', emoji: '📞', accent: '#15803D' },
-    { key: 'lead', label: 'Leads', emoji: '📝', accent: '#9B781A' },
+    { key: 'lead', label: 'Form events', emoji: '📝', accent: '#9B781A' },
     { key: 'click', label: 'Clicks', emoji: '👆', accent: '#1D4ED8' },
   ];
   const anyData = cells.some((c) => (tracking[c.key]?.lifetime || 0) > 0);
@@ -1358,11 +1288,11 @@ function TrackingRow({
   return (
     <section className="mb-6 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
-        Results this month — calls · leads · clicks
+        Recorded events this month
       </p>
       <div className="mt-4 grid grid-cols-3 gap-3">
         {cells.map((c) => {
-          const t = tracking[c.key] || { month: 0, last_30d: 0, lifetime: 0 };
+          const t = tracking[c.key];
           const src = (sources && sources[c.key]) || {};
           const srcEntries = Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 3);
           const tr = trends?.[c.key];
@@ -1370,13 +1300,8 @@ function TrackingRow({
           return (
             <div key={c.key} className="rounded-[12px] border border-white/10 bg-surface p-4 text-center">
               <p className="text-[11px] uppercase tracking-[0.12em] text-ink-3">{c.emoji} {c.label}</p>
-              <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{t.month}</p>
-              {tr && (
-                <p className={`mt-1 text-[11px] font-semibold ${arrowColor}`}>
-                  {tr.arrow} {tr.delta !== 0 ? `${tr.delta > 0 ? '+' : ''}${tr.delta}` : 'flat'} vs last mo
-                </p>
-              )}
-              <p className="mt-2 text-[11px] text-ink-4">30d: {t.last_30d} · all: {t.lifetime}</p>
+              <p className="mt-1 text-[34px] font-extrabold leading-none" style={{ color: c.accent }}>{recordedCount(t?.month) ?? "—"}</p>
+              <p className="mt-2 text-[11px] text-ink-4">30d: {recordedCount(t?.last_30d) ?? "—"} · all: {recordedCount(t?.lifetime) ?? "—"}</p>
               {srcEntries.length > 0 && (
                 <div className="mt-3 flex flex-wrap justify-center gap-1">
                   {srcEntries.map(([s, n]) => (
@@ -1400,7 +1325,7 @@ function TrackingRow({
 }
 
 function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }) {
-  const ranked = google.filter((s) => s.current?.position !== null && s.current?.position !== undefined).length;
+  const ranked = google.filter((s) => validPosition(s.current?.position)).length;
   const top3 = google.filter((s) => (s.current?.position ?? 99) <= 3).length;
   const top10 = google.filter((s) => (s.current?.position ?? 99) <= 10).length;
   const aiHits = aiMode.filter((s) => s.current?.mentioned).length;
@@ -1408,13 +1333,13 @@ function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatPill label="Keywords tracked" value={google.length} />
-      <StatPill label="Currently ranked" value={ranked} accent={ranked > 0 ? '#10B981' : '#7C828C'} />
-      <StatPill label="Top 10" value={top10} accent={top10 > 0 ? '#F4D47C' : '#7C828C'} />
+      <StatPill label="Positions available" value={ranked || "—"} accent={ranked > 0 ? '#10B981' : '#7C828C'} />
+      <StatPill label="Top 10 observed" value={ranked ? top10 : "—"} accent={top10 > 0 ? '#F4D47C' : '#7C828C'} />
       <StatPill
         label={`AI mentions (${aiMode.length})`}
-        value={aiHits}
+        value={aiMode.some(s => s.current?.run_at) ? aiHits : "—"}
         accent={aiHits > 0 ? '#10B981' : '#7C828C'}
-        sub={`Top 3: ${top3}`}
+        sub={ranked ? `Organic top 3: ${top3}` : "Organic positions unavailable"}
       />
     </div>
   );
@@ -1422,7 +1347,7 @@ function SummaryStrip({ google, aiMode }: { google: Series[]; aiMode: Series[] }
 
 function StatPill({
   label, value, accent = '#F4D47C', sub,
-}: { label: string; value: number; accent?: string; sub?: string }) {
+}: { label: string; value: number | string; accent?: string; sub?: string }) {
   return (
     <div className="rounded-[12px] border border-white/10 bg-surface-2 px-4 py-3 text-center">
       <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">{label}</p>
@@ -1517,17 +1442,8 @@ function CoverageByCity({
     });
   }, [google]);
 
-  // Map-pack city lookup
-  const mapPackCities = useMemo(() => {
-    return (verifiedWins?.map_pack ?? []).map(s =>
-      s.split(/\s*[—–-]\s*/)[0].trim().toLowerCase()
-    );
-  }, [verifiedWins]);
-
-  const hasMp = (query: string) => {
-    const q = query.toLowerCase();
-    return mapPackCities.some(c => c && q.includes(c));
-  };
+  // Legacy city-only labels cannot establish query-specific map-pack positions.
+  const hasMp = (_query: string) => false;
 
   const cityScore = (rows: Series[]) => {
     const no1   = rows.filter(r => r.current?.position === 1).length;
@@ -1543,7 +1459,7 @@ function CoverageByCity({
         Coverage by Market
       </h2>
       <p className="mb-5 text-[12px] text-ink-3">
-        Where you're winning — and where the next opportunity is.
+        Available observations by market. Missing positions do not establish absence from search.
       </p>
 
       <div className="space-y-4">
@@ -1579,12 +1495,12 @@ function CoverageByCity({
                   )}
                   {ranked === 0 && (
                     <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-ink-4 uppercase tracking-[0.1em]">
-                      Not yet ranking
+                      {rankingCoverage(rows.map(s => s.current?.position)).label}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-ink-4">{ranked}/{total} in top-10</span>
+                  <span className="text-[11px] text-ink-4">{rankingCoverage(rows.map(s => s.current?.position)).label}</span>
                   {/* Mini progress bar */}
                   <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
                     <div
@@ -2175,17 +2091,18 @@ function WonJobsCard({
   return (
     <section className="mt-6 rounded-2xl border border-[#6EE7B7]/30 bg-gradient-to-br from-[#0A1410] to-surface-2 p-5 sm:p-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-        💰 Confirmed revenue · this month
+        Owner-recorded won job value · this month
       </p>
       <p className="mt-2 text-[42px] font-extrabold leading-none text-emerald-300">
         ${wonJobs.revenue_month.toLocaleString()}
       </p>
       <p className="mt-1 text-[12px] text-ink-3">
-        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} closed · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
+        {wonJobs.month} job{wonJobs.month === 1 ? '' : 's'} recorded as won · ${wonJobs.revenue_lifetime.toLocaleString()} lifetime
       </p>
+      <p className="mt-3 text-[12px] leading-relaxed text-ink-3">Recorded job values are not verified collected payments or incremental revenue. Deposits, refunds and job completion need separate records.</p>
       {recentJobs.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-4">Recent closed jobs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-4">Recent owner-recorded jobs</p>
           {recentJobs.map(j => (
             <div key={j.id} className="flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-surface px-3 py-2">
               <div className="flex items-center gap-3">
