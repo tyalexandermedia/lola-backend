@@ -509,3 +509,57 @@ p, li, dd, summary { text-wrap: pretty; }
 /* Amber form warnings (#E5A95B) are 2.2:1 on white. */
 [class*="text-[#E5A95B]"] { color: #8A5A00 !important; }
 [class*="border-[#E5A95B]"] { border-color: #B8770A !important; }
+
+/* ── Navy moments (homepage rhythm, 2026-10) ────────────────────────────────
+   The homepage was paper → paper-tint → paper → gold-tint → paper: every band
+   a shade of beige, so nothing told the eye a new chapter had started. Two
+   sections now sit on the navy accent token — the problem (tension) and the
+   closing ask (resolution) — so the scroll has a beat. Still the light site:
+   navy is the one dark accent DECISIONS.md already allows, never black.
+
+   The global remaps above were written for paper and would sabotage text on
+   navy (`.text-gold-bright` is forced to deep gold, ~3:1 on navy). Scoped
+   overrides, so anything inside a navy surface reads at AA or better. This
+   also fixes the pricing page's Recommended panel, which hit the same remap. */
+.bg-navy .text-gold-bright,
+.navy-band .text-gold-bright { color: rgb(var(--gold-bright)) !important; }
+.navy-band {
+  background-color: rgb(var(--navy));
+  background-image:
+    radial-gradient(60% 80% at 85% 0%, rgba(214, 168, 74, 0.16) 0%, transparent 60%),
+    linear-gradient(180deg, rgb(var(--navy)) 0%, rgb(var(--navy-2)) 100%);
+  color: rgb(var(--on-navy));
+}
+.navy-band .navy-hairline { border-color: rgb(var(--on-navy) / 0.14) !important; }
+.navy-band .navy-glass {
+  background-color: rgb(var(--on-navy) / 0.05) !important;
+  border-color: rgb(var(--on-navy) / 0.14) !important;
+}
+
+/* Hero texture — a faint dot grid that fades out toward the edges, so the
+   first screen reads as a designed surface rather than an empty page. */
+.bg-dot-grid {
+  background-image: radial-gradient(rgb(var(--ink) / 0.10) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(70% 60% at 40% 35%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(70% 60% at 40% 35%, #000 30%, transparent 75%);
+}
+
+/* Gold marker stroke under one phrase. A background, not a border, so it
+   wraps with the text on any line length. Static — no looping motion. */
+.mark-gold {
+  background-image: linear-gradient(transparent 70%, rgb(var(--gold-hi) / 0.55) 70%, rgb(var(--gold-hi) / 0.55) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.08em;
+}
+
+/* Cards answer the pointer with a small lift. One-shot on hover, never a loop,
+   and only where a hover exists (no sticky "lifted" card after a tap). */
+@media (hover: hover) {
+  .card-lift { transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease; }
+  .card-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-lift, .card-lift:hover { transition: none; transform: none; }
+}

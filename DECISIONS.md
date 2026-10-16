@@ -170,3 +170,25 @@ surface, or dark hex. `text-on-gold` is only ever text on a gold button.
 Re-measure the homepage at 390×844 before adding anything; keep it near 12
 screens. Re-run the route contrast scan after any palette change. The social
 image, `theme-color` and the web manifest are paper (`#FAF9F5`).
+
+## 2026-10-03 — D-016: Homepage rhythm — two navy bands on the light site
+
+**Decision.** D-015 stands: the site is light. On the homepage, exactly two
+full-bleed sections sit on the existing navy accent token (`.navy-band` in
+`frontend/src/index.css`): the problem section (tension) and the closing CTA
+(resolution). Everything between them alternates paper / `surface-2` / gold
+tint. Text inside a navy surface uses `text-on-navy`, `text-on-navy-2` and
+`text-gold-bright` only; a scoped override restores the real bright gold
+there, which the global `.text-gold-bright` remap had been forcing to deep
+gold (~3:1 on navy — this also fixes the pricing page's Recommended panel).
+Feature icons are one inline stroke-SVG set in gold, not emoji.
+
+**Why.** Every band was a shade of beige, so nothing told the eye a new
+chapter had started and the page read as one long document. Navy is the one
+dark accent D-015's tokens already allow; it is not black and it is not the
+dark theme. Measured at 390×844: 11.4 screens (was 11.2), no horizontal
+scroll at 320px, production build and SEO check green.
+
+**Consequences.** No third navy band on the homepage — two is the rhythm, more
+is the dark theme again. No new looping motion (hover lift only, disabled for
+reduced motion). Copy, prices, claims and `/lp/*` are untouched by this change.

@@ -134,6 +134,9 @@ function Hero() {
         aria-hidden
         className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.13)_0%,transparent_62%)] blur-2xl sm:left-1/3"
       />
+      {/* Faint dot grid under the statement — texture, not decoration. It
+          masks out toward the edges, so it never frames the card or the copy. */}
+      <div aria-hidden className="bg-dot-grid pointer-events-none absolute -left-6 -top-8 -z-10 h-[560px] w-full max-w-[760px]" />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-14">
         {/* LEFT — the statement */}
         <div className="animate-slide-up">
@@ -156,7 +159,7 @@ function Hero() {
               // man and a dog at sunset rather than a face — the right warm
               // signal from the only photo that exists, but a real headshot
               // would be materially better here.
-              className="h-11 w-11 shrink-0 rounded-full border border-gold/40 object-cover [object-position:center_52%]"
+              className="h-12 w-12 shrink-0 rounded-full border-2 border-surface object-cover shadow-[0_0_0_2px_rgb(var(--gold)/0.55)] [object-position:center_52%]"
             />
             <span className="min-w-0">
               <span className="block text-[13.5px] font-semibold leading-tight text-ink">
@@ -176,9 +179,11 @@ function Hero() {
               card's price row sat under it — the first screen ended without
               the price. The card's bottom must clear ~570px on a 390-wide
               phone; re-measure before adding anything above it. */}
-          <h1 className="mt-3 text-balance font-display text-[30px] font-bold leading-[1.03] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[60px]">
+          <h1 className="mt-3 text-balance font-display text-[30px] font-bold leading-[1.03] tracking-[-0.03em] text-ink sm:text-[52px] lg:text-[64px]">
             Your next customer already searched for you.
-            <span className="mt-2 block text-gold">Did you show up?</span>
+            <span className="mt-2 block text-gold">
+              Did you <span className="mark-gold text-ink">show up?</span>
+            </span>
           </h1>
 
           {/* ONE line, not four.
@@ -567,16 +572,22 @@ function ReportCard() {
    ───────────────────────────────────────────────────────────────────────── */
 function ProblemSection() {
   return (
-    <section className="mt-14 sm:mt-20">
-      <SectionHead kicker="What's going wrong" />
+    // The first navy band. This is the tension beat of the page — the sale
+    // you never knew you lost — and it used to sit on the same paper as the
+    // letter above it, so nothing marked the turn. On navy the two mocks read
+    // as what they are: screens, lit up, showing someone else winning.
+    <section className="navy-band relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen overflow-hidden py-12 sm:mt-20 sm:py-20">
+      <div className="mx-auto max-w-[1120px] px-5 sm:px-6">
+      <SectionHead kicker="What's going wrong" onNavy />
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14">
         <div>
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
-            Right now, someone near you is asking for exactly what you sell.
+          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-on-navy sm:text-[44px]">
+            Right now, someone near you is asking for{' '}
+            <span className="text-gold-bright">exactly what you sell.</span>
           </h2>
-          <p className="mt-6 text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
+          <p className="mt-6 max-w-[34ch] text-[16px] leading-[1.65] text-on-navy-2 sm:text-[18px]">
             If you're not in the answer, they hire someone else. You never find out the
-            sale existed — <span className="font-semibold text-ink">and neither do they.</span>
+            sale existed — <span className="font-semibold text-on-navy">and neither do they.</span>
           </p>
         </div>
 
@@ -587,13 +598,18 @@ function ProblemSection() {
             a word, and on a phone this is the first thing after the letter
             that isn't a paragraph. No invented names, ratings or counts — the
             competitors are grey placeholder bars, which is the honest way to
-            draw "someone else". */}
-        <div className="space-y-4">
-          <SearchMock query="best pressure washing company near me" />
-          <ChatMock
-            query="who should I hire to soft-wash my house in Tampa?"
-            answer="Based on reviews and local presence, I’d recommend"
-          />
+            draw "someone else". The slight offset on desktop stacks them like
+            two phones on a table instead of two boxes in a column. */}
+        <div className="space-y-4 lg:space-y-0">
+          <div className="lg:mr-10">
+            <SearchMock query="best pressure washing company near me" />
+          </div>
+          <div className="lg:-mt-6 lg:ml-10">
+            <ChatMock
+              query="who should I hire to soft-wash my house in Tampa?"
+              answer="Based on reviews and local presence, I’d recommend"
+            />
+          </div>
         </div>
       </div>
 
@@ -602,33 +618,34 @@ function ProblemSection() {
           the FAQ ("Is there a guarantee?", "Can you actually guarantee
           leads?"), the promise is in the hero line and the letter, and this
           was 450px more to scroll before the reader reached what they get. */}
-      <div className="mt-12 hidden grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid sm:grid-cols-2">
-        <div className="bg-surface p-6 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.08em] text-gold">
+      <div className="mt-14 hidden grid-cols-1 gap-4 sm:grid sm:grid-cols-2">
+        <div className="navy-glass rounded-xl border p-6 sm:p-7">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gold-bright">
             ✓ What I guarantee
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-on-navy">
             {GUARANTEE.short}
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
+          <p className="mt-3 text-[15px] leading-[1.6] text-on-navy-2">
             The commitment covers the agreed work, not a ranking, lead count or AI recommendation.
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/[0.06] px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-gold">
+          <p className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold-bright/40 px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-gold-bright">
             {GUARANTEE.emoji} {GUARANTEE.title}
           </p>
         </div>
 
-        <div className="bg-surface p-6 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-3">
+        <div className="navy-glass rounded-xl border p-6 sm:p-7">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-on-navy-2">
             ✗ What I won't fake
           </p>
-          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-ink">
+          <p className="mt-4 text-[18px] font-semibold leading-[1.4] text-on-navy">
             Specific rankings, lead counts or AI recommendations.
           </p>
-          <p className="mt-3 text-[15px] leading-[1.6] text-ink-2">
+          <p className="mt-3 text-[15px] leading-[1.6] text-on-navy-2">
             We improve visibility and follow-up. Results depend on your market, customer demand and how inquiries are handled.
           </p>
         </div>
+      </div>
       </div>
     </section>
   );
@@ -637,8 +654,8 @@ function ProblemSection() {
 /** Shared chrome for the two "what the customer sees" mocks. */
 function MockFrame({ engine, glyph, children }: { engine: string; glyph: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-surface p-4 sm:p-5">
-      <div className="flex items-center gap-2 border-b border-white/[0.07] pb-3">
+    <div className="rounded-xl border border-black/[0.08] bg-surface p-4 shadow-[0_24px_60px_-24px_rgba(5,10,25,0.65)] sm:p-5">
+      <div className="flex items-center gap-2 border-b border-black/[0.07] pb-3">
         <span aria-hidden className="text-[11px] text-gold">{glyph}</span>
         <span className="text-[10px] uppercase tracking-[0.08em] text-ink-3">{engine}</span>
       </div>
@@ -743,8 +760,8 @@ function ProofSection() {
   return (
     <section className="mt-14 sm:mt-20">
       <SectionHead kicker="Don't take my word for it" />
-      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
-        See the work and the evidence.
+      <h2 className="mt-8 max-w-[820px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px]">
+        See the work <span className="text-gold">and the evidence.</span>
       </h2>
       <p className="mt-5 max-w-[680px] text-[16px] leading-[1.65] text-ink-2 sm:text-[17px]">
         See completed work, dated measurements and what still needs attention. Missing data is labeled unavailable; manual observations are identified separately.
@@ -754,10 +771,24 @@ function ProofSection() {
         {/* the receipts */}
         <a
           href="/r/client/sandbar"
-          className="group flex flex-col rounded-xl border border-gold/30 bg-surface p-6 transition-colors hover:border-gold/60 sm:p-7"
+          className="card-lift group flex flex-col overflow-hidden rounded-xl border border-gold/30 bg-surface hover:border-gold/60"
         >
-          <p className="text-[11px] uppercase tracking-[0.08em] text-gold">
-            Live client dashboard
+          {/* Browser chrome with the dashboard's real address — the link IS the
+              proof, so the card is drawn as the page it opens. */}
+          <span aria-hidden className="flex items-center gap-3 border-b border-black/[0.07] bg-surface-2 px-4 py-2.5">
+            <span className="flex gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-black/[0.14]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-black/[0.14]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-black/[0.14]" />
+            </span>
+            <span className="min-w-0 flex-1 truncate rounded-md bg-surface px-2.5 py-1 text-[11.5px] text-ink-3">
+              coachtyleads.com/r/client/sandbar
+            </span>
+          </span>
+          <span className="flex flex-1 flex-col p-6 sm:p-7">
+          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-ok">
+            <span aria-hidden className="h-2 w-2 rounded-full bg-ok shadow-[0_0_0_3px_rgb(var(--ok)/0.18)]" />
+            Live client dashboard · no login
           </p>
           <p className="mt-4 text-[19px] font-semibold leading-[1.35] text-ink">
             Sandbar Soft Wash — our original implementation.
@@ -765,9 +796,10 @@ function ProofSection() {
           <p className="mt-3 flex-1 text-[15px] leading-[1.6] text-ink-2">
             My father’s Holiday-based soft-wash business. Follow the website, visibility and lead-handoff work, with measured results distinguished from implementation progress.
           </p>
-          <span className="mt-5 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-gold">
+          <span className="mt-5 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-gold">
             Open the dashboard
             <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
           </span>
         </a>
 
@@ -777,7 +809,7 @@ function ProofSection() {
             this card was the fifth copy of one button. */}
         <a
           href="/growth-score"
-          className="group hidden flex-col rounded-xl border border-white/12 bg-surface p-6 transition-colors hover:border-gold/40 sm:p-7 lg:flex"
+          className="card-lift group hidden flex-col rounded-xl border border-dashed border-gold/40 bg-gold/[0.04] p-6 hover:border-gold/70 sm:p-7 lg:flex"
         >
           <p className="text-[11px] uppercase tracking-[0.08em] text-ink-3">
             Or skip my proof entirely
@@ -839,8 +871,13 @@ function StorySection() {
             (the wide original had a ceiling of gym lights and a second player
             at the edge); the photographer is credited in the caption at every
             size. Used with the photographer's okay. */}
-        <figure className="order-1 sm:col-start-1 sm:row-start-1">
-          <div className="overflow-hidden rounded-xl border border-gold/25">
+        <figure className="order-1 sm:col-start-1 sm:row-start-1 sm:sticky sm:top-24">
+          {/* Offset gold frame behind the portrait — a print-magazine move
+              that makes the one real photo on the page feel placed, not
+              dropped in. Decorative; the frame sits under the image. */}
+          <div className="relative">
+          <span aria-hidden className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-xl border-2 border-gold/45 sm:translate-x-3.5 sm:translate-y-3.5" />
+          <div className="relative overflow-hidden rounded-xl shadow-lift">
             <img
               src="/images/ty-coaching-gym.jpg"
               alt="Ty Alexander Traufield — Coach Ty — coaching from the sideline at a basketball gym in Florida"
@@ -850,15 +887,16 @@ function StorySection() {
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
-          <figcaption className="mt-2 text-[11px] uppercase tracking-[0.14em] text-ink-3">
+          </div>
+          <figcaption className="mt-5 text-[11px] uppercase tracking-[0.14em] text-ink-3">
             Coach Ty · Photo: Florida&apos;s Sports Coast
           </figcaption>
         </figure>
 
         {/* the letter */}
         <div className="order-2 sm:col-start-2 sm:row-start-1 sm:row-span-2">
-          <h2 className="font-display text-[30px] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[40px]">
-            Hey — I'm Ty.
+          <h2 className="font-display text-[34px] font-bold leading-[1.04] tracking-[-0.03em] text-ink sm:text-[52px]">
+            Hey — I'm <span className="mark-gold">Ty.</span>
           </h2>
 
           {/* max-w keeps the letter at a readable ~70 characters per line. */}
@@ -910,7 +948,7 @@ function StorySection() {
                 right level of detail on /pricing, but it turns the hardest-
                 hitting line in the letter into a procedure. The terms live one
                 click away; this paragraph only has to land the promise. */}
-            <p className="border-l-2 border-gold pl-4 text-ink">
+            <p className="rounded-r-lg border-l-[3px] border-gold bg-gold/[0.06] py-3 pl-4 pr-4 text-ink">
               What I'm not: a $5K-a-month agency hiding behind a dashboard. I answer my own phone.
               I do the work myself.{' '}
               <span className="font-bold text-gold">{GUARANTEE.short}</span> In writing.
@@ -938,7 +976,7 @@ function StorySection() {
             {/* The whole sign-off. Name, title and location used to follow
                 here — the footer carries those same three lines word for word,
                 and the hero byline already says Coach Ty · Tampa Bay. */}
-            <p className="font-display text-[20px] text-gold">— {FOUNDER.knownAs}</p>
+            <p className="font-display text-[26px] font-bold tracking-[-0.02em] text-gold">— {FOUNDER.knownAs}</p>
           </div>
 
         </div>
@@ -1206,7 +1244,7 @@ function OfferSection() {
       {/* free step */}
       <a
         href="/growth-score"
-        className="group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-surface p-5 transition-colors hover:bg-gold/[0.06] sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        className="card-lift group mt-8 flex flex-col gap-3 rounded-xl border border-gold/30 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
       >
         <div className="flex items-center gap-4">
           <span className="font-display text-[26px] font-bold text-gold">00</span>
@@ -1236,15 +1274,25 @@ function OfferSection() {
 
 function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; featured?: boolean }) {
   return (
+    // Featured: a 1px gold gradient ring (the wrapper's padding) around the
+    // card, plus a soft gold glow — the one card on the page that asks for
+    // money is the one that looks like it's worth something.
     <div
-      className={`flex flex-col rounded-xl border p-5 sm:p-7 ${
-        featured ? 'border-gold/50 bg-surface' : 'border-white/12 bg-[#0B0B0D]'
+      className={`flex flex-col rounded-2xl p-5 sm:p-7 ${
+        featured
+          ? 'relative bg-surface shadow-[0_0_0_1px_rgb(var(--gold)/0.55),0_30px_70px_-30px_rgb(var(--gold)/0.45)]'
+          : 'border border-white/12 bg-[#0B0B0D]'
       }`}
     >
+      {featured && (
+        <span className="absolute -top-3 left-5 rounded-full bg-gradient-to-r from-gold to-gold-bright px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] text-on-gold shadow-glow sm:left-7">
+          The full system
+        </span>
+      )}
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[12px] uppercase tracking-[0.08em] text-ink">{tier.name}</p>
       </div>
-      <p className="mt-4 font-display text-[40px] font-bold leading-none tracking-[-0.02em] text-ink">
+      <p className="mt-4 font-display text-[48px] font-bold leading-none tracking-[-0.03em] text-ink sm:text-[56px]">
         {tier.price}
         <span className="ml-2 text-[12px] font-normal uppercase tracking-[0.14em] text-ink-3">{tier.period}</span>
       </p>
@@ -1268,11 +1316,11 @@ function TierCard({ tier, href, featured }: { tier: typeof PLAN; href: string; f
 
       <a
         href={href}
-        className={`mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors ${
+        className={
           featured
-            ? 'bg-gold text-on-gold hover:bg-gold-bright'
-            : 'border border-white/15 text-ink hover:border-gold/60 hover:text-gold'
-        }`}
+            ? `${GOLD_CTA} mt-6 px-6 py-3`
+            : 'mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3 text-[13px] font-bold uppercase tracking-[0.06em] text-ink transition-colors hover:border-gold/60 hover:text-gold'
+        }
       >
         {tier.cta} <span aria-hidden>→</span>
       </a>
@@ -1304,16 +1352,26 @@ function FaqSection() {
    ───────────────────────────────────────────────────────────────────────── */
 function FinalCta() {
   return (
-    // bg-surface-2 (was bg-black, remapped): the footer is the same surface and
-    // sits flush beneath this on the homepage, so the two read as one closing
-    // block instead of grey / a strip of paper / grey.
-    <section className="relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen border-t border-gold/30 bg-surface-2 py-12 sm:mt-20 sm:py-16">
+    // The second navy band, bookending the first: the problem was posed on
+    // navy, the answer is asked for on navy. The footer below stays paper-
+    // tint, so the page ends on one strong block and then a quiet floor.
+    <section className="navy-band relative left-1/2 right-1/2 mt-14 -mx-[50vw] w-screen overflow-hidden py-14 sm:mt-20 sm:py-24">
       <div className="mx-auto max-w-[1120px] px-5 text-center sm:px-6">
-        <p className="text-[11px] uppercase tracking-[0.1em] text-gold">Your next customer is searching right now</p>
-        <h2 className="mx-auto mt-5 max-w-[760px] font-display text-[32px] font-bold leading-[1.05] tracking-[-0.02em] text-ink sm:text-[48px]">
-          Make sure the answer is you.
+        {/* Ty and Lola — the same photo as the hero byline, so the page closes
+            on the two faces it opened with. */}
+        <img
+          src="/images/ty-lola-beach.jpg"
+          alt=""
+          width={96}
+          height={96}
+          loading="lazy"
+          className="mx-auto h-16 w-16 rounded-full border-2 border-gold-bright/70 object-cover [object-position:center_52%] sm:h-20 sm:w-20"
+        />
+        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-bright">Your next customer is searching right now</p>
+        <h2 className="mx-auto mt-4 max-w-[760px] font-display text-[34px] font-bold leading-[1.02] tracking-[-0.03em] text-on-navy sm:text-[60px]">
+          Make sure the answer is <span className="text-gold-bright">you.</span>
         </h2>
-        <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-2">
+        <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.6] text-on-navy-2">
           Complete the free one-minute form, then open your report. No card or account needed.
           {/* Desktop only: this sentence describes the Start button, which
               phones don't show here (the sticky bar carries it). */}
@@ -1332,7 +1390,7 @@ function FinalCta() {
               thumb-width below this exact button. */}
           <a
             href={START}
-            className="hidden min-h-[56px] items-center justify-center rounded-lg border border-gold/35 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/[0.08] sm:inline-flex"
+            className="hidden min-h-[56px] items-center justify-center rounded-lg border border-gold-bright/50 px-8 py-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-gold-bright transition-colors hover:border-gold-bright hover:bg-gold-bright/10 sm:inline-flex"
           >
             Start now — {PLAN.price}{PLAN.period}
           </a>
@@ -1349,11 +1407,25 @@ function FinalCta() {
  * contractor on a phone, not a developer. A gold dot and a plainly readable
  * label carry the same structure without the terminal costume.
  */
-function SectionHead({ kicker }: { kicker: string }) {
+function SectionHead({ kicker, onNavy = false }: { kicker: string; onNavy?: boolean }) {
+  // The paw sits in a small tinted disc and a hairline runs out to the right,
+  // so each section opens on a designed mark instead of a loose line of text.
   return (
-    <div className="flex items-center gap-2.5">
-      <PawMark className="shrink-0 text-gold" />
-      <span className="text-[14px] font-semibold text-gold sm:text-[15px]">{kicker}</span>
+    <div className="flex items-center gap-3">
+      <span
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+          onNavy ? 'bg-gold-bright/15 text-gold-bright' : 'bg-gold/[0.10] text-gold'
+        }`}
+      >
+        <PawMark />
+      </span>
+      <span className={`text-[14px] font-semibold sm:text-[15px] ${onNavy ? 'text-gold-bright' : 'text-gold'}`}>
+        {kicker}
+      </span>
+      <span
+        aria-hidden
+        className={`h-px max-w-[220px] flex-1 bg-gradient-to-r ${onNavy ? 'from-gold-bright/40' : 'from-gold/35'} to-transparent`}
+      />
     </div>
   );
 }
