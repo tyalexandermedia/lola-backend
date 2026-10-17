@@ -264,8 +264,17 @@ function HeroVerdict({ data }: { data: DashboardPayload }) {
   const wonMonth = data.won_jobs?.month ?? 0;
   const collected = data.won_jobs?.revenue_month ?? 0;
 
-  const stats: Array<{ key: string; value: string; label: string; accent?: boolean }> = [];
-  if (contacts > 0) stats.push({ key: 'contacts', value: fmtNum(contacts), label: contacts === 1 ? 'new contact' : 'new contacts' });
+  // The ONLY field with a real prior period in the payload is contacts
+  // (tracking_trends carries prev_month for calls + leads). Won and collected
+  // have no prior series, so they get NO delta — never an invented one.
+  const tr = data.tracking_trends;
+  const hasPrior = !!(tr && (tr.call || tr.lead));
+  const prevContacts = (tr?.call?.prev_month ?? 0) + (tr?.lead?.prev_month ?? 0);
+  const contactsDelta = contacts - prevContacts;
+
+  type HeroStat = { key: string; value: string; label: string; accent?: boolean; delta?: number };
+  const stats: HeroStat[] = [];
+  if (contacts > 0) stats.push({ key: 'contacts', value: fmtNum(contacts), label: contacts === 1 ? 'new contact' : 'new contacts', delta: hasPrior ? contactsDelta : undefined });
   if (wonMonth > 0) stats.push({ key: 'won', value: fmtNum(wonMonth), label: wonMonth === 1 ? 'job won' : 'jobs won' });
   if (collected > 0) stats.push({ key: 'collected', value: fmtMoney(collected), label: 'collected', accent: true });
 
@@ -288,6 +297,23 @@ function HeroVerdict({ data }: { data: DashboardPayload }) {
                   {s.value}
                 </span>
                 <span className="text-[13px] font-medium text-ink-3">{s.label}</span>
+                {s.delta !== undefined && (
+                  <span
+                    className={`ml-1.5 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                      s.delta > 0
+                        ? 'bg-emerald-500/[0.12] text-emerald-300'
+                        : s.delta < 0
+                        ? 'bg-[#FCA5A5]/[0.12] text-[#FCA5A5]'
+                        : 'text-ink-4'
+                    }`}
+                  >
+                    {s.delta > 0
+                      ? `▲ ${s.delta} vs last month`
+                      : s.delta < 0
+                      ? `▼ ${Math.abs(s.delta)} vs last month`
+                      : 'flat vs last month'}
+                  </span>
+                )}
               </span>
             ))}
           </div>
@@ -586,6 +612,7 @@ function MoneyTile({
   sub,
   source,
   accent = false,
+  wide = false,
 }: {
   label: string;
   value: number;
@@ -593,15 +620,25 @@ function MoneyTile({
   sub?: string;
   source?: string;
   accent?: boolean;
+  wide?: boolean;
 }) {
   const shown = useCountUp(value);
   const text = format === 'currency' ? fmtMoney(shown) : fmtNum(shown);
   return (
-    <div className="rounded-xl border border-gold/15 bg-surface p-3.5 shadow-lift transition duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-glow motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+    <div
+      className={`relative overflow-hidden rounded-xl border bg-surface p-4 shadow-lift transition duration-200 hover:-translate-y-0.5 hover:shadow-glow motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
+        accent ? 'border-gold/35 hover:border-gold/60' : 'border-gold/15 hover:border-gold/40'
+      } ${wide ? 'col-span-2' : ''}`}
+    >
+      {accent && (
+        <span aria-hidden className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />
+      )}
       <p className="text-[12px] font-medium text-ink-3">{label}</p>
       <p
-        className={`mt-2 font-display text-[26px] font-bold leading-none tabular-nums sm:text-[29px] ${
-          accent ? 'text-gold' : 'text-ink'
+        className={`mt-2 font-display font-bold leading-none tabular-nums ${
+          accent
+            ? 'bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[32px] text-transparent sm:text-[38px]'
+            : 'text-[24px] text-ink sm:text-[27px]'
         }`}
       >
         {text}
@@ -1419,7 +1456,7 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
       <div className="p-4 sm:p-5">
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {tiles.map((t) => (
-            <MoneyTile key={t.label} label={t.label} value={t.value} format={t.format} sub={t.sub} source="GoHighLevel" accent={t.accent} />
+            <MoneyTile key={t.label} label={t.label} value={t.value} format={t.format} sub={t.sub} source="GoHighLevel" accent={t.accent} wide={t.accent} />
           ))}
         </div>
         {showRing && (
