@@ -92,10 +92,232 @@ interface ShareOfVoice {
   queries_tracked: number;
 }
 
+// ── Honest demo payload ──────────────────────────────────────────────────────
+// Representative SAMPLE data for a fictional contractor, served by /r/client/demo
+// so the full experience can be shown in a sales conversation WITHOUT exposing a
+// real client. Always rendered behind a persistent "Demo · sample data" badge; it
+// is never presented as, or mistakable for, a real client's numbers.
+const _demoRun = new Date().toISOString();
+const DEMO_PAYLOAD: DashboardPayload = {
+  slug: 'demo',
+  client_name: 'Riverside Pressure Washing',
+  target_url: 'https://riverside-pressure.example',
+  generated_at: _demoRun,
+  google: [
+    { query: 'pressure washing riverside', source: 'google_organic', run_count: 12,
+      current: { position: 2, mentioned: true, run_at: _demoRun },
+      history: [ { position: 7, mentioned: true, run_at: _demoRun }, { position: 4, mentioned: true, run_at: _demoRun }, { position: 2, mentioned: true, run_at: _demoRun } ] },
+    { query: 'house washing near me', source: 'google_organic', run_count: 12,
+      current: { position: 3, mentioned: true, run_at: _demoRun },
+      history: [ { position: 9, mentioned: true, run_at: _demoRun }, { position: 5, mentioned: true, run_at: _demoRun }, { position: 3, mentioned: true, run_at: _demoRun } ] },
+    { query: 'driveway cleaning riverside', source: 'google_organic', run_count: 12,
+      current: { position: 1, mentioned: true, run_at: _demoRun },
+      history: [ { position: 6, mentioned: true, run_at: _demoRun }, { position: 2, mentioned: true, run_at: _demoRun }, { position: 1, mentioned: true, run_at: _demoRun } ] },
+  ],
+  ai_mode: [
+    { query: 'best pressure washing company riverside', source: 'claude_ai_mode', run_count: 8,
+      current: { position: null, mentioned: true, run_at: _demoRun },
+      history: [ { position: null, mentioned: false, run_at: _demoRun }, { position: null, mentioned: true, run_at: _demoRun } ] },
+  ],
+  verified_wins: { organic: ['pressure washing riverside', 'driveway cleaning riverside'], map_pack: ['house washing near me'] },
+  integrations: { callrail: true, ga4_measurement_protocol: true, rankings_tracker: true, gbp: true, bing: false },
+  implementation: {
+    done: [
+      { title: 'Rebuilt the Google Business Profile across 18 service areas', category: 'Local SEO', detail: null, url: null, week_of: null, created_at: _demoRun },
+      { title: 'Published 4 service-area landing pages', category: 'Content', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    in_progress: [
+      { title: 'Review-request automation for completed jobs', category: 'Reviews', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    next_up: [
+      { title: 'Schema markup on every service page', category: 'Technical', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    counts: { 'Local SEO': 6, Content: 5, Reviews: 3, Technical: 4 },
+    total_done: 18,
+  },
+  tracking: {
+    call: { month: 18, last_30d: 18, lifetime: 214 },
+    lead: { month: 14, last_30d: 14, lifetime: 168 },
+  },
+  tracking_trends: {
+    call: { month: 18, prev_month: 13, delta: 5, arrow: '↑' },
+    lead: { month: 14, prev_month: 11, delta: 3, arrow: '↑' },
+  },
+  reviews: { month: 4, lifetime: 37, google_routed_month: 4 },
+  gbp_performance: { calls: 62, website_clicks: 138, direction_requests: 44, impressions: 5120, window_days: 30 },
+  bing: null,
+  lead_sources: { 'Google Business Profile': 19, 'Organic search': 11, 'Website form': 8, Referral: 9 },
+  cwv_trend: [
+    { performance: 72, accessibility: 95, seo: 92, run_at: _demoRun },
+    { performance: 84, accessibility: 97, seo: 100, run_at: _demoRun },
+    { performance: 91, accessibility: 98, seo: 100, run_at: _demoRun },
+  ],
+  won_jobs: {
+    month: 6, lifetime: 41,
+    revenue_month: 11250, revenue_lifetime: 78900,
+    jobs: [
+      { id: 1, job_value: 2800, service_type: 'House wash + driveway', source: 'Google Business Profile', created_at: _demoRun },
+      { id: 2, job_value: 1950, service_type: 'Commercial storefront', source: 'Organic search', created_at: _demoRun },
+      { id: 3, job_value: 3400, service_type: 'Full exterior package', source: 'Referral', created_at: _demoRun },
+    ],
+  },
+  revenue_agent: {
+    contacts: 47,
+    pipeline_value: 18400,
+    won_revenue: 11250,
+    open_actions: 3,
+    opportunities: { new: 6, qualified: 4, estimate_sent: 5, won: 9 },
+    estimates: { sent: 5 },
+  },
+};
+
+/** Persistent, unmistakable marker that a view is demo / sample data, not a real
+ *  client. Required by the honesty rule whenever sample data is shown. */
+function DemoBadge() {
+  return (
+    <div className="no-print mb-4 flex items-center justify-center gap-2 rounded-xl border border-gold/40 bg-gold/[0.10] px-4 py-2.5 text-center">
+      <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-gold" style={{ boxShadow: '0 0 0 4px rgb(var(--gold) / 0.18)' }} />
+      <span className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-gold-bright">
+        Demo · sample data — not a real client
+      </span>
+    </div>
+  );
+}
+
+/** One shimmer block for the loading skeleton; pulse is off under reduced motion. */
+function SkelBlock({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-xl motion-reduce:animate-none ${className}`}
+      style={{ backgroundColor: 'rgb(var(--ink) / 0.07)' }}
+    />
+  );
+}
+
+/** Premium loading state that mirrors the real layout, so the dashboard never
+ *  reads as broken while the live payload is fetched. */
+function DashboardSkeleton() {
+  return (
+    <main className="mx-auto w-full max-w-4xl py-6 sm:py-10" aria-busy="true" aria-label="Loading dashboard">
+      <SkelBlock className="mb-5 h-24 w-full sm:h-28" />
+      <SkelBlock className="mb-6 h-11 w-full max-w-[280px]" />
+      <SkelBlock className="mb-5 h-28 w-full" />
+      <SkelBlock className="mb-5 h-40 w-full" />
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+      </div>
+      <p className="mt-6 text-center text-[13px] text-ink-4">Loading your command center…</p>
+    </main>
+  );
+}
+
+/** Calm, branded error state with a retry — never a bare "not found" in front of
+ *  a prospect. */
+function DashboardError({ message, onRetry }: { message: string | null; onRetry: () => void }) {
+  const notFound = !!message && /no dashboard exists/i.test(message);
+  return (
+    <main className="mx-auto flex min-h-[60vh] w-full max-w-4xl flex-col items-center justify-center px-6 py-12 text-center">
+      <span
+        aria-hidden
+        className="grid h-14 w-14 place-items-center rounded-2xl border border-gold/30 font-display text-[26px] font-bold text-gold"
+        style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--gold) / 0.18), rgb(var(--gold) / 0.04))' }}
+      >
+        L
+      </span>
+      <h1 className="mt-5 font-display text-[22px] font-bold text-ink sm:text-[26px]">
+        {notFound ? 'Dashboard not found' : 'Couldn’t load your dashboard'}
+      </h1>
+      <p className="mt-2 max-w-[420px] text-[14px] leading-[1.55] text-ink-3">
+        {notFound
+          ? 'That link doesn’t point to a live dashboard yet. Double-check the address, or ask Ty for your link.'
+          : 'That’s on our end, not yours — the connection dropped. Give it another try.'}
+      </p>
+      {!notFound && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-6 inline-flex min-h-[44px] items-center rounded-full bg-gold px-6 text-[13px] font-bold text-on-gold shadow-lift transition duration-200 hover:shadow-glow motion-reduce:transition-none"
+        >
+          Try again
+        </button>
+      )}
+      <p className="mt-8 text-[12px] text-ink-4">powered by Lola SEO</p>
+    </main>
+  );
+}
+
+/**
+ * HERO VERDICT — the one-glance "how am I doing this month" answer at the very top
+ * of Today, built ONLY from real payload fields: contacts (calls + quote forms
+ * this month), jobs won this month, and dollars collected this month. A stat is
+ * shown only when its field is > 0; when nothing has happened yet it falls back to
+ * a confident day-one line instead of a wall of zeros. No fabricated figures.
+ */
+function HeroVerdict({ data }: { data: DashboardPayload }) {
+  const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
+  const calls = data.tracking?.call?.month ?? 0;
+  const leads = data.tracking?.lead?.month ?? 0;
+  const contacts = calls + leads;
+  const wonMonth = data.won_jobs?.month ?? 0;
+  const collected = data.won_jobs?.revenue_month ?? 0;
+
+  const stats: Array<{ key: string; value: string; label: string; accent?: boolean }> = [];
+  if (contacts > 0) stats.push({ key: 'contacts', value: fmtNum(contacts), label: contacts === 1 ? 'new contact' : 'new contacts' });
+  if (wonMonth > 0) stats.push({ key: 'won', value: fmtNum(wonMonth), label: wonMonth === 1 ? 'job won' : 'jobs won' });
+  if (collected > 0) stats.push({ key: 'collected', value: fmtMoney(collected), label: 'collected', accent: true });
+
+  return (
+    <section
+      className="mb-5 overflow-hidden rounded-2xl border border-gold/30 bg-surface-2 p-6 shadow-lift sm:p-7"
+      style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 55%, rgb(var(--gold) / 0.10) 100%)' }}
+    >
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{monthLabel} at a glance</p>
+      {stats.length > 0 ? (
+        <>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-7 gap-y-2">
+            {stats.map((s) => (
+              <span key={s.key} className="flex items-baseline gap-2">
+                <span
+                  className={`font-display text-[30px] font-bold leading-none tabular-nums sm:text-[36px] ${
+                    s.accent ? 'bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent' : 'text-ink'
+                  }`}
+                >
+                  {s.value}
+                </span>
+                <span className="text-[13px] font-medium text-ink-3">{s.label}</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-3 text-[13.5px] leading-[1.55] text-ink-2">
+            Every lead you’ve paid for, tracked to the dollar — so none slip through.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2 className="mt-2 font-display text-[22px] font-bold leading-snug text-ink sm:text-[26px]">
+            Set up and watching your pipeline.
+          </h2>
+          <p className="mt-2 text-[13.5px] leading-[1.55] text-ink-2">
+            Your first numbers land here the moment a call or quote request comes in — nothing you’ve paid for slips through.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function ClientReport({ slug }: { slug: string }) {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(0);
+  // Honest demo mode: /r/client/demo renders representative SAMPLE data (never a
+  // real client) behind a persistent "Demo · sample data" badge, so the full
+  // experience can be shown in a sales conversation without exposing anyone.
+  const isDemo = slug === 'demo';
 
   // A client's private retainer dashboard — their rankings, call volume and
   // revenue. Same reasoning as the audit reports: never a search result.
@@ -107,6 +329,14 @@ export default function ClientReport({ slug }: { slug: string }) {
 
   useEffect(() => {
     let cancelled = false;
+    // Demo short-circuits the network entirely — representative sample data,
+    // clearly badged, never a real client's numbers.
+    if (isDemo) {
+      setData(DEMO_PAYLOAD);
+      setError(null);
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
     setLoading(true);
     setError(null);
     // On Vercel preview domains the production API is cross-origin and CORS-blocked,
@@ -125,7 +355,7 @@ export default function ClientReport({ slug }: { slug: string }) {
       .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, reload, isDemo]);
 
   // Two-view toggle for a non-technical owner: "today" (essentials, ~one screen)
   // vs "full" (every deeper section). Remembered per browser; default "today".
@@ -145,21 +375,8 @@ export default function ClientReport({ slug }: { slug: string }) {
     }
   };
 
-  if (loading) {
-    return (
-      <main className="mx-auto w-full max-w-4xl py-12 text-center text-ink-3">
-        Loading client dashboard…
-      </main>
-    );
-  }
-  if (error || !data) {
-    return (
-      <main className="mx-auto w-full max-w-4xl py-12 text-center">
-        <h1 className="text-2xl font-bold text-ink">Dashboard not found</h1>
-        <p className="mt-3 text-[14px] text-ink-3">{error}</p>
-      </main>
-    );
-  }
+  if (loading) return <DashboardSkeleton />;
+  if (error || !data) return <DashboardError message={error} onRetry={() => setReload((n) => n + 1)} />;
 
   // Pre-compute "does this section have anything worth showing" so we can
   // hide whole strips of zero-state cards (the dashboard looked broken when
@@ -189,6 +406,7 @@ export default function ClientReport({ slug }: { slug: string }) {
 
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
+      {isDemo && <DemoBadge />}
       <Header data={data} />
 
       {/* Two views for a non-technical owner: "Today" is the essentials on roughly
@@ -198,6 +416,8 @@ export default function ClientReport({ slug }: { slug: string }) {
       {view === 'today' ? (
         /* ── TODAY — owner essentials, ~one screen ──────────────────────────── */
         <>
+          {/* The one-glance "how am I doing this month" verdict — real payload fields only. */}
+          <HeroVerdict data={data} />
           {/* The single most important next step, from live revenue-agent fields
               only. Renders nothing when the agent isn't connected; a calm cleared
               state when it is connected and there's nothing outstanding. */}
