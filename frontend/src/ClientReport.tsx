@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { FOUNDER } from './lib/lola';
 import { useSeo } from './lib/seo';
@@ -439,23 +439,25 @@ export default function ClientReport({ slug }: { slug: string }) {
           one screen; "Full report" is every deeper section. Choice persists. */}
       <ViewToggle view={view} onChange={chooseView} />
 
+      {/* Keyed on view so switching Today/Full replays the entrance reveal. */}
+      <div key={view}>
       {view === 'today' ? (
         /* ── TODAY — owner essentials, ~one screen ──────────────────────────── */
         <>
           {/* The one-glance "how am I doing this month" verdict — real payload fields only. */}
-          <HeroVerdict data={data} />
+          <Reveal index={0}><HeroVerdict data={data} /></Reveal>
           {/* The single most important next step, from live revenue-agent fields
               only. Renders nothing when the agent isn't connected; a calm cleared
               state when it is connected and there's nothing outstanding. */}
-          <NeedsYouToday data={data} />
+          <Reveal index={1}><NeedsYouToday data={data} /></Reveal>
           {/* The money, live from the pipeline — stat tiles + conversion ring. */}
-          {data.revenue_agent && <RevenueAgentCard revenue={data.revenue_agent} />}
+          {data.revenue_agent && <Reveal index={2}><RevenueAgentCard revenue={data.revenue_agent} /></Reveal>}
           {/* Lead → Estimate → Booked → Paid → Review, each mapped to a real field.
               Muted "—"/0 where a feed isn't wired or has nothing yet. */}
-          <LifecycleSpine data={data} />
+          <Reveal index={3}><LifecycleSpine data={data} /></Reveal>
           {/* Is Lola actually running? Compact one-strip summary on Today; the
               full per-feed breakdown lives in the Full report. */}
-          <SystemStatus integrations={data.integrations} compact />
+          <Reveal index={4}><SystemStatus integrations={data.integrations} compact /></Reveal>
         </>
       ) : (
         /* ── FULL REPORT — everything else; all honesty/empty gates intact ───── */
@@ -523,6 +525,7 @@ export default function ClientReport({ slug }: { slug: string }) {
           <SystemStatus integrations={data.integrations} />
         </>
       )}
+      </div>
 
       <p className="mt-10 text-center text-[12px] text-ink-4">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
@@ -556,6 +559,54 @@ function prefersReducedMotion(): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Entrance reveal — a gentle fade + rise, staggered by index. Honest-motion safe:
+ * under prefers-reduced-motion it renders fully visible with no transition. (The
+ * dashboard is client-rendered, so there is no no-JS state to protect.)
+ */
+function Reveal({ index = 0, children }: { index?: number; children: ReactNode }) {
+  const [shown, setShown] = useState<boolean>(() => prefersReducedMotion());
+  useIsoLayoutEffect(() => {
+    if (prefersReducedMotion()) {
+      setShown(true);
+      return;
+    }
+    const t = window.setTimeout(() => setShown(true), 60 + index * 70);
+    return () => window.clearTimeout(t);
+  }, [index]);
+  return (
+    <div
+      className={`transition-all duration-500 ease-out motion-reduce:!translate-y-0 motion-reduce:!opacity-100 motion-reduce:!transition-none ${
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Minimal inline sparkline drawn from a REAL numeric series — no axis, no labels,
+ * no fabrication. Renders only when there are at least two real points.
+ */
+function Sparkline({ values, color = 'rgb(var(--gold))', className = '' }: { values: number[]; color?: string; className?: string }) {
+  const pts = values.filter((v) => typeof v === 'number' && !Number.isNaN(v));
+  if (pts.length < 2) return null;
+  const w = 100, h = 28, pad = 2;
+  const min = Math.min(...pts), max = Math.max(...pts);
+  const span = max - min || 1;
+  const coords = pts.map((v, i) => {
+    const x = pad + (i / (pts.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / span) * (h - pad * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={`h-7 w-full ${className}`} aria-hidden>
+      <polyline points={coords.join(' ')} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 /**
@@ -761,7 +812,7 @@ function ViewToggle({ view, onChange }: { view: 'today' | 'full'; onChange: (v: 
     { id: 'full', label: 'Full report', hint: 'Every metric' },
   ];
   return (
-    <div className="no-print mb-6 flex rounded-full border border-gold/20 bg-surface-2 p-1">
+    <div className="no-print sticky top-3 z-20 mb-6 flex rounded-full border border-gold/20 bg-surface-2 p-1 shadow-lift">
       {opts.map((o) => {
         const active = view === o.id;
         return (
@@ -895,7 +946,7 @@ function NeedsYouToday({ data }: { data: DashboardPayload }) {
               href={links.opportunities}
               target="_blank"
               rel="noopener noreferrer"
-              className="group grid min-h-[44px] grid-cols-[auto_1fr_auto] items-start gap-4 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift transition duration-200 hover:border-gold/40 hover:shadow-glow motion-reduce:transition-none sm:p-5"
+              className="group grid min-h-[44px] grid-cols-[auto_1fr_auto] items-start gap-4 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift transition duration-200 hover:border-gold/40 hover:shadow-glow active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 sm:p-5"
               style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}
             >
               <span aria-hidden className={`grid h-10 w-10 place-items-center rounded-lg ${toneSoft} ${toneText}`}>
@@ -1449,7 +1500,11 @@ function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Revenue agent</p>
           <h2 className="mt-1 font-display text-[16px] font-bold text-ink sm:text-[18px]">The money, live from your pipeline</h2>
         </div>
-        <span className="shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-ok">
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-ok">
+          <span aria-hidden className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
           Live
         </span>
       </div>
@@ -1978,6 +2033,12 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
         {metric('seo', 'SEO', '#9B781A')}
         {metric('accessibility', 'Accessibility', '#1D4ED8')}
       </div>
+      {series.length > 1 && (
+        <div className="mt-4">
+          <p className="mb-1 text-[10px] uppercase tracking-[0.12em] text-ink-4">Performance over time</p>
+          <Sparkline values={series.map((s) => s.performance || 0)} color="#15803D" />
+        </div>
+      )}
       <p className="mt-3 text-[11px] text-ink-4">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
     </section>
   );
