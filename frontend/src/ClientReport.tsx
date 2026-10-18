@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { FOUNDER } from './lib/lola';
 import { useSeo } from './lib/seo';
@@ -92,10 +92,258 @@ interface ShareOfVoice {
   queries_tracked: number;
 }
 
+// ── Honest demo payload ──────────────────────────────────────────────────────
+// Representative SAMPLE data for a fictional contractor, served by /r/client/demo
+// so the full experience can be shown in a sales conversation WITHOUT exposing a
+// real client. Always rendered behind a persistent "Demo · sample data" badge; it
+// is never presented as, or mistakable for, a real client's numbers.
+const _demoRun = new Date().toISOString();
+const DEMO_PAYLOAD: DashboardPayload = {
+  slug: 'demo',
+  client_name: 'Riverside Pressure Washing',
+  target_url: 'https://riverside-pressure.example',
+  generated_at: _demoRun,
+  google: [
+    { query: 'pressure washing riverside', source: 'google_organic', run_count: 12,
+      current: { position: 2, mentioned: true, run_at: _demoRun },
+      history: [ { position: 7, mentioned: true, run_at: _demoRun }, { position: 4, mentioned: true, run_at: _demoRun }, { position: 2, mentioned: true, run_at: _demoRun } ] },
+    { query: 'house washing near me', source: 'google_organic', run_count: 12,
+      current: { position: 3, mentioned: true, run_at: _demoRun },
+      history: [ { position: 9, mentioned: true, run_at: _demoRun }, { position: 5, mentioned: true, run_at: _demoRun }, { position: 3, mentioned: true, run_at: _demoRun } ] },
+    { query: 'driveway cleaning riverside', source: 'google_organic', run_count: 12,
+      current: { position: 1, mentioned: true, run_at: _demoRun },
+      history: [ { position: 6, mentioned: true, run_at: _demoRun }, { position: 2, mentioned: true, run_at: _demoRun }, { position: 1, mentioned: true, run_at: _demoRun } ] },
+  ],
+  ai_mode: [
+    { query: 'best pressure washing company riverside', source: 'claude_ai_mode', run_count: 8,
+      current: { position: null, mentioned: true, run_at: _demoRun },
+      history: [ { position: null, mentioned: false, run_at: _demoRun }, { position: null, mentioned: true, run_at: _demoRun } ] },
+  ],
+  verified_wins: { organic: ['pressure washing riverside', 'driveway cleaning riverside'], map_pack: ['house washing near me'] },
+  integrations: { callrail: true, ga4_measurement_protocol: true, rankings_tracker: true, gbp: true, bing: false },
+  implementation: {
+    done: [
+      { title: 'Rebuilt the Google Business Profile across 18 service areas', category: 'Local SEO', detail: null, url: null, week_of: null, created_at: _demoRun },
+      { title: 'Published 4 service-area landing pages', category: 'Content', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    in_progress: [
+      { title: 'Review-request automation for completed jobs', category: 'Reviews', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    next_up: [
+      { title: 'Schema markup on every service page', category: 'Technical', detail: null, url: null, week_of: null, created_at: _demoRun },
+    ],
+    counts: { 'Local SEO': 6, Content: 5, Reviews: 3, Technical: 4 },
+    total_done: 18,
+  },
+  tracking: {
+    call: { month: 18, last_30d: 18, lifetime: 214 },
+    lead: { month: 14, last_30d: 14, lifetime: 168 },
+  },
+  tracking_trends: {
+    call: { month: 18, prev_month: 13, delta: 5, arrow: '↑' },
+    lead: { month: 14, prev_month: 11, delta: 3, arrow: '↑' },
+  },
+  reviews: { month: 4, lifetime: 37, google_routed_month: 4 },
+  gbp_performance: { calls: 62, website_clicks: 138, direction_requests: 44, impressions: 5120, window_days: 30 },
+  bing: null,
+  lead_sources: { 'Google Business Profile': 19, 'Organic search': 11, 'Website form': 8, Referral: 9 },
+  cwv_trend: [
+    { performance: 72, accessibility: 95, seo: 92, run_at: _demoRun },
+    { performance: 84, accessibility: 97, seo: 100, run_at: _demoRun },
+    { performance: 91, accessibility: 98, seo: 100, run_at: _demoRun },
+  ],
+  won_jobs: {
+    month: 6, lifetime: 41,
+    revenue_month: 11250, revenue_lifetime: 78900,
+    jobs: [
+      { id: 1, job_value: 2800, service_type: 'House wash + driveway', source: 'Google Business Profile', created_at: _demoRun },
+      { id: 2, job_value: 1950, service_type: 'Commercial storefront', source: 'Organic search', created_at: _demoRun },
+      { id: 3, job_value: 3400, service_type: 'Full exterior package', source: 'Referral', created_at: _demoRun },
+    ],
+  },
+  revenue_agent: {
+    contacts: 47,
+    pipeline_value: 18400,
+    won_revenue: 11250,
+    open_actions: 3,
+    opportunities: { new: 6, qualified: 4, estimate_sent: 5, won: 9 },
+    estimates: { sent: 5 },
+  },
+};
+
+/** Persistent, unmistakable marker that a view is demo / sample data, not a real
+ *  client. Required by the honesty rule whenever sample data is shown. */
+function DemoBadge() {
+  return (
+    <div className="no-print mb-4 flex items-center justify-center gap-2 rounded-xl border border-gold/40 bg-gold/[0.10] px-4 py-2.5 text-center">
+      <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-gold" style={{ boxShadow: '0 0 0 4px rgb(var(--gold) / 0.18)' }} />
+      <span className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-gold-bright">
+        Demo · sample data — not a real client
+      </span>
+    </div>
+  );
+}
+
+/** One shimmer block for the loading skeleton; pulse is off under reduced motion. */
+function SkelBlock({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-xl motion-reduce:animate-none ${className}`}
+      style={{ backgroundColor: 'rgb(var(--ink) / 0.07)' }}
+    />
+  );
+}
+
+/** Premium loading state that mirrors the real layout, so the dashboard never
+ *  reads as broken while the live payload is fetched. */
+function DashboardSkeleton() {
+  return (
+    <main className="mx-auto w-full max-w-4xl py-6 sm:py-10" aria-busy="true" aria-label="Loading dashboard">
+      <SkelBlock className="mb-5 h-24 w-full sm:h-28" />
+      <SkelBlock className="mb-6 h-11 w-full max-w-[280px]" />
+      <SkelBlock className="mb-5 h-28 w-full" />
+      <SkelBlock className="mb-5 h-40 w-full" />
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+        <SkelBlock className="h-24" />
+      </div>
+      <p className="mt-6 text-center text-[13px] text-ink-4">Loading your command center…</p>
+    </main>
+  );
+}
+
+/** Calm, branded error state with a retry — never a bare "not found" in front of
+ *  a prospect. */
+function DashboardError({ message, onRetry }: { message: string | null; onRetry: () => void }) {
+  const notFound = !!message && /no dashboard exists/i.test(message);
+  return (
+    <main className="mx-auto flex min-h-[60vh] w-full max-w-4xl flex-col items-center justify-center px-6 py-12 text-center">
+      <span
+        aria-hidden
+        className="grid h-14 w-14 place-items-center rounded-2xl border border-gold/30 font-display text-[26px] font-bold text-gold"
+        style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--gold) / 0.18), rgb(var(--gold) / 0.04))' }}
+      >
+        L
+      </span>
+      <h1 className="mt-5 font-display text-[22px] font-bold text-ink sm:text-[26px]">
+        {notFound ? 'Dashboard not found' : 'Couldn’t load your dashboard'}
+      </h1>
+      <p className="mt-2 max-w-[420px] text-[14px] leading-[1.55] text-ink-3">
+        {notFound
+          ? 'That link doesn’t point to a live dashboard yet. Double-check the address, or ask Ty for your link.'
+          : 'That’s on our end, not yours — the connection dropped. Give it another try.'}
+      </p>
+      {!notFound && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-6 inline-flex min-h-[44px] items-center rounded-full bg-gold px-6 text-[13px] font-bold text-on-gold shadow-lift transition duration-200 hover:shadow-glow motion-reduce:transition-none"
+        >
+          Try again
+        </button>
+      )}
+      <p className="mt-8 text-[12px] text-ink-4">powered by Lola SEO</p>
+    </main>
+  );
+}
+
+/**
+ * HERO VERDICT — the one-glance "how am I doing this month" answer at the very top
+ * of Today, built ONLY from real payload fields: contacts (calls + quote forms
+ * this month), jobs won this month, and dollars collected this month. A stat is
+ * shown only when its field is > 0; when nothing has happened yet it falls back to
+ * a confident day-one line instead of a wall of zeros. No fabricated figures.
+ */
+function HeroVerdict({ data }: { data: DashboardPayload }) {
+  const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
+  const calls = data.tracking?.call?.month ?? 0;
+  const leads = data.tracking?.lead?.month ?? 0;
+  const contacts = calls + leads;
+  const wonMonth = data.won_jobs?.month ?? 0;
+  const collected = data.won_jobs?.revenue_month ?? 0;
+
+  // The ONLY field with a real prior period in the payload is contacts
+  // (tracking_trends carries prev_month for calls + leads). Won and collected
+  // have no prior series, so they get NO delta — never an invented one.
+  const tr = data.tracking_trends;
+  const hasPrior = !!(tr && (tr.call || tr.lead));
+  const prevContacts = (tr?.call?.prev_month ?? 0) + (tr?.lead?.prev_month ?? 0);
+  const contactsDelta = contacts - prevContacts;
+
+  type HeroStat = { key: string; value: string; label: string; accent?: boolean; delta?: number };
+  const stats: HeroStat[] = [];
+  if (contacts > 0) stats.push({ key: 'contacts', value: fmtNum(contacts), label: contacts === 1 ? 'new contact' : 'new contacts', delta: hasPrior ? contactsDelta : undefined });
+  if (wonMonth > 0) stats.push({ key: 'won', value: fmtNum(wonMonth), label: wonMonth === 1 ? 'job won' : 'jobs won' });
+  if (collected > 0) stats.push({ key: 'collected', value: fmtMoney(collected), label: 'collected', accent: true });
+
+  return (
+    <section
+      className="mb-5 overflow-hidden rounded-2xl border border-gold/30 bg-surface-2 p-6 shadow-lift sm:p-7"
+      style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 55%, rgb(var(--gold) / 0.10) 100%)' }}
+    >
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{monthLabel} at a glance</p>
+      {stats.length > 0 ? (
+        <>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-7 gap-y-2">
+            {stats.map((s) => (
+              <span key={s.key} className="flex items-baseline gap-2">
+                <span
+                  className={`font-display text-[30px] font-bold leading-none tabular-nums sm:text-[36px] ${
+                    s.accent ? 'bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent' : 'text-ink'
+                  }`}
+                >
+                  {s.value}
+                </span>
+                <span className="text-[13px] font-medium text-ink-3">{s.label}</span>
+                {s.delta !== undefined && (
+                  <span
+                    className={`ml-1.5 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                      s.delta > 0
+                        ? 'bg-emerald-500/[0.12] text-emerald-300'
+                        : s.delta < 0
+                        ? 'bg-[#FCA5A5]/[0.12] text-[#FCA5A5]'
+                        : 'text-ink-4'
+                    }`}
+                  >
+                    {s.delta > 0
+                      ? `▲ ${s.delta} vs last month`
+                      : s.delta < 0
+                      ? `▼ ${Math.abs(s.delta)} vs last month`
+                      : 'flat vs last month'}
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+          <p className="mt-3 text-[13.5px] leading-[1.55] text-ink-2">
+            Every lead you’ve paid for, tracked to the dollar — so none slip through.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2 className="mt-2 font-display text-[22px] font-bold leading-snug text-ink sm:text-[26px]">
+            Set up and watching your pipeline.
+          </h2>
+          <p className="mt-2 text-[13.5px] leading-[1.55] text-ink-2">
+            Your first numbers land here the moment a call or quote request comes in — nothing you’ve paid for slips through.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function ClientReport({ slug }: { slug: string }) {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(0);
+  // Honest demo mode: /r/client/demo renders representative SAMPLE data (never a
+  // real client) behind a persistent "Demo · sample data" badge, so the full
+  // experience can be shown in a sales conversation without exposing anyone.
+  const isDemo = slug === 'demo';
 
   // A client's private retainer dashboard — their rankings, call volume and
   // revenue. Same reasoning as the audit reports: never a search result.
@@ -107,9 +355,23 @@ export default function ClientReport({ slug }: { slug: string }) {
 
   useEffect(() => {
     let cancelled = false;
+    // Demo short-circuits the network entirely — representative sample data,
+    // clearly badged, never a real client's numbers.
+    if (isDemo) {
+      setData(DEMO_PAYLOAD);
+      setError(null);
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
     setLoading(true);
     setError(null);
-    fetch(`${API_URL}/reporting/public/${encodeURIComponent(slug)}`)
+    // On Vercel preview domains the production API is cross-origin and CORS-blocked,
+    // so route the dashboard fetch through the same-origin /reporting proxy (see the
+    // vercel.json rewrite). Production (coachtyleads.com, CORS-allowed) and local dev
+    // keep using API_URL unchanged.
+    const reportBase =
+      typeof location !== 'undefined' && location.hostname.endsWith('.vercel.app') ? '' : API_URL;
+    fetch(`${reportBase}/reporting/public/${encodeURIComponent(slug)}`)
       .then(async (r) => {
         if (r.status === 404) throw new Error('No dashboard exists for that link.');
         if (!r.ok) throw new Error(`Failed to load (HTTP ${r.status}).`);
@@ -119,23 +381,28 @@ export default function ClientReport({ slug }: { slug: string }) {
       .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, reload, isDemo]);
 
-  if (loading) {
-    return (
-      <main className="mx-auto w-full max-w-4xl py-12 text-center text-ink-3">
-        Loading client dashboard…
-      </main>
-    );
-  }
-  if (error || !data) {
-    return (
-      <main className="mx-auto w-full max-w-4xl py-12 text-center">
-        <h1 className="text-2xl font-bold text-ink">Dashboard not found</h1>
-        <p className="mt-3 text-[14px] text-ink-3">{error}</p>
-      </main>
-    );
-  }
+  // Two-view toggle for a non-technical owner: "today" (essentials, ~one screen)
+  // vs "full" (every deeper section). Remembered per browser; default "today".
+  const [view, setView] = useState<'today' | 'full'>(() => {
+    try {
+      return localStorage.getItem('lola:dashboard-view') === 'full' ? 'full' : 'today';
+    } catch {
+      return 'today';
+    }
+  });
+  const chooseView = (v: 'today' | 'full') => {
+    setView(v);
+    try {
+      localStorage.setItem('lola:dashboard-view', v);
+    } catch {
+      /* private mode / blocked storage — the in-memory choice still works */
+    }
+  };
+
+  if (loading) return <DashboardSkeleton />;
+  if (error || !data) return <DashboardError message={error} onRetry={() => setReload((n) => n + 1)} />;
 
   // Pre-compute "does this section have anything worth showing" so we can
   // hide whole strips of zero-state cards (the dashboard looked broken when
@@ -165,75 +432,607 @@ export default function ClientReport({ slug }: { slug: string }) {
 
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
+      {isDemo && <DemoBadge />}
       <Header data={data} />
-      {/* Value, work, what's next and how to reach Ty — before any metric.
-          The numbers below prove the work happened; this says what it was for. */}
-      <OwnerBriefing data={data} />
-      <OwnerOverview data={data} />
-      {/* Renders on every dashboard, not just the empty state — see SystemStatus. */}
-      <SystemStatus integrations={data.integrations} />
-      <TopWinsCard
-        google={data.google}
-        aiMode={data.ai_mode}
-        verifiedWins={data.verified_wins}
-        clientName={data.client_name}
-      />
-      {data.won_jobs && data.won_jobs.lifetime > 0 && (
-        <WonJobsCard wonJobs={data.won_jobs} />
+
+      {/* Two views for a non-technical owner: "Today" is the essentials on roughly
+          one screen; "Full report" is every deeper section. Choice persists. */}
+      <ViewToggle view={view} onChange={chooseView} />
+
+      {/* Keyed on view so switching Today/Full replays the entrance reveal. */}
+      <div key={view}>
+      {view === 'today' ? (
+        /* ── TODAY — owner essentials, ~one screen ──────────────────────────── */
+        <>
+          {/* The one-glance "how am I doing this month" verdict — real payload fields only. */}
+          <Reveal index={0}><HeroVerdict data={data} /></Reveal>
+          {/* The single most important next step, from live revenue-agent fields
+              only. Renders nothing when the agent isn't connected; a calm cleared
+              state when it is connected and there's nothing outstanding. */}
+          <Reveal index={1}><NeedsYouToday data={data} /></Reveal>
+          {/* The money, live from the pipeline — stat tiles + conversion ring. */}
+          {data.revenue_agent && <Reveal index={2}><RevenueAgentCard revenue={data.revenue_agent} /></Reveal>}
+          {/* Lead → Estimate → Booked → Paid → Review, each mapped to a real field.
+              Muted "—"/0 where a feed isn't wired or has nothing yet. */}
+          <Reveal index={3}><LifecycleSpine data={data} /></Reveal>
+          {/* Is Lola actually running? Compact one-strip summary on Today; the
+              full per-feed breakdown lives in the Full report. */}
+          <Reveal index={4}><SystemStatus integrations={data.integrations} compact /></Reveal>
+        </>
+      ) : (
+        /* ── FULL REPORT — everything else; all honesty/empty gates intact ───── */
+        <>
+          {/* Value, work, what's next and how to reach Ty. */}
+          <OwnerBriefing data={data} />
+          <OwnerOverview data={data} />
+          <TopWinsCard
+            google={data.google}
+            aiMode={data.ai_mode}
+            verifiedWins={data.verified_wins}
+            clientName={data.client_name}
+          />
+          {data.won_jobs && data.won_jobs.lifetime > 0 && (
+            <WonJobsCard wonJobs={data.won_jobs} />
+          )}
+
+          {/* Gated on "nothing MEASURED yet", not "nothing at all". It used to
+              require totallyEmpty, which includes work delivered — so the moment Ty
+              shipped the first task (day one, every time) the card vanished and a
+              brand-new client lost the only panel explaining what was being tracked
+              and what happens next. Work delivered is the day-one state, not a
+              reason to hide the expectations. Disappears once real data arrives. */}
+          {nothingMeasured && (
+            <WhatWeWatchCard
+              clientName={data.client_name}
+              google={data.google}
+              aiMode={data.ai_mode}
+              verifiedWins={data.verified_wins}
+            />
+          )}
+
+          {anyTracking && (
+            <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
+          )}
+          {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
+          {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
+          {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
+          {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
+          {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
+          {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
+          {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
+          {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
+
+          {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankings && <CompetitorWatchlist google={data.google} />}
+
+          {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
+
+          {/* The itemised work feed. The briefing at the top already names the most
+              recent items; this is the full ledger plus the category breakdown. */}
+          {anyWork && <WorkDelivered impl={data.implementation!} />}
+
+          {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
+            <ShareOfVoiceCard sov={data.share_of_voice} />
+          )}
+
+          {anyAi && <AIVisibilityCard series={data.ai_mode} />}
+
+          {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankings && <RankingMomentum google={data.google} />}
+
+          {/* Full per-feed system-health detail. Today shows only the compact
+              summary strip above; the itemised breakdown lives here. */}
+          <SystemStatus integrations={data.integrations} />
+        </>
       )}
-      {data.revenue_agent && (
-        <RevenueAgentCard revenue={data.revenue_agent} />
-      )}
-
-      {/* Gated on "nothing MEASURED yet", not "nothing at all". It used to
-          require totallyEmpty, which includes work delivered — so the moment Ty
-          shipped the first task (day one, every time) the card vanished and a
-          brand-new client lost the only panel explaining what was being tracked
-          and what happens next. Work delivered is the day-one state, not a
-          reason to hide the expectations. Disappears once real data arrives. */}
-      {nothingMeasured && (
-        <WhatWeWatchCard
-          clientName={data.client_name}
-          google={data.google}
-          aiMode={data.ai_mode}
-          verifiedWins={data.verified_wins}
-        />
-      )}
-
-      {anyTracking && (
-        <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
-      )}
-      {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
-      {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
-      {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
-      {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
-      {data.cwv_trend && data.cwv_trend.length > 0 && <CwvTrendCard series={data.cwv_trend} />}
-      {data.call_quality && data.call_quality.lifetime > 0 && <CallQualityCard q={data.call_quality} />}
-      {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
-      {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
-
-      {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
-      {anyRankings && <CompetitorWatchlist google={data.google} />}
-
-      {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
-
-      {/* The itemised work feed. The briefing at the top already names the most
-          recent items; this is the full ledger plus the category breakdown. */}
-      {anyWork && <WorkDelivered impl={data.implementation!} />}
-
-      {data.share_of_voice && data.share_of_voice.lifetime.total > 0 && (
-        <ShareOfVoiceCard sov={data.share_of_voice} />
-      )}
-
-      {anyAi && <AIVisibilityCard series={data.ai_mode} />}
-
-      {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
-      {anyRankings && <RankingMomentum google={data.google} />}
+      </div>
 
       <p className="mt-10 text-center text-[12px] text-ink-4">
         Updated {fmtDateTime(data.generated_at)} · powered by Lola SEO
       </p>
     </main>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   COMMAND-CENTER PRIMITIVES
+
+   Shared building blocks for the owner-facing hero: a reduced-motion-aware
+   count-up, a money/stat tile with a data-source chip, a progress ring, the
+   "Needs you today" action hero and the lifecycle spine. Every animation is an
+   ENHANCEMENT — the real, final value is the INITIAL render, so with JS off,
+   requestAnimationFrame unavailable, or prefers-reduced-motion set, the honest
+   number is what shows; only a motion-OK browser eases into it. No fabricated
+   deltas, sparklines, streaks or stage counts live here — every figure is read
+   straight off the live payload, and a missing field renders muted, never faked.
+   ────────────────────────────────────────────────────────────────────────── */
+
+// useLayoutEffect on the client, useEffect on the server — the count-up resets
+// to its start value BEFORE paint, so the final number never flashes first,
+// without tripping React's SSR warning on the (non-prerendered) dashboard.
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Entrance reveal — a gentle fade + rise, staggered by index. Honest-motion safe:
+ * under prefers-reduced-motion it renders fully visible with no transition. (The
+ * dashboard is client-rendered, so there is no no-JS state to protect.)
+ */
+function Reveal({ index = 0, children }: { index?: number; children: ReactNode }) {
+  const [shown, setShown] = useState<boolean>(() => prefersReducedMotion());
+  useIsoLayoutEffect(() => {
+    if (prefersReducedMotion()) {
+      setShown(true);
+      return;
+    }
+    const t = window.setTimeout(() => setShown(true), 60 + index * 70);
+    return () => window.clearTimeout(t);
+  }, [index]);
+  return (
+    <div
+      className={`transition-all duration-500 ease-out motion-reduce:!translate-y-0 motion-reduce:!opacity-100 motion-reduce:!transition-none ${
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Minimal inline sparkline drawn from a REAL numeric series — no axis, no labels,
+ * no fabrication. Renders only when there are at least two real points.
+ */
+function Sparkline({ values, color = 'rgb(var(--gold))', className = '' }: { values: number[]; color?: string; className?: string }) {
+  const pts = values.filter((v) => typeof v === 'number' && !Number.isNaN(v));
+  if (pts.length < 2) return null;
+  const w = 100, h = 28, pad = 2;
+  const min = Math.min(...pts), max = Math.max(...pts);
+  const span = max - min || 1;
+  const coords = pts.map((v, i) => {
+    const x = pad + (i / (pts.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / span) * (h - pad * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={`h-7 w-full ${className}`} aria-hidden>
+      <polyline points={coords.join(' ')} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * Count-up toward a real target. State starts AT the target, so the honest
+ * value renders with no JS / no rAF / reduced motion. A motion-OK browser
+ * resets to 0 in a layout effect (pre-paint, so no flash) and eases up.
+ */
+function useCountUp(target: number, durationMs = 850): number {
+  const [value, setValue] = useState<number>(target);
+  useIsoLayoutEffect(() => {
+    if (prefersReducedMotion()) {
+      setValue(target);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    setValue(0);
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setValue(target * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else setValue(target);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, durationMs]);
+  return value;
+}
+
+const fmtMoney = (n: number) => `$${Math.round(n || 0).toLocaleString()}`;
+const fmtNum = (n: number) => Math.round(n || 0).toLocaleString();
+
+/** A small "where this number comes from" chip — a gold dot + source name. */
+function SourceChip({ label, className = '' }: { label: string; className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-ink-4 ${className}`}>
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-gold/70" />
+      {label}
+    </span>
+  );
+}
+
+/**
+ * A money / stat tile: headline number (count-up), optional sub-metric, and a
+ * source chip — the Stripe/Mercury treatment. Tabular-nums so the width never
+ * jitters while counting. No delta is shown here: revenue-agent figures carry
+ * no prior-period series, and we never invent one.
+ */
+function MoneyTile({
+  label,
+  value,
+  format = 'number',
+  sub,
+  source,
+  accent = false,
+  wide = false,
+}: {
+  label: string;
+  value: number;
+  format?: 'currency' | 'number';
+  sub?: string;
+  source?: string;
+  accent?: boolean;
+  wide?: boolean;
+}) {
+  const shown = useCountUp(value);
+  const text = format === 'currency' ? fmtMoney(shown) : fmtNum(shown);
+  return (
+    <div
+      className={`relative overflow-hidden rounded-xl border bg-surface p-4 shadow-lift transition duration-200 hover:-translate-y-0.5 hover:shadow-glow motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
+        accent ? 'border-gold/35 hover:border-gold/60' : 'border-gold/15 hover:border-gold/40'
+      } ${wide ? 'col-span-2' : ''}`}
+    >
+      {accent && (
+        <span aria-hidden className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />
+      )}
+      <p className="text-[12px] font-medium text-ink-3">{label}</p>
+      <p
+        className={`mt-2 font-display font-bold leading-none tabular-nums ${
+          accent
+            ? 'bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[32px] text-transparent sm:text-[38px]'
+            : 'text-[24px] text-ink sm:text-[27px]'
+        }`}
+      >
+        {text}
+      </p>
+      {sub && <p className="mt-2 text-[12px] leading-[1.4] text-ink-4">{sub}</p>}
+      {source && <SourceChip label={source} className="mt-3" />}
+    </div>
+  );
+}
+
+/**
+ * A momentum ring. The arc starts empty and eases to its real fraction, but
+ * only with motion allowed — otherwise it renders filled to the honest value
+ * immediately. The label + sub spell out exactly what the fraction means so it
+ * can never read as a vanity metric. Rings are the ONLY momentum device (no
+ * points, badges or streaks).
+ */
+function ProgressRing({ pct, centerLabel, label, sub }: { pct: number; centerLabel: string; label: string; sub: string }) {
+  const R = 30;
+  const C = 2 * Math.PI * R;
+  const clamped = Math.max(0, Math.min(100, pct));
+  const finalOffset = C - (C * clamped) / 100;
+  const [offset, setOffset] = useState<number>(finalOffset);
+  useIsoLayoutEffect(() => {
+    if (prefersReducedMotion()) {
+      setOffset(finalOffset);
+      return;
+    }
+    setOffset(C);
+    const raf = requestAnimationFrame(() => setOffset(finalOffset));
+    return () => cancelAnimationFrame(raf);
+  }, [finalOffset, C]);
+  return (
+    <div className="flex items-center gap-4">
+      <svg viewBox="0 0 72 72" className="h-16 w-16 shrink-0" aria-hidden>
+        <circle cx="36" cy="36" r={R} fill="none" strokeWidth="7" style={{ stroke: 'rgb(var(--ink) / 0.10)' }} />
+        <circle
+          cx="36"
+          cy="36"
+          r={R}
+          fill="none"
+          strokeWidth="7"
+          strokeLinecap="round"
+          transform="rotate(-90 36 36)"
+          style={{
+            stroke: 'rgb(var(--gold))',
+            strokeDasharray: C,
+            strokeDashoffset: offset,
+            transition: 'stroke-dashoffset 1s cubic-bezier(.22,1,.36,1)',
+          }}
+        />
+        <text x="36" y="36" dominantBaseline="central" textAnchor="middle" className="font-display text-[15px] font-bold" style={{ fill: 'rgb(var(--ink))' }}>
+          {centerLabel}
+        </text>
+      </svg>
+      <div className="min-w-0">
+        <p className="font-display text-[14px] font-semibold text-ink">{label}</p>
+        <p className="mt-1 text-[12.5px] leading-[1.45] text-ink-3">{sub}</p>
+      </div>
+    </div>
+  );
+}
+
+/** Inline line-icons for the action hero — stroke inherits the row's tone. */
+function ActionIcon({ name }: { name: 'followups' | 'estimates' | 'pipeline' }) {
+  const p = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  if (name === 'estimates') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden {...p}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l2.5 1.5" />
+      </svg>
+    );
+  }
+  if (name === 'pipeline') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden {...p}>
+        <path d="M3 17l6-6 4 4 7-7" />
+        <path d="M14 7h6v6" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden {...p}>
+      <path d="M22 2 11 13" />
+      <path d="M22 2l-7 20-4-9-9-4Z" />
+    </svg>
+  );
+}
+
+// Slug → GoHighLevel location id, for building the owner's "open in GHL" deep links.
+// TODO: move to the dashboard payload so this is multi-tenant, not hardcoded.
+const GHL_LOCATION: Record<string, string> = { sandbar: 'rL4X2gKNPEgIwsuJeYIL' };
+
+/**
+ * Where the owner actually ACTS in GoHighLevel. We only have aggregate counts in
+ * the payload, so every link opens a VIEW (the opportunities list / the inbox) —
+ * never a specific contact — and the surrounding copy never implies the dashboard
+ * sent a message or moved a deal. It just takes the owner to where they do it.
+ */
+function ghlLinks(slug: string) {
+  const loc = GHL_LOCATION[slug];
+  if (!loc) {
+    return { opportunities: 'https://app.gohighlevel.com/', conversations: 'https://app.gohighlevel.com/' };
+  }
+  return {
+    opportunities: `https://app.gohighlevel.com/v2/location/${loc}/opportunities/list`,
+    conversations: `https://app.gohighlevel.com/v2/location/${loc}/conversations/conversations`,
+  };
+}
+
+/**
+ * Two-view segmented control. "Today" is the owner-essentials, roughly one
+ * screen; "Full report" is every deeper section. Plain toggle buttons (not a
+ * tablist) so it's valid without a paired tabpanel. 44px touch targets.
+ */
+function ViewToggle({ view, onChange }: { view: 'today' | 'full'; onChange: (v: 'today' | 'full') => void }) {
+  const opts: Array<{ id: 'today' | 'full'; label: string; hint: string }> = [
+    { id: 'today', label: 'Today', hint: 'What needs you' },
+    { id: 'full', label: 'Full report', hint: 'Every metric' },
+  ];
+  return (
+    <div className="no-print sticky top-3 z-20 mb-6 flex rounded-full border border-gold/20 bg-surface-2 p-1 shadow-lift">
+      {opts.map((o) => {
+        const active = view === o.id;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(o.id)}
+            className={`flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full px-4 text-[13px] font-bold transition duration-200 motion-reduce:transition-none ${
+              active ? 'bg-gold text-on-gold shadow-lift' : 'text-ink-3 hover:text-ink'
+            }`}
+          >
+            {o.label}
+            <span className={`hidden text-[11px] font-medium sm:inline ${active ? 'text-on-gold/70' : 'text-ink-4'}`}>· {o.hint}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * NEEDS YOU TODAY — the single most important next step, derived ONLY from live
+ * revenue-agent fields. Shows at most two actions, ranked. When the agent is
+ * wired up but there is genuinely nothing to do, it shows a calm cleared state
+ * instead of a wall of zeros. When the agent isn't connected at all, it renders
+ * nothing (we can't claim "all clear" on data we don't have). Every count is
+ * read from the payload; a field at 0/absent produces no action.
+ */
+function NeedsYouToday({ data }: { data: DashboardPayload }) {
+  const ra = data.revenue_agent;
+  if (!ra) return null;
+
+  const links = ghlLinks(data.slug);
+
+  type Tone = 'gold' | 'amber';
+  type Action = { key: string; icon: 'followups' | 'estimates' | 'pipeline'; tone: Tone; title: string; why: string };
+  const candidates: Action[] = [];
+
+  const followups = ra.open_actions || 0;
+  const sentEstimates = ra.estimates?.sent || 0;
+  const pipeline = ra.pipeline_value || 0;
+
+  if (followups > 0) {
+    candidates.push({
+      key: 'followups',
+      icon: 'followups',
+      tone: 'gold',
+      title: `${followups} follow-up${followups === 1 ? '' : 's'} queued and waiting.`,
+      why: "Queued in GoHighLevel, not sent yet — the cheapest booked job you'll get all week.",
+    });
+  }
+  if (sentEstimates > 0) {
+    candidates.push({
+      key: 'estimates',
+      icon: 'estimates',
+      tone: 'amber',
+      title: `${sentEstimates} estimate${sentEstimates === 1 ? '' : 's'} waiting on a yes or no.`,
+      why: 'Sent but not booked yet. A quick nudge closes some of these.',
+    });
+  }
+  if (pipeline > 0) {
+    candidates.push({
+      key: 'pipeline',
+      icon: 'pipeline',
+      tone: 'gold',
+      title: `${fmtMoney(pipeline)} in open pipeline to keep moving.`,
+      why: 'Live value of every open opportunity. Keep them progressing.',
+    });
+  }
+
+  const actions = candidates.slice(0, 2);
+
+  // Cleared state — the agent is connected and there is nothing outstanding.
+  if (actions.length === 0) {
+    return (
+      <section
+        className="mb-5 overflow-hidden rounded-2xl border border-ok/25 shadow-lift"
+        style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 60%, rgb(var(--ok) / 0.07) 100%)' }}
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-5 sm:px-7">
+          <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ok/15 text-ok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-[18px] font-bold text-ink sm:text-[20px]">You're on top of everything</h2>
+            <p className="mt-0.5 text-[12.5px] leading-[1.5] text-ink-3">Nothing needs you right now — Lola will surface the next move here the moment one appears.</p>
+          </div>
+          <a
+            href={links.opportunities}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-lg px-1 text-[11px] font-bold uppercase tracking-[0.08em] text-gold underline-offset-2 hover:underline"
+          >
+            Open in GoHighLevel
+            <span aria-hidden>→</span>
+          </a>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      className="mb-5 overflow-hidden rounded-2xl border border-gold/30 shadow-lift"
+      style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 55%, rgb(var(--gold) / 0.08) 100%)' }}
+    >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-4 sm:px-7">
+        <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-full bg-gold px-2 font-display text-[13px] font-bold text-on-gold">
+          {actions.length}
+        </span>
+        <h2 className="font-display text-[18px] font-bold text-ink sm:text-[20px]">Needs you today</h2>
+        <a
+          href={links.opportunities}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto inline-flex min-h-[44px] items-center gap-1 rounded-lg px-1 text-[11px] font-bold uppercase tracking-[0.08em] text-gold underline-offset-2 hover:underline"
+        >
+          Open in GoHighLevel
+          <span aria-hidden>→</span>
+        </a>
+      </div>
+      <div className="grid gap-3 px-4 pb-4 sm:px-5 sm:pb-5">
+        {actions.map((a) => {
+          const toneText = a.tone === 'gold' ? 'text-gold' : 'text-[#B8770A]';
+          const toneSoft = a.tone === 'gold' ? 'bg-gold/[0.12]' : 'bg-[#F59E0B]/[0.14]';
+          const accentColor = a.tone === 'gold' ? 'rgb(var(--gold))' : '#C77E0A';
+          return (
+            <a
+              key={a.key}
+              href={links.opportunities}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group grid min-h-[44px] grid-cols-[auto_1fr_auto] items-start gap-4 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift transition duration-200 hover:border-gold/40 hover:shadow-glow active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 sm:p-5"
+              style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}
+            >
+              <span aria-hidden className={`grid h-10 w-10 place-items-center rounded-lg ${toneSoft} ${toneText}`}>
+                <ActionIcon name={a.icon} />
+              </span>
+              <div className="min-w-0">
+                <p className="font-display text-[15px] font-semibold leading-snug text-ink sm:text-[16px]">{a.title}</p>
+                <p className="mt-1.5 text-[13px] leading-[1.5] text-ink-2">{a.why}</p>
+                <span className={`mt-3 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.06em] ${toneText}`}>
+                  Open in GoHighLevel
+                  <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none">→</span>
+                </span>
+              </div>
+              <span aria-hidden className="self-center text-ink-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * LIFECYCLE SPINE — a compact Lead → Estimate → Booked → Paid → Review stepper,
+ * the contractor-home-screen pattern (Housecall Pro / Jobber). Each step maps
+ * to a real payload field; a step whose SOURCE isn't wired up renders a muted
+ * "—", and a step that is wired but at zero renders a muted 0. That's what
+ * makes a gap (e.g. reviews never firing) visible instead of invented. Renders
+ * only when at least two steps have real data behind them.
+ */
+function LifecycleSpine({ data }: { data: DashboardPayload }) {
+  const ra = data.revenue_agent;
+  const opps = ra?.opportunities || {};
+  const bookedExplicit = (opps.open ?? 0) + (opps.won ?? 0);
+  const bookedAll = Object.values(opps).reduce((a, b) => a + (b || 0), 0);
+  const leadFromTracking = data.tracking
+    ? (data.tracking.lead?.month ?? 0) + (data.tracking.call?.month ?? 0)
+    : null;
+
+  const steps: Array<{ key: string; label: string; value: number | null }> = [
+    { key: 'lead', label: 'Lead', value: ra ? ra.contacts : leadFromTracking },
+    { key: 'estimate', label: 'Estimate', value: ra ? (ra.estimates?.sent ?? 0) : null },
+    { key: 'booked', label: 'Booked', value: ra ? (bookedExplicit > 0 ? bookedExplicit : bookedAll) : null },
+    { key: 'paid', label: 'Paid', value: data.won_jobs ? data.won_jobs.month : null },
+    { key: 'review', label: 'Review', value: data.reviews ? data.reviews.month : null },
+  ];
+
+  const withData = steps.filter((s) => s.value != null).length;
+  if (withData < 2) return null;
+
+  return (
+    <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 p-5 shadow-lift sm:p-6">
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 className="font-display text-[16px] font-bold text-ink sm:text-[18px]">Your pipeline, end to end</h2>
+        <SourceChip label="Live from your CRM" />
+      </div>
+      <div className="relative grid grid-cols-5 gap-1">
+        {steps.map((step, i) => {
+          const live = step.value != null && step.value > 0;
+          return (
+            <div key={step.key} className="relative flex flex-col items-center text-center">
+              {i < steps.length - 1 && (
+                <span aria-hidden className="absolute left-1/2 top-[11px] h-px w-[calc(100%_+_0.25rem)] bg-gold/20" />
+              )}
+              <span
+                className={`relative z-10 grid h-6 w-6 place-items-center rounded-full border text-[10px] font-bold ${
+                  live ? 'border-gold bg-gold text-on-gold' : 'border-gold/25 bg-surface text-ink-4'
+                }`}
+              >
+                {i + 1}
+              </span>
+              <span className="mt-2 text-[10px] font-semibold uppercase tracking-[0.03em] text-ink-3">{step.label}</span>
+              <span
+                className={`mt-0.5 font-display text-[16px] font-bold leading-none tabular-nums sm:text-[18px] ${
+                  live ? 'text-ink' : 'text-ink-4'
+                }`}
+              >
+                {step.value == null ? '—' : fmtNum(step.value)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -259,11 +1058,15 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
   const inProgress = impl?.in_progress ?? [];
   const nextUp = impl?.next_up ?? [];
   const totalDone = impl?.total_done ?? done.length;
+  const doneShown = useCountUp(totalDone);
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2 shadow-lift">
       <div className="border-b border-white/10 px-6 py-4 sm:px-8">
-        <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
+          The brief
+        </p>
+        <h2 className="mt-1 font-display text-[16px] font-bold text-ink sm:text-[18px]">
           Where things stand
         </h2>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
@@ -278,7 +1081,7 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
             Work finished
           </p>
-          <p className="mt-2 text-[34px] font-bold leading-none text-ink">{totalDone}</p>
+          <p className="mt-2 font-display text-[36px] font-bold leading-none tabular-nums text-ink">{Math.round(doneShown)}</p>
           <p className="mt-1 text-[12px] text-ink-3">
             {totalDone === 1 ? 'implementation task completed' : 'implementation tasks completed'} on your account
           </p>
@@ -392,34 +1195,54 @@ function FreshnessPill({ iso }: { iso: string }) {
 }
 
 function Header({ data }: { data: DashboardPayload }) {
+  const initial = (data.client_name || '•').trim().charAt(0).toUpperCase() || '•';
+  let host = '';
+  try {
+    host = data.target_url ? new URL(data.target_url).hostname.replace(/^www\./, '') : '';
+  } catch {
+    host = '';
+  }
   return (
-    <header className="mb-6 rounded-2xl border border-gold/20 bg-surface-2 p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)] sm:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-          Retainer Dashboard
-        </p>
-        <div className="flex flex-wrap items-center gap-2">
+    <header className="mb-5 overflow-hidden rounded-2xl border border-gold/25 bg-surface-2 shadow-lift">
+      <div className="flex flex-wrap items-start gap-4 p-5 sm:p-7">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <div
+            aria-hidden
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-gold/30 font-display text-[22px] font-bold text-gold sm:h-12 sm:w-12"
+            style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--gold) / 0.18), rgb(var(--gold) / 0.04))' }}
+          >
+            {initial}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+              Command center · Owner view
+            </p>
+            <h1 className="mt-1 truncate font-display text-[22px] font-bold leading-tight text-ink sm:text-[32px]">
+              {data.client_name}
+            </h1>
+            {data.target_url && (
+              <a
+                href={data.target_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block max-w-full truncate text-[13px] text-gold-bright underline-offset-2 hover:underline"
+              >
+                {host || data.target_url} ↗
+              </a>
+            )}
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           <FreshnessPill iso={data.generated_at} />
           <button
             type="button"
             onClick={() => window.print()}
-            className="report-actions inline-flex h-8 items-center rounded-full border border-gold/30 bg-gold/10 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-bright transition hover:bg-gold/18"
+            className="report-actions inline-flex h-8 items-center rounded-full border border-gold/30 bg-gold/10 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-bright transition hover:bg-gold/[0.18]"
           >
             Save PDF
           </button>
         </div>
       </div>
-      <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">{data.client_name}</h1>
-      {data.target_url && (
-        <a
-          href={data.target_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-[13px] text-gold-bright underline-offset-2 hover:underline"
-        >
-          {data.target_url} ↗
-        </a>
-      )}
     </header>
   );
 }
@@ -439,7 +1262,7 @@ function Header({ data }: { data: DashboardPayload }) {
  * That distinction is the whole difference between a client feeling out of
  * control and a client feeling informed.
  */
-function SystemStatus({ integrations }: { integrations?: DashboardPayload['integrations'] }) {
+function SystemStatus({ integrations, compact = false }: { integrations?: DashboardPayload['integrations']; compact?: boolean }) {
   // The quote form is wired in the page itself rather than an integration, so
   // it is always on. Everything else reflects what the backend reports.
   const feeds: ReadonlyArray<{ label: string; on: boolean; live: string; pending: string }> = [
@@ -478,42 +1301,65 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
 
   const liveCount = feeds.filter((f) => f.on).length;
 
+  // TODAY uses a one-strip summary (status chips) so the owner's first screen
+  // stays short; the full per-feed detail renders in the Full report.
+  if (compact) {
+    return (
+      <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 px-5 py-4 shadow-lift sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">System health</p>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-ok">
+            {liveCount} of {feeds.length} live
+          </span>
+          <span className="ml-auto text-[11px] text-ink-4">Full detail in Full report</span>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {feeds.map((f) => (
+            <span
+              key={f.label}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11.5px] font-medium text-ink-2 ${
+                f.on ? 'border-emerald-500/25 bg-emerald-500/[0.06]' : 'border-[#F59E0B]/25 bg-[#F59E0B]/[0.06]'
+              }`}
+            >
+              <span aria-hidden className={`h-2 w-2 rounded-full ${f.on ? 'bg-emerald-400' : 'bg-[#F59E0B]'}`} />
+              {f.label}
+              <span className={`text-[9.5px] font-bold uppercase tracking-[0.08em] ${f.on ? 'text-ok' : 'text-[#B8770A]'}`}>
+                {f.on ? 'Live' : 'Pending'}
+              </span>
+            </span>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 shadow-lift">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
         <div>
-          <h2 className="text-[17px] font-bold text-ink sm:text-[19px]">What&apos;s live right now</h2>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">System health</p>
+          <h2 className="mt-1 font-display text-[16px] font-bold text-ink sm:text-[18px]">Is Lola actually running?</h2>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
             Every data feed on this page, and what it&apos;s doing for you.
           </p>
         </div>
-        <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-gold-bright">
-          {liveCount} of {feeds.length} connected
+        <span className="shrink-0 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-ok">
+          {liveCount} of {feeds.length} live
         </span>
       </div>
 
-      <ul className="grid grid-cols-1 divide-y divide-white/[0.07] sm:grid-cols-2 sm:divide-y-0">
-        {feeds.map((f, i) => (
-          <li
-            key={f.label}
-            className={`flex items-start gap-3 px-6 py-4 sm:px-8 ${
-              i % 2 === 0 ? 'sm:border-r sm:border-white/[0.07]' : ''
-            } ${i >= 2 ? 'sm:border-t sm:border-white/[0.07]' : ''}`}
-          >
+      <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 sm:p-5">
+        {feeds.map((f) => (
+          <div key={f.label} className="flex items-start gap-3 rounded-xl border border-gold/15 bg-surface p-4 shadow-lift">
             <span
               aria-hidden
-              className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${
-                f.on ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-amber-400'
-              }`}
+              className={`mt-[3px] h-2.5 w-2.5 shrink-0 rounded-full ${f.on ? 'bg-emerald-400' : 'bg-[#F59E0B]'}`}
+              style={{ boxShadow: f.on ? '0 0 0 4px rgb(var(--ok) / 0.16)' : '0 0 0 4px rgba(245,158,11,0.16)' }}
             />
-            <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-x-2 text-[14px] font-semibold text-ink">
-                {f.label}
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-[0.1em] ${
-                    f.on ? 'text-emerald-300' : 'text-amber-300'
-                  }`}
-                >
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center justify-between gap-2">
+                <span className="text-[14px] font-semibold text-ink">{f.label}</span>
+                <span className={`shrink-0 text-[10px] font-bold uppercase tracking-[0.1em] ${f.on ? 'text-ok' : 'text-[#B8770A]'}`}>
                   {f.on ? 'Live' : 'Pending'}
                 </span>
               </p>
@@ -521,9 +1367,9 @@ function SystemStatus({ integrations }: { integrations?: DashboardPayload['integ
                 {f.on ? f.live : f.pending}
               </p>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
@@ -546,6 +1392,10 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
   const prevLeads = data.tracking_trends?.lead?.prev_month ?? 0;
   const prevContacts = prevCalls + prevLeads;
   const delta = contacts - prevContacts;
+  // Only claim a month-over-month move when the payload actually carries a
+  // prior period. No trend object → render the headline WITHOUT a delta rather
+  // than invent a "vs last month" against an assumed zero.
+  const hasPrior = !!(data.tracking_trends && (data.tracking_trends.call || data.tracking_trends.lead));
   const monthLabel = new Date().toLocaleString(undefined, { month: 'long' });
   const siteHost = (() => {
     try {
@@ -562,7 +1412,7 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
       // tracked and when it lands — this used to repeat both at full height, so
       // a new client read the same reassurance three times before reaching a
       // single number. All this needs to own is "no calls or forms yet".
-      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-gold/15 bg-surface-2 px-6 py-4 sm:px-8">
+      <section className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-gold/15 bg-surface-2 px-6 py-4 shadow-lift sm:px-8">
         <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
           {monthLabel} so far
         </span>
@@ -585,15 +1435,22 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
     : `${deltaArrow} ${Math.abs(delta)} vs last month`;
 
   return (
-    <section className="mb-6 rounded-2xl border border-gold/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#15110A] p-6 shadow-[0_0_28px_rgba(212,175,55,0.08)] sm:p-8">
+    <section
+      className="mb-6 rounded-2xl border border-gold/25 bg-surface-2 p-6 shadow-lift sm:p-8"
+      style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--surface-2)) 0%, rgb(var(--surface-2)) 60%, rgb(var(--gold) / 0.06) 100%)' }}
+    >
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
         {monthLabel} so far
       </p>
-      <h2 className="mt-3 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">
+      <h2 className="mt-3 font-display text-[24px] font-bold leading-snug text-ink sm:text-[30px]">
         <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-transparent">
           {contacts} new contact{contacts === 1 ? '' : 's'}
-        </span>{' '}
-        — <span className={deltaTone}>{deltaText}</span>.
+        </span>
+        {hasPrior ? (
+          <> — <span className={deltaTone}>{deltaText}</span>.</>
+        ) : (
+          <> this month.</>
+        )}
       </h2>
       <p className="mt-3 max-w-[680px] text-[14px] leading-[1.65] text-ink-2">
         <strong className="text-ink">{calls} phone call{calls === 1 ? '' : 's'}</strong>{' '}
@@ -611,33 +1468,64 @@ function OwnerOverview({ data }: { data: DashboardPayload }) {
 function RevenueAgentCard({ revenue }: { revenue: NonNullable<DashboardPayload['revenue_agent']> }) {
   const hasData = revenue.contacts > 0 || revenue.pipeline_value > 0 || revenue.won_revenue > 0 || revenue.open_actions > 0;
   if (!hasData) return null;
-  const money = (n: number) => `$${Math.round(n || 0).toLocaleString()}`;
-  const openOpps = (revenue.opportunities.new || 0) + (revenue.opportunities.qualified || 0) + (revenue.opportunities.estimate_sent || 0);
-  const sentEstimates = revenue.estimates.sent || 0;
+
+  const opps = revenue.opportunities || {};
+  const openOpps = (opps.new || 0) + (opps.qualified || 0) + (opps.estimate_sent || 0);
+  const sentEstimates = revenue.estimates?.sent || 0;
+  const won = revenue.won_revenue || 0;
+  const pipeline = revenue.pipeline_value || 0;
+
+  // Honest conversion ring: of all the value the CRM is tracking (already-won
+  // plus still-open), the share already won. Both dollar amounts are printed
+  // beside it so the percentage can't read as a vanity number. Shown only when
+  // both sides are real — no fabricated funnel, no stage counts.
+  const trackedTotal = won + pipeline;
+  const wonShare = trackedTotal > 0 ? (won / trackedTotal) * 100 : 0;
+  const showRing = won > 0 && pipeline > 0;
+
+  // Build only the tiles that have real data; a zero/absent field shows no
+  // tile rather than a hollow "0".
+  const tiles: Array<{ label: string; value: number; format: 'currency' | 'number'; sub?: string; accent?: boolean }> = [];
+  if (pipeline > 0) tiles.push({ label: 'Open pipeline', value: pipeline, format: 'currency', accent: true, sub: 'live value of open opportunities' });
+  if (won > 0) tiles.push({ label: 'Confirmed won', value: won, format: 'currency', sub: 'recorded won in your CRM' });
+  if (revenue.contacts > 0) tiles.push({ label: 'Contacts matched', value: revenue.contacts, format: 'number', sub: 'people in your pipeline' });
+  if (sentEstimates > 0) tiles.push({ label: 'Estimates sent', value: sentEstimates, format: 'number', sub: 'awaiting a decision' });
+  else if (openOpps > 0) tiles.push({ label: 'Open opportunities', value: openOpps, format: 'number', sub: 'still in play' });
+  else if (revenue.open_actions > 0) tiles.push({ label: 'Follow-ups queued', value: revenue.open_actions, format: 'number', sub: 'next touches ready' });
+
   return (
-    <section className="mb-6 rounded-2xl border border-emerald-500/20 bg-[#0E1512] p-6 shadow-[0_0_28px_rgba(16,185,129,0.06)]">
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-        Revenue Agent
-      </p>
-      <h2 className="mt-2 text-[22px] font-bold text-ink">
-        {money(revenue.pipeline_value)} open pipeline · {money(revenue.won_revenue)} confirmed won
-      </h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-4">
-        <MiniMetric label="Contacts matched" value={revenue.contacts} />
-        <MiniMetric label="Open opportunities" value={openOpps} />
-        <MiniMetric label="Sent estimates" value={sentEstimates} />
-        <MiniMetric label="Follow-ups queued" value={revenue.open_actions} />
+    <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 shadow-lift">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 sm:px-8">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Revenue agent</p>
+          <h2 className="mt-1 font-display text-[16px] font-bold text-ink sm:text-[18px]">The money, live from your pipeline</h2>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-ok">
+          <span aria-hidden className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
+          Live
+        </span>
+      </div>
+      <div className="p-4 sm:p-5">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {tiles.map((t) => (
+            <MoneyTile key={t.label} label={t.label} value={t.value} format={t.format} sub={t.sub} source="GoHighLevel" accent={t.accent} wide={t.accent} />
+          ))}
+        </div>
+        {showRing && (
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <ProgressRing
+              pct={wonShare}
+              centerLabel={`${Math.round(wonShare)}%`}
+              label="Share of tracked value already won"
+              sub={`${fmtMoney(won)} won · ${fmtMoney(pipeline)} still open across everything your CRM is tracking.`}
+            />
+          </div>
+        )}
       </div>
     </section>
-  );
-}
-
-function MiniMetric({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-      <p className="text-[10px] uppercase tracking-[0.12em] text-ink-3">{label}</p>
-      <p className="mt-1 text-xl font-bold text-ink">{value}</p>
-    </div>
   );
 }
 
@@ -1145,6 +2033,12 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
         {metric('seo', 'SEO', '#9B781A')}
         {metric('accessibility', 'Accessibility', '#1D4ED8')}
       </div>
+      {series.length > 1 && (
+        <div className="mt-4">
+          <p className="mb-1 text-[10px] uppercase tracking-[0.12em] text-ink-4">Performance over time</p>
+          <Sparkline values={series.map((s) => s.performance || 0)} color="#15803D" />
+        </div>
+      )}
       <p className="mt-3 text-[11px] text-ink-4">Faster, cleaner site = better rankings + more conversions. Tracked over time.</p>
     </section>
   );
