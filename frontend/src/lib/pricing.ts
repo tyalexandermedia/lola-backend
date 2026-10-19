@@ -94,7 +94,7 @@ export const PLAN_VISIBILITY: PlanTier = {
     'Local citation / NAP review',
     'Call and form tracking',
     'Monthly Lola dashboard',
-    'Direct access to Ty',
+    'A direct line to Ty — replies within 1 business day, plus a quarterly strategy check-in',
   ],
   excludes: [
     'A new custom website',
@@ -133,6 +133,7 @@ export const PLAN_GROWTH: PlanTier = {
     'Estimate pipeline connection',
     'Monthly conversion and ranking review',
     'Ongoing website updates within a clearly defined reasonable scope',
+    'A monthly strategy call with Ty',
   ],
   excludes: [
     'Paid-media budget',
@@ -168,7 +169,8 @@ export const DELIVERABLES: readonly DeliverableRow[] = [
   { label: 'Local citation / NAP review', visibility: true, growth: true },
   { label: 'Call & form tracking', visibility: true, growth: true },
   { label: 'Monthly Lola dashboard', visibility: true, growth: true },
-  { label: 'Direct access to Ty', visibility: true, growth: true },
+  { label: 'A direct line to Ty (replies within 1 business day)', visibility: true, growth: true },
+  { label: 'Monthly strategy call with Ty', visibility: false, growth: true },
   { label: 'Conversion-focused website build or rebuild', visibility: false, growth: true },
   { label: 'Up to five essential launch pages', visibility: false, growth: true },
   { label: 'Technical SEO foundation', visibility: false, growth: true },
@@ -216,6 +218,30 @@ export const COMMITMENT = {
     'We agree on the launch scope and the tracked search terms before work begins. If the agreed foundation deliverables aren’t completed within the documented launch window for reasons under our control, we continue the unfinished implementation work without an additional management charge until it is complete.',
   qualification:
     'Results still depend on competition, proximity, business history, reviews, how quickly you respond to leads, and market conditions. We commit to the work — not to a specific ranking, lead count, or AI recommendation.',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SERVICE MODEL — the structured "access to Ty" (bounds the promise; see docs/PRICING.md)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ServicePoint {
+  label: string;
+  detail: string;
+}
+export const SERVICE_MODEL = {
+  title: 'How support works',
+  intro:
+    'A real line to Ty — structured so you always get an answer, not an open-ended promise that quietly scales into silence.',
+  points: [
+    { label: 'One channel', detail: 'Requests go through one tracked place — not scattered texts and calls.' },
+    { label: 'Replies within 1 business day', detail: 'A clear, honest response window on every routine request.' },
+    { label: 'A scheduled strategy touch', detail: 'A monthly strategy call on the Local Growth System; a quarterly check-in on Local Visibility.' },
+    { label: 'Website updates, defined', detail: 'Update requests are bundled into a monthly release within a clearly defined reasonable scope.' },
+    { label: 'Out-of-scope is quoted', detail: 'New pages beyond launch, redesigns, ad management or extra locations are scoped and priced up front — never surprise-billed.' },
+    { label: 'Automated monthly reporting', detail: 'Your Lola dashboard shows calls, forms, rankings and what shipped — you never wait on a report.' },
+    { label: 'Clear escalation', detail: 'Urgent (site down, tracking broken) jumps the queue; routine requests ride the standard window.' },
+  ] as ReadonlyArray<ServicePoint>,
+  footnote: 'You reach Ty — the person doing the work — not an account manager. Lola watches. Ty does the work.',
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -322,7 +348,7 @@ export const PLAN: Plan = {
     'Review engine + missed-call text-back',
     'Automated text + email lead follow-up',
     'Call, form and UTM tracking on your Lola dashboard',
-    'A direct line to Ty — not an account manager',
+    'A direct line to Ty — 1-business-day replies and a monthly strategy call, not an account manager',
   ],
   terms: 'From $797/month + a one-time $997 launch. 90-day initial term, then month-to-month.',
   cta: PLAN_GROWTH.cta,
@@ -384,7 +410,7 @@ export const PLAN_INCLUDED: ReadonlyArray<PackageDetail> = [
     demo: 'direct',
     title: 'A direct line to Ty',
     detail:
-      "You're not routed through a support desk or account manager. You reach Ty directly — real answers, from the person doing the work. Lola watches. Ty does the work.",
+      "You're not routed through a support desk or account manager. You reach Ty directly — replies within one business day, plus a scheduled strategy call — real answers from the person doing the work. Lola watches. Ty does the work.",
   },
 ];
 

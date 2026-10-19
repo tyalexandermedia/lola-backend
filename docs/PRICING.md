@@ -100,7 +100,7 @@ Includes:
 - Local citation / NAP review
 - Call and form tracking
 - Monthly Lola dashboard
-- Direct access to Ty
+- A direct line to Ty — replies within 1 business day, plus a quarterly strategy check-in
 
 Does **not** include (state plainly, never hidden):
 - A new custom website
@@ -131,6 +131,7 @@ reviews + tracking + follow-up in one system.
 - Estimate pipeline connection
 - Monthly conversion and ranking review
 - Ongoing website updates within a clearly defined reasonable scope
+- A monthly strategy call with Ty (Local Visibility includes a quarterly check-in instead)
 
 Does **not** include:
 - Paid-media budget
@@ -161,6 +162,35 @@ For businesses that need:
 - Always use **"starting at" / "custom"** — every engagement is scoped and priced
   to the work.
 - CTA: **"Discuss Expansion"** → `/apply?plan=expansion`
+
+---
+
+## Service & support model (how "access to Ty" actually works)
+
+"Direct access to Ty" is a real differentiator — but left unbounded it doesn't scale past
+a handful of clients, and it reads as vague to a premium buyer. State it as a **structured
+commitment** so the client knows exactly what they get:
+
+- **One channel.** Requests go through one tracked place — not scattered texts and calls.
+- **Response window.** Routine requests get a reply **within 1 business day**.
+- **Scheduled strategy.** A **monthly strategy call** on the Local Growth System; a
+  **quarterly strategy check-in** on Local Visibility.
+- **Website updates, defined.** Update requests are bundled into a **monthly release**
+  within the clearly defined reasonable scope agreed in writing.
+- **Out-of-scope is quoted, never surprise-billed.** New pages beyond launch, redesigns,
+  ad management, or extra locations are scoped and priced up front (Expansion or a named
+  add-on).
+- **Automated reporting.** The Lola dashboard shows calls, forms, rankings and what shipped
+  this month — no waiting on a manual report.
+- **Clear escalation.** Urgent (site down, tracking broken) jumps the queue; routine
+  requests ride the standard window.
+
+You reach **Ty — the person doing the work** — not an account manager or a support desk.
+*Lola watches. Ty does the work.*
+
+> These windows and limits are commitments to the client. Set them where Ty can honestly
+> hold them at 12+ active clients, and keep the copy identical everywhere (sync the mirrors:
+> `pricing.ts` → `db/pricing.py` → `gen_lp.py`).
 
 ---
 

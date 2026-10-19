@@ -187,7 +187,7 @@ export const SCORE_QA = pick(AI_QA, [
 export const PRICING_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'What’s included in local SEO with Coach Ty Leads?',
-    a: `Every plan manages your Google Business Profile, builds a review-request system, turns missed calls into text-backs, and tracks your calls and forms on a monthly Lola dashboard — with direct access to Ty. The Local Growth System (${PLAN_GROWTH.monthly}/month) adds a conversion-focused website, technical SEO, a quote/estimate path and automated text-and-email follow-up on top.`,
+    a: `Every plan manages your Google Business Profile, builds a review-request system, turns missed calls into text-backs, and tracks your calls and forms on a monthly Lola dashboard — with a direct line to Ty (replies within 1 business day). The Local Growth System (${PLAN_GROWTH.monthly}/month) adds a conversion-focused website, technical SEO, a quote/estimate path and automated text-and-email follow-up on top.`,
   },
   {
     q: 'Why is there a launch or activation fee?',

@@ -91,12 +91,12 @@ function parseRoute(pathname: string): Route {
   // already published in vercel.json — production redirects before the SPA ever
   // loads, so these arms only fire on client-side navigation and local dev.
   //
-  // RetainerPage.tsx and ManagedPage.tsx are no longer imported at all. Both
-  // were survivors of the retired model — RetainerPage sold "The Full Build"
+  // RetainerPage.tsx and ManagedPage.tsx were deleted in the Brief #2 cleanup.
+  // Both were survivors of the retired model — RetainerPage sold "The Full Build"
   // behind calendar CTAs, ManagedPage published a $297/mo price that exists
   // nowhere in docs/PRICING.md — and while their route arms were already
   // unreachable, Vite kept emitting their chunks, so retired pricing shipped to
-  // the CDN as fetchable JS. The files stay in the repo for reference.
+  // the CDN as fetchable JS. Removing the files stops that for good.
   if (pathname === '/retainer' || pathname === '/retainer/') return { name: 'pricing' };
   if (pathname === '/managed' || pathname === '/managed/') return { name: 'pricing' };
   if (pathname === '/work' || pathname === '/work/') return { name: 'work' };
