@@ -45,6 +45,7 @@ import {
   FREE_GROWTH_SCORE,
   PLAN_GROWTH,
   PLAN_VISIBILITY,
+  SERVICE_MODEL,
   TERRITORY,
   type PlanTier,
 } from './lib/pricing';
@@ -68,6 +69,7 @@ export default function PricingPage() {
       <TwoPlans />
       <DecisionHelper />
       <DeliverablesTable />
+      <ServiceModel />
       <SandbarProof />
       <BreakEven />
       <Process />
@@ -490,6 +492,34 @@ function Process() {
           </li>
         ))}
       </ol>
+    </section>
+  );
+}
+
+/* ── Service & support model (bounds the "access to Ty" promise) ───────── */
+function ServiceModel() {
+  return (
+    <section className="mt-16 sm:mt-24">
+      <div className="mx-auto max-w-[820px] rounded-2xl border border-gold/25 bg-surface p-6 text-left shadow-lift sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{SERVICE_MODEL.title}</p>
+        <h2 className="mt-3 font-display text-[24px] font-bold leading-[1.2] text-ink sm:text-[30px]">
+          A direct line to Ty — with structure behind it
+        </h2>
+        <p className="mt-4 text-[15px] leading-[1.65] text-ink-2">{SERVICE_MODEL.intro}</p>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          {SERVICE_MODEL.points.map((pt) => (
+            <li key={pt.label} className="flex items-start gap-2.5">
+              <span className="text-ok">{CHECK}</span>
+              <span className="text-[14px] leading-[1.5] text-ink-2">
+                <strong className="font-semibold text-ink">{pt.label}.</strong> {pt.detail}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 border-t border-gold/15 pt-4 text-[13.5px] leading-[1.6] text-ink-2">
+          {SERVICE_MODEL.footnote}
+        </p>
+      </div>
     </section>
   );
 }

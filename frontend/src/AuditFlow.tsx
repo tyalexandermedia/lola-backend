@@ -10,7 +10,7 @@ import { track } from './analytics';
 
 import AiVisibility from './AiVisibility';
 import { API_URL } from './api';
-import { PLAN, GUARANTEE, EXCLUSIVITY } from './lib/pricing';
+import { PLAN, GUARANTEE, EXCLUSIVITY, AFTER_YOU_START } from './lib/pricing';
 import { startHref, startSmsHref } from './lib/checkout';
 import { SITE_ORIGIN } from './lib/pageMeta';
 // Re-export retained for any external consumer; new code should import from
@@ -1443,6 +1443,25 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-ink-3">
           Website design is part of it too, and I do all of it — backed by
           our launch commitment.
+        </p>
+      </section>
+
+      {/* What happens when you say yes — bridges the diagnosis to becoming a client */}
+      <section className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
+        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
+          What happens when you say yes
+        </p>
+        <ol className="mt-5 grid gap-4 sm:grid-cols-3">
+          {AFTER_YOU_START.map((s, i) => (
+            <li key={s.step} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <p className="text-[22px] font-extrabold leading-none text-gold/70">{i + 1}</p>
+              <p className="mt-2 text-[14px] font-bold leading-[1.3] text-white">{s.step}</p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-ink-3">{s.detail}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-[12.5px] leading-[1.5] text-ink-3">
+          No surprise charges: we confirm the scope and your territory in writing before anything is billed.
         </p>
       </section>
 
