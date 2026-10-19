@@ -593,12 +593,19 @@ export function ResultsStage({
     }
   };
 
-  const monthlyLeak = audit.revenue_leak.monthly_leak || 0;
-  const annualAtStake = monthlyLeak * 12;
-  const isHighLeak = monthlyLeak >= 10000;
   const businessTypeDisplay = audit.business_type
     ? audit.business_type.replace(/\b\w/g, (c) => c.toUpperCase())
     : '';
+
+  // Honest, score-band standing — characterizes the REAL score; no invented dollars or ranking promise.
+  const standingLine =
+    audit.total_score < 0
+      ? "We couldn't fully grade this yet — here's what we confirmed."
+      : audit.total_score >= 80
+      ? 'Strong foundation — a few high-leverage tweaks stand between you and the top of local search.'
+      : audit.total_score >= 65
+      ? 'Solid base, with clear and winnable opportunities below.'
+      : 'Real upside here — the fixes below are where your growth is.';
 
   const heroCtaHref = startHref(true);
 
@@ -616,9 +623,8 @@ export function ResultsStage({
 
       {/* ════════════════════════════════════════════════════════════════
           HERO — above the fold.
-          Eyebrow → H1 → city/type → custom insight → 3-stat grid
+          Eyebrow → H1 → city/type → custom insight → 2-card standing grid
           → primary CTA → micro-benefits → scroll cue (desktop only).
-          The Annual-at-Stake stat is visually dominant.
       ════════════════════════════════════════════════════════════════ */}
       <section className="animate-slide-up relative pt-0">
         {/* Radial gold glow behind the stat grid (premium feel, doesn't tint cards). */}
@@ -628,7 +634,7 @@ export function ResultsStage({
         />
 
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold">
-          Audit Complete
+          Your Growth Score
         </p>
 
         {/* H1: clamp scales 40→72px with viewport; nowrap on desktop so the
@@ -649,44 +655,19 @@ export function ResultsStage({
           {audit.lola_message}
         </p>
 
-        {/* 3-stat grid — 32px gap from insight, 16px between cards, 24px card padding */}
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {/* Score */}
+        {/* Two honest cards: the real score, and where that score puts you.
+            No modeled dollar "leak" — opportunities live in the playbook below. */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-3">Score</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-3">Growth Score</p>
             <p className={`mt-3 text-[44px] font-extrabold leading-none ${scoreTone}`}>
               {audit.total_score < 0 ? '—' : audit.total_score}
             </p>
-            <p className="mt-2 text-[13px] text-ink-3">
-              {audit.grade} — {audit.grade_label}
-            </p>
+            <p className="mt-2 text-[13px] text-ink-3">{audit.grade} — {audit.grade_label}</p>
           </div>
-
-          {/* Monthly leak — toggle between $ and missed calls */}
-          <LeakCard
-            monthlyLeak={monthlyLeak}
-            missedCalls={audit.revenue_leak.missed_calls_per_month || 0}
-            avgJobValue={audit.revenue_leak.avg_job_value || 0}
-            isIncomplete={audit.segment === 'incomplete'}
-          />
-
-          {/* Annual at stake — DOMINANT */}
-          <div
-            className={`relative rounded-[12px] border-2 border-gold/55 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-transparent p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.08),0_0_28px_rgba(212,175,55,0.10)]`}
-          >
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gold">
-              Annual at stake
-            </p>
-            <p
-              className={`mt-3 bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text font-extrabold leading-[0.95] tracking-[-0.025em] text-transparent ${
-                isHighLeak
-                  ? 'text-[56px] sm:text-[72px] lg:text-[80px]'
-                  : 'text-[48px] sm:text-[64px] lg:text-[72px]'
-              } drop-shadow-[0_4px_20px_rgba(212,175,55,0.25)]`}
-            >
-              ${formatNumber(annualAtStake)}
-            </p>
-            <p className="mt-2 text-[13px] text-gold/80">/ year at risk</p>
+          <div className="rounded-[12px] border-2 border-gold/45 bg-gradient-to-br from-gold/[0.10] via-gold-deep/[0.05] to-transparent p-6 shadow-[inset_0_0_40px_rgba(212,175,55,0.08)]">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gold">Where you stand</p>
+            <p className="mt-3 text-[18px] font-bold leading-[1.3] text-white sm:text-[20px]">{standingLine}</p>
           </div>
         </div>
 
@@ -695,11 +676,11 @@ export function ResultsStage({
         <a
           href={heroCtaHref}
           onClick={() => {
-            trackClick('start_clicked_hero', { monthly_leak: monthlyLeak, annual: annualAtStake, score: audit.total_score });
+            trackClick('start_clicked_hero', { score: audit.total_score });
           }}
           className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-r from-gold via-gold-bright to-gold bg-[length:200%_100%] bg-left px-6 text-[14px] font-bold uppercase tracking-[0.05em] text-on-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.1),0_6px_20px_rgba(212,175,55,0.32)] transition-all duration-[400ms] ease-out hover:scale-[1.02] hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1),0_10px_32px_rgba(212,175,55,0.55)] active:scale-[0.98] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-gold sm:mt-10 sm:h-16 sm:text-[16px]"
         >
-          <span>Plug the leak — {PLAN.price}{PLAN.period}</span>
+          <span>Start my Growth System — {PLAN.price}{PLAN.period}</span>
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
         </a>
 
@@ -752,7 +733,7 @@ export function ResultsStage({
         <section className="mt-5 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-sm text-amber-100">
           <p className="font-semibold text-amber-200">Audit ran with degraded data.</p>
           <p className="mt-1 text-amber-200/90">
-            Google's APIs didn't return enough signal to grade fairly. The leak estimate uses a
+            Google's APIs didn't return enough signal to grade fairly, so this score is a
             conservative baseline. The playbook below is the safe-bet starting point — once the data
             is flowing again, Lola can grade the real score.
           </p>
@@ -943,15 +924,6 @@ export function ResultsStage({
             <ProfileRow label="Rating" value={stringOf(businessInfo.rating, 'Unknown')} />
             <ProfileRow label="Reviews" value={stringOf(businessInfo.review_count, 'Unknown')} />
           </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <Stat label="Missed calls / mo" value={`${audit.revenue_leak.missed_calls_per_month}`} />
-            <Stat label="Avg job value" value={`$${formatNumber(audit.revenue_leak.avg_job_value)}`} />
-            <Stat
-              label="Recovery potential"
-              value={`$${formatNumber(audit.revenue_leak.recovery_potential)}`}
-            />
-          </div>
         </div>
       </details>
 
@@ -1079,37 +1051,18 @@ function DataFreshnessAccordion() {
 }
 
 function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) {
-  const leak = audit.revenue_leak.monthly_leak || 0;
   const score = audit.total_score;
 
-  // Dynamic headline per spec
+  // Honest, score-based headline — no invented dollar figure.
   const headline = (() => {
-    if (score >= 80) {
-      return (
-        <>
-          Your SEO is strong — but{' '}
-          <span className="text-gold-hi">${formatNumber(leak)}/month</span> is still up for grabs.
-        </>
-      );
-    }
-    if (leak >= 1000) {
-      return (
-        <>
-          You're leaving{' '}
-          <span className="text-gold-hi">${formatNumber(leak)}/month</span> on the table.
-        </>
-      );
-    }
-    return (
-      <>
-        There's <span className="text-gold-hi">${formatNumber(leak)}/month</span> worth of fixes waiting.
-      </>
-    );
+    if (score >= 80) return <>Your foundation is strong — let's take the top spots.</>;
+    if (score >= 65) return <>You're close — a few high-leverage fixes from the top.</>;
+    return <>The biggest wins are still on the table. Let's go get them.</>;
   })();
 
   const strategyHref = startHref(true);
 
-  const onBookClick = () => trackClick('start_clicked_report_footer', { leak, score });
+  const onBookClick = () => trackClick('start_clicked_report_footer', { score });
   const onGuideClick = () => trackClick('guide_download', { score });
   const onCaseStudyClick = () => trackClick('case_study_view', { score });
   const onRerunClick = () => {
@@ -1128,9 +1081,9 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
           {headline}
         </h2>
         <p className="mt-5 max-w-[640px] text-[15px] leading-[1.6] text-ink-2 sm:text-[17px]">
-          Most owners don't fix this — they grind harder.
+          Most owners just grind harder.
           <br className="hidden sm:inline" />{' '}
-          Smart ones plug the leak.
+          The ones who win fix the system.
         </p>
 
         <a
@@ -1227,86 +1180,6 @@ function ResultsFooter({ audit, cta }: { audit: AuditResult; cta: ResultsCta }) 
 
 // CheckIcon — used by the hero's micro-benefits row. Pricing tier card uses
 // an inline SVG for the same reason but with a slightly thinner stroke.
-// Stat-card with $/missed-calls toggle. Default shows monthly dollars; toggling
-// to "calls" surfaces the visceral count of customers walking past — based on
-// the same revenue_leak math the backend already returned (no recompute on FE).
-function LeakCard({
-  monthlyLeak,
-  missedCalls,
-  avgJobValue,
-  isIncomplete,
-}: {
-  monthlyLeak: number;
-  missedCalls: number;
-  avgJobValue: number;
-  isIncomplete: boolean;
-}) {
-  const [mode, setMode] = useState<'dollars' | 'calls'>('dollars');
-
-  return (
-    <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.02] p-6">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-3">
-          Monthly leak
-        </p>
-        <div
-          role="tablist"
-          aria-label="Leak display mode"
-          className="inline-flex rounded-full border border-white/[0.08] bg-surface-2 p-0.5 text-[10px] font-bold uppercase tracking-[0.08em]"
-        >
-          <button
-            role="tab"
-            aria-selected={mode === 'dollars'}
-            type="button"
-            onClick={() => {
-              setMode('dollars');
-              trackClick('leak_toggle', { mode: 'dollars' });
-            }}
-            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
-              mode === 'dollars' ? 'bg-gold text-on-gold' : 'text-ink-3 hover:text-white'
-            }`}
-          >
-            💰 $
-          </button>
-          <button
-            role="tab"
-            aria-selected={mode === 'calls'}
-            type="button"
-            onClick={() => {
-              setMode('calls');
-              trackClick('leak_toggle', { mode: 'calls' });
-            }}
-            className={`flex h-11 min-w-[44px] items-center rounded-full px-3 transition ${
-              mode === 'calls' ? 'bg-gold text-on-gold' : 'text-ink-3 hover:text-white'
-            }`}
-          >
-            📞 calls
-          </button>
-        </div>
-      </div>
-
-      {mode === 'dollars' ? (
-        <>
-          <p className="mt-3 bg-gradient-to-br from-gold to-gold-bright bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
-            ${formatNumber(monthlyLeak)}
-          </p>
-          <p className="mt-2 text-[13px] text-ink-3">
-            {isIncomplete ? 'conservative estimate' : '/ month walking out the door'}
-          </p>
-        </>
-      ) : (
-        <>
-          <p className="mt-3 bg-gradient-to-br from-gold to-gold-bright bg-clip-text text-[40px] font-extrabold leading-none tracking-[-0.02em] text-transparent sm:text-[48px]">
-            ~{formatNumber(missedCalls)}
-          </p>
-          <p className="mt-2 text-[13px] text-ink-3">
-            missed calls / month{avgJobValue > 0 ? ` · ~$${formatNumber(avgJobValue)} avg job` : ''}
-          </p>
-        </>
-      )}
-    </div>
-  );
-}
 
 // ── P11 Phase C — Copy-paste deliverables + Lola's Take + Share ──────
 //
@@ -1443,8 +1316,6 @@ function CopyCard({
 
 function DeliverablesBlock({ audit }: { audit: AuditResult }) {
   const score = audit.total_score;
-  const monthlyLeak = audit.revenue_leak?.monthly_leak || 0;
-  const businessFirst = (audit.business_name || 'your business').split(' ')[0];
 
   const titleTag = useMemo(() => generateTitleTag(audit), [audit]);
   const gbpDescription = useMemo(() => generateGbpDescription(audit), [audit]);
@@ -1454,19 +1325,15 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
   // Score-aware messaging for "Lola's Take" closing
   let assessment: string;
   let topFix: string;
-  let movementHint: string;
   if (score >= 80) {
-    assessment = 'solid — top tier among Florida operators';
-    topFix = 'Tighten title tag + add 2 GBP posts this week';
-    movementHint = '2–4 spots';
+    assessment = 'strong';
+    topFix = 'Tighten the title tag + add 2 GBP posts this week';
   } else if (score >= 65) {
-    assessment = 'decent — but a few high-impact gaps are bleeding revenue';
-    topFix = 'Fix the GBP description + add LocalBusiness schema today';
-    movementHint = '4–6 spots';
+    assessment = 'solid, with a few high-impact gaps to close';
+    topFix = 'Fix the GBP description + add LocalBusiness schema';
   } else {
-    assessment = 'rough — the foundation needs work, but the gap is your opportunity';
-    topFix = 'Deploy all 4 copy-paste artifacts below this week';
-    movementHint = '6–8 spots';
+    assessment = 'a real opportunity — the foundation needs work, and that gap is your upside';
+    topFix = 'Deploy all 4 copy-paste fixes below this week';
   }
 
   // Build share URL only if we have a valid audit_id — otherwise the link
@@ -1590,17 +1457,8 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
             <strong>{score}/100 — {audit.grade}</strong>)
           </p>
           <p>
-            <strong className="text-white">Fastest win:</strong> {topFix}. That alone could move
-            you <strong className="text-gold">{movementHint}</strong> in 30 days.
+            <strong className="text-white">Fastest win:</strong> {topFix}.
           </p>
-          {monthlyLeak > 0 && (
-            <p>
-              <strong className="text-white">Biggest leak:</strong> The gap between where{' '}
-              {businessFirst} ranks today and where it could rank. That's about{' '}
-              <strong className="text-gold">${formatNumber(monthlyLeak)}/mo</strong> on the
-              table.
-            </p>
-          )}
           <p className="pt-1 font-semibold text-white">
             Want me to do this for you instead?
           </p>
@@ -1788,28 +1646,10 @@ function EnhancementBlock({ audit }: { audit: AuditResult }) {
         </p>
       )}
 
-      {/* Revenue leak headline */}
-      {payload.revenue_leak && typeof payload.revenue_leak.monthly_dollars === 'number' && (
+      {payload.revenue_leak && payload.revenue_leak.explanation && (
         <div className="mt-6 rounded-2xl border border-gold/30 bg-surface-2 p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">
-            Revenue leak — Lola's deeper read
-          </p>
-          <p className="mt-3">
-            <span className="bg-gradient-to-br from-gold-hi via-gold-bright to-gold bg-clip-text text-[36px] font-extrabold leading-none text-transparent sm:text-[44px]">
-              ${formatNumber(payload.revenue_leak.monthly_dollars)}
-            </span>
-            <span className="ml-2 text-[14px] text-ink-3">/month</span>
-          </p>
-          {payload.revenue_leak.annual_dollars ? (
-            <p className="mt-1 text-[13px] text-ink-3">
-              ${formatNumber(payload.revenue_leak.annual_dollars)}/year at stake
-            </p>
-          ) : null}
-          {payload.revenue_leak.explanation && (
-            <p className="mt-3 text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">
-              {payload.revenue_leak.explanation}
-            </p>
-          )}
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Lola's deeper read</p>
+          <p className="mt-3 text-[13px] leading-[1.6] text-ink-2 sm:text-[14px]">{payload.revenue_leak.explanation}</p>
         </div>
       )}
 
