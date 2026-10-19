@@ -35,6 +35,25 @@ POSTHOG_HOST = (
 GHL_PIPELINE_STAGE = "New Growth Score Lead"
 GHL_TAG = "growth-score"
 
+# New-contact bridges beyond the Growth Score. Each is OPT-IN and dormant by
+# default: the code ships inert and is activated in Railway once the matching
+# GoHighLevel inbound-webhook workflow exists to route the new `source` value.
+# The webhook URL is already live for growth-score leads, so without these flags
+# the new pushes would hit an unprepared workflow — hence off until Ty flips them.
+GHL_BRIDGE_APPLICATIONS = (
+    os.getenv("GHL_BRIDGE_APPLICATIONS", "false").strip().lower() == "true"
+)
+GHL_BRIDGE_PURCHASES = (
+    os.getenv("GHL_BRIDGE_PURCHASES", "false").strip().lower() == "true"
+)
+# Pipeline-stage strings Ty maps in the GHL workflow builder (like the stage above).
+GHL_PIPELINE_STAGE_APPLICATION = os.getenv(
+    "GHL_PIPELINE_STAGE_APPLICATION", "Application"
+).strip()
+GHL_PIPELINE_STAGE_CUSTOMER = os.getenv(
+    "GHL_PIPELINE_STAGE_CUSTOMER", "Customer"
+).strip()
+
 _TIMEOUT = 10.0
 
 
@@ -155,3 +174,139 @@ async def push_growth_score_lead(
         },
     )
     return ok
+
+
+async def _bridge_contact(
+    *,
+    source: str,
+    tags: list,
+    pipeline_stage: str,
+    event: str,
+    distinct_id: str = "",
+    name: str = "",
+    email: str = "",
+    phone: str = "",
+    city: str = "",
+    service: str = "",
+    extra: Optional[dict] = None,
+    event_props: Optional[dict] = None,
+) -> bool:
+    """
+    Shared GHL inbound-webhook bridge for the application/customer pushes. Same
+    safe-by-default contract as push_growth_score_lead: no-ops when the webhook
+    is unconfigured, swallows every error, logs the attempt to PostHog. Intended
+    fire-and-forget via asyncio.create_task.
+    """
+    if not ghl_enabled():
+        return False
+
+    payload = {
+        "name": name or "",
+        "email": email or "",
+        "phone": phone or "",
+        "city": city or "",
+        "service": service or "",
+        "source": source,
+        "tags": tags,
+        "pipeline_stage": pipeline_stage,
+    }
+    if extra:
+        payload.update({k: v for k, v in extra.items() if v not in (None, "")})
+
+    ok = False
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.post(GHL_INBOUND_WEBHOOK_URL, json=payload)
+            ok = r.status_code < 400
+            if not ok:
+                print(f"⚠️ GHL bridge non-2xx ({source}): {r.status_code} {r.text[:200]}")
+    except Exception as e:
+        print(f"⚠️ GHL bridge failed ({source}): {e}")
+
+    await posthog_capture(
+        event,
+        distinct_id=distinct_id or email or phone or "anonymous",
+        properties={
+            "ok": ok,
+            "source": source,
+            "has_email": bool(email),
+            "has_phone": bool(phone),
+            **(event_props or {}),
+        },
+    )
+    return ok
+
+
+async def push_application_lead(
+    *,
+    first_name: str = "",
+    last_name: str = "",
+    email: str = "",
+    business_name: str = "",
+    website: str = "",
+    trade: str = "",
+    monthly_revenue: str = "",
+    tier: str = "",
+    frustration: str = "",
+) -> bool:
+    """
+    Bridge a submitted application into GoHighLevel as a hot lead. OPT-IN:
+    dormant unless GHL_BRIDGE_APPLICATIONS=true. No phone is collected on the
+    application form, so the contact is keyed on email and GHL de-dups onto any
+    existing Growth Score contact.
+    """
+    if not GHL_BRIDGE_APPLICATIONS:
+        return False
+    tags = ["application"] + ([f"plan-{tier}"] if tier else [])
+    return await _bridge_contact(
+        source="application",
+        tags=tags,
+        pipeline_stage=GHL_PIPELINE_STAGE_APPLICATION,
+        event="ghl_application_bridged",
+        distinct_id=email,
+        name=f"{first_name} {last_name}".strip(),
+        email=email,
+        service=trade,
+        extra={
+            "business_name": business_name,
+            "website": website,
+            "trade": trade,
+            "monthly_revenue": monthly_revenue,
+            "tier": tier,
+            "frustration": frustration,
+        },
+        event_props={"tier": tier, "monthly_revenue": monthly_revenue, "trade": trade},
+    )
+
+
+async def push_customer(
+    *,
+    email: str = "",
+    phone: str = "",
+    tier: str = "",
+    amount: Optional[int] = None,
+    session_id: str = "",
+) -> bool:
+    """
+    Bridge a paid customer into GoHighLevel (contact moved to the customer
+    stage). OPT-IN: dormant unless GHL_BRIDGE_PURCHASES=true. Called from the
+    Stripe webhook ONLY after signature verification + the paid check, as a
+    fire-and-forget side effect that can never affect fulfillment.
+    """
+    if not GHL_BRIDGE_PURCHASES:
+        return False
+    tags = ["customer"] + ([f"plan-{tier}"] if tier else [])
+    extra = {"tier": tier, "session_id": session_id}
+    if amount is not None:
+        extra["amount"] = amount
+    return await _bridge_contact(
+        source="customer",
+        tags=tags,
+        pipeline_stage=GHL_PIPELINE_STAGE_CUSTOMER,
+        event="ghl_customer_bridged",
+        distinct_id=email or phone,
+        email=email,
+        phone=phone,
+        extra=extra,
+        event_props={"tier": tier, **({"amount": amount} if amount is not None else {})},
+    )

@@ -144,7 +144,13 @@ from db.reviews import review_counts_for_slug
 from db.reporting import set_gbp_credentials
 from agents.reporting_agent.data_fetcher import fetch_search_metrics
 from api_clients.search_providers import fetch_gbp_performance, fetch_bing_webmaster
-from api_clients.ghl import push_growth_score_lead, ghl_enabled
+from api_clients.ghl import (
+    push_growth_score_lead,
+    push_application_lead,
+    push_customer,
+    posthog_capture,
+    ghl_enabled,
+)
 
 # Lola personal command-center (Daily Brief) — see docs/LOLA-COMMAND-CENTER-AUDIT.md
 from db.lola_items import (
@@ -1794,6 +1800,22 @@ async def submit_application(body: ApplicationRequest):
         trade=body.trade,
         frustration=(body.frustration or "").strip(),
         tier=body.tier,
+    )
+
+    # Bridge the applicant into GoHighLevel as a hot lead (opt-in; dormant unless
+    # GHL_BRIDGE_APPLICATIONS=true). Fire-and-forget — never blocks the response.
+    asyncio.create_task(
+        push_application_lead(
+            first_name=body.first_name,
+            last_name=body.last_name,
+            email=body.email,
+            business_name=body.business_name,
+            website=body.website,
+            trade=body.trade,
+            monthly_revenue=body.monthly_revenue,
+            tier=body.tier,
+            frustration=body.frustration or "",
+        )
     )
 
     async with httpx.AsyncClient() as client:
@@ -4118,6 +4140,22 @@ async def stripe_webhook(request: Request):
 
     # Converted — stop the prospect ('score') follow-up sequence for this buyer.
     asyncio.create_task(mark_followup_purchased(email=email, phone=phone))
+
+    # Bridge the paid customer into GoHighLevel (opt-in; dormant unless
+    # GHL_BRIDGE_PURCHASES=true) and log a server-side purchase event to PostHog.
+    # Both are fire-and-forget side effects AFTER signature + paid verification —
+    # they can never affect fulfillment or the 200 returned to Stripe.
+    amount_total = int(sess.get("amount_total") or 0)
+    asyncio.create_task(
+        push_customer(email=email, phone=phone, tier=tier, amount=amount_total, session_id=sid)
+    )
+    asyncio.create_task(
+        posthog_capture(
+            "purchase",
+            distinct_id=email or phone or "anonymous",
+            properties={"tier": tier, "amount": amount_total, "currency": sess.get("currency") or "usd"},
+        )
+    )
 
     # The post-build → $297/mo continuity enrollment that sat here went with the
     # Full Build tier and the $297 price, neither of which exists. A monthly

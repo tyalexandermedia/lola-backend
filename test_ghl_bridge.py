@@ -103,6 +103,46 @@ async def main() -> None:
     ok = await ghl.push_growth_score_lead(name="Bad Co", email="c@c.com")
     assert ok is False, "non-2xx GHL should return False"
 
+    # 5) The new application/customer pushes are OPT-IN: dormant even with the
+    #    webhook set, until their own flag is on — so they can't hit an
+    #    unprepared GHL workflow.
+    _FakeClient.raise_on_post = False
+    _FakeClient.status_code = 200
+    _FakeClient.posts = []
+    assert await ghl.push_application_lead(email="a@a.com") is False
+    assert await ghl.push_customer(email="a@a.com") is False
+    assert _FakeClient.posts == [], "opt-in pushes must not POST while dormant"
+
+    # 6) Flags on → each bridges with the right source / tags / stage.
+    os.environ["GHL_BRIDGE_APPLICATIONS"] = "true"
+    os.environ["GHL_BRIDGE_PURCHASES"] = "true"
+    ghl = importlib.reload(ghl)
+    ghl.POSTHOG_API_KEY = ""  # keep posthog leg a no-op so posts[] holds only GHL
+    ghl.httpx.AsyncClient = _FakeClient
+    _FakeClient.posts = []
+
+    ok = await ghl.push_application_lead(
+        first_name="Pat", last_name="Roof", email="pat@roof.com",
+        business_name="Roof Co", website="roofco.com", trade="roofing",
+        monthly_revenue="50k_100k", tier="growth", frustration="slow leads",
+    )
+    assert ok is True
+    appl = _FakeClient.posts[-1]["json"]
+    assert appl["source"] == "application", appl
+    assert "application" in appl["tags"] and "plan-growth" in appl["tags"], appl["tags"]
+    assert appl["pipeline_stage"] == ghl.GHL_PIPELINE_STAGE_APPLICATION
+    assert appl["email"] == "pat@roof.com" and appl["trade"] == "roofing", appl
+
+    ok = await ghl.push_customer(
+        email="pat@roof.com", phone="+17275550123", tier="growth",
+        amount=79700, session_id="cs_test_1",
+    )
+    assert ok is True
+    cust = _FakeClient.posts[-1]["json"]
+    assert cust["source"] == "customer" and "customer" in cust["tags"], cust
+    assert cust["pipeline_stage"] == ghl.GHL_PIPELINE_STAGE_CUSTOMER
+    assert cust["amount"] == 79700, cust
+
     print("OK: GHL lead-bridge is safe-by-default and maps fields correctly")
 
 
