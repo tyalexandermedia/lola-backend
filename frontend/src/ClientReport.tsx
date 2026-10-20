@@ -146,6 +146,22 @@ const DEMO_PAYLOAD: DashboardPayload = {
   reviews: { month: 4, lifetime: 37, google_routed_month: 4 },
   gbp_performance: { calls: 62, website_clicks: 138, direction_requests: 44, impressions: 5120, window_days: 30 },
   bing: null,
+  search_console: {
+    fetched_at: _demoRun,
+    gsc: {
+      error: null, clicks: 486, impressions: 9820, ctr: 4.9, position: 7.3,
+      clicks_prev: 402, impressions_prev: 9010,
+      top_queries: [
+        { query: 'pressure washing riverside', clicks: 88, impressions: 1120, ctr: 7.9, position: 2 },
+        { query: 'house washing near me', clicks: 61, impressions: 980, ctr: 6.2, position: 3 },
+      ],
+      top_pages: [
+        { page: '/services/house-washing', clicks: 140, impressions: 2600 },
+        { page: '/', clicks: 96, impressions: 1800 },
+      ],
+    },
+    ga: { error: null, organic_sessions: 612, organic_sessions_prev: 528 },
+  },
   lead_sources: { 'Google Business Profile': 19, 'Organic search': 11, 'Website form': 8, Referral: 9 },
   cwv_trend: [
     { performance: 72, accessibility: 95, seo: 92, run_at: _demoRun },
@@ -430,6 +446,16 @@ export default function ClientReport({ slug }: { slug: string }) {
   // what-happens-next panel. See the WhatWeWatchCard gate below.
   const nothingMeasured = !anyTracking && !anyRankings && !anyAi;
 
+  // A ranking "result" is actually placing or being mentioned somewhere — not
+  // merely that the tracker RAN. A brand-new or weak site can have run_count>0
+  // with every position null; five tables of "not ranked" read as failure, not
+  // day one. When there are no real results AND no traffic/tracking yet, lead
+  // with the what-we're-watching plan instead of a wall of empties.
+  const anyRankResults = data.google.some((s) => s.current?.position != null);
+  const anyAiResults = data.ai_mode.some((s) => s.current?.position != null || s.current?.mentioned);
+  const hasGaTraffic = (data.search_console?.ga?.organic_sessions || 0) > 0;
+  const earlyState = nothingMeasured || (!anyTracking && !anyRankResults && !anyAiResults && !hasGaTraffic);
+
   return (
     <main className="client-report mx-auto w-full max-w-4xl py-6 sm:py-10">
       {isDemo && <DemoBadge />}
@@ -457,7 +483,7 @@ export default function ClientReport({ slug }: { slug: string }) {
           <Reveal index={3}><LifecycleSpine data={data} /></Reveal>
           {/* Is Lola actually running? Compact one-strip summary on Today; the
               full per-feed breakdown lives in the Full report. */}
-          <Reveal index={4}><SystemStatus integrations={data.integrations} compact /></Reveal>
+          <Reveal index={4}><SystemStatus integrations={data.integrations} quoteFormLive={(data.tracking?.lead?.lifetime || 0) > 0} compact /></Reveal>
         </>
       ) : (
         /* ── FULL REPORT — everything else; all honesty/empty gates intact ───── */
@@ -481,7 +507,7 @@ export default function ClientReport({ slug }: { slug: string }) {
               brand-new client lost the only panel explaining what was being tracked
               and what happens next. Work delivered is the day-one state, not a
               reason to hide the expectations. Disappears once real data arrives. */}
-          {nothingMeasured && (
+          {earlyState && (
             <WhatWeWatchCard
               clientName={data.client_name}
               google={data.google}
@@ -494,6 +520,9 @@ export default function ClientReport({ slug }: { slug: string }) {
             <TrackingRow tracking={data.tracking!} sources={data.tracking_sources} trends={data.tracking_trends} />
           )}
           {data.gbp_performance && <GbpCard g={data.gbp_performance} />}
+          {data.search_console?.ga && !data.search_console.ga.error && (data.search_console.ga.organic_sessions || 0) > 0 && (
+            <SearchTrafficCard ga={data.search_console.ga} />
+          )}
           {data.search_console?.gsc && !data.search_console.gsc.error && <SearchConsoleCard sc={data.search_console} />}
           {data.bing && (data.bing.clicks > 0 || data.bing.impressions > 0) && <BingCard b={data.bing} />}
           {data.lead_sources && Object.keys(data.lead_sources).length > 0 && <LeadSourceCard sources={data.lead_sources} />}
@@ -502,10 +531,10 @@ export default function ClientReport({ slug }: { slug: string }) {
           {data.funnel && (data.funnel.view > 0 || data.funnel.click > 0) && <FunnelCard f={data.funnel} />}
           {data.reviews && (data.reviews.month > 0 || data.reviews.lifetime > 0) && <ReviewsCard r={data.reviews} />}
 
-          {anyRankings && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
-          {anyRankings && <CompetitorWatchlist google={data.google} />}
+          {anyRankResults && <RankingsTable google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankResults && <CompetitorWatchlist google={data.google} />}
 
-          {(anyRankings || anyAi) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
+          {(anyRankResults || anyAiResults) && <SummaryStrip google={data.google} aiMode={data.ai_mode} />}
 
           {/* The itemised work feed. The briefing at the top already names the most
               recent items; this is the full ledger plus the category breakdown. */}
@@ -515,14 +544,14 @@ export default function ClientReport({ slug }: { slug: string }) {
             <ShareOfVoiceCard sov={data.share_of_voice} />
           )}
 
-          {anyAi && <AIVisibilityCard series={data.ai_mode} />}
+          {anyAiResults && <AIVisibilityCard series={data.ai_mode} />}
 
-          {anyRankings && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
-          {anyRankings && <RankingMomentum google={data.google} />}
+          {anyRankResults && <CoverageByCity google={data.google} verifiedWins={data.verified_wins} />}
+          {anyRankResults && <RankingMomentum google={data.google} />}
 
           {/* Full per-feed system-health detail. Today shows only the compact
               summary strip above; the itemised breakdown lives here. */}
-          <SystemStatus integrations={data.integrations} />
+          <SystemStatus integrations={data.integrations} quoteFormLive={(data.tracking?.lead?.lifetime || 0) > 0} />
         </>
       )}
       </div>
@@ -844,7 +873,10 @@ function ViewToggle({ view, onChange }: { view: 'today' | 'full'; onChange: (v: 
  */
 function NeedsYouToday({ data }: { data: DashboardPayload }) {
   const ra = data.revenue_agent;
-  if (!ra) return null;
+  // Only render when the CRM actually has signal. Otherwise we'd tell a client
+  // with no CRM wired "you're on top of everything" — a claim about data we
+  // don't have. (The backend always sends a revenue_agent object.)
+  if (!ra || !crmHasSignal(ra)) return null;
 
   const links = ghlLinks(data.slug);
 
@@ -999,11 +1031,19 @@ function LifecycleSpine({ data }: { data: DashboardPayload }) {
   const withData = steps.filter((s) => s.value != null).length;
   if (withData < 2) return null;
 
+  // Don't render an all-zero spine under a "Live from your CRM" chip when nothing
+  // real is flowing — that implies a connected pipeline the client may not have.
+  const crmConnected = !!ra && crmHasSignal(ra);
+  const trackingSignal = (leadFromTracking || 0) > 0;
+  const outcomeSignal = (data.won_jobs?.month || 0) > 0 || (data.reviews?.month || 0) > 0;
+  if (!crmConnected && !trackingSignal && !outcomeSignal) return null;
+  const sourceLabel = crmConnected ? 'Live from your CRM' : 'From your site tracking';
+
   return (
     <section className="mb-5 overflow-hidden rounded-2xl border border-gold/20 bg-surface-2 p-5 shadow-lift sm:p-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="font-display text-[16px] font-bold text-ink sm:text-[18px]">Your pipeline, end to end</h2>
-        <SourceChip label="Live from your CRM" />
+        <SourceChip label={sourceLabel} />
       </div>
       <div className="relative grid grid-cols-5 gap-1">
         {steps.map((step, i) => {
@@ -1176,13 +1216,54 @@ function OwnerBriefing({ data }: { data: DashboardPayload }) {
  * ago, amber if staler. Signals to the client the dashboard is a living
  * system, not a one-time report. Drives the "open it every Monday" habit.
  */
-function FreshnessPill({ iso }: { iso: string }) {
+/**
+ * The most recent REAL data-fetch time across the payload's snapshots — so the
+ * freshness pill reflects when data was actually gathered, not when the response
+ * was generated. (generated_at is stamped "now" every request, which would read
+ * green "Updated today" over week-old snapshots.) null when nothing fetched yet.
+ */
+function latestDataAt(d: DashboardPayload): string | null {
+  const times: string[] = [];
+  const push = (t?: string | null) => { if (t) times.push(t); };
+  push(d.search_console?.fetched_at ?? null);
+  push(d.gbp_performance?.fetched_at ?? null);
+  push(d.bing?.fetched_at ?? null);
+  (d.cwv_trend || []).forEach((p) => push(p.run_at));
+  [...(d.google || []), ...(d.ai_mode || [])].forEach((s) => {
+    push(s.current?.run_at);
+    (s.history || []).forEach((h) => push(h.run_at));
+  });
+  if (!times.length) return null;
+  return times.reduce((a, b) => (new Date(b).getTime() > new Date(a).getTime() ? b : a));
+}
+
+/** True only when the revenue agent actually has live signal. The backend always
+ *  returns a revenue_agent object (all-zeros fallback with no CRM wired), so a
+ *  bare truthiness check can't tell "connected + clear" from "not connected". */
+function crmHasSignal(ra: NonNullable<DashboardPayload['revenue_agent']>): boolean {
+  return (
+    (ra.contacts || 0) + (ra.pipeline_value || 0) + (ra.won_revenue || 0) + (ra.open_actions || 0)
+    + Object.values(ra.opportunities || {}).reduce((a, b) => a + (b || 0), 0)
+    + Object.values(ra.estimates || {}).reduce((a, b) => a + (b || 0), 0)
+  ) > 0;
+}
+
+function FreshnessPill({ iso }: { iso: string | null }) {
+  // No real snapshot yet → say so plainly rather than flashing a green "Live".
+  if (!iso) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 bg-ink/[0.04] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-3">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink-4" />
+        Setting up
+      </span>
+    );
+  }
   let label = 'Live';
   let fresh = true;
   try {
     const days = (Date.now() - new Date(iso).getTime()) / 86400000;
     fresh = days < 8;
-    label = days < 1 ? 'Updated today' : days < 8 ? `Updated ${Math.round(days)}d ago` : `Stale — ${Math.round(days)}d`;
+    label = days < 1 ? 'Updated today' : `Updated ${Math.round(days)}d ago`;
   } catch { /* keep defaults */ }
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
@@ -1233,7 +1314,7 @@ function Header({ data }: { data: DashboardPayload }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <FreshnessPill iso={data.generated_at} />
+          <FreshnessPill iso={latestDataAt(data)} />
           <button
             type="button"
             onClick={() => window.print()}
@@ -1262,15 +1343,16 @@ function Header({ data }: { data: DashboardPayload }) {
  * That distinction is the whole difference between a client feeling out of
  * control and a client feeling informed.
  */
-function SystemStatus({ integrations, compact = false }: { integrations?: DashboardPayload['integrations']; compact?: boolean }) {
-  // The quote form is wired in the page itself rather than an integration, so
-  // it is always on. Everything else reflects what the backend reports.
+function SystemStatus({ integrations, quoteFormLive = false, compact = false }: { integrations?: DashboardPayload['integrations']; quoteFormLive?: boolean; compact?: boolean }) {
+  // Everything reflects what the backend reports. The quote form reads "live"
+  // only once a real request has come through it — no green for a feed we can't
+  // verify for this client.
   const feeds: ReadonlyArray<{ label: string; on: boolean; live: string; pending: string }> = [
     {
       label: 'Quote form',
-      on: true,
+      on: quoteFormLive,
       live: 'Every quote request on your site lands here and texts Ty.',
-      pending: '',
+      pending: 'No quote requests have come through here yet — they land the moment one does.',
     },
     {
       label: 'Call tracking',
@@ -2050,9 +2132,45 @@ function CwvTrendCard({ series }: { series: NonNullable<DashboardPayload['cwv_tr
  * position with month-over-month deltas, top queries, + GA organic sessions.
  * This is the 'free metrics to sell' layer — pure value, costs nothing.
  */
+/**
+ * Website traffic, from Google Analytics — organic search visits, promoted out of
+ * the Search Console card into its own tile so GA has a real home. Honest: this is
+ * the organic-sessions figure the GA4 Data API returns (last 7 days vs the prior
+ * 7). Renders only when real GA data is present; the week-over-week delta shows
+ * only when there's a prior period to compare.
+ */
+function SearchTrafficCard({ ga }: { ga: NonNullable<NonNullable<DashboardPayload['search_console']>['ga']> }) {
+  const now = ga.organic_sessions || 0;
+  const prev = ga.organic_sessions_prev || 0;
+  const delta = prev ? Math.round(((now - prev) / prev) * 100) : null;
+  return (
+    <section className="mt-6 rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-surface-2 via-surface-2 to-[#07140E] p-5 sm:p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+        📈 Website traffic · Google Analytics
+        <span className="ml-2 text-[10px] font-medium normal-case tracking-normal text-ink-3">
+          organic search visits · last 7 days
+        </span>
+      </p>
+      <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-2">
+        <div>
+          <p className="font-display text-[44px] font-extrabold leading-none text-ink">{now.toLocaleString()}</p>
+          <p className="mt-1 text-[12px] text-ink-3">organic sessions</p>
+        </div>
+        {delta !== null && (
+          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold ${
+            delta > 0 ? 'bg-emerald-500/[0.12] text-emerald-300' : delta < 0 ? 'bg-red-500/[0.10] text-red-300' : 'bg-ink/[0.06] text-ink-3'
+          }`}>
+            {delta > 0 ? '↑' : delta < 0 ? '↓' : '·'} {Math.abs(delta)}% vs prev 7 days
+          </span>
+        )}
+        {prev > 0 && <span className="text-[12px] text-ink-4">prev {prev.toLocaleString()}</span>}
+      </div>
+    </section>
+  );
+}
+
 function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_console']> }) {
   const g = sc.gsc!;
-  const ga = sc.ga;
   const delta = (now: number, prev: number) => {
     if (!prev) return null;
     const d = Math.round(((now - prev) / prev) * 100);
@@ -2087,12 +2205,6 @@ function SearchConsoleCard({ sc }: { sc: NonNullable<DashboardPayload['search_co
           </div>
         ))}
       </div>
-      {ga && !ga.error && ga.organic_sessions > 0 && (
-        <p className="mt-3 text-[12px] text-ink-2">
-          📊 Google Analytics: <span className="font-bold text-ink">{ga.organic_sessions.toLocaleString()}</span> organic sessions
-          {ga.organic_sessions_prev ? <span className="text-ink-3"> (prev period {ga.organic_sessions_prev.toLocaleString()})</span> : null}
-        </p>
-      )}
       {g.top_queries && g.top_queries.length > 0 && (
         <div className="mt-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-3">Top queries bringing you traffic</p>
