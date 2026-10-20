@@ -151,6 +151,11 @@ from api_clients.ghl import (
     posthog_capture,
     ghl_enabled,
 )
+from api_clients.stripe_checkout import (
+    create_checkout_session,
+    checkout_sessions_enabled,
+    plan_is_chargeable,
+)
 
 # Lola personal command-center (Daily Brief) — see docs/LOLA-COMMAND-CENTER-AUDIT.md
 from db.lola_items import (
@@ -1835,6 +1840,41 @@ async def list_applications(
         raise HTTPException(status_code=403, detail="Forbidden")
     rows = await get_recent_applications(limit=max(1, min(limit, 200)))
     return {"applications": rows}
+
+
+class CheckoutLinkRequest(BaseModel):
+    plan: str                       # visibility | growth (expansion/both stay manual)
+    email: Optional[str] = ""
+    application_id: Optional[int] = None
+
+
+@app.post("/admin/checkout-link")
+async def admin_checkout_link(
+    body: CheckoutLinkRequest,
+    x_admin_key: str = Header(..., alias="X-Admin-Key"),
+):
+    """
+    Admin-only — mint a Stripe Checkout Session link for an APPROVED applicant,
+    once Ty has confirmed territory + scope. There is no public self-serve route
+    (territory exclusivity). Returns {url} for Ty to send to the buyer.
+
+    Dormant unless STRIPE_CHECKOUT_SESSIONS=true and the plan's price IDs are set
+    in Railway; expansion / "both" have no self-serve price and 400 (stay manual).
+    """
+    _check_admin(x_admin_key)
+    if not checkout_sessions_enabled():
+        raise HTTPException(status_code=503, detail="checkout_sessions_disabled")
+    if not plan_is_chargeable(body.plan):
+        raise HTTPException(
+            status_code=400,
+            detail=f"plan '{body.plan}' has no self-serve checkout — scope it manually",
+        )
+    result = await create_checkout_session(
+        plan=body.plan, email=(body.email or "").strip(), application_id=body.application_id
+    )
+    if result.get("error") or not result.get("url"):
+        raise HTTPException(status_code=502, detail=result.get("error") or "checkout_session_failed")
+    return {"url": result["url"], "id": result.get("id")}
 
 
 # ── CASE STUDY RANKING TRACKER ────────────────────────────────
@@ -4125,13 +4165,24 @@ async def stripe_webhook(request: Request):
     email = (details.get("email") or "").strip()
     phone = (details.get("phone") or "").strip()
     sid = sess.get("id", "")
-    tier = _tier_for_amount(int(sess.get("amount_total") or 0))
+    # Fulfill by the plan recorded on the session — server-created Checkout
+    # Sessions (F4) carry metadata.plan ("growth"/"visibility"). Fall back to the
+    # amount for the legacy $397 Payment Link. Unknown → skip, never guess.
+    meta_plan = ((sess.get("metadata") or {}).get("plan") or "").strip().lower()
+    tier = meta_plan or _tier_for_amount(int(sess.get("amount_total") or 0))
     if not tier:
-        # Unrecognised amount — do not guess a fulfillment path. The old code
-        # defaulted to "diy" here, which is how a $397 subscriber ended up
-        # being sent a DIY guide.
-        print(f"⚠️  Stripe paid but amount unrecognised: {sess.get('amount_total')}")
-        return {"received": True, "unrecognised_amount": True}
+        # Unrecognised — do not guess a fulfillment path. The old code defaulted
+        # to "diy" here, which is how a $397 subscriber got sent a DIY guide.
+        print(f"⚠️  Stripe paid but plan/amount unrecognised: meta={meta_plan!r} amount={sess.get('amount_total')}")
+        return {"received": True, "unrecognised": True}
+
+    # Idempotency: Stripe retries a webhook until it gets a 2xx, so the same paid
+    # session can arrive twice. Claim it once; a duplicate delivery short-circuits
+    # so the buyer isn't emailed / texted / CRM-bridged twice.
+    from db.billing import claim_checkout_session
+    if not await claim_checkout_session(sid):
+        print(f"↩️  Stripe session already fulfilled, skipping duplicate: {sid}")
+        return {"received": True, "duplicate": True}
     # /start reads session_id and shows "You're in" plus the 2-minute intake —
     # the same page the Payment Link redirects to, so the emailed link and the
     # browser redirect land in exactly the same place.
