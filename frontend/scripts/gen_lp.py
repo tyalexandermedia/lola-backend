@@ -53,7 +53,7 @@ EMAIL = "ty@tyalexandermedia.com"
 # commitment. Plus a custom Expansion route from $1,497/mo.
 TIERS = [
     {"name": "Local Visibility", "price": "$397/month", "featured": False,
-     "blurb": "For a business that already has a usable website. Google Business Profile optimization and monthly management, a review-request system, missed-call text-back, lead follow-up, call and form tracking, a monthly Lola dashboard and direct access to Ty. Plus a one-time $397 activation."},
+     "blurb": "For a business that already has a usable website. Google Business Profile optimization and monthly management, a review-request system, missed-call text-back, lead follow-up, call and form tracking, a monthly Lola dashboard and a direct line to Ty — replies within one business day. Plus a one-time $397 activation."},
     {"name": "Local Growth System", "price": "$797/month", "featured": True,
      "blurb": "Everything in Local Visibility, plus a conversion-focused website built or rebuilt, technical SEO, service and primary-market optimization, a quote/estimate conversion path, automated text and email follow-up, and lead-source + UTM attribution. Plus a one-time $997 launch. Backed by our launch commitment."},
 ]
