@@ -2,6 +2,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import PawMark from './PawMark';
 import { startHref, startSmsHref } from './lib/checkout';
+import { track } from './analytics';
 import { FOUNDER } from './lib/lola';
 import { SITE_ORIGIN } from './lib/seo';
 // Homepage stays eager — primary entry, must paint immediately. Everything
@@ -473,12 +474,14 @@ function MobileStickyCTA({ route }: { route: Route }) {
       <div className="mx-auto flex max-w-[640px] items-stretch gap-2">
         <a
           href="/growth-score"
+          onClick={() => { try { track('sticky_cta_click', { cta: 'free_score' }); } catch { /* noop */ } }}
           className="flex h-12 flex-1 items-center justify-center rounded-md border border-gold/40 bg-white/[0.02] px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-gold transition-transform duration-150 ease-press active:scale-[0.97]"
         >
           Free Score
         </a>
         <a
           href={buyHref}
+          onClick={() => { try { track('sticky_cta_click', { cta: 'get_started' }); } catch { /* noop */ } }}
           className="flex h-12 flex-[1.35] items-center justify-center rounded-md bg-gradient-to-r from-gold via-gold-bright to-gold px-3 text-[12px] font-bold uppercase tracking-[0.06em] text-on-gold shadow-glow transition-transform duration-150 ease-press active:scale-[0.97]"
         >
           {/* Two plans now, so the sticky control can't quote one price — it

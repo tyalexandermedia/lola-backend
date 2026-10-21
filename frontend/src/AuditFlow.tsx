@@ -1482,21 +1482,26 @@ function DeliverablesBlock({ audit }: { audit: AuditResult }) {
             Want me to do this for you instead?
           </p>
         </div>
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* One obvious next step — the plans — with a quiet direct-apply path
+            beneath it, instead of two equal competing buttons. */}
+        <div className="mt-5">
           <a
             href="/pricing"
             onClick={() => trackClick('roadmap_cta_clicked', { from: 'lolas_take' })}
-            className="inline-flex h-12 items-center justify-center rounded-[10px] bg-gradient-to-r from-gold via-gold-bright to-gold px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold"
+            className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-gold via-gold-bright to-gold px-6 text-[13px] font-bold uppercase tracking-[0.05em] text-on-gold sm:w-auto"
           >
-            See pricing →
+            See the plans that fix this →
           </a>
-          <a
-            href="/apply"
-            onClick={() => trackClick('roadmap_apply_clicked', { from: 'lolas_take' })}
-            className="inline-flex h-12 items-center justify-center rounded-[10px] border border-gold/40 bg-white/[0.02] px-5 text-[13px] font-bold uppercase tracking-[0.05em] text-gold"
-          >
-            Apply (Coach Ty reviews every one)
-          </a>
+          <p className="mt-3 text-[12.5px] leading-[1.5] text-ink-3">
+            Prefer to skip ahead?{' '}
+            <a
+              href="/apply"
+              onClick={() => trackClick('roadmap_apply_clicked', { from: 'lolas_take' })}
+              className="font-semibold text-gold underline-offset-2 hover:underline"
+            >
+              Apply directly — Coach Ty reviews every one →
+            </a>
+          </p>
         </div>
         <p className="mt-5 text-[13px] text-gold">
           — Coach Ty

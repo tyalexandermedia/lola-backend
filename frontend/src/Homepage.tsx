@@ -44,6 +44,7 @@ import PawMark from './PawMark';
 import { HOME_QA } from './lib/pageMeta';
 import { PLAN, PLAN_GROWTH, GUARANTEE, GROWTH_SCORE_CHECKS, MONTHLY_AT_A_GLANCE, EXCLUSIVITY, trialLine } from './lib/pricing';
 import { startHref } from './lib/checkout';
+import { track } from './analytics';
 import Vsl from './Vsl';
 import FeatureShowcase from './FeatureShowcase';
 import BeforeAfter from './BeforeAfter';
@@ -200,6 +201,7 @@ function Hero() {
               order (card, then buttons) below — this is hidden there. */}
           <a
             href="/growth-score"
+            onClick={() => { try { track('home_cta_click', { location: 'hero_mobile', cta: 'growth_score' }); } catch { /* noop */ } }}
             className={`${GOLD_CTA} mt-3 w-full px-6 py-3 sm:hidden`}
           >
             Run my free Growth Score
@@ -241,6 +243,7 @@ function Hero() {
           <div className="mt-6 hidden gap-3 sm:flex sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="/growth-score"
+              onClick={() => { try { track('home_cta_click', { location: 'hero_desktop', cta: 'growth_score' }); } catch { /* noop */ } }}
               className={`${GOLD_CTA} shrink-0 whitespace-nowrap px-6 py-3`}
             >
               Run my free Growth Score
@@ -248,6 +251,7 @@ function Hero() {
             </a>
             <a
               href={START}
+              onClick={() => { try { track('home_cta_click', { location: 'hero_desktop', cta: 'start' }); } catch { /* noop */ } }}
               // Hidden on mobile: the sticky bar carries "START — $397/MO"
               // permanently at the bottom of the screen, so this rendered the
               // same ask twice within one thumb-reach — and the lower copy was
