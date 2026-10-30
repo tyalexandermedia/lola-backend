@@ -43,8 +43,7 @@ const REVENUE_BANDS: ReadonlyArray<{ value: RevenueBand; label: string }> = [
 // backend sends (main.py::TIER_LABELS) — keep these values in sync with that map.
 // A ?plan= hint from the pricing page pre-selects the matching option.
 const TIER_OPTIONS: ReadonlyArray<{ value: TierInterest; label: string }> = [
-  { value: 'visibility', label: 'Local Visibility — $397/mo + $397 activation' },
-  { value: 'growth', label: 'Local Growth System — $797/mo + $997 launch' },
+  { value: 'growth', label: 'Local Growth System — $497/mo + setup from $497' },
   { value: 'expansion', label: 'Expansion — custom, from $1,497/mo' },
 ];
 

@@ -219,7 +219,7 @@ function Hero() {
               <span className="flex shrink-0 items-baseline gap-2">
                 <span className="text-[13px] text-ink-4 line-through">$3,000+</span>
                 <span className="rounded-full border border-gold/40 bg-gold/[0.12] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-gold">
-                  $997 launch
+                  from $497 setup
                 </span>
               </span>
             </div>
@@ -233,7 +233,7 @@ function Hero() {
           {/* The one-time launch fee builds the site + foundation; the struck
               $3,000+ is what a comparable custom site costs elsewhere. */}
           <p className="mt-2.5 text-[13px] leading-[1.5] text-ink-3">
-            A one-time $997 launch builds it — most shops charge $3,000+ for the website alone.
+            A one-time setup from $497 builds it — most shops charge $3,000+ for the website alone.
           </p>
 
           {/* Desktop-only now: on mobile the same free-score button already sits
@@ -469,7 +469,7 @@ function ReportCard() {
           <span className="flex shrink-0 items-baseline gap-2">
             <span className="text-[12px] text-ink-4 line-through">$3,000+</span>
             <span className="rounded-full border border-gold/40 bg-gold/[0.12] px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-gold">
-              $997 launch
+              from $497 setup
             </span>
           </span>
         </div>
@@ -532,7 +532,7 @@ function ReportCard() {
           <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
         </a>
         <p className="mt-2 text-center text-[11.5px] leading-[1.45] text-ink-3">
-          One-time $997 launch · month-to-month after the first 90 days
+          One-time setup from $497 · month-to-month after the first 90 days
         </p>
 
         {/* Softer second path, 44px min height. */}
@@ -979,7 +979,7 @@ const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 const COMPARISON: ReadonlyArray<{ label: string; agency: string; lola: string }> = [
   { label: 'Year one', agency: usd(AGENCY_YEAR_ONE), lola: `${usd(LOLA_YEAR_ONE)} — $${MONTHLY_PRICE}/mo` },
-  { label: 'Website build', agency: '$3,000+ extra, up front', lola: 'Built in your $997 launch' },
+  { label: 'Website build', agency: '$3,000+ extra, up front', lola: 'Built in your setup, from $497' },
   { label: 'Contract', agency: '12 months, locked', lola: 'Month-to-month after 90 days' },
   { label: 'Who does the work', agency: 'An account manager', lola: 'Ty — the one you texted' },
   { label: 'What you get monthly', agency: 'A 50-page PDF report', lola: 'A live score you can check' },
@@ -1322,7 +1322,7 @@ function FinalCta() {
           {/* Desktop only: this sentence describes the Start button, which
               phones don't show here (the sticky bar carries it). */}
           <span className="hidden sm:inline">
-            {' '}Or start today: the complete system with your website built in — {PLAN.price}{PLAN.period} plus a one-time $997 launch.
+            {' '}Or start today: the complete system with your website built in — {PLAN.price}{PLAN.period} plus a one-time setup from $497.
           </span>
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">

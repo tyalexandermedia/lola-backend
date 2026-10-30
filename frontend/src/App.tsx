@@ -369,7 +369,7 @@ function SiteFooter({ route }: { route: Route }) {
             44px on every phone and read as padding. */}
         <FooterCol title="Get found">
           <FooterLink href="/growth-score">Free Growth Score</FooterLink>
-          <FooterLink href="/pricing">Pricing — from $397/mo</FooterLink>
+          <FooterLink href="/pricing">Pricing — $497/mo</FooterLink>
           <FooterLink href="/work">See sites we've built</FooterLink>
           <FooterLink href="/case-studies">Case studies</FooterLink>
           <FooterLink href="/r/client/sandbar">Live Sandbar dashboard ↗</FooterLink>

@@ -26,15 +26,15 @@
  * Every value below is either a verifiable fact (name, phone, service area,
  * published price) or copy that appears on the page it describes.
  *
- * 2026-09-12: migrated from the single $397 all-inclusive plan (website
- * included free, 90-Day Promise) to two plans — Local Visibility ($397/mo) and
- * Local Growth System ($797/mo, website built in) — plus a custom Expansion
- * route. The old ranking guarantee is retired in favour of an implementation
- * commitment (see lib/pricing.ts COMMITMENT / GUARANTEE).
+ * 2026-10-30: collapsed the $397/$797 two-plan model into one flagship — the
+ * Local Growth System ($497/mo + a one-time setup from $497, website built in) —
+ * plus a custom Expansion route from $1,497/mo. The old ranking guarantee is
+ * retired in favour of an implementation commitment (see lib/pricing.ts
+ * COMMITMENT / GUARANTEE).
  */
 
 import { FOUNDER } from './lola';
-import { PLAN_VISIBILITY, PLAN_GROWTH, PRICE_RANGE } from './pricing';
+import { PLAN_GROWTH, PRICE_RANGE } from './pricing';
 
 /**
  * Canonical origin — ONE definition for the whole frontend.
@@ -92,13 +92,13 @@ export const AI_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'How do I get my business found on Google and AI search?',
     a:
-      "We improve your website, Google Business Profile, public business information and review-request process. Rankings and AI recommendations vary by engine, location and competition; no placement is guaranteed. Coach Ty Leads supports Tampa Bay home-service contractors — from " +
-      `${PLAN_VISIBILITY.monthly}/month for visibility, reviews and lead response, or ${PLAN_GROWTH.monthly}/month for the complete system with a conversion-focused website built in.`,
+      "We improve your website, Google Business Profile, public business information and review-request process. Rankings and AI recommendations vary by engine, location and competition; no placement is guaranteed. Coach Ty Leads supports Tampa Bay home-service contractors with one done-for-you system — " +
+      `the Local Growth System at ${PLAN_GROWTH.monthly}/month plus a one-time setup from ${PLAN_GROWTH.oneTime.amount}, with a conversion-focused website built in.`,
   },
   {
     q: 'How much does local SEO cost for a contractor?',
     a:
-      `Coach Ty Leads publishes two plans. Local Visibility is ${PLAN_VISIBILITY.monthly}/month plus a one-time ${PLAN_VISIBILITY.oneTime.amount} activation — Google Business Profile management, a review system, missed-call text-back and call tracking for a business that already has a usable website. Local Growth System is ${PLAN_GROWTH.monthly}/month plus a one-time ${PLAN_GROWTH.oneTime.amount} launch, and adds a conversion-focused website, technical SEO and automated lead follow-up. Both run a 90-day initial term, then month-to-month. Multi-location work is custom, starting at $1,497/month. Start with a free Growth Score to see which one fits.`,
+      `Coach Ty Leads publishes one flagship plan: the Local Growth System at ${PLAN_GROWTH.monthly}/month plus a one-time setup from ${PLAN_GROWTH.oneTime.amount}. It's the complete done-for-you system — a conversion-focused website built in, Google Business Profile management, a review system, missed-call text-back, automated lead follow-up and call tracking — on a 90-day initial term, then month-to-month. The simple website build is in the setup; complex sites and migrations are quoted separately. Multi-location work is custom, starting at $1,497/month. Start with a free Growth Score.`,
   },
   {
     q: 'How long does local SEO take to work?',
@@ -139,7 +139,7 @@ export const BRAND_QA: ReadonlyArray<{ q: string; a: string }> = [
   },
   {
     q: 'Why does it cost so much less than a $5,000/month agency?',
-    a: `Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. Plans are ${PLAN_VISIBILITY.monthly}/month for visibility or ${PLAN_GROWTH.monthly}/month for the complete system with a website built in. A $5,000/month agency retainer is $60,000 in year one, usually on a 12-month contract. Compare each provider’s written scope; these are fee examples, not equivalent-service claims.`,
+    a: `Because you're not paying for an office, an account manager, or a sales team — Ty does the work himself. The Local Growth System is ${PLAN_GROWTH.monthly}/month plus a one-time setup from ${PLAN_GROWTH.oneTime.amount}, with a website built in. A $5,000/month agency retainer is $60,000 in year one, usually on a 12-month contract. Compare each provider’s written scope; these are fee examples, not equivalent-service claims.`,
   },
   {
     q: 'Who is behind Lola?',
@@ -187,15 +187,15 @@ export const SCORE_QA = pick(AI_QA, [
 export const PRICING_QA: ReadonlyArray<{ q: string; a: string }> = [
   {
     q: 'What’s included in local SEO with Coach Ty Leads?',
-    a: `Every plan manages your Google Business Profile, builds a review-request system, turns missed calls into text-backs, and tracks your calls and forms on a monthly Lola dashboard — with a direct line to Ty (replies within 1 business day). The Local Growth System (${PLAN_GROWTH.monthly}/month) adds a conversion-focused website, technical SEO, a quote/estimate path and automated text-and-email follow-up on top.`,
+    a: `The Local Growth System (${PLAN_GROWTH.monthly}/month) is one complete done-for-you system: a conversion-focused website built in and kept current, Google Business Profile managed every month, a review-request system, missed-call text-back, automated text-and-email follow-up, a quote/estimate path, and call, form and UTM tracking on a monthly Lola dashboard — with a direct line to Ty (replies within 1 business day) and a monthly strategy call.`,
   },
   {
-    q: 'Why is there a launch or activation fee?',
-    a: `The one-time fee covers the up-front build — setting up the profile, tracking and review systems in Local Visibility (${PLAN_VISIBILITY.oneTime.amount} activation), or building the full website and technical foundation in the Local Growth System (${PLAN_GROWTH.oneTime.amount} launch). It pays for the work that happens before monthly management even starts, so month one isn't spent billing you for setup.`,
+    q: 'Why is there a one-time setup fee?',
+    a: `The one-time setup (from ${PLAN_GROWTH.oneTime.amount}) covers the up-front build — the conversion-focused website, your Google Business Profile, and the tracking and review systems — before monthly management starts, so month one isn't spent billing you for setup. The simple build is included; a complex website or a migration is quoted separately, which is why setup starts "from" ${PLAN_GROWTH.oneTime.amount}.`,
   },
   {
-    q: 'Is a new website included in the $397 plan?',
-    a: `No. Local Visibility (${PLAN_VISIBILITY.monthly}/month) is for a business that already has a usable website — it strengthens visibility, reviews and lead response around the site you have. A new conversion-focused website is part of the Local Growth System (${PLAN_GROWTH.monthly}/month plus a one-time ${PLAN_GROWTH.oneTime.amount} launch).`,
+    q: 'Is a new website included?',
+    a: `Yes. A conversion-focused website — built or rebuilt — is part of the Local Growth System (${PLAN_GROWTH.monthly}/month plus a one-time setup from ${PLAN_GROWTH.oneTime.amount}), then it's hosted and kept current with up to two edits a month. The simple build is included in setup; a complex website or a migration is quoted separately. Already have a strong site? We manage and optimize it instead — same system, same price.`,
   },
   {
     q: 'How long does it take to see results?',
@@ -314,12 +314,12 @@ export const PAGE_META: Record<string, PageMeta> = {
 
 /** The /vs/<slug> pages, generated so every competitor gets its own metadata. */
 const VS: ReadonlyArray<[slug: string, name: string, hook: string]> = [
-  ['localiq', 'LocalIQ', 'quote-only pricing vs published plans from $397/mo'],
+  ['localiq', 'LocalIQ', 'quote-only pricing vs published pricing from $497/mo'],
   ['brightlocal', 'BrightLocal', 'a DIY toolset you run yourself vs done-for-you local SEO'],
-  ['scorpion', 'Scorpion', 'a $3K+/month agency vs published plans from $397/mo'],
+  ['scorpion', 'Scorpion', 'a $3K+/month agency vs published pricing from $497/mo'],
   ['podium', 'Podium', 'review and messaging software vs done-for-you local SEO'],
   ['yext', 'Yext', 'listings sync you rent vs local SEO and AI visibility you own'],
-  ['hibu', 'Hibu', 'a bundled ad contract vs published plans from $397/mo'],
+  ['hibu', 'Hibu', 'a bundled ad contract vs published pricing from $497/mo'],
   ['local-service-ads', 'Local Service Ads', 'paid leads per call vs organic and AI visibility you keep'],
 ];
 
@@ -484,7 +484,6 @@ export function serviceSchema() {
       audienceType: 'Local service businesses and home-service contractors',
     },
     offers: [
-      offer(PLAN_VISIBILITY.name, PLAN_VISIBILITY.monthly),
       offer(PLAN_GROWTH.name, PLAN_GROWTH.monthly),
     ],
   };

@@ -4,14 +4,15 @@
  * MIRROR, NOT ORIGIN. `docs/PRICING.md` is canonical. On any change, sync in
  * this order: docs/PRICING.md → this file → db/pricing.py → frontend/scripts/gen_lp.py.
  *
- * 2026-09-12 — migrated from the single $397 all-inclusive plan to a free
- * diagnostic + TWO genuinely different paid plans + a custom Expansion route:
+ * 2026-10-30 — collapsed the two paid plans into a single flagship:
  *   • Free Growth Score — $0, the diagnostic and primary low-friction entry.
- *   • Local Visibility — $397/mo + $397 activation. For a business that already
- *     has a usable website and needs stronger visibility, reviews and lead response.
- *   • Local Growth System — $797/mo + $997 launch (RECOMMENDED). Adds the
- *     conversion-focused website and the full foundation.
+ *   • Local Growth System — $497/mo + a one-time setup from $497. The one plan:
+ *     a conversion-focused website built in, plus Google visibility, reviews,
+ *     tracking and automated follow-up, run every month. The simple build is in
+ *     the setup; complex sites/migrations are quoted on top (hence "from $497").
  *   • Expansion — custom, from $1,497/mo. Multi-location / multi-territory.
+ * The retired $397 "Local Visibility" (no website) and the $797/$997 two-plan
+ * split are gone — one price, one honest answer.
  *
  * Brand: Coach Ty Leads (company). Product/system: The Lola Local Growth System.
  * Founder: Ty Alexander. Legal entity "Ty Alexander Media LLC" — footer/legal only.
@@ -50,13 +51,16 @@ export const FREE_GROWTH_SCORE = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PlanTier {
-  id: 'visibility' | 'growth';
+  id: 'growth';
   name: string;
-  /** Display monthly price, e.g. "$397". */
+  /** Display monthly price, e.g. "$497". */
   monthly: string;
   period: string;
   /** One-time fee charged at start. */
   oneTime: { label: string; amount: string };
+  /** When true the one-time fee is a "from" floor — the simple build is included,
+   *  complex sites are quoted on top — rendered as "from $497". */
+  oneTimeFrom?: boolean;
   /** Cost framed per day — shrinks the number next to a job. */
   perDay: string;
   term: string;
@@ -74,113 +78,65 @@ export interface PlanTier {
   ctaHref: string;
 }
 
-export const PLAN_VISIBILITY: PlanTier = {
-  id: 'visibility',
-  name: 'Local Visibility',
-  monthly: '$397',
-  period: '/month',
-  oneTime: { label: 'activation', amount: '$397' },
-  perDay: 'About $13/day + a one-time $397 to set it up.',
-  term: '90-day initial term, then month-to-month.',
-  recommended: false,
-  idealFor:
-    'A service business that already has a usable website but needs stronger Google visibility, more reviews, and faster lead response.',
-  includes: [
-    'Google Business Profile optimization and monthly management',
-    'Service and category alignment',
-    'Review-request system',
-    'Missed-call text-back',
-    'Basic lead follow-up',
-    'Local citation / NAP review',
-    'Call and form tracking',
-    'Monthly Lola dashboard',
-    'A direct line to Ty — replies within 1 business day, plus a quarterly strategy check-in',
-  ],
-  excludes: [
-    'A new custom website',
-    'Paid advertising or ad spend',
-    'Unlimited content',
-    'Unlimited service-area pages',
-    'Logo or full brand design',
-    'Photography, drone or 360° media',
-    'Multiple locations',
-  ],
-  cta: 'Improve My Visibility',
-  ctaHref: '/apply?plan=visibility',
-};
-
 export const PLAN_GROWTH: PlanTier = {
   id: 'growth',
   name: 'Local Growth System',
-  monthly: '$797',
+  monthly: '$497',
   period: '/month',
-  oneTime: { label: 'launch', amount: '$997' },
-  perDay: 'About $27/day + a one-time $997 to build and launch.',
+  oneTime: { label: 'setup', amount: '$497' },
+  oneTimeFrom: true,
+  perDay: 'About $16/day + a one-time setup from $497.',
   term: '90-day initial term, then month-to-month.',
-  recommended: true,
+  recommended: false,
   idealFor:
-    'A contractor who needs the complete foundation: a conversion-focused website, local visibility, reviews, tracking and lead follow-up — in one system.',
-  inheritsLabel: 'Everything in Local Visibility, plus:',
+    'A contractor who wants the complete system that turns local searches into booked jobs — a conversion-focused website, Google visibility, reviews, tracking and automated follow-up — built and run for them every month.',
   includes: [
-    'Conversion-focused website build or strategic rebuild',
-    'Up to five essential launch pages',
-    'Technical SEO foundation',
-    'LocalBusiness / service structured data where accurate',
-    'Service and primary-market optimization',
-    'Quote / estimate conversion path',
-    'Automated text and email follow-up',
-    'Lead-source and UTM attribution',
-    'Estimate pipeline connection',
-    'Monthly conversion and ranking review',
-    'Ongoing website updates within a clearly defined reasonable scope',
-    'A monthly strategy call with Ty',
+    'A conversion-focused website — built in, hosted and kept current (up to two edits a month)',
+    'Google Business Profile managed every month — posts, services, photos and updates',
+    'A review engine — happy customers asked for a Google review automatically',
+    'Missed-call text-back + automated text and email lead follow-up',
+    'Call, form and UTM tracking on your Lola dashboard',
+    'A monthly plain-language report you can actually read',
+    'A direct line to Ty — replies within 1 business day, plus a monthly strategy call',
   ],
   excludes: [
-    'Paid-media budget',
+    'Paid advertising or ad spend',
+    'Complex website rebuilds or migrations (quoted separately)',
     'Unlimited pages or redesign requests',
     'Custom software development',
-    'Multiple businesses, locations or territories',
-    'Drone / 360° production',
+    'Multiple locations or territories (see Expansion)',
+    'Photography, drone or 360° media',
     'Guaranteed leads, revenue or rankings',
   ],
   cta: 'Build My Growth System',
   ctaHref: '/apply?plan=growth',
 };
 
-/** The two paid plans, in display order. Never a third equal card. */
-export const PLAN_TIERS: readonly PlanTier[] = [PLAN_VISIBILITY, PLAN_GROWTH];
+/** The one flagship plan. Kept as an array so surfaces that map over tiers keep
+ *  working; Expansion is a separate custom route, never an equal card. */
+export const PLAN_TIERS: readonly PlanTier[] = [PLAN_GROWTH];
 
 /**
- * Complete deliverables comparison — the accessible table under the two cards.
- * Derived by hand (not from includes[]) so the table stays readable and the two
- * plans line up row-for-row. `true` = included, `false` = not in that plan.
+ * The complete deliverables list — the accessible "everything included, nothing
+ * hidden" list under the offer. One flagship plan now, so one column: every line
+ * is included. (Was a two-plan comparison table before the 2026-10-30 reprice.)
  */
-export interface DeliverableRow {
-  label: string;
-  visibility: boolean;
-  growth: boolean;
-}
-export const DELIVERABLES: readonly DeliverableRow[] = [
-  { label: 'Google Business Profile optimization + monthly management', visibility: true, growth: true },
-  { label: 'Service & category alignment', visibility: true, growth: true },
-  { label: 'Review-request system', visibility: true, growth: true },
-  { label: 'Missed-call text-back', visibility: true, growth: true },
-  { label: 'Lead follow-up', visibility: true, growth: true },
-  { label: 'Local citation / NAP review', visibility: true, growth: true },
-  { label: 'Call & form tracking', visibility: true, growth: true },
-  { label: 'Monthly Lola dashboard', visibility: true, growth: true },
-  { label: 'A direct line to Ty (replies within 1 business day)', visibility: true, growth: true },
-  { label: 'Monthly strategy call with Ty', visibility: false, growth: true },
-  { label: 'Conversion-focused website build or rebuild', visibility: false, growth: true },
-  { label: 'Up to five essential launch pages', visibility: false, growth: true },
-  { label: 'Technical SEO foundation', visibility: false, growth: true },
-  { label: 'LocalBusiness / service structured data (where accurate)', visibility: false, growth: true },
-  { label: 'Quote / estimate conversion path', visibility: false, growth: true },
-  { label: 'Automated text + email follow-up', visibility: false, growth: true },
-  { label: 'Lead-source & UTM attribution', visibility: false, growth: true },
-  { label: 'Estimate pipeline connection', visibility: false, growth: true },
-  { label: 'Monthly conversion & ranking review', visibility: false, growth: true },
-  { label: 'Ongoing website updates (defined scope)', visibility: false, growth: true },
+export const DELIVERABLES: readonly string[] = [
+  'Conversion-focused website — built in, hosted and kept current',
+  'Up to two website edits a month',
+  'Google Business Profile optimization + monthly management',
+  'Service & category alignment',
+  'Review-request system',
+  'Missed-call text-back',
+  'Automated text + email lead follow-up',
+  'Local citation / NAP review',
+  'Call, form & UTM tracking',
+  'Monthly Lola dashboard + plain-language report',
+  'Technical SEO foundation',
+  'LocalBusiness / service structured data (where accurate)',
+  'Quote / estimate conversion path',
+  'A direct line to Ty (replies within 1 business day)',
+  'A monthly strategy call with Ty',
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -235,7 +191,7 @@ export const SERVICE_MODEL = {
   points: [
     { label: 'One channel', detail: 'Requests go through one tracked place — not scattered texts and calls.' },
     { label: 'Replies within 1 business day', detail: 'A clear, honest response window on every routine request.' },
-    { label: 'A scheduled strategy touch', detail: 'A monthly strategy call on the Local Growth System; a quarterly check-in on Local Visibility.' },
+    { label: 'A scheduled strategy touch', detail: 'A monthly strategy call — scheduled, so it actually happens, not an open-ended promise.' },
     { label: 'Website updates, defined', detail: 'Update requests are bundled into a monthly release within a clearly defined reasonable scope.' },
     { label: 'Out-of-scope is quoted', detail: 'New pages beyond launch, redesigns, ad management or extra locations are scoped and priced up front — never surprise-billed.' },
     { label: 'Automated monthly reporting', detail: 'Your Lola dashboard shows calls, forms, rankings and what shipped — you never wait on a report.' },
@@ -350,7 +306,7 @@ export const PLAN: Plan = {
     'Call, form and UTM tracking on your Lola dashboard',
     'A direct line to Ty — 1-business-day replies and a monthly strategy call, not an account manager',
   ],
-  terms: 'From $797/month + a one-time $997 launch. 90-day initial term, then month-to-month.',
+  terms: 'From $497/month + a one-time setup from $497. 90-day initial term, then month-to-month.',
   cta: PLAN_GROWTH.cta,
 };
 
@@ -447,8 +403,8 @@ export const BUILD = PLAN;
 export const TIERS = [PLAN] as const;
 export const BUILD_INCLUDED = PLAN_INCLUDED;
 
-/** Plain-text price range for schema / meta. */
-export const PRICE_RANGE = '$397–$797/month';
+/** Plain-text price range for schema / meta. One published monthly plan. */
+export const PRICE_RANGE = '$497/month';
 
 /** Territory (legacy name EXCLUSIVITY, kept for existing surfaces). */
 export const EXCLUSIVITY = {

@@ -4,16 +4,15 @@ Coach Ty Leads — pricing & offer (backend source of truth).
 Mirror of docs/PRICING.md. When pricing changes: update docs/PRICING.md first,
 then this file, then frontend/src/lib/pricing.ts and frontend/scripts/gen_lp.py.
 
-Model (2026-09-12): a free Growth Score diagnostic + two paid plans + a custom
+Model (2026-10-30): a free Growth Score diagnostic + one flagship plan + a custom
 Expansion route.
 
-  - Local Visibility     $397/month + $397 one-time activation
-  - Local Growth System  $797/month + $997 one-time launch   (recommended)
+  - Local Growth System  $497/month + a one-time setup from $497 (website built in)
   - Expansion            custom, from $1,497/month
 
-Replaces the single $397 all-inclusive plan (website included free, 90-Day
-Promise), which replaced the two-tier one-time model (DIY $197, Full Build $997).
-The Growth Score stays the free, branded, top-of-funnel diagnostic.
+Replaces the $397/$797 two-plan model (Local Visibility + Local Growth System),
+which replaced the single $397 all-inclusive plan. The Growth Score stays the
+free, branded, top-of-funnel diagnostic.
 
 The DB-backed counter is retained (function signatures unchanged for import
 compatibility) as a simple build-signup counter.
@@ -27,22 +26,25 @@ import aiosqlite
 DB_PATH = os.getenv("DB_PATH", "lola.db")
 
 # ── Offer prices (source of truth) ────────────────────────────────
-VISIBILITY_PRICE = 397         # Local Visibility — $/month
-VISIBILITY_ACTIVATION = 397    # one-time activation
-GROWTH_PRICE = 797             # Local Growth System — $/month (recommended)
-GROWTH_LAUNCH = 997            # one-time launch
+# One flagship plan: the Local Growth System at $497/month + a one-time setup
+# from $497 (simple website build included; complex sites/migrations quoted).
+GROWTH_PRICE = 497             # Local Growth System — $/month
+GROWTH_SETUP = 497             # one-time setup (a "from" floor)
 EXPANSION_FROM = 1497          # Expansion — custom, from $/month
 
-# The live Stripe subscription (and its webhook validation) is $397/month, which
-# equals the Local Visibility monthly. Older imports referencing MONTHLY_PRICE
-# resolve to that entry price.
-MONTHLY_PRICE = VISIBILITY_PRICE
-# Back-compat aliases so older imports keep resolving to a live price.
-DIY_PRICE = VISIBILITY_PRICE
+# The live Stripe subscription amount is validated in main.py by
+# STRIPE_MONTHLY_AMOUNT (env, in cents), independent of these display constants.
+MONTHLY_PRICE = GROWTH_PRICE
+# Back-compat aliases so older imports keep resolving to the live price. The
+# retired $397 "Local Visibility" and its activation now alias the one plan.
+VISIBILITY_PRICE = GROWTH_PRICE
+VISIBILITY_ACTIVATION = GROWTH_SETUP
+GROWTH_LAUNCH = GROWTH_SETUP   # legacy name for the one-time setup
+DIY_PRICE = GROWTH_PRICE
 BUILD_PRICE = GROWTH_PRICE
 RETAINER_PRICE = GROWTH_PRICE
 
-PRICE_RANGE = "$397–$797/month"
+PRICE_RANGE = "$497/month"
 
 # ── Signup counter ────────────────────────────────────────────────
 # Retained for import compatibility with main.py. Kept as a simple counter.

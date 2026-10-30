@@ -20,9 +20,9 @@ Design notes
   (local-seo-plumbers-tampa.html) so every page shares the dark-gold aesthetic.
 * Copy is varied per SERVICE (H1, intent framing, "what we do" bullets, FAQ)
   and per CITY (neighborhoods, nearby cities) so pages are not thin duplicates.
-* Pricing mirrors docs/PRICING.md: a free Growth Score, then Local Visibility
-  ($397/mo + $397 activation) or the Local Growth System ($797/mo + $997 launch,
-  website built in), backed by our launch commitment. Change it there first.
+* Pricing mirrors docs/PRICING.md: a free Growth Score, then the one flagship —
+  the Local Growth System ($497/mo + a one-time setup from $497, website built
+  in), backed by our launch commitment. Change it there first.
 * Primary CTAs point at /pricing (see the plans); a secondary CTA carries the
   free Growth Score with per-page UTM attribution.
 """
@@ -39,7 +39,8 @@ from pathlib import Path
 # Canonical origin. Mirrors SITE_ORIGIN in src/lib/pageMeta.ts and the
 # VITE_SITE_ORIGIN the build scripts read, so the whole site moves together.
 BASE_URL = os.getenv("VITE_SITE_ORIGIN", "https://www.coachtyleads.com").rstrip("/")
-# The live $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts.
+# The legacy $397/month Stripe Payment Link — mirrors frontend/src/lib/checkout.ts
+# (rebuild at $497 before handing to a buyer; see that file's note).
 # These pages used to point three gold CTAs at a Google Calendar booking link,
 # which is the call path Ty removed. A Payment Link is a public URL, not a
 # secret; the Stripe API keys live in Railway.
@@ -47,21 +48,18 @@ CHECKOUT_URL = "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
 PHONE = "+1-727-300-6573"
 EMAIL = "ty@tyalexandermedia.com"
 
-# Two plans (source of truth: docs/PRICING.md): Local Visibility ($397/mo, for a
-# business that already has a usable website) and the Local Growth System
-# ($797/mo, with a conversion-focused website built in), backed by our launch
-# commitment. Plus a custom Expansion route from $1,497/mo.
+# One flagship plan (source of truth: docs/PRICING.md): the Local Growth System
+# ($497/mo + a one-time setup from $497, with a conversion-focused website built
+# in), backed by our launch commitment. Plus a custom Expansion route from
+# $1,497/mo.
 TIERS = [
-    {"name": "Local Visibility", "price": "$397/month", "featured": False,
-     "blurb": "For a business that already has a usable website. Google Business Profile optimization and monthly management, a review-request system, missed-call text-back, lead follow-up, call and form tracking, a monthly Lola dashboard and a direct line to Ty — replies within one business day. Plus a one-time $397 activation."},
-    {"name": "Local Growth System", "price": "$797/month", "featured": True,
-     "blurb": "Everything in Local Visibility, plus a conversion-focused website built or rebuilt, technical SEO, service and primary-market optimization, a quote/estimate conversion path, automated text and email follow-up, and lead-source + UTM attribution. Plus a one-time $997 launch. Backed by our launch commitment."},
+    {"name": "Local Growth System", "price": "$497/month", "featured": True,
+     "blurb": "The complete done-for-you system: a conversion-focused website built in and kept current, Google Business Profile managed monthly, a review-request system, missed-call text-back, automated text and email follow-up, call/form/UTM tracking, a monthly Lola dashboard, and a direct line to Ty — replies within one business day. Plus a one-time setup from $497 (simple build included; complex sites quoted separately). Backed by our launch commitment."},
 ]
-PRICE_RANGE = "$397–$797/month"
-# Two published monthly prices: Local Visibility ($397) and the Local Growth
-# System ($797). Rendered into per-page Offer structured data below.
-MONTHLY_PRICE = "397"
-GROWTH_PRICE = "797"
+PRICE_RANGE = "$497/month"
+# One published monthly price: the Local Growth System ($497). Rendered into
+# per-page Offer structured data below.
+MONTHLY_PRICE = "497"
 
 # Repo-root-relative output locations. Resolved against the repo root, which we
 # derive from this file's location so the script works from any cwd.
@@ -216,7 +214,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you keep for good',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Soft-wash + house-wash keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -237,7 +235,7 @@ SERVICES = {
             ("Do you understand soft wash vs pressure wash?",
              "Yes. Coach Ty's dad runs Sandbar Soft Wash in Palm Harbor — 15+ years, master certified. We know the difference and we optimize for both."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
             ("Can you handle a seasonal schedule?",
              f"Yes — we build GBP post cadence around {c['name']}'s busy washing season and keep ranking signals warm in the off months."),
         ],
@@ -255,7 +253,7 @@ SERVICES = {
         ],
         this_=[
             'Organic Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Emergency-keyword targeting baked in',
             'Launch commitment, in writing',
         ],
@@ -274,7 +272,7 @@ SERVICES = {
             ("How fast will I see new calls?",
              "First movement usually lands in 30–90 days. We agree the search terms we track in week 1 and back it with our launch commitment — we finish the agreed foundation or keep working at no extra management charge until it's done. Most clients see new GMB call volume within 6-8 weeks."),
             ("What if my GMB profile is a mess?",
-             "That's part of week 1. We clean it up, fix categories, add proper services, photo cadence, and post strategy — part of every plan, starting at $397/month."),
+             "That's part of week 1. We clean it up, fix categories, add proper services, photo cadence, and post strategy — part of the Local Growth System, $497/month."),
             ("Do you do Google LSA (Local Service Ads)?",
              "LSA is a separate paid channel. Lola handles organic + Map Pack. Many clients pause LSA after 60 days because organic catches up."),
             ("We have 10 service vans — will the system scale?",
@@ -294,7 +292,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Emergency AC-repair keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -317,7 +315,7 @@ SERVICES = {
             ("Do you optimize for replace-vs-repair searches?",
              "Yes. Those buyers are high-ticket and high-intent. We build content and GBP services to capture them."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -333,7 +331,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Storm + insurance-claim keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -356,7 +354,7 @@ SERVICES = {
             ("Do you build insurance-claim content?",
              "Yes — insurance-claim and storm-inspection pages are high-intent and we make them part of the playbook."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -372,7 +370,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Weekly-service + green-pool keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -395,7 +393,7 @@ SERVICES = {
             ("Do you handle seasonal demand?",
              f"Yes — we keep {c['name']} ranking signals warm year-round so you're first in line when pool season ramps."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -411,7 +409,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Weekly-service + lawn-treatment keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -434,7 +432,7 @@ SERVICES = {
             ("Do you optimize for fertilization and treatment too?",
              "Yes — treatment and fertilization searches are higher-margin and high-intent. We target them alongside mowing."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -450,7 +448,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Emergency + panel-upgrade keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -473,7 +471,7 @@ SERVICES = {
             ("What if my licensing info is inconsistent online?",
              "That's part of week 1. We fix NAP and licensing citations so Google trusts your listing."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
     # ---------------------------------------------------------------- #
@@ -489,7 +487,7 @@ SERVICES = {
         ],
         this_=[
             'Map Pack rankings you own forever',
-            'Plans from $397/month — website build in the Growth System',
+            'The complete system — website built in, from $497/month',
             'Recurring + deep-clean keywords baked in',
             'Launch commitment, in writing',
         ],
@@ -512,7 +510,7 @@ SERVICES = {
             ("Do you target commercial cleaning too?",
              "Yes — the plan can add commercial and office-cleaning keywords and service-area pages so you show up for those searches too."),
             ("Is there a contract?",
-             "No long contract. Plans are $397/month for Local Visibility (already have a usable website) or $797/month for the Local Growth System (a conversion-focused website built in), each a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
+             "No long contract. The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, plus Google visibility, reviews, tracking and follow-up — on a 90-day initial term, then month-to-month. Backed by our launch commitment: we agree the launch scope and the search terms we track in week 1, and if we don't finish the agreed foundation within the launch window for reasons on our side, we keep working at no extra management charge until it's done."),
         ],
     ),
 }
@@ -654,9 +652,9 @@ def render_page(svc_slug, svc, city_slug, city):
     cname = city["name"]
     title = f'{svc["name"]} SEO {cname} | Rank on Google + AI | Coach Ty Leads'
     desc = (f'Done-for-you local SEO for {cname} {svc["noun"]}. Rank on Google + '
-            f'ChatGPT for high-intent searches. Plans from $397/month; the complete '
-            f'system with a website built in at $797. Backed by our launch commitment. '
-            f'Built by Coach Ty.')
+            f'ChatGPT for high-intent searches. The Local Growth System — $497/month '
+            f'plus a one-time setup from $497, with a website built in. Backed by our '
+            f'launch commitment. Built by Coach Ty.')
 
     faqs = svc["faqs"](city)
     do_items = svc["do"](city)
@@ -687,27 +685,12 @@ def render_page(svc_slug, svc, city_slug, city):
         "offers": [
             {
                 "@type": "Offer",
-                "name": "Local Visibility",
+                "name": "Local Growth System",
                 "priceCurrency": "USD",
                 "price": MONTHLY_PRICE,
                 "priceSpecification": {
                     "@type": "UnitPriceSpecification",
                     "price": MONTHLY_PRICE,
-                    "priceCurrency": "USD",
-                    "unitCode": "MON",
-                    "billingIncrement": 1,
-                },
-                "availability": "https://schema.org/InStock",
-                "url": f"{BASE_URL}/pricing",
-            },
-            {
-                "@type": "Offer",
-                "name": "Local Growth System",
-                "priceCurrency": "USD",
-                "price": GROWTH_PRICE,
-                "priceSpecification": {
-                    "@type": "UnitPriceSpecification",
-                    "price": GROWTH_PRICE,
                     "priceCurrency": "USD",
                     "unitCode": "MON",
                     "billingIncrement": 1,
@@ -842,7 +825,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h1>{esc(svc["h1"](city))}</h1>
 <p class="sub">{esc(svc["sub"](city))}</p>
 <p class="sub" style="font-size:15px;opacity:.78">Serving {METRO_CITIES} &mdash; and the service areas around them.</p>
-<a class="cta" href="{esc(primary_cta)}">See plans &mdash; from $397/mo &rarr;</a>
+<a class="cta" href="{esc(primary_cta)}">See plans &mdash; $497/mo &rarr;</a>
 <a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <h2>Not this. This.</h2>
@@ -869,9 +852,9 @@ def render_page(svc_slug, svc, city_slug, city):
 <span class="spots">One client per trade, per agreed territory · once yours is taken, it's taken</span>
 </div>
 
-<h2>Two plans. Pick your level.</h2>
-<p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. When you're ready, choose your level — <strong>Local Visibility at $397/month</strong> (+ a one-time $397 activation) if you already have a usable website, or the <strong>Local Growth System at $797/month</strong> (+ a one-time $997 launch) for the complete system with a conversion-focused website built in. Each runs a 90-day initial term, then month-to-month. Backed by our launch commitment.</p>
-<a class="cta" href="{esc(primary_cta)}">See plans &mdash; from $397/mo &rarr;</a>
+<h2>One plan. Everything built in.</h2>
+<p>Start free: your <strong>60-second Growth Score</strong> shows exactly where you stand. When you're ready, start the <strong>Local Growth System at $497/month</strong> (+ a one-time setup from $497) — the complete done-for-you system with a conversion-focused website built in, Google visibility, reviews, tracking and automated follow-up. A 90-day initial term, then month-to-month. Backed by our launch commitment.</p>
+<a class="cta" href="{esc(primary_cta)}">See plans &mdash; $497/mo &rarr;</a>
 <a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 <div class="divider"></div>
@@ -882,7 +865,7 @@ def render_page(svc_slug, svc, city_slug, city):
 <h2>FAQ</h2>
 {faq_details}
 
-<a class="cta" href="{esc(primary_cta)}" style="margin-top:40px">See plans &mdash; from $397/mo &rarr;</a>
+<a class="cta" href="{esc(primary_cta)}" style="margin-top:40px">See plans &mdash; $497/mo &rarr;</a>
 <a class="cta-secondary" href="{BASE_URL}/growth-score?utm_source=lp&utm_medium=cta&utm_campaign={slug}&trade={esc(svc['trade_param'])}">Or get your free Growth Score first &rarr;</a>
 
 {footer_links}
@@ -907,8 +890,8 @@ def render_hub():
     title = "Local SEO by Industry & City — Tampa Bay & Florida | Coach Ty Leads"
     desc = ("Done-for-you local SEO for service businesses across Tampa Bay & "
             "Florida. Pick your trade and city. Rank on Google + ChatGPT. "
-            "Plans from $397/month. Backed by our launch commitment. "
-            "Built by Coach Ty.")
+            "The Local Growth System — $497/month plus setup from $497. Backed by "
+            "our launch commitment. Built by Coach Ty.")
 
     # ItemList of every generated page for the CollectionPage schema.
     item_list = []
@@ -946,10 +929,7 @@ def render_hub():
         "areaServed": [{"@type": "State", "name": "Florida"}]
         + [{"@type": "City", "name": c["name"]} for c in CITIES.values()],
         "offers": [
-            {"@type": "Offer", "name": "Local Visibility", "price": MONTHLY_PRICE,
-             "priceCurrency": "USD", "availability": "https://schema.org/InStock",
-             "url": f"{BASE_URL}/pricing"},
-            {"@type": "Offer", "name": "Local Growth System", "price": GROWTH_PRICE,
+            {"@type": "Offer", "name": "Local Growth System", "price": MONTHLY_PRICE,
              "priceCurrency": "USD", "availability": "https://schema.org/InStock",
              "url": f"{BASE_URL}/pricing"},
         ],
@@ -1038,14 +1018,14 @@ h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,4vw,2.5rem);line-h
 <main class="wrap">
 <p class="eyebrow">Industries &amp; Cities · Coach Ty Leads</p>
 <h1>Local SEO by industry &amp; city. Tampa Bay &amp; Florida.</h1>
-<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). Two plans, from $397/month — or the complete system with a website built in at $797/month.</p>
-<a class="cta" href="{esc(cta)}">See plans &mdash; from $397/mo &rarr;</a>
+<p class="sub">Done-for-you local SEO for service businesses across Tampa Bay and Florida. Pick your trade and your city. Each page shows exactly what Lola does to get you ranking on Google <em>and</em> AI search (ChatGPT, Perplexity, Gemini, Google AI Overviews). One plan — the Local Growth System at $497/month, with a website built in.</p>
+<a class="cta" href="{esc(cta)}">See plans &mdash; $497/mo &rarr;</a>
 
 {sections}
 
 <h2>Two ways in</h2>
-<p>Start free with your <strong>60-second Growth Score</strong>. When you're ready, choose your level — <strong>Local Visibility at $397/month</strong> for stronger visibility around the site you have, or the <strong>Local Growth System at $797/month</strong> for the complete build with a website built in. Each runs a 90-day initial term, then month-to-month. Backed by our launch commitment.</p>
-<a class="cta" href="{esc(cta)}">See plans &mdash; from $397/mo &rarr;</a>
+<p>Start free with your <strong>60-second Growth Score</strong>. When you're ready, start the <strong>Local Growth System at $497/month</strong> (+ a one-time setup from $497) — the complete build with a website built in, plus visibility, reviews, tracking and follow-up. A 90-day initial term, then month-to-month. Backed by our launch commitment.</p>
+<a class="cta" href="{esc(cta)}">See plans &mdash; $497/mo &rarr;</a>
 
 <div class="coachty">
 <p class="eyebrow">Why Lola</p>
@@ -1163,6 +1143,8 @@ def render_vercel(slugs):
                      "destination": "https://lola-backend-production.up.railway.app/t/$1"})
     rewrites.append({"source": "/lead-gen/(.*)",
                      "destination": "https://lola-backend-production.up.railway.app/lead-gen/$1"})
+    rewrites.append({"source": "/reporting/(.*)",
+                     "destination": "https://lola-backend-production.up.railway.app/reporting/$1"})
     # 4. Catch-all LAST.
     rewrites.append({"source": "/(.*)", "destination": "/index.html"})
 
