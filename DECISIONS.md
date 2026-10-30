@@ -170,3 +170,34 @@ surface, or dark hex. `text-on-gold` is only ever text on a gold button.
 Re-measure the homepage at 390×844 before adding anything; keep it near 12
 screens. Re-run the route contrast scan after any palette change. The social
 image, `theme-color` and the web manifest are paper (`#FAF9F5`).
+
+## 2026-10-30 — D-016: One flagship at $497/mo + setup from $497 (retire the two-plan model)
+
+**Decision.** The paid offer collapses to a single flagship: the **Lola Local
+Growth System at `$497/month` + a one-time setup `from $497`**, with a
+conversion-focused website built in on every engagement (the simple build is in
+the setup; complex sites and migrations are quoted separately). **Expansion**
+stays as the custom route from `$1,497/month`, shown below the flagship, never an
+equal card. The free **Growth Score** is unchanged. The 2026-09-12 two-plan model
+(`$397` Local Visibility / `$797` Local Growth System) is **retired**, along with
+the older `$197` DIY / `$997` Full Build / `$297` Managed tiers, the Half-Back
+Guarantee and the 90-Day Promise. The **launch commitment** (we finish the agreed
+foundation or keep working at no extra management charge; no ranking/lead/revenue
+guarantee) remains the only promise.
+
+**Why.** The two-plan split made the buyer self-diagnose "do I need a website?"
+and split the message in two. One price, one message, website built in is the
+honest, higher-converting answer — and it keeps the strongest hook ("we build
+your site") at a lower entry price. Setup is a "from" floor so a simple build is
+included without discounting work on a site we'd build anyway.
+
+**Consequences.** Canon `docs/PRICING.md` is the source of truth; mirrors
+`frontend/src/lib/pricing.ts`, `db/pricing.py` and `frontend/scripts/gen_lp.py`
+carry the single plan, as do every rendered surface, the 48 `/lp` pages,
+`index.html` schema + social meta, the Growth Score result email + outreach SMS,
+the enhancement-agent CTAs, and the rewritten nurture sequence. The live Stripe
+Payment Link is still `$397/mo` and `STRIPE_MONTHLY_AMOUNT` still defaults to
+`39700` — both must move to `$497` / `49700` before a `$497` charge goes live (the
+funnel routes "Start" → `/apply`, so nothing is auto-charged the old price).
+`/context/offers.md` and `context/businesses/lola-leads.md` are updated; retired
+offers are marked inactive.

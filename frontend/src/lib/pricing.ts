@@ -129,6 +129,7 @@ export const DELIVERABLES: readonly string[] = [
   'Review-request system',
   'Missed-call text-back',
   'Automated text + email lead follow-up',
+  'Your CRM pipeline + agreed automations, managed for you',
   'Local citation / NAP review',
   'Call, form & UTM tracking',
   'Monthly Lola dashboard + plain-language report',

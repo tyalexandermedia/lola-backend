@@ -7,11 +7,13 @@ service business and becoming a paying customer, then fix the highest-value leak
 - Has a GHL location (pipeline/opportunities feed the brief once GHL read is on).
 - All SEO clients other than Sandbar map to this workspace.
 
-**Offers:** $197 DIY / $997 Full Build (public), $297/mo Managed (continuity only).
-Free lead magnet = Growth Score. See `../offers.md` and `DECISIONS.md`.
+**Offers:** Lola Local Growth System — $497/mo + a one-time setup from $497 (the one
+flagship), plus a custom Expansion route from $1,497/mo. Free lead magnet = Growth
+Score. Retired (do not quote): $197/$997/$297 and the $397/$797 two-plan model.
+See `../offers.md`, `db/pricing.py` and `DECISIONS.md`.
 
 **Watch:** qualified prospects waiting on a response, estimates/proposals unanswered,
-Full Build closes, Managed conversions.
+Growth Calls booked, new Growth System clients.
 
 **Clients mapped to this workspace in the brief:**
 - **Randy Golden, PC** (Ty's grandfather's mediation practice) — GHL location
