@@ -1341,6 +1341,10 @@ function FinalCta() {
             Start now — {PLAN.price}{PLAN.period}
           </a>
         </div>
+        <p className="mt-5 text-[13px] text-ink-3">
+          Prefer to talk first?{' '}
+          <a href="/book" className="font-semibold text-gold underline decoration-gold/40 underline-offset-4 hover:decoration-gold">Book a free Growth Call →</a>
+        </p>
       </div>
     </section>
   );

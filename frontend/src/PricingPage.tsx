@@ -504,7 +504,11 @@ function FinalCta() {
           Compare plans
         </a>
       </div>
-      <p className="mt-5 text-[13px] text-ink-3">
+      <p className="mt-5 text-[14px] text-ink-2">
+        Ready to talk?{' '}
+        <a href="/book" className="font-semibold text-gold underline decoration-gold/40 underline-offset-4 hover:decoration-gold">Book a free 15-minute Growth Call →</a>
+      </p>
+      <p className="mt-3 text-[13px] text-ink-3">
         Prefer to ask first?{' '}
         <a
           href={startSmsHref(`Hi ${FOUNDER.knownAs} — I have a question about the plans.`)}

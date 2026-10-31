@@ -711,6 +711,12 @@ export default function GrowthScore() {
           >
             See what&apos;s included
           </a>
+          <a
+            href="/book"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-gold/40 bg-gold/[0.06] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.12]"
+          >
+            Book a Free Call
+          </a>
         </div>
       </section>
 

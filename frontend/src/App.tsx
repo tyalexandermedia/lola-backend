@@ -42,11 +42,13 @@ const CaseStudiesIndex = lazy(() => import('./CaseStudiesIndex'));
 const LolaOS = lazy(() => import('./LolaOS'));
 const DiyAccess = lazy(() => import('./DiyAccess'));
 const WorkPage = lazy(() => import('./WorkPage'));
+const Book = lazy(() => import('./Book'));
 
 type Route =
   | { name: 'home' }
   | { name: 'growth-score' }
   | { name: 'start' }
+  | { name: 'book' }
   | { name: 'methodology' }
   | { name: 'lola-os' }
   | { name: 'case-studies-index' }
@@ -82,6 +84,7 @@ function parseRoute(pathname: string): Route {
   if (pathname === '/grader' || pathname === '/grader/') return { name: 'growth-score' };
   if (pathname === '/growth-score' || pathname === '/growth-score/') return { name: 'growth-score' };
   if (pathname === '/start' || pathname === '/start/') return { name: 'start' };
+  if (pathname === '/book' || pathname === '/book/') return { name: 'book' };
   if (pathname === '/methodology' || pathname === '/methodology/') return { name: 'methodology' };
   if (pathname === '/os' || pathname === '/os/' || pathname === '/client-status' || pathname === '/client-status/') return { name: 'lola-os' };
   if (pathname === '/case-studies' || pathname === '/case-studies/') return { name: 'case-studies-index' };
@@ -204,6 +207,8 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
       ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'start'
       ? 'max-w-[820px] pt-2 sm:pt-6'
+      : route.name === 'book'
+      ? 'max-w-[820px] pt-6 sm:pt-10'
       : route.name === 'methodology'
       ? 'max-w-[920px] pt-6 sm:pt-10'
       : route.name === 'lola-os'
@@ -242,6 +247,7 @@ function App({ ssrPath }: { ssrPath?: string } = {}) {
           {route.name === 'home' && <Homepage />}
           {route.name === 'growth-score' && <GrowthScore />}
           {route.name === 'start' && <Start />}
+          {route.name === 'book' && <Book />}
           {route.name === 'methodology' && <Methodology />}
           {route.name === 'lola-os' && <LolaOS />}
           {route.name === 'case-studies-index' && <CaseStudiesIndex />}
