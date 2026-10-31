@@ -3,15 +3,23 @@
 Current offers/pricing per business. Source of truth for what Lola is selling.
 Keep in sync with `db/pricing.py` and `DECISIONS.md`.
 
-## Lola Leads (from DECISIONS.md)
+## Coach Ty Leads — current offer (updated 2026-10-30)
 
-- **$197 DIY** — one-time. "See your score, fix it yourself."
-- **$997 Full Build** — one-time, done-for-you + 30 days visibility + GBP + direct
-  access. Half-Back Guarantee.
-- **$297/mo Lola Managed** — continuity, **never public**. Reached only via
-  post-build nurture / `/managed`.
-- Public funnel shows **only** the two one-time tiers. Free top-of-funnel = the
-  **Growth Score** (never "audit").
+- **Lola Local Growth System — $497/month + a one-time setup from $497.** The one
+  flagship, done-for-you: a conversion-focused website built in, Google Business
+  Profile managed, reviews, missed-call text-back, automated follow-up, tracking +
+  a monthly report, and a direct line to Ty. Simple build included in setup;
+  complex sites/migrations quoted separately. 90-day initial term, then month-to-month.
+- **Expansion — custom, from $1,497/month.** Multi-location / multi-territory,
+  scoped to the work. The narrow route below the flagship, never an equal card.
+- **Free Growth Score** — the top-of-funnel diagnostic (never "audit").
+- Public funnel shows the single flagship + the free Growth Score. One price, one
+  message.
+
+**Retired — inactive, do not quote:** $197 DIY, $997 Full Build, $297/mo Managed,
+and the earlier $397 Local Visibility / $797 Local Growth System two-plan model.
+The Half-Back Guarantee and 90-Day Promise are retired, replaced by the launch
+commitment. Source of truth: `db/pricing.py`, `docs/PRICING.md`, `DECISIONS.md`.
 
 ## Sandbar Soft Wash
 

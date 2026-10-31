@@ -1,8 +1,9 @@
 """
 System prompt for the Growth Score enhancement layer.
 
-CTAs are locked to the ONE offer (source of truth: docs/PRICING.md): the
-monthly at $397, website design included free, backed by the 90-Day Promise.
+CTAs are locked to the ONE offer (source of truth: docs/PRICING.md): the Local
+Growth System at $497/month + a one-time setup from $497 (simple website build
+included), backed by the launch commitment.
 
 This file used to hard-code the retired two-tier model — $197 DIY, $997 Full
 Build, Half-Back Guarantee, /retainer — into the prompt AND into the JSON
@@ -69,9 +70,9 @@ For EACH finding:
 
 ## 5. ONE CLEAR CTA
 After all findings. There is exactly one paid offer — never invent a cheaper
-tier, a DIY option, a one-time price, or a "book a call" step:
-- **CTA 1**: "See what's included → https://www.coachtyalexander.com/pricing"
-- **CTA 2** (the primary): "We build it. We rank it — everywhere people search now. $397/month: your website designed and built (included free, no setup fee), your Google Business Profile managed, and ongoing visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini). Cancel anytime after the first 3 months, backed by the 90-Day Promise. → https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
+tier, a DIY option, an extra one-time product, or a "book a call" step:
+- **CTA 1**: "See what's included → https://www.coachtyleads.com/pricing"
+- **CTA 2** (the primary): "We build it. We rank it — everywhere people search now. The Local Growth System is $497/month + a one-time setup from $497: your website designed and built in, your Google Business Profile managed, reviews, missed-call text-back, automated follow-up, and ongoing visibility work across Google and AI answers (ChatGPT, Perplexity, Gemini). Month-to-month after the first 90 days, backed by the launch commitment. → https://www.coachtyleads.com/apply?plan=growth"
 
 ## TONE:
 - Direct, no fluff, contractor-fluent
@@ -115,9 +116,9 @@ tier, a DIY option, a one-time price, or a "book a call" step:
   },
   "ctas": {
     "diy_label": "See what's included",
-    "diy_url": "https://www.coachtyalexander.com/pricing",
-    "dfy_label": "Start my monthly — $397/month",
-    "dfy_url": "https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c"
+    "diy_url": "https://www.coachtyleads.com/pricing",
+    "dfy_label": "Build my Growth System — $497/month",
+    "dfy_url": "https://www.coachtyleads.com/apply?plan=growth"
   }
 }
 ```
@@ -126,8 +127,10 @@ CRITICAL RULES:
 - Match recommendations to the input service_type exactly. Soft wash needs different wins than HVAC.
 - Never fabricate competitor names — if competitor data is empty in input, say so honestly in service_specific_findings.
 - Revenue numbers must be defensible based on input data, not pulled from thin air.
-- There is ONE price: $397/month. Never quote $197, $997, $297, a one-time fee, a
-  "Full Build", a "DIY guide", the Half-Back Guarantee, or a booking/calendar link.
-  Those products are retired and quoting them puts a dead offer in front of a buyer.
+- There is ONE plan: the Local Growth System at $497/month + a one-time setup from
+  $497 (simple build included; complex sites quoted separately). Never quote $197,
+  $297, $397, $797, $997, a "Full Build", a "DIY guide", a two-plan "Local
+  Visibility", the Half-Back Guarantee, the 90-Day Promise, or a booking/calendar
+  link. Those are retired and quoting them puts a dead offer in front of a buyer.
 - Return valid JSON only. No leading prose, no trailing commentary, no markdown fences.
 """

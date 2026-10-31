@@ -21,7 +21,7 @@ import type { BusinessAuditRequest, AuditResult } from './types';
 import { API_URL } from './api';
 import { track } from './analytics';
 import { usePageMeta } from './lib/seo';
-import { GROWTH_SCORE_CHECKS, GUARANTEE, PLAN, PLAN_VISIBILITY, TIERS } from './lib/pricing';
+import { GROWTH_SCORE_CHECKS, GUARANTEE, PLAN, TIERS } from './lib/pricing';
 import { startHref } from './lib/checkout';
 import AnswerBlock from './AnswerBlock';
 import { SITE_ORIGIN, SCORE_QA } from './lib/pageMeta';
@@ -692,9 +692,8 @@ export default function GrowthScore() {
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink-2 sm:text-[16px]">
           Complete the free form above to open your report when checks succeed. Or skip the
-          wait and choose a plan: from <span className="font-semibold text-ink">{PLAN_VISIBILITY.monthly}/month</span> for
-          visibility, or <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span> for the complete
-          system with your website built in. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
+          wait and start the complete system — <span className="font-semibold text-ink">{PLAN.price}{PLAN.period}</span>{' '}
+          with your website built in. Backed by {GUARANTEE.title}: {GUARANTEE.short.toLowerCase()}{' '}
           <a href="/#founder" className="text-gold underline underline-offset-2 decoration-gold/50 hover:decoration-gold">
             Who&apos;s behind it →
           </a>
@@ -711,6 +710,12 @@ export default function GrowthScore() {
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-white/[0.15] bg-white/[0.02] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-ink transition hover:border-white/[0.3]"
           >
             See what&apos;s included
+          </a>
+          <a
+            href="/book"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-gold/40 bg-gold/[0.06] px-5 text-[13px] font-semibold uppercase tracking-[0.05em] text-gold transition hover:border-gold/70 hover:bg-gold/[0.12]"
+          >
+            Book a Free Call
           </a>
         </div>
       </section>

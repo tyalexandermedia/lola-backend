@@ -8,9 +8,10 @@ recurring price PLUS the one-time setup fee on the first invoice (via
 subscription_data[add_invoice_items]), tagged with metadata the Stripe webhook
 fulfills by — never by fragile amount-matching.
 
-  Local Growth System   $797/mo + $997 launch
-  Local Visibility      $397/mo + $397 activation
+  Local Growth System   $497/mo + a one-time setup from $497
   Expansion / "both"    no self-serve price — stays manual (returns an error)
+  (The retired "visibility" plan stays in PLAN_PRICES, dormant, for back-compat
+   and the F4 test; no frontend surface offers it.)
 
 Safe-by-default + OPT-IN: dormant unless STRIPE_CHECKOUT_SESSIONS=true AND the
 secret key + the plan's price IDs are set. Territory exclusivity means this is

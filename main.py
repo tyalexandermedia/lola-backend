@@ -343,9 +343,12 @@ STRIPE_MONTHLY_URL = os.getenv(
 # "unconfigured" and the webhook 200s without doing anything.
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "").strip()
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
-# Amount (in cents) → which tier was bought, for fulfillment + gating.
-# $397/month, in cents. The retired STRIPE_DIY_AMOUNT (19700) and
-# STRIPE_BUILD_AMOUNT (99700) went with the tiers they priced.
+# Amount (in cents) → which tier was bought, for fulfillment + gating. This is
+# the FLOOR the webhook treats as "the monthly plan," independent of the display
+# price. Default 39700 ($397) matches the legacy live Payment Link; the 2026-10-30
+# reprice moved the published price to $497 — set STRIPE_MONTHLY_AMOUNT=49700 when
+# the $497 link goes live. Anything at/above the floor already classifies as the
+# monthly, so a $497 charge is recognised without a code change.
 STRIPE_MONTHLY_AMOUNT = int(os.getenv("STRIPE_MONTHLY_AMOUNT", "39700"))
 
 HOME_SERVICES_TYPES = {
@@ -1017,9 +1020,9 @@ Inside the report:
 
 WANT ME TO FIX IT?
 
-Two plans, from $397/month.
+One plan — the Local Growth System, $497/month.
 
-Local Visibility ($397/month + a one-time $397 activation) strengthens your Google Business Profile, reviews, missed-call text-back and lead tracking — for a business that already has a usable website. The Local Growth System ($797/month + a one-time $997 launch) adds a conversion-focused website built in, technical SEO and automated follow-up. Everything's done for you, with a live dashboard you can open any time to check my work.
+The Local Growth System is $497/month plus a one-time setup from $497 — a conversion-focused website built in, your Google Business Profile managed, reviews, missed-call text-back, automated follow-up and lead tracking. The simple build is included; complex sites and migrations are quoted separately. Everything's done for you, with a live dashboard you can open any time to check my work.
 
 Our launch commitment: we agree the launch scope and the search terms we track before work starts, and if we don't finish the agreed foundation in the launch window for reasons on our side, we keep working at no extra management charge until it's done.
 
@@ -1116,8 +1119,8 @@ P.S. — That {total_score} score means you're already doing the hard part. The 
 <tr><td style="padding:0 28px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1408;border:1.5px solid #C9A84C;border-radius:8px;">
 <tr><td style="padding:20px 22px;">
-<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want me to fix it?</strong> <span style="color:#C9A84C;">Plans from $397/month</span></p>
-<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">Local Visibility — $397/month</strong> (+ a one-time $397 activation) strengthens your Google Business Profile, reviews, missed-call text-back and lead tracking, for a business that already has a usable website. <strong style="color:#F0EAD6;">Local Growth System — $797/month</strong> (+ a one-time $997 launch) adds a conversion-focused website built in, technical SEO and automated follow-up. Done for you, with a live dashboard you can open any time.</p>
+<p style="margin:0 0 6px;font-size:15px;color:#F0EAD6;"><span style="font-size:18px;">🦴</span> <strong>Want me to fix it?</strong> <span style="color:#C9A84C;">The Local Growth System — $497/month</span></p>
+<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">Local Growth System — $497/month</strong> (+ a one-time setup from $497) is the complete done-for-you system: a conversion-focused website built in, your Google Business Profile managed, reviews, missed-call text-back, automated follow-up and lead tracking. The simple build is included; complex sites and migrations are quoted separately. Done for you, with a live dashboard you can open any time.</p>
 <p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#F0EAD6;"><strong>Our launch commitment:</strong> we agree the launch scope and the search terms we track before work starts — and if we don't finish the agreed foundation in the launch window for reasons on our side, we keep working at no extra management charge until it's done.</p>
 <p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:#C8C0B0;"><strong style="color:#F0EAD6;">One client per trade, per agreed territory.</strong> I can't rank two soft-wash companies in the same town against each other — so I don't take the second one.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:6px;background:#C9A84C;">
@@ -1666,12 +1669,12 @@ async def pricing():
         "founding_active": founding_active,
         "founding_slots_remaining": slots_remaining,
         "founding_cap": FOUNDING_CAP,
-        # Two plans + a custom Expansion route (source of truth: docs/PRICING.md).
-        # Nothing in the frontend reads this today (it reads lib/pricing.ts), but
-        # it's kept truthful so a scraped public price is never a retired one.
+        # One flagship plan + a custom Expansion route (source of truth:
+        # docs/PRICING.md). Nothing in the frontend reads this today (it reads
+        # lib/pricing.ts), but it's kept truthful so a scraped public price is
+        # never a retired one.
         "tiers": {
-            "visibility": {"recurring_monthly": 397, "one_time_activation": 397},
-            "growth": {"recurring_monthly": 797, "one_time_launch": 997},
+            "growth": {"recurring_monthly": 497, "one_time_setup_from": 497},
             "expansion": {"recurring_monthly_from": 1497},
         },
     }
@@ -1707,11 +1710,13 @@ REVENUE_LABELS = {
 _LEGACY_LABEL = "A Coach Ty Leads plan (details in the application)"
 TIER_LABELS = {
     # Current plans — must match ApplyPage TIER_OPTIONS values.
-    "visibility": "Local Visibility — $397/month + $397 activation",
-    "growth": "Local Growth System — $797/month + $997 launch",
+    "growth": "Local Growth System — $497/month + setup from $497",
     "expansion": "Expansion — custom, from $1,497/month",
     "both": "Tell me which fits better",
-    # Back-compat for older/retired inbound payloads (stale cached bundles).
+    # Back-compat for older/retired inbound payloads (stale cached bundles). The
+    # retired "visibility" tier resolves here so an old ?plan=visibility link that
+    # still posts validates rather than erroring.
+    "visibility": _LEGACY_LABEL,
     "monthly": _LEGACY_LABEL,
     "diy": _LEGACY_LABEL,
     "build": _LEGACY_LABEL,
@@ -2865,7 +2870,7 @@ def draft_outreach_email(
         f"{fix_line}\n\n"
         f"I do this done-for-you for one {niche_label} per agreed territory (so I'd never take "
         f"your competitor here). Want me to send your full scorecard + the 3 fixes worth the most? "
-        f"Just reply. Or see the plans — from $397/month, backed by my launch commitment: "
+        f"Just reply. Or see the plan — $497/month, backed by my launch commitment: "
         f"{PUBLIC_APP_URL}/pricing\n\n"
         f"— Coach Ty\nLola — AI Leads Expert · Ty Alexander Media"
     )
@@ -4050,7 +4055,8 @@ async def _stripe_get_session(session_id: str) -> Optional[dict]:
 
 def _tier_for_amount(amount_cents: int) -> Optional[str]:
     """
-    There is one paid offer: the $397/month monthly.
+    There is one paid offer: the monthly Local Growth System (published at
+    $497/month; the legacy live link is $397 until it's rebuilt).
 
     This used to map an amount onto the retired DIY ($197) / Full Build ($997)
     tiers, and the fall-through was live-fire wrong: 39700 cents is under the

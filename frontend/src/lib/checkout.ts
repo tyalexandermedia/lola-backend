@@ -18,8 +18,13 @@
  * different thing entirely and live in Railway, never here.
  *
  * The live link must be, and this file cannot verify:
- *   • RECURRING at $397/month — not one-time. Stripe prices are immutable, so
- *     a one-time price cannot be converted later; the link gets rebuilt.
+ *   • RECURRING at the published monthly price — not one-time. Stripe prices are
+ *     immutable, so a one-time price cannot be converted later; the link gets
+ *     rebuilt. NOTE (2026-10-30 reprice): the site now sells $497/month + a
+ *     one-time setup from $497. DEFAULT_MONTHLY_URL below is the LEGACY $397/month
+ *     link — rebuild it at $497 (and set STRIPE_MONTHLY_AMOUNT=49700 in Railway)
+ *     before handing it to a $497 buyer. "Start" routes to /apply, never straight
+ *     to Stripe, so nobody is auto-charged the old price in the meantime.
  *   • Redirecting on success to:
  *       https://www.coachtyleads.com/start?session_id={CHECKOUT_SESSION_ID}
  *     /start branches on that parameter to show "You're in" and the intake,
@@ -38,7 +43,10 @@
 
 import { FOUNDER } from './lola';
 
-/** Live $397/month Payment Link. Public by design — see the note above. */
+/** Legacy $397/month Payment Link (public by design — see the note above). The
+ *  2026-10-30 reprice moved the published price to $497/month + setup from $497;
+ *  rebuild this link at $497 before it's handed to a buyer. VITE_STRIPE_MONTHLY_URL
+ *  overrides it, so the new link can be pointed at without touching this file. */
 const DEFAULT_MONTHLY_URL = 'https://buy.stripe.com/00w3cu8e6g3lcLTcTD3oA0c';
 
 export const STRIPE_MONTHLY_URL =
@@ -57,7 +65,7 @@ export function checkoutEnabled(): boolean {
 
 /** Pre-filled text to Ty — the buy path until the Payment Link exists. */
 export function startSmsHref(
-  message = "Hi Ty — I want to start the $397/month plan.",
+  message = "Hi Ty — I want to start the $497/month Growth System.",
 ): string {
   return `sms:${FOUNDER.phone}?&body=${encodeURIComponent(message)}`;
 }
@@ -65,9 +73,9 @@ export function startSmsHref(
 /**
  * Where a "Start" control should point.
  *
- * 2026-09-12: with the two-plan model (Local Visibility $397/mo + $397
- * activation, Local Growth System $797/mo + $997 launch, plus custom
- * Expansion), a generic "Start" button must NOT go straight to Stripe. The one
+ * 2026-10-30: with the single flagship (Local Growth System $497/mo + a one-time
+ * setup from $497, plus the custom Expansion route), a generic "Start" button
+ * must NOT go straight to Stripe. The one
  * Payment Link is a single recurring charge that can't represent a chosen plan,
  * its one-time fee, or the territory-availability check — and docs/PRICING.md
  * requires plan terms to be clear before any charge. So every Start control now

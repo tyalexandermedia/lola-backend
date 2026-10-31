@@ -1,23 +1,24 @@
 """
-LOLA SEO — Nurture Email Sequence Sender
-Sends 3 emails at D+0 (2hr), D+2, D+5 after audit delivery.
-Uses Resend API + asyncio.sleep for delays (Railway keeps process alive).
-All placeholder variables are replaced with real audit data.
+Coach Ty Leads — Nurture Email Sequence Sender
+Sends 3 emails at D+0 (2hr), D+2, D+5 after a free Growth Score / Revenue
+Opportunity Assessment. Uses Resend API + asyncio.sleep for delays (Railway
+keeps the process alive). {{placeholders}} are filled with real assessment data.
 
-⚠️  DORMANT, AND THE TEMPLATES ARE OUT OF DATE. Read before wiring this up.
+⚠️  DORMANT BY DESIGN. Nothing imports run_nurture_sequence, so no email in this
+module sends until it is explicitly wired up.
 
-The docstring used to say "Triggered from background task in main.py" — nothing
-imports run_nurture_sequence, so no email in this module has been sent since the
-offer changed. That is the only reason it isn't a live problem.
+The three templates in ./emails sell the CURRENT single offer — the Lola Local
+Growth System at $497/month + a one-time setup from $497 — with CTAs to the
+booking call and /pricing (source of truth: docs/PRICING.md). They carry no
+fabricated results, revenue figures, or ranking guarantees.
 
-All three templates in ./emails still sell the RETIRED model: a $197 DIY plan, a
-$997 Full Build, and the Half-Back Guarantee, with CTAs pointing at
-tyalexandermedia.com/contact. The live offer is one plan at $397/month backed by
-the 90-Day Promise (source of truth: docs/PRICING.md).
-
-Rewrite email1_day0.html / email2_day2.html / email3_day5.html onto the live
-offer BEFORE calling run_nurture_sequence from anywhere. As written, connecting
-it would email prospects three products they cannot buy.
+Before activating (Phase B), the caller MUST:
+  1. Pass a `stop_check` that returns True once the contact has booked a call or
+     purchased, so promotional follow-up stops (never email a customer a pitch).
+  2. Ensure the booking route (https://www.coachtyleads.com/book) is live.
+  3. De-dupe enrollment so a contact can't be put through the sequence twice.
+  4. Add a List-Unsubscribe header on the Resend send (the templates also carry a
+     visible unsubscribe link).
 """
 import asyncio, httpx, logging, os
 from pathlib import Path
@@ -25,24 +26,24 @@ from pathlib import Path
 logger = logging.getLogger("lola.sequence")
 
 EMAILS_DIR  = Path(__file__).parent / "emails"
-FROM_EMAIL  = "LOLA SEO <lola@tyalexandermedia.com>"
+FROM_EMAIL  = "Coach Ty Leads <ty@tyalexandermedia.com>"
 RESEND_URL  = "https://api.resend.com/emails"
 
 # Sequence: (filename, subject_template, delay_seconds)
 SEQUENCE = [
     (
         "email1_day0.html",
-        "🐾 {business_name} scored {score}/100 — here's what to fix first",
+        "🐾 {business_name} — your Revenue Opportunity Assessment ({score}/100)",
         7200,   # 2 hours
     ),
     (
         "email2_day2.html",
-        "While {business_name} was offline, {competitor_name} got 3 more calls",
+        "The customer opportunities {business_name} may be missing",
         172800, # 48 hours
     ),
     (
         "email3_day5.html",
-        "Last thing from Lola about {business_name}'s SEO",
+        "A simpler system for growing {business_name}",
         432000, # 5 days
     ),
 ]
@@ -121,10 +122,16 @@ async def _send_one(to_email: str, subject: str, html: str, resend_key: str) -> 
         return False
 
 
-async def run_nurture_sequence(to_email: str, audit: dict, resend_key: str):
+async def run_nurture_sequence(to_email: str, audit: dict, resend_key: str,
+                               stop_check=None):
     """
     Fire all 3 nurture emails with proper delays.
     Runs as a background asyncio task — Railway keeps the process alive.
+
+    stop_check: optional callable () -> bool (sync or async). Checked before each
+    send; when it returns True (the contact has booked a call or purchased) the
+    sequence stops, so a customer is never sent promotional follow-up. Wire this
+    before activating — see the module docstring.
     """
     if not resend_key or not to_email:
         logger.warning("Sequence skipped — missing Resend key or email")
@@ -136,6 +143,18 @@ async def run_nurture_sequence(to_email: str, audit: dict, resend_key: str):
     for filename, subject_tpl, delay_secs in SEQUENCE:
         # Wait for the delay
         await asyncio.sleep(delay_secs)
+
+        # Stop promotional follow-up once the contact has booked or purchased.
+        if stop_check is not None:
+            try:
+                done = stop_check()
+                if asyncio.iscoroutine(done):
+                    done = await done
+                if done:
+                    logger.info(f"Sequence stopped early (booked/purchased) → {to_email}")
+                    return
+            except Exception as e:
+                logger.error(f"stop_check error (continuing): {e}")
 
         # Load + fill template
         email_path = EMAILS_DIR / filename

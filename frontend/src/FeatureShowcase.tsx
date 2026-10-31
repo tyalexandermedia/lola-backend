@@ -53,7 +53,7 @@ const FEATURES: ReadonlyArray<{ icon: string; headline: string; worth: string; h
   {
     icon: '🌐',
     headline: 'Your website, built for inquiries.',
-    worth: `Included in the ${PLAN_GROWTH.oneTime.amount} launch`,
+    worth: `Included in your setup (from ${PLAN_GROWTH.oneTime.amount})`,
     how: 'Fast, mobile-first, built around the jobs you actually want, with click-to-call and a quote form front and centre.',
   },
   {

@@ -11,15 +11,15 @@
 > Legal entity **Ty Alexander Media LLC** only where legally appropriate (footer,
 > schema `legalName`). Tagline: **"Get found. Get called. Get booked."**
 >
-> Last updated: 2026-09-12 — **migrated from the single $397 all-inclusive plan to a
-> free diagnostic + TWO genuinely different paid plans + a custom Expansion route.**
-> The old "one plan, one button, website included free" model and the **90-Day
-> Promise** are retired. The 90-Day Promise guaranteed a *search-placement outcome*
-> (page one / map pack, or two months free) that no honest operator controls; it is
-> replaced by an **implementation commitment** — the thing we actually control (see
-> below). The single-offer mandate ("no tier tables, no comparison grid") is
-> replaced by a deliberately-small two-plan comparison, because the two plans now
-> solve genuinely different problems (already-have-a-website vs. need-one-built).
+> Last updated: 2026-10-30 — **collapsed the two paid plans into a single flagship:
+> the Lola Local Growth System at `$497/month` + a one-time setup `from $497`, with a
+> conversion-focused website built in on every engagement.** The retired $397 "Local
+> Visibility" (no website) and $797/$997 "Local Growth System" split the offer in two
+> and forced the buyer to self-diagnose "do I need a website?"; one plan at one price is
+> the honest answer. Expansion stays as the custom route below the flagship. The simple
+> website build is included in setup; complex websites and migrations are quoted on top
+> (hence "from $497"). The **90-Day Promise** and the old ranking guarantee remain
+> retired, replaced by the **implementation commitment** below.
 
 ---
 
@@ -48,7 +48,7 @@ Core narrative:
 - **Never** present "Lola Leads" as the company name. The company is **Coach Ty Leads**.
 - **Never** promise guaranteed leads, guaranteed revenue, guaranteed rankings, or
   guaranteed AI recommendations.
-- Two paid plans, shown side by side, plus a narrower custom Expansion section. The
+- One flagship plan, plus a narrower custom Expansion section below it. The
   **free Growth Score is the primary conversion** on the pricing page.
 
 ---
@@ -76,79 +76,60 @@ Includes:
   *"By submitting, you agree to receive texts and emails about your results."*
 - No pricing mentioned on the opt-in form.
 
-Funnel: **Free Growth Score → choose the plan that fits.** The score is the low-friction
-front door; the two paid plans are the two honest destinations.
+Funnel: **Free Growth Score → start the Growth System.** The score is the low-friction
+front door; the flagship Local Growth System is the honest destination.
 
 ---
 
-## The offer — two plans + a custom route
+## The offer — one flagship + a custom route
 
 > Prices are the source of truth. Change them HERE, then sync the three mirrors.
-> All plans: **90-day initial term, then month-to-month.**
+> **90-day initial term, then month-to-month.**
 
-### Plan 1 — LOCAL VISIBILITY · `$397/month` + one-time `$397` activation
+### THE LOLA LOCAL GROWTH SYSTEM · `$497/month` + one-time setup `from $497` — the one plan
 
-**For a business that ALREADY has a usable website** and needs stronger Google
-visibility, more reviews, and faster lead response.
+**The complete done-for-you system a local contractor owns** — a conversion-focused
+website, Google visibility, reviews, tracking and automated lead follow-up — built and
+run so more searches turn into calls, estimates and booked jobs.
 
-Includes:
-- Google Business Profile optimization and monthly management
-- Service and category alignment
-- Review-request system
-- Missed-call text-back
-- Basic lead follow-up
-- Local citation / NAP review
-- Call and form tracking
-- Monthly Lola dashboard
-- A direct line to Ty — replies within 1 business day, plus a quarterly strategy check-in
+**One-time setup — from $497** (built before monthly management starts):
+- A simple conversion-focused website build or strategic rebuild
+- Google Business Profile set up and optimized
+- Lead capture, call/form tracking and UTM attribution wired up
+- *The simple build is included. Complex websites and migrations are quoted
+  separately — hence "from $497."*
+
+**Every month — $497:**
+- Website hosted, maintained and kept current — up to two edits a month
+- Google Business Profile managed — up to four posts and one profile update a month
+- Review engine — happy customers asked for a Google review automatically
+- Missed-call text-back + automated text and email lead follow-up (consent-based)
+- Call, form and UTM tracking on your Lola dashboard
+- A monthly plain-language report + a live dashboard link
+- A direct line to Ty — replies within 1 business day, plus a monthly strategy call
 
 Does **not** include (state plainly, never hidden):
-- A new custom website
 - Paid advertising or ad spend
-- Unlimited content
-- Unlimited service-area pages
-- Logo or full brand design
-- Photography, drone or 360° media
-- Multiple locations
-
-- Day framing: *"About $13/day + a one-time $397 to set it up."*
-- CTA: **"Improve My Visibility"** → `/apply?plan=visibility`
-
-### Plan 2 — LOCAL GROWTH SYSTEM · `$797/month` + one-time `$997` launch — **RECOMMENDED**
-
-**For a contractor who needs the complete foundation** — website + visibility +
-reviews + tracking + follow-up in one system.
-
-**Everything in Local Visibility, plus:**
-- Conversion-focused website build or strategic rebuild
-- Up to five essential launch pages
-- Technical SEO foundation
-- LocalBusiness / service structured data where accurate
-- Service and primary-market optimization
-- Quote / estimate conversion path
-- Automated text and email follow-up
-- Lead-source and UTM attribution
-- Estimate pipeline connection
-- Monthly conversion and ranking review
-- Ongoing website updates within a clearly defined reasonable scope
-- A monthly strategy call with Ty (Local Visibility includes a quarterly check-in instead)
-
-Does **not** include:
-- Paid-media budget
+- Complex website rebuilds or migrations (quoted separately)
 - Unlimited pages or redesign requests
 - Custom software development
-- Multiple businesses, locations or territories
-- Drone / 360° production
+- Multiple locations or territories (see Expansion)
+- Photography, drone or 360° media
 - Guaranteed leads, revenue or rankings
 
-- Day framing: *"About $27/day + a one-time $997 to build and launch."*
+- Day framing: *"About $16/day + a one-time setup from $497."*
 - CTA: **"Build My Growth System"** → `/apply?plan=growth`
-- **Recommended.** Emphasize $797 as the fuller answer **without making $397 look
-  inferior** — they solve different problems.
+
+> **Why one plan.** The retired $397 "Local Visibility" (no website) and $797/$997
+> "Local Growth System" split the offer in two and made the buyer self-diagnose. One
+> flagship — `$497/mo` + setup `from $497`, website built in — is the single honest
+> answer: the system is run for them, the price is one number. A business that already
+> has a strong site still gets the full system around it; we don't discount for skipping
+> a build we'd do anyway — the setup scales with the actual work ("from $497").
 
 ### EXPANSION — Custom, starting at `$1,497/month`
 
-Shown as a **narrower section below the two cards — NOT an equal third card.**
+Shown as a **narrower section below the flagship — NOT an equal second card.**
 
 For businesses that need:
 - Multiple locations
@@ -173,8 +154,7 @@ commitment** so the client knows exactly what they get:
 
 - **One channel.** Requests go through one tracked place — not scattered texts and calls.
 - **Response window.** Routine requests get a reply **within 1 business day**.
-- **Scheduled strategy.** A **monthly strategy call** on the Local Growth System; a
-  **quarterly strategy check-in** on Local Visibility.
+- **Scheduled strategy.** A **monthly strategy call** — scheduled, not open-ended.
 - **Website updates, defined.** Update requests are bundled into a **monthly release**
   within the clearly defined reasonable scope agreed in writing.
 - **Out-of-scope is quoted, never surprise-billed.** New pages beyond launch, redesigns,
@@ -299,7 +279,7 @@ in front of a card form.
 ## Checkout / conversion path
 
 - The **free Growth Score** is the primary CTA everywhere on the pricing page.
-- Both paid plans and Expansion route to **`/apply`** (with a `?plan=` hint), NOT
+- The flagship and Expansion route to **`/apply`** (with a `?plan=` hint), NOT
   straight to Stripe. Territory availability and launch scope must be confirmed before
   any charge, and plan terms must be clear before payment — never send a user directly
   to Stripe without first making the plan terms clear.

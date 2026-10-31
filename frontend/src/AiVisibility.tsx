@@ -128,7 +128,7 @@ export default function AiVisibility({
               </p>
               <p className="mx-auto mt-2 max-w-[460px] text-[13px] leading-[1.6] text-ink-2">
                 Now let&apos;s make sure you&apos;re the <em>top</em> pick — and that Google agrees.
-                Our plans keep you there — starting at $397/month.
+                Our plan keeps you there — $497/month.
               </p>
             </>
           ) : (
