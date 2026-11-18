@@ -29,11 +29,11 @@ import { PLAN, PLAN_GROWTH } from './lib/pricing';
  *  is what the same systems cost elsewhere, so the one-number price reads as
  *  what it is. Keep the sum in the closing line in step with these rows. */
 const ALA_CARTE: ReadonlyArray<{ label: string; price: string }> = [
-  { label: 'A website, designed and built', price: '$3,000+ one-time' },
-  { label: 'Missed-call text-back', price: 'from $500/mo' },
-  { label: 'Review automation', price: 'from $750/mo' },
-  { label: 'Lead follow-up system', price: 'from $1,500/mo' },
-  { label: 'Google Business Profile + AI visibility', price: 'included' },
+  { label: 'A website with service and city pages', price: 'included' },
+  { label: 'Instant quote + online booking', price: 'included' },
+  { label: 'Text-back in seconds + missed-call text-back', price: 'included' },
+  { label: 'Automatic review requests after every job', price: 'included' },
+  { label: 'Google Business Profile + monthly dashboard', price: 'included' },
 ];
 
 /** Order is the argument: the two things no competitor sells lead. Each card is
@@ -151,13 +151,12 @@ export default function FeatureShowcase() {
           mobile; total and price share a line where there's room. */}
       <div className="mt-8 rounded-xl border border-gold/30 bg-surface p-4 sm:p-6">
         <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-gold">
-          Bought one at a time
+          One price, all of it
         </p>
         {/* Desktop only: on a phone the label above and the "Bought
             separately" total below already say it, and the list is the proof. */}
         <p className="mt-2 hidden max-w-[560px] text-[15px] leading-[1.55] text-ink-2 sm:block">
-          These same systems are usually sold separately, each with its own
-          monthly bill.
+          The same system that runs Sandbar Soft Wash, set up for your trade.
         </p>
         <ul className="mt-3 divide-y divide-black/[0.06] text-[14px] sm:mt-4 sm:text-[15px]">
           {ALA_CARTE.map((r) => (
@@ -169,11 +168,10 @@ export default function FeatureShowcase() {
         </ul>
         <div className="mt-4 flex flex-col gap-3 border-t border-gold/25 pt-4 sm:flex-row sm:items-end sm:justify-between">
           <p className="text-[14px] leading-[1.5] text-ink-3">
-            Bought separately:{' '}
-            <span className="font-semibold text-ink">$3,000+ up front, then $2,750+ a month.</span>
+            {PLAN.price} to set up, then one monthly bill.
           </p>
           <p className="font-display text-[22px] font-bold leading-none text-ink">
-            Lola: <span className="text-gold">{PLAN.price}{PLAN.period}</span> — all of it.
+            Coach Ty Leads: <span className="text-gold">{PLAN.price}{PLAN.period}</span>
           </p>
         </div>
       </div>

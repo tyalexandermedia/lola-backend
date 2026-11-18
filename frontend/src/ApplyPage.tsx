@@ -25,8 +25,7 @@ const TRADES = [
   'HVAC', 'Plumber', 'Roofer', 'Soft Wash', 'Electrician', 'Landscaper',
   'Painter', 'Pool Services', 'General Contractor', 'Handyman', 'Concrete',
   'Flooring', 'Pest Control', 'Carpet Cleaning', 'Cleaning Services',
-  'Lawn Care', 'Auto Detailing', 'Garage Doors', 'Moving', 'Med Spa',
-  'Salon / Barber', 'Locksmith', 'Masonry', 'Windows', 'Gutters',
+  'Lawn Care', 'Garage Doors', 'Moving', 'Locksmith', 'Masonry', 'Windows', 'Gutters',
   'Duct Cleaning', 'Fencing', 'Home Remodeling', 'Carpenter', 'Arborist',
   'Other',
 ] as const;

@@ -84,7 +84,7 @@ export default function WorkPage() {
           </a>
         </div>
         <p className="mt-4 text-[12px] text-ink-3">
-          🔒 Secure checkout · {PLAN.terms}
+          {PLAN.terms}
         </p>
       </section>
 

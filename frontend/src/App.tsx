@@ -356,8 +356,8 @@ function SiteFooter({ route }: { route: Route }) {
             </span>
           </a>
           <p className="mt-2 max-w-[260px] text-[12px] leading-[1.55] text-ink-3">
-            Done-for-you AI Leads + Local SEO for service businesses. Recommended on
-            Google AND ChatGPT, Perplexity, and Gemini.
+            Local SEO, websites and lead follow-up for Tampa Bay home-service
+            contractors.
           </p>
           {/* #5A5F68 on #0A0A0B is 3.08:1 — below the 4.5:1 AA minimum for
               11px text. #8A8F98 is 6.09:1. Breaks are unconditional: hiding

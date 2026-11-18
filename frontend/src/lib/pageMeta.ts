@@ -236,7 +236,7 @@ export const PRICING_QA: ReadonlyArray<{ q: string; a: string }> = [
  */
 export const PAGE_META: Record<string, PageMeta> = {
   '/': {
-    title: 'Local SEO for Contractors — Found on Google & AI',
+    title: 'Tampa Bay Contractor SEO + Lead Systems | Coach Ty Leads',
     description:
       'Done-for-you local SEO for Tampa Bay home-service contractors — found on Google and in ChatGPT, Perplexity and Gemini. Start with a free Growth Score.',
     path: '/',

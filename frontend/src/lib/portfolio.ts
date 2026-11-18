@@ -50,12 +50,6 @@ export const PORTFOLIO: PortfolioSite[] = [
   // Bay Power Clean") is intentionally NOT a portfolio entry. It isn't a Lola
   // client — it's a family business Ty edits directly, routing to Sandbar. It
   // was never on Lola's backend, so it doesn't belong in proof-of-work.
-  {
-    name: 'Travels by Val',
-    url: 'https://www.travelsbyval.com',
-    vertical: 'Travel & Vacations',
-    blurb: 'Proof Lola works beyond home services — a full travel brand, built and launched.',
-  },
   // ── Add the next build here ──────────────────────────────────────────────
   // { name: 'Business Name', url: 'https://theirsite.com', vertical: 'HVAC', location: 'Tampa, FL', blurb: 'What we did.' },
 ];
